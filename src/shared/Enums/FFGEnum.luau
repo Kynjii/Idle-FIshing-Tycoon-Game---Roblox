@@ -1,52 +1,52 @@
 local FFGEnum = {}
 
-FFGEnum.TIER_MAX_LEVEL = {
-	["Tier1"] = 9,
-	["Tier2"] = 24,
-	["Tier3"] = 49,
-	["Tier4"] = 99,
-	["Tier5"] = 149,
-	["Tier6"] = 199,
-	["Tier7"] = 249,
-	["Tier8"] = 349,
-	["Tier9"] = 449,
-	["Tier10"] = 549,
-	["Tier11"] = 700,
+FFGEnum.QUALITY_PROMOTION_LEVELS = {
+	["Quality1"] = 9,
+	["Quality2"] = 24,
+	["Quality3"] = 49,
+	["Quality4"] = 99,
+	["Quality5"] = 149,
+	["Quality6"] = 199,
+	["Quality7"] = 249,
+	["Quality8"] = 349,
+	["Quality9"] = 449,
+	["Quality10"] = 549,
+	["Quality11"] = 700,
 }
 
 FFGEnum.BOAT = {
 	NAME = {
-		["Tier1"] = "Driftwood Skiff",
-		["Tier2"] = "Netting Dory",
-		["Tier3"] = "Herring Lugger",
-		["Tier4"] = "Tidecaller Canoe",
-		["Tier5"] = "Seablessed Punt",
-		["Tier6"] = "Knight's Hull",
-		["Tier7"] = "Crimson Cutter",
-		["Tier8"] = "Ironhook Galley",
-		["Tier9"] = "Mariner’s Galleon",
-		["Tier10"] = "Wyrmcatcher",
-		["Tier11"] = "The Flynnrunner",
+		["Quality1"] = "Driftwood Skiff",
+		["Quality2"] = "Netting Dory",
+		["Quality3"] = "Herring Lugger",
+		["Quality4"] = "Tidecaller Canoe",
+		["Quality5"] = "Seablessed Punt",
+		["Quality6"] = "Knight's Hull",
+		["Quality7"] = "Crimson Cutter",
+		["Quality8"] = "Ironhook Galley",
+		["Quality9"] = "Mariner’s Galleon",
+		["Quality10"] = "Wyrmcatcher",
+		["Quality11"] = "The Flynnrunner",
 	},
 }
 
 FFGEnum.TENDER = {
 	NAME = {
-		["Tier1"] = "Wooden Cart-Barge",
-		["Tier2"] = "Barrel Barge",
-		["Tier3"] = "Oarsman’s Ferry",
-		["Tier4"] = "Courier Skiff",
-		["Tier5"] = "Windcloak Sloop",
-		["Tier6"] = "Seawarden’s Tender",
-		["Tier7"] = "Crate Hauler",
-		["Tier8"] = "Knight’s Courier",
-		["Tier9"] = "Harbormaster’s Crest",
-		["Tier10"] = "Starlit Barge",
-		["Tier11"] = "Little Lucy",
+		["Quality1"] = "Wooden Cart-Barge",
+		["Quality2"] = "Barrel Barge",
+		["Quality3"] = "Oarsman’s Ferry",
+		["Quality4"] = "Courier Skiff",
+		["Quality5"] = "Windcloak Sloop",
+		["Quality6"] = "Seawarden’s Tender",
+		["Quality7"] = "Crate Hauler",
+		["Quality8"] = "Knight’s Courier",
+		["Quality9"] = "Harbormaster’s Crest",
+		["Quality10"] = "Starlit Barge",
+		["Quality11"] = "Little Lucy",
 	},
 }
 
-FFGEnum.RARITY = {
+FFGEnum.QUALITY = {
 	COMMON = {
 		label = "Common",
 		color = Color3.fromHex("#BFBFBF"),

@@ -6,7 +6,7 @@ local taggedBoats = CollectionService:GetTagged("Boat")
 local function setupBoat(boat: Model)
 	local primaryPart = boat.PrimaryPart
 
-	local attributes = BoatData.Attributes
+	local attributes = BoatData.Default_Attributes
 
 	for key, value in pairs(attributes) do
 		primaryPart:SetAttribute(key, value)
