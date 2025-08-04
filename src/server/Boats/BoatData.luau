@@ -5,8 +5,8 @@ local BoatData = {}
 
 BoatData.Default_Attributes = {
 	["Level"] = 1,
-	["UpgradeLevel"] = 1,
-	["Name"] = FFGEnum.BOAT.NAME.Quality1,
+	["UpgradeStage"] = 1,
+	["Name"] = FFGEnum.BOAT.NAME[1],
 	["isUnlocked"] = false,
 	["isActive"] = false,
 }
