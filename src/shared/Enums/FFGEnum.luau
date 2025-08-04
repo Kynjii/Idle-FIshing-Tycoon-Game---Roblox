@@ -49,47 +49,47 @@ FFGEnum.TENDER = {
 FFGEnum.RARITY = {
 	COMMON = {
 		label = "Common",
-		color = "#BFBFBF",
+		color = Color3.fromHex("#BFBFBF"),
 	},
 	UNCOMMON = {
 		label = "Uncommon",
-		color = "#3EFF3E",
+		color = Color3.fromHex("#3EFF3E"),
 	},
 	RARE = {
 		label = "Rare",
-		color = "#0070DD",
+		color = Color3.fromHex("#0070DD"),
 	},
 	EPIC = {
 		label = "Epic",
-		color = "#A335EE",
+		color = Color3.fromHex("#A335EE"),
 	},
 	LEGENDARY = {
 		label = "Legendary",
-		color = "#FF9A00",
+		color = Color3.fromHex("#FF9A00"),
 	},
 	EXOTIC = {
 		label = "Exotic",
-		color = "#E6C266",
+		color = Color3.fromHex("#E6C266"),
 	},
 	ASCENDED = {
 		label = "Ascended",
-		color = "#FF66CC",
+		color = Color3.fromHex("#FF66CC"),
 	},
 	MYTHIC = {
 		label = "Mythic",
-		color = "#00FFFF",
+		color = Color3.fromHex("#00FFFF"),
 	},
 	DIVINE = {
 		label = "Divine",
-		color = "#FFD700",
+		color = Color3.fromHex("#FFD700"),
 	},
 	ETERNAL = {
 		label = "Eternal",
-		color = "#C0C0FF",
+		color = Color3.fromHex("#C0C0FF"),
 	},
 	TRANSCENDENT = {
 		label = "Transcendent",
-		color = "#F5E663",
+		color = Color3.fromHex("#F5E663"),
 	},
 }
 
