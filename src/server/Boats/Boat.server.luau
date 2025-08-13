@@ -9,7 +9,7 @@ local taggedBoats = CollectionService:GetTagged("Boat")
 
 local BOAT = {}
 
-BOAT.SetupProximityPrompt = function(primaryPart: Part, purchaseBoard: Part)
+BOAT.SetupProximityPrompt = function(boat: Model, primaryPart: Part, purchaseBoard: Part)
 	local proximityPrompt = Instance.new("ProximityPrompt", purchaseBoard)
 	proximityPrompt.ObjectText = primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.isPurchased) and "Upgrade" or "Unlock"
 	proximityPrompt.ActionText = primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.isPurchased)
@@ -17,10 +17,12 @@ BOAT.SetupProximityPrompt = function(primaryPart: Part, purchaseBoard: Part)
 		or "Boat"
 
 	proximityPrompt.Triggered:Connect(function()
-		-- logic for handling upgrade
-		-- most likely send a remove event to server to update state which in turn updates the Instance's attribute(s)
 		if primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.isPurchased) then
-			-- handle upgrading
+			primaryPart:SetAttribute(
+				FFGEnum.ATTRIBUTES.BOAT.Level,
+				primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.Level) + 1
+				-- //TODO probably gotta send something to replica at some point
+			)
 		else
 			primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.BOAT.isPurchased, true)
 			primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.BOAT.isActive, true)
@@ -30,6 +32,13 @@ BOAT.SetupProximityPrompt = function(primaryPart: Part, purchaseBoard: Part)
 			proximityPrompt.ActionText = primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.isPurchased)
 					and "Level: " .. tostring(primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.Level) + 1)
 				or "Boat"
+
+			local boatParts = boat:GetChildren()
+			for _, part in pairs(boatParts) do
+				if part.Transparency and part.Transparency == 1 then
+					part.Transparency = 0
+				end
+			end
 		end
 	end)
 end
@@ -68,9 +77,10 @@ BOAT.SetupBoat = function(boat: Model)
 	for key, value in pairs(attributes) do
 		primaryPart:SetAttribute(key, value)
 	end
+	-- //TODO Look into on attribute changed and then have other attributes update based that
 
 	local purchaseBoard = BOAT.SetupUpgradeStore(boat, primaryPart)
-	BOAT.SetupProximityPrompt(primaryPart, purchaseBoard)
+	BOAT.SetupProximityPrompt(boat, primaryPart, purchaseBoard)
 end
 
 for _, taggedBoat in ipairs(taggedBoats) do
