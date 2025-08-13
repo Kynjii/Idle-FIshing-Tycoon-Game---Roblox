@@ -1,3 +1,5 @@
+--!nocheck
+
 --[[
 MAD STUDIO (by loleris)
 

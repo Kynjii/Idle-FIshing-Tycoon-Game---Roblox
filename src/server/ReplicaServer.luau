@@ -1,3 +1,4 @@
+--!nocheck
 --[[
 MAD STUDIO
 
