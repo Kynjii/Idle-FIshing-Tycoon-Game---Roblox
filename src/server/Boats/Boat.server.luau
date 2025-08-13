@@ -24,6 +24,12 @@ BOAT.SetupProximityPrompt = function(primaryPart: Part, purchaseBoard: Part)
 		else
 			primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.BOAT.isPurchased, true)
 			primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.BOAT.isActive, true)
+
+			proximityPrompt.ObjectText = primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.isPurchased) and "Upgrade"
+				or "Unlock"
+			proximityPrompt.ActionText = primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.isPurchased)
+					and "Level: " .. tostring(primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.Level) + 1)
+				or "Boat"
 		end
 	end)
 end
