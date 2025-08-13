@@ -1,8 +1,9 @@
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
+local FFGDefaults = require(ServerScriptService.Server.FFGDefaults)
 local FFGHelpers = require(ReplicatedStorage.Shared.Utils.FFGHelpers)
-local BoatData = require(script.Parent.BoatData)
 
 local taggedBoats = CollectionService:GetTagged("Boat")
 
@@ -12,17 +13,17 @@ BOAT.SetupProximityPrompt = function(primaryPart: Part, purchaseBoard: Part)
 	local proximityPrompt = Instance.new("ProximityPrompt", purchaseBoard)
 	proximityPrompt.ObjectText = primaryPart:GetAttribute("isUnlocked") and "Upgrade" or "Unlock"
 	proximityPrompt.ActionText = primaryPart:GetAttribute("isUnlocked")
-			and "Level: " .. tostring(primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.Level))
+			and "Level: " .. tostring(primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.Level))
 		or "Boat"
 
 	proximityPrompt.Triggered:Connect(function()
 		-- logic for handling upgrade
 		-- most likely send a remove event to server to update state which in turn updates the Instance's attribute(s)
-		if primaryPart:GetAttribute("isUnlocked") then
+		if primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.isPurchased) then
 			-- handle upgrading
 		else
-			primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.isUnlocked, true)
-			primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.isActive, true)
+			primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.BOAT.isPurchased, true)
+			primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.BOAT.isActive, true)
 		end
 	end)
 end
@@ -34,7 +35,7 @@ BOAT.SetupUpgradeStore = function(boat: Model, primaryPart: Instance)
 	pbDetails.LevelLabel = FFGHelpers.deepWait(purchaseBoard, "SurfaceGui", "Main", "Header", "Level", "TextLabel")
 
 	if pbDetails then
-		local level = primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.Level)
+		local level = primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.Level)
 		for qualityIndex, qualityLevelCap in ipairs(FFGEnum.QUALITY_PROMOTION_LEVELS) do
 			if level <= qualityLevelCap then
 				local qualityInfo = FFGEnum.QUALITY[qualityIndex]
@@ -46,7 +47,7 @@ BOAT.SetupUpgradeStore = function(boat: Model, primaryPart: Instance)
 				break
 			end
 		end
-		pbDetails.NameLabel.Text = primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.Name)
+		pbDetails.NameLabel.Text = primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.Name)
 
 		pbDetails.LevelLabel.Text = "Level: " .. level
 	end
@@ -57,7 +58,7 @@ end
 BOAT.SetupBoat = function(boat: Model)
 	local primaryPart = boat.PrimaryPart
 
-	local attributes = BoatData.Default_Attributes
+	local attributes = FFGDefaults.BOAT_STARTING_ATT
 
 	for key, value in pairs(attributes) do
 		primaryPart:SetAttribute(key, value)

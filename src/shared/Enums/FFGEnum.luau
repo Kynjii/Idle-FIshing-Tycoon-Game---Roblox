@@ -96,11 +96,18 @@ FFGEnum.QUALITY = {
 }
 
 FFGEnum.ATTRIBUTES = {
-	["Level"] = "Level",
-	["UpgradeStage"] = "UpgradeStage",
-	["Name"] = "Name",
-	["isUnlocked"] = "isUnlocked",
-	["isActive"] = "isActive",
+	GENERAL = {
+		["Name"] = "Name",
+		["isUnlocked"] = "isUnlocked",
+	},
+	BOAT = {
+		["Tier"] = "Tier",
+		["Level"] = "Level",
+		["UpgradeStage"] = "UpgradeStage",
+		["Name"] = "Name",
+		["isActive"] = "isActive",
+		["isPurchased"] = "isPurchased",
+	},
 }
 
 FFGEnum.CURRENCY_TYPES = {

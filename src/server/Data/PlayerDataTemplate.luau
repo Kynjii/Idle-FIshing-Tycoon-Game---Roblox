@@ -1,9 +1,10 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local FFGDefaults = require(ReplicatedStorage.Shared.Utils.FFGDefaults)
+local ServerScriptService = game:GetService("ServerScriptService")
+local FFGDefaults = require(ServerScriptService.Server.FFGDefaults)
 return {
 	Realms = {
 		[1] = {
 			isUnlocked = true,
+			maxBoats = 6,
 			Lanes = {
 				Tier_1 = {
 					isPurchased = true,
