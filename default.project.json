@@ -7,8 +7,14 @@
             "Shared": {
                 "$path": "src/shared"
             },
-            "UpdateGold": {
-                "$className": "RemoteEvent"
+            "Packages": {
+                "$path": "src/Packages"
+            },
+            "Remotes": {
+                "$className": "Folder",
+                "UpdateGold": {
+                    "$className": "RemoteEvent"
+                }
             }
         },
 
