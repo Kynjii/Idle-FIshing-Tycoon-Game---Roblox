@@ -1,11 +1,8 @@
--- Services
 local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
-local PlayerDataTemplate = require(ServerScriptService.Server.Data.PlayerDataTemplate)
 
--- ProfileStore
+local PlayerDataTemplate = require(ServerScriptService.Server.Data.PlayerDataTemplate)
 local ProfileStore = require(ServerScriptService.Server.Libs.ProfileStore)
 local DataManager = require(ServerScriptService.Server.Data.DataManager)
 
@@ -13,45 +10,39 @@ local function GetStoreName()
 	return RunService:IsStudio() and "Staging" or "Live"
 end
 
--- Access Profile Store
 local PlayerStore = ProfileStore.New(GetStoreName(), PlayerDataTemplate)
 
--- Add leaderstats and sync player data
 local function Initialize(player: Player, profile: typeof(PlayerStore:StartSessionAsync()))
-	-- Leaderstats
-	local leaderstats = Instance.new("Folder", player)
+	-- Leaderstats (optional but nice for the default leaderboard)
+	local leaderstats = Instance.new("Folder")
 	leaderstats.Name = "leaderstats"
+	leaderstats.Parent = player
 
-	local Gold = Instance.new("NumberValue", leaderstats)
+	local Gold = Instance.new("NumberValue")
 	Gold.Name = "Gold"
-	Gold.Value = profile.Data.Gold
+	Gold.Value = profile.Data.Gold or 0
+	Gold.Parent = leaderstats
 
-	-- sync player data
-	ReplicatedStorage.Remotes.UpdateGold:FireClient(player, profile.Data.Gold)
+	DataManager.AttachReplica(player, profile)
 end
 
--- Creates and stores a profile
 local function PlayerAdded(player: Player)
-	-- Start new profile session
 	local profile = PlayerStore:StartSessionAsync("Player_" .. player.UserId, {
 		Cancel = function()
 			return player.Parent ~= Players
 		end,
 	})
 
-	-- Sanity check to ensure profile exist
-
 	if profile ~= nil then
-		profile:AddUserId(player.UserId) -- GDPR compliance
-		profile:Reconcile() -- Fill in missing data variables from template
+		profile:AddUserId(player.UserId)
+		profile:Reconcile()
 
-		-- Handles session locking
 		profile.OnSessionEnd:Connect(function()
 			DataManager.Profiles[player] = nil
+			DataManager.DetachReplica(player)
 			player:Kick("Data error occured, please rejoin.")
 		end)
 
-		-- Save profile for later use
 		if player.Parent == Players then
 			DataManager.Profiles[player] = profile
 			Initialize(player, profile)
@@ -59,23 +50,20 @@ local function PlayerAdded(player: Player)
 			profile:EndSession()
 		end
 	else
-		-- Server shuts down while player is joining
 		player:Kick("Data error occured, please rejoin.")
 	end
 end
 
--- early joiners (studio users)
-for _, player in Players:GetPlayers() do
-	task.spawn(PlayerAdded, player)
+for _, p in Players:GetPlayers() do
+	task.spawn(PlayerAdded, p)
 end
 
 Players.PlayerAdded:Connect(PlayerAdded)
 Players.PlayerRemoving:Connect(function(player)
 	local profile = DataManager.Profiles[player]
-	if not profile then
-		return
+	if profile then
+		profile:EndSession()
+		DataManager.Profiles[player] = nil
 	end
-
-	profile:EndSession()
-	DataManager.Profiles[player] = nil
+	DataManager.DetachReplica(player)
 end)
