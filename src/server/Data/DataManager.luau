@@ -12,12 +12,17 @@ DataManager.Replicas = {}
 
 function DataManager.AttachReplica(player: Player, profile)
 	FFGHelpers.PrintLog("Attaching Replica for: ", player)
+
+	local currencies = {}
+
+	for currencyType, amount in pairs(profile.Data.Currencies) do
+		currencies[currencyType] = amount or PlayerDataTemplate.Currencies[currencyType]
+	end
+
 	local replica = Replica.New({
 		Token = PlayerStateToken,
 		Data = {
-			Currencies = {
-				Gold = profile.Data.Currencies.Gold or PlayerDataTemplate.Currencies.Gold,
-			},
+			Currencies = currencies,
 		},
 	})
 	FFGHelpers.PrintLog("New Replica is: ", replica)
