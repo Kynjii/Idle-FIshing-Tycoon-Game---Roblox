@@ -78,6 +78,7 @@ BOAT.SetupBoat = function(boat: Model)
 		primaryPart:SetAttribute(key, value)
 	end
 	-- //TODO Look into on attribute changed and then have other attributes update based that
+	--  https://create.roblox.com/docs/reference/engine/classes/Instance#GetAttributeChangedSignal
 
 	local purchaseBoard = BOAT.SetupUpgradeStore(boat, primaryPart)
 	BOAT.SetupProximityPrompt(boat, primaryPart, purchaseBoard)
