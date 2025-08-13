@@ -42,7 +42,7 @@ resetGoldButton.Touched:Connect(function(hit)
 	if humanoid then
 		local player = Players:GetPlayerFromCharacter(character)
 		if player then
-			DataManager.ResetAllData(player)
+			DataManager.ResetAllPlayerData(player)
 		end
 	end
 

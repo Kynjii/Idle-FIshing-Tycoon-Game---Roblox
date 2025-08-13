@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
+local TableUtil = require(ReplicatedStorage.Packages.TableUtil)
 local FFGHelpers = require(ReplicatedStorage.Shared.Utils.FFGHelpers)
 local PlayerDataTemplate = require(script.Parent.PlayerDataTemplate)
 local Replica = require(ServerScriptService.Server.ReplicaServer)
@@ -10,22 +11,23 @@ DataManager.Profiles = {}
 DataManager.Replicas = {}
 
 function DataManager.AttachReplica(player: Player, profile)
+	FFGHelpers.PrintLog("Attaching Replica for: ", player)
 	local replica = Replica.New({
 		Token = PlayerStateToken,
 		Data = {
 			Currencies = {
-				Gold = profile.Data.Gold or PlayerDataTemplate.Currencies.Gold,
+				Gold = profile.Data.Currencies.Gold or PlayerDataTemplate.Currencies.Gold,
 			},
-			-- Add other HUD-safe pieces, e.g. Boat, Storage, etc.
-			-- Boat = profile.Data.Boat or { Level = 1, Storage = 100 },
 		},
 	})
-	replica:Subscribe(player) -- replicate only to this player
+	FFGHelpers.PrintLog("New Replica is: ", replica)
+	replica:Subscribe(player)
 	DataManager.Replicas[player] = replica
 	return replica
 end
 
 function DataManager.DetachReplica(player: Player)
+	FFGHelpers.PrintLog("Detaching Replica for: ", player)
 	local replica = DataManager.Replicas[player]
 	if replica then
 		replica:Destroy()
@@ -34,8 +36,6 @@ function DataManager.DetachReplica(player: Player)
 end
 
 function DataManager.Earn(player: Player, currencyType: string, amount: number)
-	print("woo")
-	FFGHelpers.PrintLog("Weee")
 	local profile = DataManager.Profiles[player]
 	if not profile then
 		FFGHelpers.PrintLog("No profile found when attempting to earn: ", currencyType)
@@ -94,15 +94,40 @@ function DataManager.Spend(player: Player, currencyType: string, amount: number)
 	end
 end
 
-function DataManager.ResetAllData(player: Player)
-	local profile = DataManager.Profiles[player]
+function DataManager.ClearProfileData(player: Player, profile)
 	if not profile then
+		FFGHelpers.PrintLog("No profile found when attempting to clear profile data for: ", player)
 		return
 	end
 
-	profile.Data = PlayerDataTemplate
+	profile.Data = nil
 
+	FFGHelpers.PrintLog("Cleared Profile Data: ", profile)
+end
+
+function DataManager.CreateNewProfileData(player: Player, profile)
+	if not profile then
+		FFGHelpers.PrintLog("No profile found when attempting to create new profile data for: ", player)
+		return
+	end
+
+	local resetDataTemplate = TableUtil.Copy(PlayerDataTemplate, true)
+	profile.Data = resetDataTemplate
+
+	FFGHelpers.PrintLog("Created Profile Data: ", profile)
+end
+
+function DataManager.ResetAllPlayerData(player: Player)
+	local profile = DataManager.Profiles[player]
+	if not profile then
+		FFGHelpers.PrintLog("No profile found when attempting to reset data for: ", player)
+		return
+	end
+
+	DataManager.ClearProfileData(player, profile)
 	DataManager.DetachReplica(player)
+
+	DataManager.CreateNewProfileData(player, profile)
 	DataManager.AttachReplica(player, profile)
 end
 
