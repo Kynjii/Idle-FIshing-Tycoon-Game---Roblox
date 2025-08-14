@@ -60,43 +60,29 @@ function DataManager.Earn(player: Player, currencyType: string, amount: number)
 	profile.Data.Currencies[currencyType] = newValue
 
 	local replica = DataManager.Replicas[player]
-	if replica then
-		replica:Set({ "Currencies", currencyType }, newValue)
-	end
+	if replica then replica:Set({ "Currencies", currencyType }, newValue) end
 end
 
 function DataManager.CanAfford(player: Player, currencyType: string, amount: number)
 	local profile = DataManager.Profiles[player]
-	if not profile then
-		return
-	end
+	if not profile then return end
 	return (tonumber(profile.Data.Currencies[currencyType]) or 0) >= amount
 end
 
 function DataManager.Spend(player: Player, currencyType: string, amount: number)
 	local profile = DataManager.Profiles[player]
-	if not profile then
-		return
-	end
-	if typeof(amount) ~= "number" or amount <= 0 then
-		return
-	end
-	if typeof(currencyType) ~= "string" then
-		return
-	end
+	if not profile then return end
+	if typeof(amount) ~= "number" or amount <= 0 then return end
+	if typeof(currencyType) ~= "string" then return end
 
 	local current = tonumber(profile.Data.Currencies[currencyType]) or 0
-	if current < amount then
-		return
-	end
+	if current < amount then return end
 
 	local newValue = current - amount
 	profile.Data.Currencies[currencyType] = newValue
 
 	local replica = DataManager.Replicas[player]
-	if replica then
-		replica:Set({ "Currencies", currencyType }, newValue)
-	end
+	if replica then replica:Set({ "Currencies", currencyType }, newValue) end
 end
 
 function DataManager.ClearProfileData(player: Player, profile)
@@ -122,8 +108,9 @@ function DataManager.CreateNewProfileData(player: Player, profile)
 	FFGHelpers.PrintLog("Created Profile Data: ", profile)
 end
 
-function DataManager.UpdateBoatState(player: Player, stateKey, newStateValue, ownerId)
+function DataManager.UpdateBoatState(player: Player, stateKey, newStateValue)
 	-- //TODO - probably do a check to see if boat owner matches player, if not then return
+	-- local userId = player.UserId
 	-- //TODO - think if you want to pass the current attributes to determine things like tier, it might help with finding inxed instead of hardcoding
 	local profile = DataManager.Profiles[player]
 	if not profile then

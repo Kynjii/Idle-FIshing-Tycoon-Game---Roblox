@@ -25,11 +25,9 @@ BOAT.SetupProximityPrompt = function(boat: Model, primaryPart: Part, purchaseBoa
 			-- update level
 			local newValue = primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.Level) + 1
 			primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.BOAT.Level, newValue)
-			DataManager.UpdateBoatState(player, FFGEnum.ATTRIBUTES.BOAT.Level, newValue, player.UserId)
+			DataManager.UpdateBoatState(player, FFGEnum.ATTRIBUTES.BOAT.Level, newValue)
 
-			-- update name
-			primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.BOAT.Name, FFGEnum.BOAT.NAME[primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.UpgradeStage)])
-			DataManager.UpdateBoatState(player, FFGEnum.ATTRIBUTES.BOAT.Name, FFGEnum.BOAT.NAME[primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.UpgradeStage)], player.UserId)
+			BOAT.UpdateNameState(player, primaryPart)
 
 			-- if the new level matches the threshold in quality promo, update the UpgradeStage
 			for k, v in ipairs(FFGEnum.QUALITY_PROMOTION_LEVELS) do
@@ -37,26 +35,22 @@ BOAT.SetupProximityPrompt = function(boat: Model, primaryPart: Part, purchaseBoa
 					-- update boat name and upgrade stage
 					local newStage = tonumber(k) + 1
 					primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.BOAT.UpgradeStage, newStage)
-					DataManager.UpdateBoatState(player, FFGEnum.ATTRIBUTES.BOAT.UpgradeStage, newStage, player.UserId)
+					DataManager.UpdateBoatState(player, FFGEnum.ATTRIBUTES.BOAT.UpgradeStage, newStage)
 
 					primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.BOAT.Name, FFGEnum.BOAT.NAME[newStage])
-					DataManager.UpdateBoatState(player, FFGEnum.ATTRIBUTES.BOAT.Name, FFGEnum.BOAT.NAME[newStage], player.UserId)
+					DataManager.UpdateBoatState(player, FFGEnum.ATTRIBUTES.BOAT.Name, FFGEnum.BOAT.NAME[newStage])
 					break
 				end
 			end
 		else
-			-- update name
-			primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.BOAT.Name, FFGEnum.BOAT.NAME[primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.UpgradeStage)])
-			DataManager.UpdateBoatState(player, FFGEnum.ATTRIBUTES.BOAT.Name, FFGEnum.BOAT.NAME[primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.UpgradeStage)], player.UserId)
-			-- update isPurchased
-			primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.BOAT.isPurchased, true)
-			DataManager.UpdateBoatState(player, FFGEnum.ATTRIBUTES.BOAT.isPurchased, true, player.UserId)
+			BOAT.UpdateNameState(player, primaryPart)
+			BOAT.UpdatePurchasedState(player, primaryPart)
 			-- update isActive (begins fishing)
 			primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.BOAT.isActive, true)
-			DataManager.UpdateBoatState(player, FFGEnum.ATTRIBUTES.BOAT.isActive, true, player.UserId)
+			DataManager.UpdateBoatState(player, FFGEnum.ATTRIBUTES.BOAT.isActive, true)
 			-- update owner //TODO - need to figure out how to handle this later
-			primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.BOAT.Owner, player.UserId)
-			DataManager.UpdateBoatState(player, FFGEnum.ATTRIBUTES.BOAT.Owner, player.UserId, player.UserId)
+			primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.BOAT.Owner)
+			DataManager.UpdateBoatState(player, FFGEnum.ATTRIBUTES.BOAT.Owner)
 
 			proximityPrompt.ObjectText = "Upgrade"
 			proximityPrompt.ActionText = "Level: " .. tostring(primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.Level) + 1)
@@ -163,6 +157,16 @@ BOAT.SetupBoat = function(boat: Model)
 		local proximityPrompt = BOAT.SetupProximityPrompt(boat, primaryPart, purchaseBoard)
 		BOAT.SetupAttributeListeners(primaryPart, purchaseBoard, proximityPrompt)
 	end
+end
+
+BOAT.UpdateNameState = function(player: Player, primaryPart: Part)
+	primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.BOAT.Name, FFGEnum.BOAT.NAME[primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.UpgradeStage)])
+	DataManager.UpdateBoatState(player, FFGEnum.ATTRIBUTES.BOAT.Name, FFGEnum.BOAT.NAME[primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.UpgradeStage)])
+end
+
+BOAT.UpdatePurchasedState = function(player: Player, primaryPart: Part)
+	primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.BOAT.isPurchased, true)
+	DataManager.UpdateBoatState(player, FFGEnum.ATTRIBUTES.BOAT.isPurchased, true)
 end
 
 for _, taggedBoat in ipairs(taggedBoats) do
