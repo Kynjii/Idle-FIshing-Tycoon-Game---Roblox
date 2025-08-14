@@ -1,2 +1,2 @@
 column_width = 5000
-collapse_simple_statement = ConditionalOnly
+collapse_simple_statement = "ConditionalOnly"
