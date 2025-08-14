@@ -34,23 +34,18 @@ BOAT.SetupProximityPrompt = function(boat: Model, primaryPart: Part, purchaseBoa
 				if newValue == v + 1 then
 					-- update boat name and upgrade stage
 					local newStage = tonumber(k) + 1
-					primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.BOAT.UpgradeStage, newStage)
-					DataManager.UpdateBoatState(player, FFGEnum.ATTRIBUTES.BOAT.UpgradeStage, newStage)
-
-					primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.BOAT.Name, FFGEnum.BOAT.NAME[newStage])
-					DataManager.UpdateBoatState(player, FFGEnum.ATTRIBUTES.BOAT.Name, FFGEnum.BOAT.NAME[newStage])
+					BOAT.UpdateUpgradeStage(player, primaryPart, newStage)
+					BOAT.UpdateNameState(player, primaryPart)
 					break
 				end
 			end
 		else
 			BOAT.UpdateNameState(player, primaryPart)
 			BOAT.UpdatePurchasedState(player, primaryPart)
-			-- update isActive (begins fishing)
-			primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.BOAT.isActive, true)
-			DataManager.UpdateBoatState(player, FFGEnum.ATTRIBUTES.BOAT.isActive, true)
-			-- update owner //TODO - need to figure out how to handle this later
-			primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.BOAT.Owner)
-			DataManager.UpdateBoatState(player, FFGEnum.ATTRIBUTES.BOAT.Owner)
+			BOAT.UpdateActiveState(player, primaryPart, true)
+			-- Add owner //TODO - need to figure out how to handle this later for multiple players
+			-- perhaps all objects in the place/area are owned by the player assigned to that area/teamcolor
+			BOAT.AddOwner(player, primaryPart)
 
 			proximityPrompt.ObjectText = "Upgrade"
 			proximityPrompt.ActionText = "Level: " .. tostring(primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.Level) + 1)
@@ -167,6 +162,21 @@ end
 BOAT.UpdatePurchasedState = function(player: Player, primaryPart: Part)
 	primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.BOAT.isPurchased, true)
 	DataManager.UpdateBoatState(player, FFGEnum.ATTRIBUTES.BOAT.isPurchased, true)
+end
+
+BOAT.UpdateActiveState = function(player: Player, primaryPart: Part, state: BoolValue)
+	primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.BOAT.isActive, state)
+	DataManager.UpdateBoatState(player, FFGEnum.ATTRIBUTES.BOAT.isActive, state)
+end
+
+BOAT.AddOwner = function(player: Player, primaryPart: Part)
+	primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.BOAT.Owner, player.UserId)
+	DataManager.UpdateBoatState(player, FFGEnum.ATTRIBUTES.BOAT.Owner, player.UserId)
+end
+
+BOAT.UpdateUpgradeStage = function(player: Player, primaryPart: Part, newStage: number)
+	primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.BOAT.UpgradeStage, newStage)
+	DataManager.UpdateBoatState(player, FFGEnum.ATTRIBUTES.BOAT.UpgradeStage, newStage)
 end
 
 for _, taggedBoat in ipairs(taggedBoats) do
