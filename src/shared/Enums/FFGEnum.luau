@@ -101,6 +101,7 @@ FFGEnum.ATTRIBUTES = {
 		["isUnlocked"] = "isUnlocked",
 	},
 	BOAT = {
+		["Owner"] = "Owner",
 		["Tier"] = "Tier",
 		["Level"] = "Level",
 		["UpgradeStage"] = "UpgradeStage",

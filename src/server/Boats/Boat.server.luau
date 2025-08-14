@@ -1,6 +1,7 @@
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
+local DataManager = require(ServerScriptService.Server.Data.DataManager)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local FFGDefaults = require(ServerScriptService.Server.FFGDefaults)
 local FFGHelpers = require(ReplicatedStorage.Shared.Utils.FFGHelpers)
@@ -11,18 +12,19 @@ local BOAT = {}
 
 BOAT.SetupProximityPrompt = function(boat: Model, primaryPart: Part, purchaseBoard: Part)
 	local proximityPrompt = Instance.new("ProximityPrompt", purchaseBoard)
+	proximityPrompt.HoldDuration = 1
 	proximityPrompt.ObjectText = primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.isPurchased) and "Upgrade" or "Unlock"
 	proximityPrompt.ActionText = primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.isPurchased)
 			and "Level: " .. tostring(primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.Level))
 		or "Boat"
 
-	proximityPrompt.Triggered:Connect(function()
+	proximityPrompt.TriggerEnded:Connect(function(player)
 		if primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.isPurchased) then
-			primaryPart:SetAttribute(
-				FFGEnum.ATTRIBUTES.BOAT.Level,
-				primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.Level) + 1
-				-- //TODO probably gotta send something to replica at some point
-			)
+			local newValue = primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.Level) + 1
+			primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.BOAT.Level, newValue)
+
+			-- //TODO think about replica too
+			DataManager.UpdateBoatState(player, FFGEnum.ATTRIBUTES.BOAT.Level, newValue, player.UserId)
 		else
 			primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.BOAT.isPurchased, true)
 			primaryPart:SetAttribute(FFGEnum.ATTRIBUTES.BOAT.isActive, true)

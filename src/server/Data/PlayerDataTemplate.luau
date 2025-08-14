@@ -6,7 +6,7 @@ return {
 			isUnlocked = true,
 			maxBoats = 6,
 			Lanes = {
-				Tier_1 = {
+				[1] = {
 					isPurchased = true,
 					Boat = FFGDefaults.BOAT_STARTING_ATT,
 				},

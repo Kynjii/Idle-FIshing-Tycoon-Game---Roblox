@@ -122,6 +122,51 @@ function DataManager.CreateNewProfileData(player: Player, profile)
 	FFGHelpers.PrintLog("Created Profile Data: ", profile)
 end
 
+function DataManager.UpdateBoatState(player: Player, stateKey, newStateValue, ownerId)
+	-- //TODO - probably do a check to see if boat owner matches player, if not then return
+	local profile = DataManager.Profiles[player]
+	if not profile then
+		FFGHelpers.PrintLog("No profile found when attempting to update state for: ", player)
+		return
+	end
+
+	local BoatState = DataManager.GetBoatState(profile)
+
+	FFGHelpers.PrintLog("Attempting to apply new state: ", stateKey)
+	FFGHelpers.PrintLog("Attempting to apply new state: ", newStateValue)
+
+	if BoatState then
+		FFGHelpers.PrintLog("Found state, updating now: ", BoatState)
+		BoatState[stateKey] = newStateValue
+
+		FFGHelpers.PrintLog("Updated Boatstate: ", BoatState)
+	else
+		FFGHelpers.PrintLog("Could not find state when attempting to update: ", stateKey)
+	end
+end
+
+function DataManager.GetBoatState(profile)
+	-- // TODO Remove hardcoded realmId
+	local realm1 = profile.Data.Realms[1]
+	local boat = realm1.Lanes[1].Boat
+	if not boat then
+		FFGHelpers.PrintLog("Unable to get BoatState")
+		return
+	end
+
+	return boat
+end
+
+function DataManager.SaveProfileState(player: Player)
+	local profile = DataManager.Profiles[player]
+	if not profile then
+		FFGHelpers.PrintLog("No profile found when attempting to save state for: ", player)
+		return
+	end
+
+	profile:Save()
+end
+
 function DataManager.ResetAllPlayerData(player: Player)
 	local profile = DataManager.Profiles[player]
 	if not profile then

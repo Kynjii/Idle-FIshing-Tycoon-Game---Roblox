@@ -7,6 +7,7 @@ local FFGDefaults = {}
 FFGDefaults.DebounceCD = 3
 
 FFGDefaults.BOAT_STARTING_ATT = {
+	[FFGEnum.ATTRIBUTES.BOAT.Owner] = "",
 	[FFGEnum.ATTRIBUTES.BOAT.Tier] = 1,
 	[FFGEnum.ATTRIBUTES.BOAT.Name] = "Default Name",
 	[FFGEnum.ATTRIBUTES.BOAT.isActive] = false,
