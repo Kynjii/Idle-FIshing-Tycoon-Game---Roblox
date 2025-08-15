@@ -58,16 +58,20 @@ BOAT.SetupBoat = function(boat: Model, player: Player)
 	-- Setup the purchase board info and attribute listeners
 	local purchaseBoard = BOAT.SetupPurchaseBoard(boat, primaryPart, state)
 	if purchaseBoard then
-		BOAT.SetupProximityPrompt(boat, primaryPart, purchaseBoard)
+		BOAT.SetupProximityPrompt(boat, primaryPart, purchaseBoard, state)
 		BOAT.SetupAttributeListeners(primaryPart, purchaseBoard)
 	end
 end
 
 -- STATE MANAGEMENT FOR BOAT - Proximity Prompt currently handles a lot of the management as it triggers all changes to the Boat
-BOAT.SetupProximityPrompt = function(boat: Model, primaryPart: Part, purchaseBoard: Part)
+BOAT.SetupProximityPrompt = function(boat: Model, primaryPart: Part, purchaseBoard: Part, state: FFGTypes.BoatState)
 	local currentState = {}
-	for k, v in pairs(primaryPart:GetAttributes()) do
-		currentState[k] = v
+	if not state then
+		for k, v in pairs(primaryPart:GetAttributes()) do
+			currentState[k] = v
+		end
+	else
+		currentState = state
 	end
 
 	-- Helper function to update cache and attribute together
@@ -86,13 +90,13 @@ BOAT.SetupProximityPrompt = function(boat: Model, primaryPart: Part, purchaseBoa
 	-- Create the prompt and apply conditional text
 	local proximityPrompt = Instance.new("ProximityPrompt", purchaseBoard)
 	proximityPrompt.HoldDuration = 1
-	proximityPrompt.ObjectText = currentState.IsPurchased and "Upgrade Boat" or "Purchase"
-	proximityPrompt.ActionText = currentState.IsPurchased and "Level: " .. tostring(currentState.Level + 1) or "Tier " .. currentState.Tier .. " Boat"
+	proximityPrompt.ObjectText = currentState[BoatEnums.isPurchased] and "Upgrade Boat" or "Purchase" :: string
+	proximityPrompt.ActionText = currentState[BoatEnums.isPurchased] and "Level: " .. tostring(currentState.Level + 1) or "Tier " .. currentState.Tier .. " Boat" :: string
 
 	proximityPrompt.TriggerEnded:Connect(function(player)
 		-- Use cached values but refresh critical ones to be safe
-		local isPurchased = getAndCacheAttribute(BoatEnums.isPurchased)
-		local upgradeCost = isPurchased and getAndCacheAttribute(BoatEnums.UpgradeCost) or getAndCacheAttribute(BoatEnums.BaseCost)
+		local isPurchased = getAndCacheAttribute(BoatEnums.isPurchased) :: boolean
+		local upgradeCost = isPurchased and getAndCacheAttribute(BoatEnums.UpgradeCost) or getAndCacheAttribute(BoatEnums.BaseCost) :: number
 
 		if not DataManager.CanAfford(player, FFGEnum.CURRENCY_TYPES.Gold, upgradeCost) then
 			FFGHelpers.PrintLog("Unable to afford upgrade, cost is: ", upgradeCost)
