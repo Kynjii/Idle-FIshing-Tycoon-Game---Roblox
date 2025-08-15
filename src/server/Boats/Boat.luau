@@ -89,11 +89,11 @@ BOAT.SetupProximityPrompt = function(boat: Model, primaryPart: Part, purchaseBoa
 
 	-- Create the prompt and apply conditional text
 	local proximityPrompt = Instance.new("ProximityPrompt", purchaseBoard)
-	proximityPrompt.HoldDuration = 1
+	proximityPrompt.HoldDuration = 0
 	proximityPrompt.ObjectText = currentState[BoatEnums.isPurchased] and "Upgrade Boat" or "Purchase" :: string
 	proximityPrompt.ActionText = currentState[BoatEnums.isPurchased] and "Level: " .. tostring(currentState.Level + 1) or "Tier " .. currentState.Tier .. " Boat" :: string
 
-	proximityPrompt.TriggerEnded:Connect(function(player)
+	proximityPrompt.Triggered:Connect(function(player)
 		-- Use cached values but refresh critical ones to be safe
 		local isPurchased = getAndCacheAttribute(BoatEnums.isPurchased) :: boolean
 		local upgradeCost = isPurchased and getAndCacheAttribute(BoatEnums.UpgradeCost) or getAndCacheAttribute(BoatEnums.BaseCost) :: number
@@ -136,11 +136,11 @@ BOAT.SetupProximityPrompt = function(boat: Model, primaryPart: Part, purchaseBoa
 			-- Add owner //TODO - need to figure out how to handle this later for multiple players
 			-- perhaps all objects in the place/area are owned by the player assigned to that area/teamcolor
 			BOAT.AddOwner(player, primaryPart)
-
-			local actText = "Upgrade"
-			local objText = "Level: " .. tostring(currentState.Level + 1)
-			BOAT.UpdateProximityPromptUI(proximityPrompt, primaryPart, actText, objText)
 		end
+
+		local actText = "Upgrade"
+		local objText = "Level: " .. tostring(currentState.Level + 1)
+		BOAT.UpdateProximityPromptUI(proximityPrompt, primaryPart, actText, objText)
 	end)
 
 	return proximityPrompt
