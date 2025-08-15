@@ -74,12 +74,6 @@ BOAT.SetupProximityPrompt = function(boat: Model, primaryPart: Part, purchaseBoa
 		currentState = state
 	end
 
-	-- Helper function to update cache and attribute together
-	local function updateStateAndAttribute(key: string, value: any)
-		currentState[key] = value
-		primaryPart:SetAttribute(key, value)
-	end
-
 	-- Helper function to get fresh value and update cache
 	local function getAndCacheAttribute(key: string)
 		local value = primaryPart:GetAttribute(key)
@@ -108,7 +102,7 @@ BOAT.SetupProximityPrompt = function(boat: Model, primaryPart: Part, purchaseBoa
 		if isPurchased then
 			-- Update level using cache-updating helper
 			local currentLevel = currentState.Level
-			updateStateAndAttribute(BoatEnums.Level, currentLevel + 1)
+			currentState[BoatEnums.Level] = currentLevel + 1
 
 			-- if the new level passes the threshold in quality promo, update the UpgradeStage
 			for k, v in ipairs(FFGEnum.QUALITY_PROMOTION_LEVELS) do
