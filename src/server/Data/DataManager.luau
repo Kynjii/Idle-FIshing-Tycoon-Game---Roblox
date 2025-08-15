@@ -145,6 +145,21 @@ function DataManager.GetBoatState(profile)
 	return boat
 end
 
+function DataManager.LoadBoatState(player)
+	FFGHelpers.PrintLog("Attempting to load boat state for: ", player)
+	local profile = DataManager.Profiles[player]
+	if not profile then FFGHelpers.PrintLog("No profile found for: ", player) end
+	local state = DataManager.GetBoatState(profile)
+	if not state then
+		FFGHelpers.PrintLog("Unable to get BoatState for loading")
+		return
+	end
+
+	FFGHelpers.PrintLog("Current boat state: ", state)
+
+	return state
+end
+
 function DataManager.SaveProfileState(player: Player)
 	local profile = DataManager.Profiles[player]
 	if not profile then

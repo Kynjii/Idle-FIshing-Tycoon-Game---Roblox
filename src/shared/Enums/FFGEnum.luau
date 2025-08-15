@@ -109,6 +109,7 @@ FFGEnum.ATTRIBUTES = {
 		["Name"] = "Name",
 		["isActive"] = "isActive",
 		["isPurchased"] = "isPurchased",
+		["Id"] = "Id",
 	},
 }
 

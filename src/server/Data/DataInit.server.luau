@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local Boat = require(ServerScriptService.Server.Boats.Boat)
 local FFGHelpers = require(ReplicatedStorage.Shared.Utils.FFGHelpers)
 local PlayerDataTemplate = require(ServerScriptService.Server.Data.PlayerDataTemplate)
 local ProfileStore = require(ServerScriptService.Server.Libs.ProfileStore)
@@ -11,6 +12,22 @@ local PlayerStore = ProfileStore.New(FFGHelpers.GetStoreName(), PlayerDataTempla
 
 local function Initialize(player: Player, profile: typeof(PlayerStore:StartSessionAsync()))
 	DataManager.AttachReplica(player, profile)
+end
+
+local function SetupBoats(player)
+	if player then
+		Boat.SetupTaggedBoats(player)
+	else
+		FFGHelpers.PrintLog("No player passed during initalization")
+	end
+end
+
+local function ResetBoats(player)
+	if player then
+		Boat.ResetTaggedBoats(player)
+	else
+		FFGHelpers.PrintLog("No player passed during initalization")
+	end
 end
 
 local function PlayerAdded(player: Player)
@@ -25,14 +42,18 @@ local function PlayerAdded(player: Player)
 		profile:Reconcile()
 
 		profile.OnSessionEnd:Connect(function()
-			DataManager.Profiles[player] = nil
-			DataManager.DetachReplica(player)
-			player:Kick("Data error occured, please rejoin.")
+			ResetBoats(player)
+			task.delay(1, function()
+				DataManager.Profiles[player] = nil
+				DataManager.DetachReplica(player)
+				player:Kick("Data error occured, please rejoin.")
+			end)
 		end)
 
 		if player.Parent == Players then
 			DataManager.Profiles[player] = profile
 			Initialize(player, profile)
+			SetupBoats(player)
 		else
 			profile:EndSession()
 		end
@@ -50,7 +71,10 @@ Players.PlayerRemoving:Connect(function(player)
 	local profile = DataManager.Profiles[player]
 	if profile then
 		profile:EndSession()
-		DataManager.Profiles[player] = nil
+		ResetBoats(player)
+		task.delay(1, function()
+			DataManager.Profiles[player] = nil
+		end)
 	end
 	DataManager.DetachReplica(player)
 end)

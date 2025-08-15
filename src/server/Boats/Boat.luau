@@ -1,4 +1,5 @@
 local CollectionService = game:GetService("CollectionService")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local DataManager = require(ServerScriptService.Server.Data.DataManager)
@@ -144,30 +145,49 @@ BOAT.SetupAttributeListeners = function(primaryPart: Part, purchaseBoard: Part)
 	end)
 end
 
-BOAT.SetupBoat = function(boat: Model)
+BOAT.SetupBoat = function(boat: Model, player: Player)
 	local primaryPart = boat.PrimaryPart
 
-	-- //TODO - get boat state or FFGDefaults.BOAT_STARTING_ATT
-	local attributes = FFGDefaults.BOAT_STARTING_ATT
-
-	for key, value in pairs(attributes) do
-		primaryPart:SetAttribute(key, value)
+	if not player then
+		FFGHelpers.PrintLog("No local player found, unable to setup boat")
+		return
 	end
 
-	if not primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.isPurchased) then
-		BOAT.Hide(boat)
-		BOAT.CannotCollide(boat)
-	else
-		BOAT.Show(boat)
-		BOAT.CanCollide(boat)
-	end
+	local state = BOAT.GetBoatState(player)
 
-	-- Setup the purchase board info and attribute listeners
-	local purchaseBoard = BOAT.SetupUpgradeStore(boat, primaryPart)
-	if purchaseBoard then
-		BOAT.SetupProximityPrompt(boat, primaryPart, purchaseBoard)
-		BOAT.SetupAttributeListeners(primaryPart, purchaseBoard)
-	end
+	local attributes = nil
+	task.delay(1, function()
+		attributes = state or FFGDefaults.BOAT_STARTING_ATT
+
+		FFGHelpers.PrintLog("Attempting to apply state to boat: ", state)
+
+		for key, value in pairs(attributes) do
+			primaryPart:SetAttribute(key, value)
+		end
+
+		if not primaryPart:GetAttribute(FFGEnum.ATTRIBUTES.BOAT.isPurchased) then
+			BOAT.Hide(boat)
+			BOAT.CannotCollide(boat)
+		else
+			BOAT.Show(boat)
+			BOAT.CanCollide(boat)
+		end
+
+		-- Setup the purchase board info and attribute listeners
+		local purchaseBoard = BOAT.SetupUpgradeStore(boat, primaryPart)
+		if purchaseBoard then
+			BOAT.SetupProximityPrompt(boat, primaryPart, purchaseBoard)
+			BOAT.SetupAttributeListeners(primaryPart, purchaseBoard)
+		end
+	end)
+end
+
+BOAT.ResetBoat = function(profile)
+	-- // TODO clear up boat data for the next player
+end
+
+BOAT.GetBoatState = function(player: Player)
+	return DataManager.LoadBoatState(player)
 end
 
 BOAT.UpdateName = function(player: Player, primaryPart: Part, upgradeStage: number)
@@ -232,8 +252,20 @@ BOAT.Hide = function(boat: Model)
 	end
 end
 
-for _, taggedBoat in ipairs(taggedBoats) do
-	BOAT.SetupBoat(taggedBoat)
+BOAT.SetupTaggedBoats = function(player)
+	if player then task.delay(1, function()
+		for _, taggedBoat in ipairs(taggedBoats) do
+			BOAT.SetupBoat(taggedBoat, player)
+		end
+	end) end
 end
 
-CollectionService:GetInstanceAddedSignal("Boat"):Connect(BOAT.SetupBoat)
+BOAT.ResetTaggedBoats = function(profile)
+	if profile then
+		for _, taggedBoat in ipairs(taggedBoats) do
+			BOAT.ResetBoat(taggedBoat, profile)
+		end
+	end
+end
+
+return BOAT
