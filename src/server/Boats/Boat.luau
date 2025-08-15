@@ -182,8 +182,16 @@ BOAT.SetupBoat = function(boat: Model, player: Player)
 	end)
 end
 
-BOAT.ResetBoat = function(profile)
-	-- // TODO clear up boat data for the next player
+BOAT.ResetBoat = function(boat: Model, player: Player)
+	local primaryPart = boat.PrimaryPart
+
+	local attributes = FFGDefaults.BOAT_STARTING_ATT
+
+	for key, value in pairs(attributes) do
+		primaryPart:SetAttribute(key, value)
+	end
+
+	FFGHelpers.PrintLog("Reset Attributes completed: ", primaryPart:GetAttributes())
 end
 
 BOAT.GetBoatState = function(player: Player)
@@ -260,10 +268,10 @@ BOAT.SetupTaggedBoats = function(player)
 	end) end
 end
 
-BOAT.ResetTaggedBoats = function(profile)
-	if profile then
+BOAT.ResetTaggedBoats = function(player)
+	if player then
 		for _, taggedBoat in ipairs(taggedBoats) do
-			BOAT.ResetBoat(taggedBoat, profile)
+			BOAT.ResetBoat(taggedBoat, player)
 		end
 	end
 end
