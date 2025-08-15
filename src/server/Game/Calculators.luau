@@ -72,7 +72,7 @@ CALCULATOR.GetBaseCost = function(type: string, level: number, tier: number, rea
 		boatTier = 1
 	end
 
-	local tierMultiplier = Formulas.TIER_MULTIPLIER[tier] :: number
+	local tierMultiplier = Formulas.TIER_MULTIPLIER[boatTier] :: number
 	FFGHelpers.PrintLog("Tier Multiplier: ", tierMultiplier)
 	local realmMultiplier = math.pow(realmLevel, 2.25) -- scaling curve
 
@@ -102,16 +102,16 @@ CALCULATOR.UpgradeCost = function(type: string, level: number, tier: number, rea
 		boatTier = 1
 	end
 
-	local tierMultiplier = Formulas.TIER_MULTIPLIER[tier] :: number
+	local tierMultiplier = Formulas.TIER_MULTIPLIER[boatTier] :: number
 	FFGHelpers.PrintLog("Tier Multiplier: ", tierMultiplier)
 
 	local realmMultiplier = math.pow(realmLevel, 2.25) -- scaling curve
 
 	local growthRate = 0
 	if type == FFGEnum.ENTITIES.Boat then
-		growthRate = Formulas.BOAT.GrowthRate + tier * 0.02 :: number
+		growthRate = Formulas.BOAT.GrowthRate
 	else
-		growthRate = Formulas.TENDER.GrowthRate + tier * 0.02 :: number
+		growthRate = Formulas.TENDER.GrowthRate
 	end
 
 	FFGHelpers.PrintLog("Growth Rate: ", growthRate)

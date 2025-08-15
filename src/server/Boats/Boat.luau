@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local DataManager = require(ServerScriptService.Server.Data.DataManager)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
+local FFGTypes = require(ReplicatedStorage.Shared.Types.FFGTypes)
 local FFGDefaults = require(ServerScriptService.Server.FFGDefaults)
 local Calculators = require(ServerScriptService.Server.Game.Calculators)
 local FFGHelpers = require(ReplicatedStorage.Shared.Utils.FFGHelpers)
@@ -69,6 +70,19 @@ BOAT.SetupProximityPrompt = function(boat: Model, primaryPart: Part, purchaseBoa
 		currentState[k] = v
 	end
 
+	-- Helper function to update cache and attribute together
+	local function updateStateAndAttribute(key: string, value: any)
+		currentState[key] = value
+		primaryPart:SetAttribute(key, value)
+	end
+
+	-- Helper function to get fresh value and update cache
+	local function getAndCacheAttribute(key: string)
+		local value = primaryPart:GetAttribute(key)
+		currentState[key] = value
+		return value
+	end
+
 	-- Create the prompt and apply conditional text
 	local proximityPrompt = Instance.new("ProximityPrompt", purchaseBoard)
 	proximityPrompt.HoldDuration = 1
@@ -76,7 +90,10 @@ BOAT.SetupProximityPrompt = function(boat: Model, primaryPart: Part, purchaseBoa
 	proximityPrompt.ActionText = currentState.IsPurchased and "Level: " .. tostring(currentState.Level + 1) or "Tier " .. currentState.Tier .. " Boat"
 
 	proximityPrompt.TriggerEnded:Connect(function(player)
-		local upgradeCost = currentState.isPurchased and currentState.UpgradeCost > 100 or currentState.BaseCost
+		-- Use cached values but refresh critical ones to be safe
+		local isPurchased = getAndCacheAttribute(BoatEnums.isPurchased)
+		local upgradeCost = isPurchased and getAndCacheAttribute(BoatEnums.UpgradeCost) or getAndCacheAttribute(BoatEnums.BaseCost)
+
 		if not DataManager.CanAfford(player, FFGEnum.CURRENCY_TYPES.Gold, upgradeCost) then
 			FFGHelpers.PrintLog("Unable to afford upgrade, cost is: ", upgradeCost)
 			return
@@ -84,8 +101,10 @@ BOAT.SetupProximityPrompt = function(boat: Model, primaryPart: Part, purchaseBoa
 			DataManager.Spend(player, FFGEnum.CURRENCY_TYPES.Gold, upgradeCost)
 		end
 
-		if currentState.IsPurchased then
-			currentState.Level += 1
+		if isPurchased then
+			-- Update level using cache-updating helper
+			local currentLevel = currentState.Level
+			updateStateAndAttribute(BoatEnums.Level, currentLevel + 1)
 
 			-- if the new level passes the threshold in quality promo, update the UpgradeStage
 			for k, v in ipairs(FFGEnum.QUALITY_PROMOTION_LEVELS) do
@@ -98,6 +117,8 @@ BOAT.SetupProximityPrompt = function(boat: Model, primaryPart: Part, purchaseBoa
 			end
 
 			BOAT.UpdateLevel(player, primaryPart, currentState)
+			local newUpgradeCost = BOAT.GetUpgradeCost(currentState[BoatEnums.Level], currentState[BoatEnums.Tier], currentState[BoatEnums.RealmLevel], currentState[BoatEnums.BaseCost])
+			currentState[BoatEnums.UpgradeCost] = newUpgradeCost
 			BOAT.UpdateName(player, primaryPart, currentState.UpgradeStage)
 		else
 			BOAT.Show(boat)
@@ -122,7 +143,7 @@ BOAT.SetupProximityPrompt = function(boat: Model, primaryPart: Part, purchaseBoa
 end
 
 -- Set's the current state of the Boat on the Purchase Board
-BOAT.SetupPurchaseBoard = function(boat: Model, primaryPart: Part, boatState: { [string]: any })
+BOAT.SetupPurchaseBoard = function(boat: Model, primaryPart: Part, boatState: FFGTypes.BoatState)
 	local purchaseBoard = boat:WaitForChild("Purchase_Board")
 	local pbDetails = {}
 	pbDetails.NameLabel = FFGHelpers.deepWait(purchaseBoard, "SurfaceGui", "Main", "Header", "Name", "TextLabel") :: TextLabel
@@ -258,7 +279,7 @@ BOAT.UpdateName = function(player: Player, primaryPart: Part, upgradeStage: numb
 	DataManager.UpdateBoatState(player, BoatEnums.Name, FFGEnum.BOAT.NAME[upgradeStage])
 end
 
-BOAT.UpdateLevel = function(player: Player, primaryPart: Part, currentState: { Level: number, Tier: number, RealmLevel: number, BaseCost: number })
+BOAT.UpdateLevel = function(player: Player, primaryPart: Part, currentState: FFGTypes.BoatState?)
 	primaryPart:SetAttribute(BoatEnums.Level, currentState.Level)
 	DataManager.UpdateBoatState(player, BoatEnums.Level, currentState.Level)
 
