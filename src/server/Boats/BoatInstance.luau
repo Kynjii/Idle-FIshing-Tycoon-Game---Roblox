@@ -2,7 +2,6 @@ local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local DataManager = require(ServerScriptService.Server.Data.DataManager)
-local FFGDefaults = require(ServerScriptService.Server.FFGDefaults)
 local Formulas = require(ServerScriptService.Server.Game.Formulas)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local FFGTypes = require(ReplicatedStorage.Shared.Types.FFGTypes)
@@ -50,6 +49,7 @@ local STARTER_STATS: FFGTypes.BoatState = {
 	[BOATEnum.CostGrowthRate] = 1.4,
 	[BOATEnum.BaseStorage] = 100,
 	[BOATEnum.BaseFPS] = 10,
+	[BOATEnum.RealmLevel] = 1,
 }
 
 local BoatInstance = {}
@@ -75,16 +75,16 @@ function BoatInstance:New(state: FFGTypes.BoatState, ownerId: number, model: Mod
 	instance[BOATEnum.Id] = instance[BOATEnum.Id] or HttpService:GenerateGUID(false)
 	instance[BOATEnum.Owner] = instance[BOATEnum.Owner] or ownerId
 	instance[BOATEnum.BoatModel] = model
-	instance[BOATEnum.RealmLevel] = instance[BOATEnum.RealmLevel] or currentrealm
+	instance[BOATEnum.RealmLevel] = instance[BOATEnum.RealmLevel] or currentrealm or STARTER_STATS.RealmLevel
 	instance[BOATEnum.Name] = instance[BOATEnum.Name] or instance:GetName()
 	instance[BOATEnum.BaseCost] = instance[BOATEnum.BaseCost] or instance:CalculateBaseCost()
 	instance[BOATEnum.UpgradeCost] = instance[BOATEnum.UpgradeCost] or instance:CalculateUpgradeCost()
 
-	local currentMaxStorage: number, nextLvlMaxStorage: number = self:CalculateMaxStorage()
+	local currentMaxStorage: number, nextLvlMaxStorage: number = instance:CalculateMaxStorage()
 	instance[BOATEnum.CurrentMaxStorage] = instance[BOATEnum.CurrentMaxStorage] or currentMaxStorage
 	instance[BOATEnum.NextLvlMaxStorage] = instance[BOATEnum.NextLvlMaxStorage] or nextLvlMaxStorage
 
-	instance[BOATEnum.FPS] = instance[BOATEnum.FPS] or self:CalculateFPS()
+	instance[BOATEnum.FPS] = instance[BOATEnum.FPS] or instance:CalculateFPS()
 
 	return instance
 end
@@ -102,7 +102,6 @@ end
 
 function BoatInstance:CalculateMaxStorage()
 	local baseStorage = STARTER_STATS.BaseStorage
-
 	local growthRate = STARTER_STATS.GrowthRate + self[BOATEnum.Tier] * 0.02 :: number
 	local tierMultiplier = Formulas.TIER_MULTIPLIER[self[BOATEnum.Tier]] :: number
 	local maxStorage = baseStorage * math.pow(growthRate, self[BOATEnum.Level]) * tierMultiplier :: number
@@ -249,7 +248,8 @@ function BoatInstance:IsStorageFull()
 end
 
 function BoatInstance:Show()
-	local boatParts = self[BOATEnum.BoatModel]
+	local model = self[BOATEnum.BoatModel] :: Model
+	local boatParts = model:GetChildren()
 	for _, part in pairs(boatParts) do
 		if part.Name == "Purchase_Board" then continue end
 		if part.Transparency and part.Transparency == 1 then part.Transparency = 0 end
@@ -257,7 +257,8 @@ function BoatInstance:Show()
 end
 
 function BoatInstance:CanCollide()
-	local boatParts = self[BOATEnum.BoatModel]:GetChildren()
+	local model = self[BOATEnum.BoatModel] :: Model
+	local boatParts = model:GetChildren()
 	for _, part in pairs(boatParts) do
 		if part.Name == "Purchase_Board" then continue end
 		if not part.CanCollide then part.CanCollide = true end
@@ -265,7 +266,8 @@ function BoatInstance:CanCollide()
 end
 
 function BoatInstance:CannotCollide()
-	local boatParts = self[BOATEnum.BoatModel]:GetChildren()
+	local model = self[BOATEnum.BoatModel] :: Model
+	local boatParts = model:GetChildren()
 	for _, part in pairs(boatParts) do
 		if part.Name == "Purchase_Board" then continue end
 		if part.CanCollide then part.CanCollide = false end
@@ -273,23 +275,12 @@ function BoatInstance:CannotCollide()
 end
 
 function BoatInstance:Hide()
-	local boatParts = self[BOATEnum.BoatModel]:GetChildren()
+	local model = self[BOATEnum.BoatModel] :: Model
+	local boatParts = model:GetChildren()
 	for _, part in pairs(boatParts) do
 		if part.Name == "Purchase_Board" then continue end
 		if part.Transparency and part.Transparency == 0 then part.Transparency = 1 end
 	end
-end
-
-function BoatInstance:ResetBoat(boat: Model, player: Player)
-	local primaryPart = boat.PrimaryPart
-
-	local attributes = FFGDefaults.BOAT_STARTING_ATT
-
-	for key, value in pairs(attributes) do
-		primaryPart:SetAttribute(key, value)
-	end
-
-	FFGHelpers.PrintLog("Reset Attributes completed: ", primaryPart:GetAttributes())
 end
 
 -- //SECTION - UI Setup Methods

@@ -22,13 +22,15 @@ local function SetupBoats(player)
 	end
 end
 
-local function ResetBoats(player)
-	if player then
-		Boat.ResetTaggedBoats(player)
-	else
-		FFGHelpers.PrintLog("No player passed during initalization")
-	end
-end
+-- //TODO - save boats to datamanager and remove instance
+
+-- local function ResetBoats(player)
+-- 	if player then
+-- 		Boat.ResetTaggedBoats(player)
+-- 	else
+-- 		FFGHelpers.PrintLog("No player passed during initalization")
+-- 	end
+-- end
 
 local function PlayerAdded(player: Player)
 	local profile = PlayerStore:StartSessionAsync("Player_" .. player.UserId, {
@@ -42,7 +44,7 @@ local function PlayerAdded(player: Player)
 		profile:Reconcile()
 
 		profile.OnSessionEnd:Connect(function()
-			ResetBoats(player)
+			-- ResetBoats(player)
 			task.delay(1, function()
 				DataManager.Profiles[player] = nil
 				DataManager.DetachReplica(player)
@@ -71,7 +73,7 @@ Players.PlayerRemoving:Connect(function(player)
 	local profile = DataManager.Profiles[player]
 	if profile then
 		profile:EndSession()
-		ResetBoats(player)
+		-- ResetBoats(player)
 		task.delay(1, function()
 			DataManager.Profiles[player] = nil
 		end)

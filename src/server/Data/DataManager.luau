@@ -162,7 +162,7 @@ function DataManager.LoadBoatState(player)
 	local state = DataManager.GetBoatState(profile)
 	if not state then
 		FFGHelpers.PrintLog("Unable to get BoatState for loading")
-		return
+		return state
 	end
 
 	FFGHelpers.PrintLog("Current boat state: ", state)
