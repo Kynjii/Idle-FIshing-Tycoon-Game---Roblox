@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local TableUtil = require(ReplicatedStorage.Packages.TableUtil)
+local FFGTypes = require(ReplicatedStorage.Shared.Types.FFGTypes)
 local FFGHelpers = require(ReplicatedStorage.Shared.Utils.FFGHelpers)
 local PlayerDataTemplate = require(script.Parent.PlayerDataTemplate)
 local Replica = require(ServerScriptService.Server.ReplicaServer)
@@ -38,16 +39,6 @@ function DataManager.DetachReplica(player: Player)
 		replica:Destroy()
 		DataManager.Replicas[player] = nil
 	end
-end
-
-function DataManager.CurrentRealm(player: Player)
-	local profile = DataManager.Profiles[player]
-	if not profile then
-		FFGHelpers.PrintLog("No profile found when attempting to get current realm")
-		return
-	end
-
-	return profile.Data.CurrentRealm
 end
 
 function DataManager.Earn(player: Player, currencyType: string, amount: number)
@@ -118,66 +109,107 @@ function DataManager.CreateNewProfileData(player: Player, profile)
 	FFGHelpers.PrintLog("Created Profile Data: ", profile)
 end
 
-function DataManager.UpdateBoatState(player: Player, stateKey, newStateValue)
-	-- //TODO - probably do a check to see if boat owner matches player, if not then return
-	-- local userId = player.UserId
-	-- //TODO - think if you want to pass the current attributes to determine things like tier, it might help with finding inxed instead of hardcoding
+function DataManager.SaveBoatState(player: Player, boatId: string, newState: FFGTypes.BoatState): boolean
 	local profile = DataManager.Profiles[player]
 	if not profile then
-		FFGHelpers.PrintLog("No profile found when attempting to update state for: ", player)
-		return
+		FFGHelpers.PrintLog("No profile found when attempting to save boat state for: ", player)
+		return false
 	end
 
-	local BoatState = DataManager.GetBoatState(profile)
+	local realmId = newState.RealmLevel or 1
+	local laneId = newState.Tier or 1
 
-	FFGHelpers.PrintLog("Attempting to apply new state: ", stateKey)
-	FFGHelpers.PrintLog("Attempting to apply new state: ", newStateValue)
-
-	if BoatState then
-		FFGHelpers.PrintLog("Found state, updating now: ", BoatState)
-		BoatState[stateKey] = newStateValue
-
-		FFGHelpers.PrintLog("Updated Boatstate: ", BoatState)
-	else
-		FFGHelpers.PrintLog("Could not find state when attempting to update: ", stateKey)
+	-- Ensure the data structure exists
+	if not profile.Data.Realms then
+		FFGHelpers.PrintLog("No Realms data structure found")
+		return false
 	end
+
+	if not profile.Data.Realms[realmId] then
+		FFGHelpers.PrintLog("Realm not found", realmId)
+		return false
+	end
+
+	if not profile.Data.Realms[realmId].Lanes then
+		FFGHelpers.PrintLog("No Lanes in realm", realmId)
+		return false
+	end
+
+	if not profile.Data.Realms[realmId].Lanes[laneId] then
+		FFGHelpers.PrintLog("Lane", laneId, "not found in realm", realmId)
+		return false
+	end
+
+	-- Actually save the boat state to the profile
+	profile.Data.Realms[realmId].Lanes[laneId].Boat = newState
+
+	FFGHelpers.PrintLog("Saved boat state for player", player.Name, "boat", boatId)
+	return true
 end
 
-function DataManager.GetBoatState(profile)
-	-- // TODO Remove hardcoded realmId
-	local realm1 = profile.Data.Realms[1]
-	local boat = realm1.Lanes[1].Boat
-	if not boat then
-		FFGHelpers.PrintLog("Unable to get BoatState")
-		return
-	end
+function DataManager.GetBoatState(profile): FFGTypes.BoatState?
+	if not profile or not profile.Data then return nil end
+	local realmId = profile.Data.CurrentRealm
 
-	return boat
+	-- //TODO remove hardcoded laneId
+	local laneId = 1
+
+	if not profile.Data.Realms then return nil end
+	if not profile.Data.Realms[realmId] then return nil end
+	if not profile.Data.Realms[realmId].Lanes then return nil end
+	if not profile.Data.Realms[realmId].Lanes[laneId] then return nil end
+
+	return profile.Data.Realms[realmId].Lanes[laneId].Boat
 end
 
-function DataManager.LoadBoatState(player)
+function DataManager.LoadBoatState(player: Player): FFGTypes.BoatState?
 	FFGHelpers.PrintLog("Attempting to load boat state for: ", player)
 	local profile = DataManager.Profiles[player]
-	if not profile then FFGHelpers.PrintLog("No profile found for: ", player) end
+	if not profile then
+		FFGHelpers.PrintLog("No profile found for: ", player)
+		return nil
+	end
+
 	local state = DataManager.GetBoatState(profile)
 	if not state then
 		FFGHelpers.PrintLog("Unable to get BoatState for loading")
-		return state
+		return nil
 	end
 
 	FFGHelpers.PrintLog("Current boat state: ", state)
-
 	return state
 end
 
-function DataManager.SaveProfileState(player: Player)
+function DataManager.LoadBoatStateById(player: Player, boatId: string): FFGTypes.BoatState?
+	-- TODO: Implement proper boat lookup by ID when supporting multiple boats
+	-- For now, just return the single boat state
+	return DataManager.LoadBoatState(player)
+end
+
+function DataManager.SaveProfileState(player: Player): boolean
 	local profile = DataManager.Profiles[player]
 	if not profile then
 		FFGHelpers.PrintLog("No profile found when attempting to save state for: ", player)
-		return
+		return false
 	end
 
-	profile:Save()
+	local success = pcall(function()
+		profile:Save()
+	end)
+
+	if success then
+		FFGHelpers.PrintLog("Successfully saved profile for: ", player.Name)
+	else
+		FFGHelpers.PrintLog("Failed to save profile for: ", player.Name)
+	end
+
+	return success
+end
+
+function DataManager.SaveAllBoatData(player: Player): boolean
+	-- This is called by BoatManager to trigger a profile save
+	-- The actual boat data should already be updated in the profile by SaveBoatState
+	return DataManager.SaveProfileState(player)
 end
 
 function DataManager.ResetAllPlayerData(player: Player)

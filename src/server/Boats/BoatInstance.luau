@@ -56,7 +56,7 @@ local BoatInstance = {}
 BoatInstance.__index = BoatInstance
 
 -- //SECTION - Constructor
-function BoatInstance:New(state: FFGTypes.BoatState, ownerId: number, model: Model, currentrealm: number)
+function BoatInstance:New(state: FFGTypes.BoatState, player: Player, model: Model, currentrealm: number)
 	local instance = setmetatable({}, BoatInstance)
 
 	-- Start with default stats as base
@@ -73,7 +73,7 @@ function BoatInstance:New(state: FFGTypes.BoatState, ownerId: number, model: Mod
 
 	-- Calculate derived properties after instance is set up
 	instance[BOATEnum.Id] = instance[BOATEnum.Id] or HttpService:GenerateGUID(false)
-	instance[BOATEnum.Owner] = instance[BOATEnum.Owner] or ownerId
+	instance[BOATEnum.Owner] = instance[BOATEnum.Owner] or player.UserId
 	instance[BOATEnum.BoatModel] = model
 	instance[BOATEnum.RealmLevel] = instance[BOATEnum.RealmLevel] or currentrealm or STARTER_STATS.RealmLevel
 	instance[BOATEnum.Name] = instance[BOATEnum.Name] or instance:GetName()
@@ -210,41 +210,33 @@ function BoatInstance:IncreaseUpgradeStage(stage)
 	self[BOATEnum.UpgradeStage] = stage
 end
 
--- //SECTION - Handles State updates for the boat
 function BoatInstance:GetName(): string
 	return NAME[self[BOATEnum.UpgradeStage]]
 end
--- //!SECTION
 
--- //TODO - make sure this is sync'd
--- //SECTION - (De)Serialization
-function BoatInstance:serialize()
+-- //SECTION - Loading and Saving
+function BoatInstance:Serialize(): FFGTypes.BoatState
 	return {
-		id = self.id,
-		ownerId = self.ownerId,
-		level = self.level,
-		tier = self.tier,
-		isPurchased = self.isPurchased,
-		upgradeCost = self.upgradeCost,
+		id = self[BOATEnum.Id],
+		ownerId = self[BOATEnum.Owner],
+		level = self[BOATEnum.Level],
+		tier = self[BOATEnum.Tier],
+		isPurchased = self[BOATEnum.isPurchased],
+		isActive = self[BOATEnum.isActive],
+		upgradeCost = self[BOATEnum.UpgradeCost],
+		upgradeStage = self[BOATEnum.UpgradeStage],
+		maxLevel = self[BOATEnum.MaxLevel],
+		baseCost = self[BOATEnum.BaseCost],
+		baseFPS = self[BOATEnum.BaseFPS],
+		baseStorage = self[BOATEnum.BaseStorage],
+		currentMaxStorage = self[BOATEnum.CurrentMaxStorage],
+		fishPerSecond = self[BOATEnum.FPS],
+		fishInStorage = self[BOATEnum.FishInStorage],
+		name = self[BOATEnum.Name],
+		nextLvlMaxStorage = self[BOATEnum.NextLvlMaxStorage],
+		realmLevel = self[BOATEnum.RealmLevel],
+		storageFull = self[BOATEnum.StorageFull],
 	}
-end
-
-function BoatInstance:fromSerializedData(data: FFGTypes.BoatState, boatModel: Model)
-	local instance = setmetatable({}, BoatInstance)
-
-	-- Restore the data
-	instance.id = data.id
-	instance.ownerId = data.ownerId
-	instance.level = data.level
-	instance.tier = data.tier
-	instance.isPurchased = data.isPurchased
-	instance.upgradeCost = data.upgradeCost
-
-	-- Re-attach runtime-only stuff
-	instance.model = boatModel
-	instance.primaryPart = boatModel.PrimaryPart
-
-	return instance
 end
 -- //!SECTION
 

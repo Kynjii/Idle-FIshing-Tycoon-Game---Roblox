@@ -1,8 +1,8 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
-
-local Boat = require(ServerScriptService.Server.Boats.SetupBoat)
+local BoatManager = require(ServerScriptService.Server.Boats.BoatManager)
+local Boat = require(ServerScriptService.Server.Boats.SetupBoats)
 local FFGHelpers = require(ReplicatedStorage.Shared.Utils.FFGHelpers)
 local PlayerDataTemplate = require(ServerScriptService.Server.Data.PlayerDataTemplate)
 local ProfileStore = require(ServerScriptService.Server.Libs.ProfileStore)
@@ -22,16 +22,6 @@ local function SetupBoats(player)
 	end
 end
 
--- //TODO - save boats to datamanager and remove instance
-
--- local function ResetBoats(player)
--- 	if player then
--- 		Boat.ResetTaggedBoats(player)
--- 	else
--- 		FFGHelpers.PrintLog("No player passed during initalization")
--- 	end
--- end
-
 local function PlayerAdded(player: Player)
 	local profile = PlayerStore:StartSessionAsync("Player_" .. player.UserId, {
 		Cancel = function()
@@ -44,12 +34,8 @@ local function PlayerAdded(player: Player)
 		profile:Reconcile()
 
 		profile.OnSessionEnd:Connect(function()
-			-- ResetBoats(player)
-			task.delay(1, function()
-				DataManager.Profiles[player] = nil
-				DataManager.DetachReplica(player)
-				player:Kick("Data error occured, please rejoin.")
-			end)
+			DataManager.Profiles[player] = nil
+			DataManager.DetachReplica(player)
 		end)
 
 		if player.Parent == Players then
@@ -72,8 +58,9 @@ Players.PlayerAdded:Connect(PlayerAdded)
 Players.PlayerRemoving:Connect(function(player)
 	local profile = DataManager.Profiles[player]
 	if profile then
+		BoatManager.CleanupPlayer(player)
 		profile:EndSession()
-		-- ResetBoats(player)
+
 		task.delay(1, function()
 			DataManager.Profiles[player] = nil
 		end)
