@@ -1,7 +1,6 @@
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
-local DataManager = require(ServerScriptService.Server.Data.DataManager)
 local FFGDefaults = require(ServerScriptService.Server.FFGDefaults)
 local Formulas = require(ServerScriptService.Server.Game.Formulas)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
