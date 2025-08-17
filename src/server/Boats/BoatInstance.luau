@@ -92,6 +92,12 @@ end
 
 function BoatInstance:Upgrade()
 	self[BOATEnum.Level] += 1
+	for k, v in ipairs(_BOAT_PROMOTION_LEVELS) do
+		if self[BOATEnum.Level] == v then
+			self:IncreaseUpgradeStage(k)
+			break
+		end
+	end
 	self[BOATEnum.UpgradeCost] = self:CalculateUpgradeCost()
 	self[BOATEnum.Name] = self:GetName()
 
@@ -200,8 +206,8 @@ function BoatInstance:RemoveFish(amount: number)
 	--
 end
 
-function BoatInstance:IncreaseUpgradeStage()
-	self[BOATEnum.UpgradeStage] += 1
+function BoatInstance:IncreaseUpgradeStage(stage)
+	self[BOATEnum.UpgradeStage] = stage
 end
 
 -- //SECTION - Handles State updates for the boat
@@ -324,8 +330,7 @@ function BoatInstance:SetupPurchaseBoard()
 		pbDetails.LevelLabel.Text = self[BOATEnum.isPurchased] and "Level: " .. level or "Purchase Boat"
 
 		-- Use instance methods for storage calculations
-		local currentStorage = self:CalculateMaxStorage()
-		local nextStorage = self:CalculateMaxStorage() -- TODO: Calculate next level storage
+		local currentStorage, nextStorage = self:CalculateMaxStorage()
 		pbDetails.CurrentMaxStorageLabel.Text = self[BOATEnum.isPurchased] and tostring(currentStorage) or ""
 		pbDetails.NextMaxStorageLabel.Text = self[BOATEnum.isPurchased] and tostring(nextStorage) or ""
 	end
@@ -355,7 +360,7 @@ function BoatInstance:UpdatePurchaseBoardUI()
 	local qualityInfo = FFGEnum.QUALITY[currentUpgradeStage]
 	local color = qualityInfo.Color
 	pbDetails.NameLabel.TextColor3 = color
-	pbDetails.NameLabel.Text = FFGEnum.ACTIVEBOATS.NAME[currentUpgradeStage]
+	pbDetails.NameLabel.Text = self:GetName()
 
 	if self[BOATEnum.isPurchased] then pbDetails.NameLabel.Parent.Visible = true end
 end

@@ -25,28 +25,28 @@ export type BoatState = {
 export type BoatInstance = BoatState & {
 	-- Constructor
 	New: (self: BoatInstance, state: BoatState, ownerId: number, model: Model, currentrealm: number?) -> BoatInstance,
-	
+
 	-- Core boat actions
 	Purchase: (self: BoatInstance) -> (),
 	Upgrade: (self: BoatInstance) -> (),
-	
+
 	-- Calculations
 	CalculateBaseCost: (self: BoatInstance) -> number,
 	CalculateUpgradeCost: (self: BoatInstance) -> number,
 	GetMaxStorage: (self: BoatInstance) -> number,
-	
+
 	-- Visibility and collision
 	Hide: (self: BoatInstance) -> (),
 	CannotCollide: (self: BoatInstance) -> (),
 	Show: (self: BoatInstance) -> (),
 	CanCollide: (self: BoatInstance) -> (),
-	
+
 	-- UI Setup (new methods)
 	Initialize: (self: BoatInstance) -> (),
 	SetupPurchaseBoard: (self: BoatInstance) -> Part,
 	SetupProximityPrompt: (self: BoatInstance, purchaseBoard: Part) -> ProximityPrompt,
 	UpdateProximityPromptUI: (self: BoatInstance, proximityPrompt: ProximityPrompt) -> (),
-	
+
 	-- Utilities
 	GetName: (self: BoatInstance) -> string,
 }
