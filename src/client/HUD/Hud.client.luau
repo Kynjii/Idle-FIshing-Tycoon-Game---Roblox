@@ -40,7 +40,7 @@ local function fmt(n: number): string
 		end
 	end
 
-	-- no suffix (< 1e3): still keep it tidy
+	-- no suffix (< 1e3)
 	if absn >= 100 then
 		return string.format("%.0f", n)
 	elseif absn >= 10 then
@@ -69,8 +69,7 @@ Replica.OnNew("PlayerState", function(replica)
 		end
 	end
 
-	-- Subscribe to currency patches (Gold + any others you add)
-	-- This captures the key per iteration to avoid closure bugs.
+	-- Subscribe to currency patches
 	local subscribed: { [string]: boolean } = {}
 
 	local function subscribeCurrency(key: string)
@@ -81,7 +80,7 @@ Replica.OnNew("PlayerState", function(replica)
 		end)
 	end
 
-	-- Subscribe for all labels you have in the HUD (even if not present yet)
+	-- Subscribe for all labels in the HUD
 	for key in pairs(labels) do
 		subscribeCurrency(key)
 	end
