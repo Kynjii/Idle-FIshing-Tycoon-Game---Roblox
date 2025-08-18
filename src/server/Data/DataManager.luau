@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local TableUtil = require(ReplicatedStorage.Packages.TableUtil)
+local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local FFGTypes = require(ReplicatedStorage.Shared.Types.FFGTypes)
 local FFGHelpers = require(ReplicatedStorage.Shared.Utils.FFGHelpers)
 local PlayerDataTemplate = require(script.Parent.PlayerDataTemplate)
@@ -116,38 +117,33 @@ function DataManager.SaveBoatState(player: Player, boatId: string, newState: FFG
 		return false
 	end
 
-	local realmId = newState.RealmLevel or 1
-	local laneId = newState.Tier or 1
-
 	-- Ensure the data structure exists
 	if not profile.Data.Realms then
 		FFGHelpers.PrintLog("No Realms data structure found")
 		return false
 	end
 
-	if not profile.Data.Realms[realmId] then
-		FFGHelpers.PrintLog("Realm not found", realmId)
+	if not profile.Data.Boats then
+		FFGHelpers.PrintLog("Boats Table not found")
 		return false
 	end
 
-	if not profile.Data.Realms[realmId].Lanes then
-		FFGHelpers.PrintLog("No Lanes in realm", realmId)
-		return false
-	end
+	local existingBoat = TableUtil.Find(profile.Data.Boats, function(boat)
+		return boat[FFGEnum.ATTRIBUTES.BOAT.Id] == boat[FFGEnum.ATTRIBUTES.BOAT.Id]
+	end)
 
-	if not profile.Data.Realms[realmId].Lanes[laneId] then
-		FFGHelpers.PrintLog("Lane", laneId, "not found in realm", realmId)
-		return false
+	if not existingBoat then
+		profile.Data.Boats[newState] = newState
+	else
+		profile.Data.Boats[existingBoat] = newState
 	end
-
-	-- Actually save the boat state to the profile
-	profile.Data.Realms[realmId].Lanes[laneId].Boat = newState
 
 	FFGHelpers.PrintLog("Saved boat state for player", player.Name, "boat", boatId)
 	return true
 end
 
 function DataManager.GetBoatState(profile): FFGTypes.BoatState?
+	-- //TODO - update to match new saving scheme
 	if not profile or not profile.Data then return nil end
 	local realmId = profile.Data.CurrentRealm
 

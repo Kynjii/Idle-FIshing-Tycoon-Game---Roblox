@@ -47,7 +47,7 @@ CALCULATOR.MaxStorage = function(type: string, level: number, tier: number)
 	return maxStorage, nextLvlMaxStorage
 end
 
-CALCULATOR.GetBaseCost = function(type: string, level: number, tier: number, realmLevel: number): number
+CALCULATOR.GetBaseCost = function(type: string, level: number, tier: number, RealmId: number): number
 	if not type or not level or not tier then
 		FFGHelpers("No type or entityState passed to GetBaseCost fn")
 		return
@@ -76,20 +76,20 @@ CALCULATOR.GetBaseCost = function(type: string, level: number, tier: number, rea
 
 	local tierMultiplier = Formulas.TIER_MULTIPLIER[boatTier] :: number
 	FFGHelpers.PrintLog("Tier Multiplier: ", tierMultiplier)
-	local realmMultiplier = math.pow(realmLevel, 2.25) -- scaling curve
+	local realmMultiplier = math.pow(RealmId, 2.25) -- scaling curve
 
 	local cost = baseCost * tierMultiplier * realmMultiplier
 
 	return cost
 end
 
-CALCULATOR.UpgradeCost = function(type: string, level: number, tier: number, realmLevel: number, baseCost: number): number
+CALCULATOR.UpgradeCost = function(type: string, level: number, tier: number, RealmId: number, baseCost: number): number
 	if not type or not level or not tier then
 		FFGHelpers("No type or entityState passed to UpgradeCost fn")
 		return
 	end
 
-	local baseCostCalc = baseCost or CALCULATOR.GetBaseCost(type, level, tier, realmLevel) :: number
+	local baseCostCalc = baseCost or CALCULATOR.GetBaseCost(type, level, tier, RealmId) :: number
 
 	if baseCostCalc <= 0 then
 		FFGHelpers.PrintLog("Base cost is either 0 or below, returning")
@@ -107,7 +107,7 @@ CALCULATOR.UpgradeCost = function(type: string, level: number, tier: number, rea
 	local tierMultiplier = Formulas.TIER_MULTIPLIER[boatTier] :: number
 	FFGHelpers.PrintLog("Tier Multiplier: ", tierMultiplier)
 
-	local realmMultiplier = math.pow(realmLevel, 2.25) -- scaling curve
+	local realmMultiplier = math.pow(RealmId, 2.25) -- scaling curve
 
 	local growthRate = 0
 	if type == FFGEnum.ENTITIES.Boat then
@@ -125,7 +125,7 @@ CALCULATOR.UpgradeCost = function(type: string, level: number, tier: number, rea
 	return cost
 end
 
-CALCULATOR.FishPerSecond = function(level: number, tier: number, realmLevel: number)
+CALCULATOR.FishPerSecond = function(level: number, tier: number, RealmId: number)
 	-- //TODO - look into why i am not calulating base cost based on tier note: i get basecost from the upgradableentity but i dont have a calculation for baseFPS that's why
 	local baseFPS = FFGDefaults.BOAT_STARTING_ATT[FFGEnum.ATTRIBUTES.BOAT.FPS] or 10
 	local growthRate = Formulas.BOAT.GrowthRate

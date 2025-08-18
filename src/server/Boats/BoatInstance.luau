@@ -8,7 +8,7 @@ local FFGTypes = require(ReplicatedStorage.Shared.Types.FFGTypes)
 local FFGHelpers = require(ReplicatedStorage.Shared.Utils.FFGHelpers)
 local BOATEnum = FFGEnum.ATTRIBUTES.BOAT
 
-local _BOAT_PROMOTION_LEVELS = {
+local BOAT_PROMOTION_LEVELS = {
 	[1] = 1,
 	[2] = 10,
 	[3] = 20,
@@ -49,7 +49,7 @@ local STARTER_STATS: FFGTypes.BoatState = {
 	[BOATEnum.CostGrowthRate] = 1.4,
 	[BOATEnum.BaseStorage] = 100,
 	[BOATEnum.BaseFPS] = 10,
-	[BOATEnum.RealmLevel] = 1,
+	[BOATEnum.RealmId] = 1,
 }
 
 local BoatInstance = {}
@@ -75,7 +75,7 @@ function BoatInstance:New(state: FFGTypes.BoatState, player: Player, model: Mode
 	instance[BOATEnum.Id] = instance[BOATEnum.Id] or HttpService:GenerateGUID(false)
 	instance[BOATEnum.Owner] = instance[BOATEnum.Owner] or player.UserId
 	instance[BOATEnum.BoatModel] = model
-	instance[BOATEnum.RealmLevel] = instance[BOATEnum.RealmLevel] or currentrealm or STARTER_STATS.RealmLevel
+	instance[BOATEnum.RealmId] = instance[BOATEnum.RealmId] or currentrealm or STARTER_STATS.RealmId
 	instance[BOATEnum.Name] = instance[BOATEnum.Name] or instance:GetName()
 	instance[BOATEnum.BaseCost] = instance[BOATEnum.BaseCost] or instance:CalculateBaseCost()
 	instance[BOATEnum.UpgradeCost] = instance[BOATEnum.UpgradeCost] or instance:CalculateUpgradeCost()
@@ -92,7 +92,7 @@ end
 
 function BoatInstance:Upgrade()
 	self[BOATEnum.Level] += 1
-	for k, v in ipairs(_BOAT_PROMOTION_LEVELS) do
+	for k, v in ipairs(BOAT_PROMOTION_LEVELS) do
 		if self[BOATEnum.Level] == v then
 			self:IncreaseUpgradeStage(k)
 			break
@@ -122,7 +122,7 @@ function BoatInstance:CalculateBaseFPS(): number
 	local baseFPS = STARTER_STATS.BaseFPS
 
 	local tierMultiplier = Formulas.TIER_MULTIPLIER[self[BOATEnum.Tier]]
-	local realmMultiplier = math.pow(self[BOATEnum.RealmLevel], 2.25) -- scaling curve
+	local realmMultiplier = math.pow(self[BOATEnum.RealmId], 2.25) -- scaling curve
 
 	local baseFPSCalc = baseFPS * tierMultiplier * realmMultiplier
 
@@ -148,7 +148,7 @@ function BoatInstance:CalculateBaseCost(): number
 	local baseCost = STARTER_STATS.BaseCost
 
 	local tierMultiplier = Formulas.TIER_MULTIPLIER[self[BOATEnum.Tier]]
-	local realmMultiplier = math.pow(self[BOATEnum.RealmLevel], 2.25) -- scaling curve
+	local realmMultiplier = math.pow(self[BOATEnum.RealmId], 2.25) -- scaling curve
 
 	local cost = baseCost * tierMultiplier * realmMultiplier
 
@@ -165,7 +165,7 @@ function BoatInstance:CalculateUpgradeCost(): number
 
 	local tierMultiplier = Formulas.TIER_MULTIPLIER[self[BOATEnum.Tier]]
 
-	local realmMultiplier = math.pow(self[BOATEnum.RealmLevel], 2.25) -- scaling curve
+	local realmMultiplier = math.pow(self[BOATEnum.RealmId], 2.25) -- scaling curve
 
 	local growthRate = STARTER_STATS.CostGrowthRate
 
@@ -234,7 +234,7 @@ function BoatInstance:Serialize(): FFGTypes.BoatState
 		fishInStorage = self[BOATEnum.FishInStorage],
 		name = self[BOATEnum.Name],
 		nextLvlMaxStorage = self[BOATEnum.NextLvlMaxStorage],
-		realmLevel = self[BOATEnum.RealmLevel],
+		RealmId = self[BOATEnum.RealmId],
 		storageFull = self[BOATEnum.StorageFull],
 	}
 end

@@ -16,36 +16,6 @@ FFGEnum.QUALITY_PROMOTION_LEVELS = {
 	[11] = 700,
 }
 
-FFGEnum.BOAT_PROMOTION_LEVELS = {
-	[1] = 1,
-	[2] = 10,
-	[3] = 20,
-	[4] = 30,
-	[5] = 40,
-	[6] = 50,
-	[7] = 60,
-	[8] = 70,
-	[9] = 80,
-	[10] = 90,
-	[11] = 100,
-}
-
-FFGEnum.BOAT = {
-	NAME = {
-		[1] = "Driftwood Skiff",
-		[2] = "Netting Dory",
-		[3] = "Herring Lugger",
-		[4] = "Tidecaller Canoe",
-		[5] = "Seablessed Punt",
-		[6] = "Knight's Hull",
-		[7] = "Crimson Cutter",
-		[8] = "Ironhook Galley",
-		[9] = "Mariner’s Galleon",
-		[10] = "Wyrmcatcher",
-		[11] = "The Flynnrunner",
-	},
-}
-
 FFGEnum.TENDER = {
 	NAME = {
 		[1] = "Wooden Cart-Barge",
@@ -126,7 +96,7 @@ FFGEnum.ATTRIBUTES = {
 		["Id"] = "Id",
 		["CurrentMaxStorage"] = "CurrentMaxStorage",
 		["NextLvlMaxStorage"] = "NextLvlMaxStorage",
-		["RealmLevel"] = "RealmLevel",
+		["RealmId"] = "RealmId",
 		["MaxLevel"] = "MaxLevel",
 		["BaseCost"] = "BaseCost",
 		["UpgradeCost"] = "UpgradeCost",

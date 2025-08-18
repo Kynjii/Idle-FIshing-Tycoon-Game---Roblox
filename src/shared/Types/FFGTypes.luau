@@ -2,7 +2,7 @@ export type BoatState = {
 	Id: string,
 	Level: number,
 	Tier: number,
-	RealmLevel: number,
+	RealmId: number,
 	BaseCost: number,
 	UpgradeCost: number?,
 	isPurchased: boolean,
