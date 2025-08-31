@@ -1,7 +1,4 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerScriptService = game:GetService("ServerScriptService")
-
-local DataManager = require(ServerScriptService.Server.Data.DataManager)
 local FFGTypes = require(ReplicatedStorage.Shared.Types.FFGTypes)
 local FFGHelpers = require(ReplicatedStorage.Shared.Utils.FFGHelpers)
 
@@ -66,54 +63,6 @@ BoatManager.GetBoat = function(player: Player, boatId: string): FFGTypes.BoatIns
 	return playerBoats and playerBoats[boatId] or nil
 end
 
--- Save all boats for a player to persistent storage
-BoatManager.SaveAllBoats = function(player: Player): boolean
-	local playerBoats = BoatManager.GetPlayerBoats(player)
-	if not playerBoats then return false end
-
-	local success = true
-	for boatId, boat in pairs(playerBoats) do
-		local serializedData = boat:Serialize() -- uppercase to match BoatInstance method
-		local saveSuccess = DataManager.SaveBoatState(player, boatId, serializedData)
-		if not saveSuccess then
-			FFGHelpers.PrintLog("BoatManager: Failed to save boat", boatId)
-			success = false
-		end
-	end
-
-	-- Trigger profile save to persist all changes
-	if success then
-		success = DataManager.SaveAllBoatData(player)
-		FFGHelpers.PrintLog("BoatManager: Saved all boats for player", player.Name)
-	end
-
-	return success
-end
-
--- Clean up all boats for a player (when they leave)
-BoatManager.CleanupPlayer = function(player: Player): boolean
-	if not player then return false end
-
-	local userId = player.UserId
-
-	-- Save before cleanup
-	BoatManager.SaveAllBoats(player)
-
-	-- Remove from active boats
-	if BoatManager.ActiveBoats[userId] then
-		local boatCount = 0
-		for _ in pairs(BoatManager.ActiveBoats[userId]) do
-			boatCount = boatCount + 1
-		end
-
-		BoatManager.ActiveBoats[userId] = nil
-		FFGHelpers.PrintLog("BoatManager: Cleaned up", boatCount, "boats for player", player.Name)
-		return true
-	end
-
-	return false
-end
-
 -- Get total active boat count (for monitoring)
 BoatManager.GetActiveBoatCount = function(): number
 	local count = 0
@@ -123,20 +72,6 @@ BoatManager.GetActiveBoatCount = function(): number
 		end
 	end
 	return count
-end
-
--- Save all boats for all players (periodic save)
-BoatManager.SaveAllPlayersBoats = function(): boolean
-	local Players = game:GetService("Players")
-	local success = true
-
-	for _, player in pairs(Players:GetPlayers()) do
-		local playerSuccess = BoatManager.SaveAllBoats(player)
-		if not playerSuccess then success = false end
-	end
-
-	FFGHelpers.PrintLog("BoatManager: Periodic save completed, success:", success)
-	return success
 end
 
 return BoatManager

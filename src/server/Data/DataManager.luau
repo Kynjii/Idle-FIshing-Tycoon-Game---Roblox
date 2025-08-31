@@ -202,12 +202,6 @@ function DataManager.SaveProfileState(player: Player): boolean
 	return success
 end
 
-function DataManager.SaveAllBoatData(player: Player): boolean
-	-- This is called by BoatManager to trigger a profile save
-	-- The actual boat data should already be updated in the profile by SaveBoatState
-	return DataManager.SaveProfileState(player)
-end
-
 function DataManager.ResetAllPlayerData(player: Player)
 	local profile = DataManager.Profiles[player]
 	if not profile then
