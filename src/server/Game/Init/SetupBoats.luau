@@ -23,7 +23,8 @@ function SetupBoat(boatModel: Model, player: Player)
 	end
 
 	local state = GetBoatState(player)
-	local Boat: FFGTypes.BoatClass = BoatClass:New(state, player, boatModel)
+	-- //TODO Remove hardcoded index
+	local Boat: FFGTypes.BoatClass = BoatClass:New(state[1], player, boatModel)
 
 	Boat:Initialize()
 end
