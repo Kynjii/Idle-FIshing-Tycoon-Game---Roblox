@@ -6,6 +6,7 @@ local Formulas = require(ServerScriptService.Server.Math.Formulas)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local DeepWait = require(ReplicatedStorage.Shared.Utils.DeepWait)
 local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
+local SetInterval = require(ServerScriptService.Server.Modules.SetInterval)
 local BOATEnum = FFGEnum.ATTRIBUTES.BOAT
 
 export type BoatState = {
@@ -241,10 +242,9 @@ function BoatClass:Purchase()
 end
 
 function BoatClass:StartFishing()
-	while not self[BOATEnum.StorageFull] do
-		self:AddFish(self[BOATEnum.FPS])
-		task.wait(1)
-	end
+	SetInterval(function()
+		if not self[BOATEnum.StorageFull] then self:AddFish(self[BOATEnum.FPS]) end
+	end, 1)
 end
 
 function BoatClass:AddFish(amount: number)
