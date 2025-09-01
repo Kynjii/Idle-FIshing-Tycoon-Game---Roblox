@@ -2,7 +2,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local TableUtil = require(ReplicatedStorage.Packages.TableUtil)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
-local FFGTypes = require(ReplicatedStorage.Shared.Types.FFGTypes)
 local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
 local PlayerDataTemplate = require(ServerScriptService.Server.Modules.PlayerDataTemplate)
 local Replica = require(ServerScriptService.Server.ReplicaServer)
@@ -110,7 +109,7 @@ function DataService.CreateNewProfileData(player: Player, profile)
 	FFGHelpers.PrintLog("Created Profile Data: ", profile)
 end
 
-function DataService.SaveBoatState(player: Player, boatId: string, newState: FFGTypes.BoatState): boolean
+function DataService.SaveBoatState(player: Player, boatId: string, newState): boolean
 	local profile = DataService.Profiles[player]
 	if not profile then
 		FFGHelpers.PrintLog("No profile found when attempting to save boat state for: ", player)
@@ -153,7 +152,7 @@ function DataService.SaveBoatState(player: Player, boatId: string, newState: FFG
 end
 
 -- //TODO - Figure out with boatstate function to use when multiple is needed
-function DataService.GetBoatState(profile): FFGTypes.BoatState?
+function DataService.GetBoatState(profile)
 	if not profile or not profile.Data then return nil end
 	local currentRealm = profile.Data.CurrentRealm or 1
 
@@ -164,7 +163,7 @@ function DataService.GetBoatState(profile): FFGTypes.BoatState?
 	return profile.Data.Realms[currentRealm].Boats
 end
 
-function DataService.LoadBoatState(player: Player): FFGTypes.BoatState?
+function DataService.LoadBoatState(player: Player)
 	FFGHelpers.PrintLog("Attempting to load boat state for: ", player)
 	local profile = DataService.Profiles[player]
 	if not profile then

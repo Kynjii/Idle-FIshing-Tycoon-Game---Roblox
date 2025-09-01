@@ -1,9 +1,7 @@
 local CollectionService = game:GetService("CollectionService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local BoatClass = require(ServerScriptService.Server.Classes.Boat)
 local DataService = require(ServerScriptService.Server.Services.DataService)
-local FFGTypes = require(ReplicatedStorage.Shared.Types.FFGTypes)
 local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
 
 local taggedBoats = CollectionService:GetTagged("Boat")
@@ -24,7 +22,7 @@ function SetupBoat(boatModel: Model, player: Player)
 
 	local state = GetBoatState(player)
 	-- //TODO Remove hardcoded index
-	local Boat: FFGTypes.BoatClass = BoatClass:New(state[1], player, boatModel)
+	local Boat = BoatClass:New(state[1], player, boatModel)
 
 	Boat:Initialize()
 end

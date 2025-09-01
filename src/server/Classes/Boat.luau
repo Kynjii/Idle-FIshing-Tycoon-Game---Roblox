@@ -4,10 +4,68 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local Formulas = require(ServerScriptService.Server.Math.Formulas)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
-local FFGTypes = require(ReplicatedStorage.Shared.Types.FFGTypes)
 local DeepWait = require(ReplicatedStorage.Shared.Utils.DeepWait)
 local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
 local BOATEnum = FFGEnum.ATTRIBUTES.BOAT
+
+export type BoatState = {
+	Id: string,
+	Level: number,
+	Tier: number,
+	RealmId: number,
+	BaseCost: number,
+	UpgradeCost: number?,
+	isPurchased: boolean,
+	isActive: boolean,
+	Name: string?,
+	Owner: number?,
+	MaxLevel: number,
+	UpgradeStage: number,
+	CurrentMaxStorage: number?,
+	NextLvlMaxStorage: number?,
+	FPS: number?,
+	FishInStorage: number?,
+	StorageFull: boolean,
+	GrowthRate: number,
+	CostGrowthRate: number,
+	BaseFPS: number,
+	BaseStorage: number,
+}
+
+export type BoatClass = BoatState & {
+	-- Constructor
+	New: (self: BoatClass, state: BoatState, ownerId: number, model: Model, currentrealm: number?) -> BoatClass,
+
+	-- Core boat actions
+	Purchase: (self: BoatClass) -> (),
+	Upgrade: (self: BoatClass) -> (),
+
+	-- Calculations
+	CalculateBaseCost: (self: BoatClass) -> number,
+	CalculateUpgradeCost: (self: BoatClass) -> number,
+	GetMaxStorage: (self: BoatClass) -> number,
+
+	-- Fishing
+	StartFishing: (self: BoatClass) -> (),
+
+	-- Visibility and collision
+	Hide: (self: BoatClass) -> (),
+	CannotCollide: (self: BoatClass) -> (),
+	Show: (self: BoatClass) -> (),
+	CanCollide: (self: BoatClass) -> (),
+
+	-- UI Setup (new methods)
+	Initialize: (self: BoatClass) -> (),
+	SetupPurchaseBoard: (self: BoatClass) -> Part,
+	SetupProximityPrompt: (self: BoatClass, purchaseBoard: Part) -> ProximityPrompt,
+	UpdateProximityPromptUI: (self: BoatClass, proximityPrompt: ProximityPrompt) -> (),
+
+	-- Utilities
+	GetName: (self: BoatClass) -> string,
+
+	-- Saving and Loading
+	Serialize: (self: BoatClass) -> BoatState,
+}
 
 local BOAT_PROMOTION_LEVELS = {
 	[1] = 1,
@@ -37,7 +95,7 @@ local NAME = {
 	[11] = "The Flynnrunner",
 }
 
-local STARTER_STATS: FFGTypes.BoatState = {
+local STARTER_STATS: BoatState = {
 	[BOATEnum.Level] = 1,
 	[BOATEnum.MaxLevel] = 100,
 	[BOATEnum.Tier] = 1,
@@ -53,11 +111,11 @@ local STARTER_STATS: FFGTypes.BoatState = {
 	[BOATEnum.RealmId] = 1,
 }
 
-local BoatClass = {}
+local BoatClass: BoatClass = {}
 BoatClass.__index = BoatClass
 
 -- //SECTION - Constructor
-function BoatClass:New(state: FFGTypes.BoatState, player: Player, model: Model, currentrealm: number)
+function BoatClass:New(state: BoatState, player: Player, model: Model, currentrealm: number)
 	local instance = setmetatable({}, BoatClass)
 
 	-- Start with default stats as base
@@ -216,7 +274,7 @@ function BoatClass:GetName(): string
 end
 
 -- //SECTION - Loading and Saving
-function BoatClass:Serialize(): FFGTypes.BoatState
+function BoatClass:Serialize(): BoatState
 	return {
 		[BOATEnum.Id] = self[BOATEnum.Id],
 		[BOATEnum.Owner] = self[BOATEnum.Owner],
@@ -394,6 +452,7 @@ function BoatClass:SetupProximityPrompt(purchaseBoard: Part)
 		else
 			-- Purchase boat
 			self:Purchase()
+			self:StartFishing()
 			self:Show()
 			self:CanCollide()
 		end
