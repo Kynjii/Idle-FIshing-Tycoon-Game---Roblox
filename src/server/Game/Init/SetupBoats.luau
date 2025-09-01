@@ -16,14 +16,6 @@ function SetupTaggedBoats(player)
 	end) end
 end
 
-function SaveTaggedBoats(player)
-	if player then task.delay(1, function()
-		for _, taggedBoat in ipairs(taggedBoats) do
-			taggedBoat:Save(player)
-		end
-	end) end
-end
-
 function SetupBoat(boatModel: Model, player: Player)
 	if not player then
 		FFGHelpers.PrintLog("No local player found, unable to setup boat")
@@ -46,7 +38,6 @@ end
 
 return {
 	SetupTaggedBoats = SetupTaggedBoats,
-	SaveTaggedBoats = SaveTaggedBoats,
 	SetupBoat = SetupBoat,
 	GetBoatState = GetBoatState,
 	GetBoosts = GetBoosts,
