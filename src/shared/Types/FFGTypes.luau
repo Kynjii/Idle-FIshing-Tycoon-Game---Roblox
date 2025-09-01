@@ -51,4 +51,17 @@ export type BoatClass = BoatState & {
 	GetName: (self: BoatClass) -> string,
 }
 
+export type GameSave = {
+	CurrentRealm: number,
+	Realms: {
+		[number]: {
+			isUnlocked: boolean,
+			Boats: {},
+		},
+	},
+	Currencies: {
+		Gold: number,
+	},
+}
+
 return {}
