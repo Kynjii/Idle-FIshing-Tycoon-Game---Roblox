@@ -4,7 +4,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local Workspace = game:GetService("Workspace")
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local DataService = require(ServerScriptService.Server.Services.DataService)
-local FFGHelpers = require(ReplicatedStorage.Shared.Utils.FFGHelpers)
+local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
 
 local giveGoldButton = FFGHelpers.deepWait(Workspace, "DevGiveGold")
 local debounce = false

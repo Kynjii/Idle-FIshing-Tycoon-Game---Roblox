@@ -5,7 +5,7 @@ local DataService = require(ServerScriptService.Server.Services.DataService)
 local Formulas = require(ServerScriptService.Server.Math.Formulas)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local FFGTypes = require(ReplicatedStorage.Shared.Types.FFGTypes)
-local FFGHelpers = require(ReplicatedStorage.Shared.Utils.FFGHelpers)
+local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
 local BOATEnum = FFGEnum.ATTRIBUTES.BOAT
 
 local BOAT_PROMOTION_LEVELS = {

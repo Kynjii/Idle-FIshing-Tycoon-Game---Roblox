@@ -4,7 +4,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local BoatClass = require(ServerScriptService.Server.Classes.Boat)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local FFGTypes = require(ReplicatedStorage.Shared.Types.FFGTypes)
-local FFGHelpers = require(ReplicatedStorage.Shared.Utils.FFGHelpers)
+local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
 
 local taggedBoats = CollectionService:GetTagged("Boat")
 

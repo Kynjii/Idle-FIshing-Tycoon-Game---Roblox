@@ -1,8 +1,9 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
-local FFGHelpers = require(ReplicatedStorage.Shared.Utils.FFGHelpers)
+local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
 local Replica = require(ReplicatedStorage.Shared.ReplicaClient)
 Replica.RequestData()
 

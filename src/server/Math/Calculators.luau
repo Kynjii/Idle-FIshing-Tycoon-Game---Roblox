@@ -3,7 +3,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local FFGDefaults = require(ServerScriptService.Server.Modules.FFGDefaults)
 local Formulas = require(script.Parent.Formulas)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
-local FFGHelpers = require(ReplicatedStorage.Shared.Utils.FFGHelpers)
+local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
 local CALCULATOR = {}
 
 CALCULATOR.MaxStorage = function(type: string, level: number, tier: number)
