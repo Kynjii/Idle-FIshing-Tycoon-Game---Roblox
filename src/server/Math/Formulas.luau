@@ -2,14 +2,14 @@ local FORMULAS = {
 	BOAT = {
 		BaseCost = 100,
 		GrowthRate = 1.1,
-		CostGrowthRate = 1.4,
+		CostGrowthRate = 1.1,
 		BaseStorage = 100,
 		BaseFPS = 10,
 	},
 	TENDER = {
 		BaseCost = 100,
-		GrowthRate = 1.4,
-		CostGrowthRate = 1.4,
+		GrowthRate = 1.1,
+		CostGrowthRate = 1.1,
 		BaseStorage = 95,
 	},
 	TIER_MULTIPLIER = {
