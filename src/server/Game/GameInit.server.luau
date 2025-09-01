@@ -1,17 +1,16 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
-local BoatManager = require(ServerScriptService.Server.Boats.BoatManager)
-local Boat = require(ServerScriptService.Server.Boats.SetupBoats)
+local Boat = require(ServerScriptService.Server.Classes.Boats.SetupBoats)
 local FFGHelpers = require(ReplicatedStorage.Shared.Utils.FFGHelpers)
-local PlayerDataTemplate = require(ServerScriptService.Server.Data.PlayerDataTemplate)
+local PlayerDataTemplate = require(ServerScriptService.Server.Modules.PlayerDataTemplate)
 local ProfileStore = require(ServerScriptService.Server.Libs.ProfileStore)
-local DataManager = require(ServerScriptService.Server.Data.DataManager)
+local DataService = require(ServerScriptService.Server.Services.DataService)
 
 local PlayerStore = ProfileStore.New(FFGHelpers.GetStoreName(), PlayerDataTemplate)
 
 local function Initialize(player: Player, profile: typeof(PlayerStore:StartSessionAsync()))
-	DataManager.AttachReplica(player, profile)
+	DataService.AttachReplica(player, profile)
 end
 
 local function SetupBoats(player)
@@ -34,12 +33,12 @@ local function PlayerAdded(player: Player)
 		profile:Reconcile()
 
 		profile.OnSessionEnd:Connect(function()
-			DataManager.Profiles[player] = nil
-			DataManager.DetachReplica(player)
+			DataService.Profiles[player] = nil
+			DataService.DetachReplica(player)
 		end)
 
 		if player.Parent == Players then
-			DataManager.Profiles[player] = profile
+			DataService.Profiles[player] = profile
 			Initialize(player, profile)
 			SetupBoats(player)
 		else
@@ -56,14 +55,13 @@ end
 
 Players.PlayerAdded:Connect(PlayerAdded)
 Players.PlayerRemoving:Connect(function(player)
-	local profile = DataManager.Profiles[player]
+	local profile = DataService.Profiles[player]
 	if profile then
-		BoatManager.CleanupPlayer(player)
 		profile:EndSession()
 
 		task.delay(1, function()
-			DataManager.Profiles[player] = nil
+			DataService.Profiles[player] = nil
 		end)
 	end
-	DataManager.DetachReplica(player)
+	DataService.DetachReplica(player)
 end)

@@ -7,3 +7,6 @@
 
 # luau-lsp wath folder
 /sourcemap.json
+
+# Packages
+/Packages

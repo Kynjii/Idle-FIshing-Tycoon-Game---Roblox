@@ -22,33 +22,33 @@ export type BoatState = {
 	BaseStorage: number,
 }
 
-export type BoatInstance = BoatState & {
+export type BoatClass = BoatState & {
 	-- Constructor
-	New: (self: BoatInstance, state: BoatState, ownerId: number, model: Model, currentrealm: number?) -> BoatInstance,
+	New: (self: BoatClass, state: BoatState, ownerId: number, model: Model, currentrealm: number?) -> BoatClass,
 
 	-- Core boat actions
-	Purchase: (self: BoatInstance) -> (),
-	Upgrade: (self: BoatInstance) -> (),
+	Purchase: (self: BoatClass) -> (),
+	Upgrade: (self: BoatClass) -> (),
 
 	-- Calculations
-	CalculateBaseCost: (self: BoatInstance) -> number,
-	CalculateUpgradeCost: (self: BoatInstance) -> number,
-	GetMaxStorage: (self: BoatInstance) -> number,
+	CalculateBaseCost: (self: BoatClass) -> number,
+	CalculateUpgradeCost: (self: BoatClass) -> number,
+	GetMaxStorage: (self: BoatClass) -> number,
 
 	-- Visibility and collision
-	Hide: (self: BoatInstance) -> (),
-	CannotCollide: (self: BoatInstance) -> (),
-	Show: (self: BoatInstance) -> (),
-	CanCollide: (self: BoatInstance) -> (),
+	Hide: (self: BoatClass) -> (),
+	CannotCollide: (self: BoatClass) -> (),
+	Show: (self: BoatClass) -> (),
+	CanCollide: (self: BoatClass) -> (),
 
 	-- UI Setup (new methods)
-	Initialize: (self: BoatInstance) -> (),
-	SetupPurchaseBoard: (self: BoatInstance) -> Part,
-	SetupProximityPrompt: (self: BoatInstance, purchaseBoard: Part) -> ProximityPrompt,
-	UpdateProximityPromptUI: (self: BoatInstance, proximityPrompt: ProximityPrompt) -> (),
+	Initialize: (self: BoatClass) -> (),
+	SetupPurchaseBoard: (self: BoatClass) -> Part,
+	SetupProximityPrompt: (self: BoatClass, purchaseBoard: Part) -> ProximityPrompt,
+	UpdateProximityPromptUI: (self: BoatClass, proximityPrompt: ProximityPrompt) -> (),
 
 	-- Utilities
-	GetName: (self: BoatInstance) -> string,
+	GetName: (self: BoatClass) -> string,
 }
 
 return {}

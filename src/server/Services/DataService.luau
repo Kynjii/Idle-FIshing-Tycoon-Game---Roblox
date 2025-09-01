@@ -4,15 +4,15 @@ local TableUtil = require(ReplicatedStorage.Packages.TableUtil)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local FFGTypes = require(ReplicatedStorage.Shared.Types.FFGTypes)
 local FFGHelpers = require(ReplicatedStorage.Shared.Utils.FFGHelpers)
-local PlayerDataTemplate = require(script.Parent.PlayerDataTemplate)
+local PlayerDataTemplate = require(ServerScriptService.Server.Modules.PlayerDataTemplate)
 local Replica = require(ServerScriptService.Server.ReplicaServer)
 local PlayerStateToken = Replica.Token("PlayerState")
 
-local DataManager = {}
-DataManager.Profiles = {}
-DataManager.Replicas = {}
+local DataService = {}
+DataService.Profiles = {}
+DataService.Replicas = {}
 
-function DataManager.AttachReplica(player: Player, profile)
+function DataService.AttachReplica(player: Player, profile)
 	FFGHelpers.PrintLog("Attaching Replica for: ", player)
 
 	local currencies = {}
@@ -29,21 +29,21 @@ function DataManager.AttachReplica(player: Player, profile)
 	})
 	FFGHelpers.PrintLog("New Replica is: ", replica)
 	replica:Subscribe(player)
-	DataManager.Replicas[player] = replica
+	DataService.Replicas[player] = replica
 	return replica
 end
 
-function DataManager.DetachReplica(player: Player)
+function DataService.DetachReplica(player: Player)
 	FFGHelpers.PrintLog("Detaching Replica for: ", player)
-	local replica = DataManager.Replicas[player]
+	local replica = DataService.Replicas[player]
 	if replica then
 		replica:Destroy()
-		DataManager.Replicas[player] = nil
+		DataService.Replicas[player] = nil
 	end
 end
 
-function DataManager.Earn(player: Player, currencyType: string, amount: number)
-	local profile = DataManager.Profiles[player]
+function DataService.Earn(player: Player, currencyType: string, amount: number)
+	local profile = DataService.Profiles[player]
 	if not profile then
 		FFGHelpers.PrintLog("No profile found when attempting to earn: ", currencyType)
 		return
@@ -61,18 +61,18 @@ function DataManager.Earn(player: Player, currencyType: string, amount: number)
 	local newValue = current + amount
 	profile.Data.Currencies[currencyType] = newValue
 
-	local replica = DataManager.Replicas[player]
+	local replica = DataService.Replicas[player]
 	if replica then replica:Set({ "Currencies", currencyType }, newValue) end
 end
 
-function DataManager.CanAfford(player: Player, currencyType: string, amount: number)
-	local profile = DataManager.Profiles[player]
+function DataService.CanAfford(player: Player, currencyType: string, amount: number)
+	local profile = DataService.Profiles[player]
 	if not profile then return end
 	return (tonumber(profile.Data.Currencies[currencyType]) or 0) >= amount
 end
 
-function DataManager.Spend(player: Player, currencyType: string, amount: number)
-	local profile = DataManager.Profiles[player]
+function DataService.Spend(player: Player, currencyType: string, amount: number)
+	local profile = DataService.Profiles[player]
 	if not profile then return end
 	if typeof(amount) ~= "number" or amount <= 0 then return end
 	if typeof(currencyType) ~= "string" then return end
@@ -83,11 +83,11 @@ function DataManager.Spend(player: Player, currencyType: string, amount: number)
 	local newValue = current - amount
 	profile.Data.Currencies[currencyType] = newValue
 
-	local replica = DataManager.Replicas[player]
+	local replica = DataService.Replicas[player]
 	if replica then replica:Set({ "Currencies", currencyType }, newValue) end
 end
 
-function DataManager.ClearProfileData(player: Player, profile)
+function DataService.ClearProfileData(player: Player, profile)
 	if not profile then
 		FFGHelpers.PrintLog("No profile found when attempting to clear profile data for: ", player)
 		return
@@ -98,7 +98,7 @@ function DataManager.ClearProfileData(player: Player, profile)
 	FFGHelpers.PrintLog("Cleared Profile Data: ", profile)
 end
 
-function DataManager.CreateNewProfileData(player: Player, profile)
+function DataService.CreateNewProfileData(player: Player, profile)
 	if not profile then
 		FFGHelpers.PrintLog("No profile found when attempting to create new profile data for: ", player)
 		return
@@ -110,8 +110,8 @@ function DataManager.CreateNewProfileData(player: Player, profile)
 	FFGHelpers.PrintLog("Created Profile Data: ", profile)
 end
 
-function DataManager.SaveBoatState(player: Player, boatId: string, newState: FFGTypes.BoatState): boolean
-	local profile = DataManager.Profiles[player]
+function DataService.SaveBoatState(player: Player, boatId: string, newState: FFGTypes.BoatState): boolean
+	local profile = DataService.Profiles[player]
 	if not profile then
 		FFGHelpers.PrintLog("No profile found when attempting to save boat state for: ", player)
 		return false
@@ -142,7 +142,7 @@ function DataManager.SaveBoatState(player: Player, boatId: string, newState: FFG
 	return true
 end
 
-function DataManager.GetBoatState(profile): FFGTypes.BoatState?
+function DataService.GetBoatState(profile): FFGTypes.BoatState?
 	-- //TODO - update to match new saving scheme
 	if not profile or not profile.Data then return nil end
 	local realmId = profile.Data.CurrentRealm
@@ -158,15 +158,15 @@ function DataManager.GetBoatState(profile): FFGTypes.BoatState?
 	return profile.Data.Realms[realmId].Lanes[laneId].Boat
 end
 
-function DataManager.LoadBoatState(player: Player): FFGTypes.BoatState?
+function DataService.LoadBoatState(player: Player): FFGTypes.BoatState?
 	FFGHelpers.PrintLog("Attempting to load boat state for: ", player)
-	local profile = DataManager.Profiles[player]
+	local profile = DataService.Profiles[player]
 	if not profile then
 		FFGHelpers.PrintLog("No profile found for: ", player)
 		return nil
 	end
 
-	local state = DataManager.GetBoatState(profile)
+	local state = DataService.GetBoatState(profile)
 	if not state then
 		FFGHelpers.PrintLog("Unable to get BoatState for loading")
 		return nil
@@ -176,14 +176,14 @@ function DataManager.LoadBoatState(player: Player): FFGTypes.BoatState?
 	return state
 end
 
-function DataManager.LoadBoatStateById(player: Player, boatId: string): FFGTypes.BoatState?
+function DataService.LoadBoatStateById(player: Player, boatId: string): FFGTypes.BoatState?
 	-- TODO: Implement proper boat lookup by ID when supporting multiple boats
 	-- For now, just return the single boat state
-	return DataManager.LoadBoatState(player)
+	return DataService.LoadBoatState(player)
 end
 
-function DataManager.SaveProfileState(player: Player): boolean
-	local profile = DataManager.Profiles[player]
+function DataService.SaveProfileState(player: Player): boolean
+	local profile = DataService.Profiles[player]
 	if not profile then
 		FFGHelpers.PrintLog("No profile found when attempting to save state for: ", player)
 		return false
@@ -202,18 +202,18 @@ function DataManager.SaveProfileState(player: Player): boolean
 	return success
 end
 
-function DataManager.ResetAllPlayerData(player: Player)
-	local profile = DataManager.Profiles[player]
+function DataService.ResetAllPlayerData(player: Player)
+	local profile = DataService.Profiles[player]
 	if not profile then
 		FFGHelpers.PrintLog("No profile found when attempting to reset data for: ", player)
 		return
 	end
 
-	DataManager.ClearProfileData(player, profile)
-	DataManager.DetachReplica(player)
+	DataService.ClearProfileData(player, profile)
+	DataService.DetachReplica(player)
 
-	DataManager.CreateNewProfileData(player, profile)
-	DataManager.AttachReplica(player, profile)
+	DataService.CreateNewProfileData(player, profile)
+	DataService.AttachReplica(player, profile)
 end
 
-return DataManager
+return DataService

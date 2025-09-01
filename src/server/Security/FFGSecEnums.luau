@@ -1,1 +1,0 @@
--- //TODO - Either store shared data like enums here and always cross-reference to determine if someone is trying to set an adjusted value (cheating) or simply move the files to server and have it a module script

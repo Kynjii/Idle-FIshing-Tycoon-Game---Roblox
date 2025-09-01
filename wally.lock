@@ -3,9 +3,19 @@
 registry = "test"
 
 [[package]]
+name = "csqrl/sift"
+version = "0.0.11"
+dependencies = []
+
+[[package]]
 name = "dtbur/ffg-idle-roblox"
 version = "0.1.0"
-dependencies = [["Signal", "sleitnick/signal@1.5.0"], ["TableUtil", "sleitnick/table-util@1.2.1"]]
+dependencies = [["Find", "sleitnick/find@1.0.0"], ["Sift", "csqrl/sift@0.0.11"], ["Signal", "sleitnick/signal@1.5.0"], ["TableUtil", "sleitnick/table-util@1.2.1"]]
+
+[[package]]
+name = "sleitnick/find"
+version = "1.0.0"
+dependencies = []
 
 [[package]]
 name = "sleitnick/signal"

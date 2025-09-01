@@ -1,8 +1,8 @@
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
-local DataManager = require(ServerScriptService.Server.Data.DataManager)
-local Formulas = require(ServerScriptService.Server.Game.Formulas)
+local DataService = require(ServerScriptService.Server.Services.DataService)
+local Formulas = require(ServerScriptService.Server.Math.Formulas)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local FFGTypes = require(ReplicatedStorage.Shared.Types.FFGTypes)
 local FFGHelpers = require(ReplicatedStorage.Shared.Utils.FFGHelpers)
@@ -52,12 +52,12 @@ local STARTER_STATS: FFGTypes.BoatState = {
 	[BOATEnum.RealmId] = 1,
 }
 
-local BoatInstance = {}
-BoatInstance.__index = BoatInstance
+local BoatClass = {}
+BoatClass.__index = BoatClass
 
 -- //SECTION - Constructor
-function BoatInstance:New(state: FFGTypes.BoatState, player: Player, model: Model, currentrealm: number)
-	local instance = setmetatable({}, BoatInstance)
+function BoatClass:New(state: FFGTypes.BoatState, player: Player, model: Model, currentrealm: number)
+	local instance = setmetatable({}, BoatClass)
 
 	-- Start with default stats as base
 	for key, value in pairs(STARTER_STATS) do
@@ -90,7 +90,7 @@ function BoatInstance:New(state: FFGTypes.BoatState, player: Player, model: Mode
 end
 -- //!SECTION
 
-function BoatInstance:Upgrade()
+function BoatClass:Upgrade()
 	self[BOATEnum.Level] += 1
 	for k, v in ipairs(BOAT_PROMOTION_LEVELS) do
 		if self[BOATEnum.Level] == v then
@@ -106,7 +106,7 @@ function BoatInstance:Upgrade()
 	self[BOATEnum.NextLvlMaxStorage] = nextLvlMaxStorage
 end
 
-function BoatInstance:CalculateMaxStorage()
+function BoatClass:CalculateMaxStorage()
 	local baseStorage = STARTER_STATS.BaseStorage
 	local growthRate = STARTER_STATS.GrowthRate + self[BOATEnum.Tier] * 0.02 :: number
 	local tierMultiplier = Formulas.TIER_MULTIPLIER[self[BOATEnum.Tier]] :: number
@@ -118,7 +118,7 @@ function BoatInstance:CalculateMaxStorage()
 	return maxStorage, nextLvlMaxStorage
 end
 
-function BoatInstance:CalculateBaseFPS(): number
+function BoatClass:CalculateBaseFPS(): number
 	local baseFPS = STARTER_STATS.BaseFPS
 
 	local tierMultiplier = Formulas.TIER_MULTIPLIER[self[BOATEnum.Tier]]
@@ -129,7 +129,7 @@ function BoatInstance:CalculateBaseFPS(): number
 	return baseFPSCalc
 end
 
-function BoatInstance:CalculateFPS(): number
+function BoatClass:CalculateFPS(): number
 	local baseFPS = self:CalculateBaseFPS()
 
 	local growthRate = STARTER_STATS.GrowthRate
@@ -144,7 +144,7 @@ function BoatInstance:CalculateFPS(): number
 	return fpsCalc, nextLvlFPS
 end
 
-function BoatInstance:CalculateBaseCost(): number
+function BoatClass:CalculateBaseCost(): number
 	local baseCost = STARTER_STATS.BaseCost
 
 	local tierMultiplier = Formulas.TIER_MULTIPLIER[self[BOATEnum.Tier]]
@@ -155,7 +155,7 @@ function BoatInstance:CalculateBaseCost(): number
 	return cost
 end
 
-function BoatInstance:CalculateUpgradeCost(): number
+function BoatClass:CalculateUpgradeCost(): number
 	local baseCost = self[BOATEnum.BaseCost] or STARTER_STATS.BaseCost
 
 	if baseCost <= 0 then
@@ -176,11 +176,11 @@ function BoatInstance:CalculateUpgradeCost(): number
 	return cost
 end
 
-function BoatInstance:Purchase()
+function BoatClass:Purchase()
 	self[BOATEnum.isPurchased] = true
 end
 
-function BoatInstance:StartFishing()
+function BoatClass:StartFishing()
 	if self[BOATEnum.isActive] then
 		FFGHelpers.PrintLog("The boat is already active, no need to start fishing.")
 		return
@@ -189,7 +189,7 @@ function BoatInstance:StartFishing()
 	self[BOATEnum.isActive] = true
 end
 
-function BoatInstance:StopFishing()
+function BoatClass:StopFishing()
 	if not self[BOATEnum.isActive] then
 		FFGHelpers.PrintLog("The boat is already not active, no need to stop fishing.")
 		return
@@ -198,24 +198,24 @@ function BoatInstance:StopFishing()
 	self[BOATEnum.isActive] = false
 end
 
-function BoatInstance:AddFish(amount: number)
+function BoatClass:AddFish(amount: number)
 	--
 end
 
-function BoatInstance:RemoveFish(amount: number)
+function BoatClass:RemoveFish(amount: number)
 	--
 end
 
-function BoatInstance:IncreaseUpgradeStage(stage)
+function BoatClass:IncreaseUpgradeStage(stage)
 	self[BOATEnum.UpgradeStage] = stage
 end
 
-function BoatInstance:GetName(): string
+function BoatClass:GetName(): string
 	return NAME[self[BOATEnum.UpgradeStage]]
 end
 
 -- //SECTION - Loading and Saving
-function BoatInstance:Serialize(): FFGTypes.BoatState
+function BoatClass:Serialize(): FFGTypes.BoatState
 	return {
 		id = self[BOATEnum.Id],
 		ownerId = self[BOATEnum.Owner],
@@ -241,11 +241,11 @@ end
 -- //!SECTION
 
 -- //SECTION - Boat  Utilities
-function BoatInstance:IsStorageFull()
+function BoatClass:IsStorageFull()
 	return self[BOATEnum.StorageFull]
 end
 
-function BoatInstance:Show()
+function BoatClass:Show()
 	local model = self[BOATEnum.BoatModel] :: Model
 	local boatParts = model:GetChildren()
 	for _, part in pairs(boatParts) do
@@ -254,7 +254,7 @@ function BoatInstance:Show()
 	end
 end
 
-function BoatInstance:CanCollide()
+function BoatClass:CanCollide()
 	local model = self[BOATEnum.BoatModel] :: Model
 	local boatParts = model:GetChildren()
 	for _, part in pairs(boatParts) do
@@ -263,7 +263,7 @@ function BoatInstance:CanCollide()
 	end
 end
 
-function BoatInstance:CannotCollide()
+function BoatClass:CannotCollide()
 	local model = self[BOATEnum.BoatModel] :: Model
 	local boatParts = model:GetChildren()
 	for _, part in pairs(boatParts) do
@@ -272,7 +272,7 @@ function BoatInstance:CannotCollide()
 	end
 end
 
-function BoatInstance:Hide()
+function BoatClass:Hide()
 	local model = self[BOATEnum.BoatModel] :: Model
 	local boatParts = model:GetChildren()
 	for _, part in pairs(boatParts) do
@@ -282,7 +282,7 @@ function BoatInstance:Hide()
 end
 
 -- //SECTION - UI Setup Methods
-function BoatInstance:Initialize()
+function BoatClass:Initialize()
 	-- Handle visibility based on purchase status
 	if not self[BOATEnum.isPurchased] then
 		self:Hide()
@@ -297,7 +297,7 @@ function BoatInstance:Initialize()
 	if purchaseBoard then self:SetupProximityPrompt(purchaseBoard) end
 end
 
-function BoatInstance:SetupPurchaseBoard()
+function BoatClass:SetupPurchaseBoard()
 	local purchaseBoard = self[BOATEnum.BoatModel]:WaitForChild("Purchase_Board")
 	local pbDetails = {}
 	pbDetails.NameLabel = FFGHelpers.deepWait(purchaseBoard, "SurfaceGui", "Main", "Header", "Name", "TextLabel") :: TextLabel
@@ -330,7 +330,7 @@ function BoatInstance:SetupPurchaseBoard()
 	return purchaseBoard
 end
 
-function BoatInstance:UpdatePurchaseBoardUI()
+function BoatClass:UpdatePurchaseBoardUI()
 	local isPurchased = self[BOATEnum.isPurchased]
 	local purchaseBoard = self[BOATEnum.BoatModel]:WaitForChild("Purchase_Board")
 
@@ -357,7 +357,7 @@ function BoatInstance:UpdatePurchaseBoardUI()
 	if self[BOATEnum.isPurchased] then pbDetails.NameLabel.Parent.Visible = true end
 end
 
-function BoatInstance:SetupProximityPrompt(purchaseBoard: Part)
+function BoatClass:SetupProximityPrompt(purchaseBoard: Part)
 	-- Create the proximity prompt
 	local proximityPrompt = Instance.new("ProximityPrompt", purchaseBoard)
 
@@ -379,13 +379,13 @@ function BoatInstance:SetupProximityPrompt(purchaseBoard: Part)
 
 		local upgradeCost = self[BOATEnum.isPurchased] and self[BOATEnum.UpgradeCost] or self[BOATEnum.BaseCost]
 
-		if not DataManager.CanAfford(player, FFGEnum.CURRENCY_TYPES.Gold, upgradeCost) then
+		if not DataService.CanAfford(player, FFGEnum.CURRENCY_TYPES.Gold, upgradeCost) then
 			FFGHelpers.PrintLog("Unable to afford upgrade, cost is: ", upgradeCost)
 			return
 		end
 
 		-- Spend the currency
-		DataManager.Spend(player, FFGEnum.CURRENCY_TYPES.Gold, upgradeCost)
+		DataService.Spend(player, FFGEnum.CURRENCY_TYPES.Gold, upgradeCost)
 
 		if self[BOATEnum.isPurchased] then
 			-- Upgrade existing boat
@@ -405,7 +405,7 @@ function BoatInstance:SetupProximityPrompt(purchaseBoard: Part)
 	return proximityPrompt
 end
 
-function BoatInstance:UpdateProximityPromptUI(proximityPrompt: ProximityPrompt)
+function BoatClass:UpdateProximityPromptUI(proximityPrompt: ProximityPrompt)
 	if self[BOATEnum.Level] == self[BOATEnum.MaxLevel] then
 		proximityPrompt.ObjectText = "Max Level Reached"
 		proximityPrompt.ActionText = ""
@@ -416,4 +416,4 @@ function BoatInstance:UpdateProximityPromptUI(proximityPrompt: ProximityPrompt)
 end
 -- //!SECTION
 
-return BoatInstance
+return BoatClass
