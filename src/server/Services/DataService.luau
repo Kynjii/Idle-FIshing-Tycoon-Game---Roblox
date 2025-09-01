@@ -123,39 +123,41 @@ function DataService.SaveBoatState(player: Player, boatId: string, newState: FFG
 		return false
 	end
 
-	if not profile.Data.Boats then
-		FFGHelpers.PrintLog("Boats Table not found")
+	local currentRealm = profile.Data.CurrentRealm or 1
+	if not profile.Data.Realms[currentRealm] then
+		FFGHelpers.PrintLog("No data structure found for Realm:" .. currentRealm)
 		return false
 	end
 
-	local existingBoat = TableUtil.Find(profile.Data.Boats, function(boat)
+	if not profile.Data.Realms[currentRealm].Boats then
+		FFGHelpers.PrintLog("No data structure found for boats in Realm:" .. currentRealm)
+		return false
+	end
+
+	local existingBoat = TableUtil.Find(profile.Data.Realms[currentRealm].Boats, function(boat)
 		return boat[FFGEnum.ATTRIBUTES.BOAT.Id] == boat[FFGEnum.ATTRIBUTES.BOAT.Id]
 	end)
 
 	if not existingBoat then
-		profile.Data.Boats[newState] = newState
+		profile.Data.Realms[currentRealm].Boats[newState] = newState
 	else
-		profile.Data.Boats[existingBoat] = newState
+		profile.Data.Realms[currentRealm].Boats[existingBoat] = newState
 	end
 
 	FFGHelpers.PrintLog("Saved boat state for player", player.Name, "boat", boatId)
 	return true
 end
 
+-- //TODO - Figure out with boatstate function to use when multiple is needed
 function DataService.GetBoatState(profile): FFGTypes.BoatState?
-	-- //TODO - update to match new saving scheme
 	if not profile or not profile.Data then return nil end
-	local realmId = profile.Data.CurrentRealm
-
-	-- //TODO remove hardcoded laneId
-	local laneId = 1
+	local currentRealm = profile.Data.CurrentRealm or 1
 
 	if not profile.Data.Realms then return nil end
-	if not profile.Data.Realms[realmId] then return nil end
-	if not profile.Data.Realms[realmId].Lanes then return nil end
-	if not profile.Data.Realms[realmId].Lanes[laneId] then return nil end
+	if not profile.Data.Realms[currentRealm] then return nil end
+	if not profile.Data.Realms[currentRealm].Boats then return nil end
 
-	return profile.Data.Realms[realmId].Lanes[laneId].Boat
+	return profile.Data.Realms[currentRealm].Boats
 end
 
 function DataService.LoadBoatState(player: Player): FFGTypes.BoatState?
@@ -174,32 +176,6 @@ function DataService.LoadBoatState(player: Player): FFGTypes.BoatState?
 
 	FFGHelpers.PrintLog("Current boat state: ", state)
 	return state
-end
-
-function DataService.LoadBoatStateById(player: Player, boatId: string): FFGTypes.BoatState?
-	-- TODO: Implement proper boat lookup by ID when supporting multiple boats
-	-- For now, just return the single boat state
-	return DataService.LoadBoatState(player)
-end
-
-function DataService.SaveProfileState(player: Player): boolean
-	local profile = DataService.Profiles[player]
-	if not profile then
-		FFGHelpers.PrintLog("No profile found when attempting to save state for: ", player)
-		return false
-	end
-
-	local success = pcall(function()
-		profile:Save()
-	end)
-
-	if success then
-		FFGHelpers.PrintLog("Successfully saved profile for: ", player.Name)
-	else
-		FFGHelpers.PrintLog("Failed to save profile for: ", player.Name)
-	end
-
-	return success
 end
 
 function DataService.ResetAllPlayerData(player: Player)
