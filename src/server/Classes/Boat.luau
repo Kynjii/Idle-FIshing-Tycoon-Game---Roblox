@@ -16,7 +16,6 @@ export type BoatState = {
 	BaseCost: number,
 	UpgradeCost: number?,
 	isPurchased: boolean,
-	isActive: boolean,
 	Name: string?,
 	Owner: number?,
 	MaxLevel: number,
@@ -47,6 +46,9 @@ export type BoatClass = BoatState & {
 
 	-- Fishing
 	StartFishing: (self: BoatClass) -> (),
+	StopFishing: (self: BoatClass) -> (),
+	AddFish: (self: BoatClass, amount: number) -> (),
+	RemoveFish: (self: BoatClass, amount: number) -> (),
 
 	-- Visibility and collision
 	Hide: (self: BoatClass) -> (),
@@ -99,7 +101,6 @@ local STARTER_STATS: BoatState = {
 	[BOATEnum.Level] = 1,
 	[BOATEnum.MaxLevel] = 100,
 	[BOATEnum.Tier] = 1,
-	[BOATEnum.isActive] = false,
 	[BOATEnum.isPurchased] = false,
 	[BOATEnum.UpgradeStage] = 1,
 	[BOATEnum.StorageFull] = false,
@@ -109,6 +110,7 @@ local STARTER_STATS: BoatState = {
 	[BOATEnum.BaseStorage] = 100,
 	[BOATEnum.BaseFPS] = 10,
 	[BOATEnum.RealmId] = 1,
+	[BOATEnum.FishInStorage] = 0,
 }
 
 local BoatClass: BoatClass = {}
@@ -134,7 +136,6 @@ function BoatClass:New(state: BoatState, player: Player, model: Model, currentre
 	instance[BOATEnum.Id] = instance[BOATEnum.Id] or HttpService:GenerateGUID(false) :: string
 	instance[BOATEnum.Owner] = instance[BOATEnum.Owner] or player.UserId :: number
 	instance[BOATEnum.BoatModel] = model :: Model
-	instance[BOATEnum.RealmId] = instance[BOATEnum.RealmId] or currentrealm or STARTER_STATS.RealmId :: number
 	instance[BOATEnum.Name] = instance[BOATEnum.Name] or instance:GetName() :: string
 	instance[BOATEnum.BaseCost] = instance[BOATEnum.BaseCost] or instance:CalculateBaseCost() :: number
 	instance[BOATEnum.UpgradeCost] = instance[BOATEnum.UpgradeCost] or instance:CalculateUpgradeCost() :: number
@@ -240,29 +241,25 @@ function BoatClass:Purchase()
 end
 
 function BoatClass:StartFishing()
-	if self[BOATEnum.isActive] then
-		FFGHelpers.PrintLog("The boat is already active, no need to start fishing.")
-		return
+	while not self[BOATEnum.StorageFull] do
+		self:AddFish(self[BOATEnum.FPS])
+		task.wait(1)
 	end
-
-	self[BOATEnum.isActive] = true
-end
-
-function BoatClass:StopFishing()
-	if not self[BOATEnum.isActive] then
-		FFGHelpers.PrintLog("The boat is already not active, no need to stop fishing.")
-		return
-	end
-
-	self[BOATEnum.isActive] = false
 end
 
 function BoatClass:AddFish(amount: number)
-	--
+	self[BOATEnum.FishInStorage] += amount
+
+	if self[BOATEnum.FishInStorage] > self[BOATEnum.CurrentMaxStorage] then
+		self[BOATEnum.FishInStorage] = self[BOATEnum.CurrentMaxStorage]
+		self[BOATEnum.StorageFull] = true
+	end
 end
 
 function BoatClass:RemoveFish(amount: number)
-	--
+	self[BOATEnum.FishInStorage] = math.max(self[BOATEnum.FishInStorage] - amount, 0)
+
+	self[BOATEnum.StorageFull] = false
 end
 
 function BoatClass:IncreaseUpgradeStage(stage)
@@ -281,7 +278,6 @@ function BoatClass:Serialize(): BoatState
 		[BOATEnum.Level] = self[BOATEnum.Level],
 		[BOATEnum.Tier] = self[BOATEnum.Tier],
 		[BOATEnum.isPurchased] = self[BOATEnum.isPurchased],
-		[BOATEnum.isActive] = self[BOATEnum.isActive],
 		[BOATEnum.UpgradeCost] = self[BOATEnum.UpgradeCost],
 		[BOATEnum.UpgradeStage] = self[BOATEnum.UpgradeStage],
 		[BOATEnum.MaxLevel] = self[BOATEnum.MaxLevel],

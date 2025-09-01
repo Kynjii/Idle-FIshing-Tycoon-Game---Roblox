@@ -91,7 +91,6 @@ FFGEnum.ATTRIBUTES = {
 		["Level"] = "Level",
 		["UpgradeStage"] = "UpgradeStage",
 		["Name"] = "Name",
-		["isActive"] = "isActive",
 		["isPurchased"] = "isPurchased",
 		["Id"] = "Id",
 		["CurrentMaxStorage"] = "CurrentMaxStorage",
