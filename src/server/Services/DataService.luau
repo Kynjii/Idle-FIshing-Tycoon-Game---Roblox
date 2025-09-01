@@ -125,23 +125,27 @@ function DataService.SaveBoatState(player: Player, boatId: string, newState: FFG
 
 	local currentRealm = profile.Data.CurrentRealm or 1
 	if not profile.Data.Realms[currentRealm] then
-		FFGHelpers.PrintLog("No data structure found for Realm:" .. currentRealm)
+		FFGHelpers.PrintLog("No data structure found for Realm:", currentRealm)
 		return false
 	end
 
-	if not profile.Data.Realms[currentRealm].Boats then
-		FFGHelpers.PrintLog("No data structure found for boats in Realm:" .. currentRealm)
-		return false
+	-- Initialize Boats array if it doesn't exist
+	if not profile.Data.Realms[currentRealm].Boats then profile.Data.Realms[currentRealm].Boats = {} end
+
+	local existingBoatIndex = nil
+	for i, boat in ipairs(profile.Data.Realms[currentRealm].Boats) do
+		if boat[FFGEnum.ATTRIBUTES.BOAT.Id] == boatId then
+			existingBoatIndex = i
+			break
+		end
 	end
 
-	local existingBoat = TableUtil.Find(profile.Data.Realms[currentRealm].Boats, function(boat)
-		return boat[FFGEnum.ATTRIBUTES.BOAT.Id] == boat[FFGEnum.ATTRIBUTES.BOAT.Id]
-	end)
-
-	if not existingBoat then
-		profile.Data.Realms[currentRealm].Boats[newState] = newState
+	if existingBoatIndex then
+		profile.Data.Realms[currentRealm].Boats[existingBoatIndex] = newState
+		FFGHelpers.PrintLog("Updated existing boat at index", existingBoatIndex)
 	else
-		profile.Data.Realms[currentRealm].Boats[existingBoat] = newState
+		table.insert(profile.Data.Realms[currentRealm].Boats, newState)
+		FFGHelpers.PrintLog("Added new boat with ID", boatId)
 	end
 
 	FFGHelpers.PrintLog("Saved boat state for player", player.Name, "boat", boatId)

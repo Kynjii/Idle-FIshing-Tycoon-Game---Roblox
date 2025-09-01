@@ -218,25 +218,25 @@ end
 -- //SECTION - Loading and Saving
 function BoatClass:Serialize(): FFGTypes.BoatState
 	return {
-		id = self[BOATEnum.Id],
-		ownerId = self[BOATEnum.Owner],
-		level = self[BOATEnum.Level],
-		tier = self[BOATEnum.Tier],
-		isPurchased = self[BOATEnum.isPurchased],
-		isActive = self[BOATEnum.isActive],
-		upgradeCost = self[BOATEnum.UpgradeCost],
-		upgradeStage = self[BOATEnum.UpgradeStage],
-		maxLevel = self[BOATEnum.MaxLevel],
-		baseCost = self[BOATEnum.BaseCost],
-		baseFPS = self[BOATEnum.BaseFPS],
-		baseStorage = self[BOATEnum.BaseStorage],
-		currentMaxStorage = self[BOATEnum.CurrentMaxStorage],
-		fishPerSecond = self[BOATEnum.FPS],
-		fishInStorage = self[BOATEnum.FishInStorage],
-		name = self[BOATEnum.Name],
-		nextLvlMaxStorage = self[BOATEnum.NextLvlMaxStorage],
-		RealmId = self[BOATEnum.RealmId],
-		storageFull = self[BOATEnum.StorageFull],
+		[BOATEnum.Id] = self[BOATEnum.Id],
+		[BOATEnum.Owner] = self[BOATEnum.Owner],
+		[BOATEnum.Level] = self[BOATEnum.Level],
+		[BOATEnum.Tier] = self[BOATEnum.Tier],
+		[BOATEnum.isPurchased] = self[BOATEnum.isPurchased],
+		[BOATEnum.isActive] = self[BOATEnum.isActive],
+		[BOATEnum.UpgradeCost] = self[BOATEnum.UpgradeCost],
+		[BOATEnum.UpgradeStage] = self[BOATEnum.UpgradeStage],
+		[BOATEnum.MaxLevel] = self[BOATEnum.MaxLevel],
+		[BOATEnum.BaseCost] = self[BOATEnum.BaseCost],
+		[BOATEnum.BaseFPS] = self[BOATEnum.BaseFPS],
+		[BOATEnum.BaseStorage] = self[BOATEnum.BaseStorage],
+		[BOATEnum.CurrentMaxStorage] = self[BOATEnum.CurrentMaxStorage],
+		[BOATEnum.FPS] = self[BOATEnum.FPS],
+		[BOATEnum.FishInStorage] = self[BOATEnum.FishInStorage],
+		[BOATEnum.Name] = self[BOATEnum.Name],
+		[BOATEnum.NextLvlMaxStorage] = self[BOATEnum.NextLvlMaxStorage],
+		[BOATEnum.RealmId] = self[BOATEnum.RealmId],
+		[BOATEnum.StorageFull] = self[BOATEnum.StorageFull],
 	}
 end
 -- //!SECTION
@@ -401,6 +401,8 @@ function BoatClass:SetupProximityPrompt(purchaseBoard: Part)
 		-- Update UIs
 		self:UpdateProximityPromptUI(proximityPrompt)
 		self:UpdatePurchaseBoardUI()
+
+		DataService.SaveBoatState(player, self[BOATEnum.Id], self:Serialize())
 	end)
 
 	return proximityPrompt

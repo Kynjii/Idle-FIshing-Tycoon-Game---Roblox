@@ -49,6 +49,9 @@ export type BoatClass = BoatState & {
 
 	-- Utilities
 	GetName: (self: BoatClass) -> string,
+
+	-- Saving and Loading
+	Serialize: (self: BoatClass) -> BoatState,
 }
 
 export type GameSave = {
