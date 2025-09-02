@@ -114,7 +114,7 @@ local TenderClass: TenderClass = {}
 TenderClass.__index = TenderClass
 
 -- //SECTION - Constructor
-function TenderClass:New(state: TenderState, player: Player, model: Model, currentRealm: number)
+function TenderClass:New(state: TenderState, player: Player, model: Model)
 	local instance = setmetatable({}, TenderClass)
 
 	-- Start with default stats as base
