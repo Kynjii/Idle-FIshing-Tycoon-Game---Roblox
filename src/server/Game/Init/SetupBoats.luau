@@ -1,6 +1,6 @@
 local CollectionService = game:GetService("CollectionService")
 local ServerScriptService = game:GetService("ServerScriptService")
-local BoatClass = require(ServerScriptService.Server.Classes.Boat)
+local Boat = require(ServerScriptService.Server.Classes.Boat)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
 
@@ -22,7 +22,7 @@ function SetupBoat(boatModel: Model, player: Player)
 
 	local state = GetBoatState(player)
 	-- //TODO Remove hardcoded index
-	local Boat = BoatClass:New(state[1], player, boatModel)
+	local Boat = Boat:New(state[1], player, boatModel)
 
 	Boat:Initialize()
 end
