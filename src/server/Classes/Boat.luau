@@ -554,7 +554,7 @@ end
 
 function Boat:IsStorageFull()
 	local status = self.FishInStorage == self.CurrentMaxStorage
-	self:UpdateStorageStatus(status)
+	if self.StorageFull ~= status then self:UpdateStorageStatus(status) end
 	return status
 end
 -- //!SECTION
