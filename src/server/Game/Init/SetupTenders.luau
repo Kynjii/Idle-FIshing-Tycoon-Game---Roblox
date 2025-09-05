@@ -28,7 +28,7 @@ function SetupTender(tenderModel: Model, player: Player)
 	local Tender: TenderInstance = Tender.New(state[1], player, tenderModel)
 
 	Tender:Initialize()
-	BoatManager.RegisterTender(tenderModel, player)
+	BoatManager.RegisterTender(Tender)
 end
 
 function GetBoosts(player: Player)

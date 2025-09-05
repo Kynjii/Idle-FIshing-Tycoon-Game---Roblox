@@ -28,7 +28,7 @@ function SetupBoat(boatModel: Model, player: Player)
 	local Boat: BoatInstance = Boat.New(state[1], player, boatModel)
 
 	Boat:Initialize()
-	BoatManager.RegisterBoat(boatModel, player)
+	BoatManager.RegisterBoat(Boat)
 end
 
 function GetBoosts(player: Player)
