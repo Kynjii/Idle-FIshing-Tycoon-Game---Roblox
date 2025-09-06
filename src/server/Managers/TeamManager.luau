@@ -1,12 +1,12 @@
 local ServerScriptService = game:GetService("ServerScriptService")
 local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
-local Boat = require(ServerScriptService.Server.Classes.Boat)
-local Tender = require(ServerScriptService.Server.Classes.Tender)
+local BoatType = require(ServerScriptService.Server.Classes.Types.BoatType)
+local TenderType = require(ServerScriptService.Server.Classes.Types.TenderType)
 local TenderSetup = require(ServerScriptService.Server.Game.Init.SetupTenders)
 local BoatSetup = require(ServerScriptService.Server.Game.Init.SetupBoats)
 
-type BoatInstance = Boat.BoatInstance
-type Tender = Tender.Tender
+type BoatInstance = BoatType.BoatInstance
+type Tender = TenderType.Tender
 
 local TeamManager = {}
 TeamManager.Teams = {

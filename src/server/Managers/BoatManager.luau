@@ -1,16 +1,16 @@
 local ServerScriptService = game:GetService("ServerScriptService")
-local Boat = require(ServerScriptService.Server.Classes.Boat)
-local Tender = require(ServerScriptService.Server.Classes.Tender)
+local BoatType = require(ServerScriptService.Server.Classes.Types.BoatType)
+local TenderType = require(ServerScriptService.Server.Classes.Types.TenderType)
 local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
 
-type BoatInstance = Boat.BoatInstance
-type TenderInstance = Tender.TenderInstance
+type Boat = BoatType.Boat
+type Tender = TenderType.Tender
 
 local BoatManager = {}
 BoatManager.Boats = {}
 BoatManager.Tenders = {}
 
-function BoatManager.RegisterBoat(boatClass: BoatInstance)
+function BoatManager.RegisterBoat(boatClass: Boat)
 	table.insert(BoatManager.Boats, boatClass)
 end
 
@@ -30,9 +30,9 @@ function BoatManager.RegisterTender(tenderClass)
 	end
 end
 
-function BoatManager.LoadFish(tenderClass, linkedBoatClass)
-	local tender = tenderClass :: TenderInstance
-	local boat = linkedBoatClass :: BoatInstance
+function BoatManager.LoadFish(tenderClass: Tender, linkedBoatClass: Boat)
+	local tender = tenderClass
+	local boat = linkedBoatClass
 	local amount = math.max(boat.FishInStorage, tender.CurrentMaxStorage)
 	boat:RemoveFish(amount)
 

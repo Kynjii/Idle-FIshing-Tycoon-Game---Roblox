@@ -1,11 +1,11 @@
 local CollectionService = game:GetService("CollectionService")
 local ServerScriptService = game:GetService("ServerScriptService")
 local Tender = require(ServerScriptService.Server.Classes.Tender)
-local BoatManager = require(ServerScriptService.Server.Managers.BoatManager)
+local TenderType = require(ServerScriptService.Server.Classes.Types.TenderType)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
 
-type TenderInstance = Tender.TenderInstance
+type TenderInstance = TenderType.TenderInstance
 
 local taggedTenders = CollectionService:GetTagged("Tender")
 

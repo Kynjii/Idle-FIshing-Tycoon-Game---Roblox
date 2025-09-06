@@ -1,11 +1,11 @@
 local CollectionService = game:GetService("CollectionService")
 local ServerScriptService = game:GetService("ServerScriptService")
 local Boat = require(ServerScriptService.Server.Classes.Boat)
-local BoatManager = require(ServerScriptService.Server.Managers.BoatManager)
+local BoatType = require(ServerScriptService.Server.Classes.Types.BoatType)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
 
-type BoatInstance = Boat.BoatInstance
+type BoatInstance = BoatType.BoatInstance
 
 local taggedBoats = CollectionService:GetTagged("Boat")
 
