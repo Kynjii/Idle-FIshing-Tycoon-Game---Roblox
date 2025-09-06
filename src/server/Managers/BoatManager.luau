@@ -1,51 +1,48 @@
+local CollectionService = game:GetService("CollectionService")
 local ServerScriptService = game:GetService("ServerScriptService")
+local Boat: Boat = require(ServerScriptService.Server.Classes.Boat)
+local Tender: Tender = require(ServerScriptService.Server.Classes.Tender)
 local BoatType = require(ServerScriptService.Server.Classes.Types.BoatType)
 local TenderType = require(ServerScriptService.Server.Classes.Types.TenderType)
-local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
+
+local taggedBoats = CollectionService:GetTagged("Boat")
+local taggedTenders = CollectionService:GetTagged("Tender")
 
 type Boat = BoatType.Boat
 type Tender = TenderType.Tender
 
 local BoatManager = {}
-BoatManager.Boats = {}
-BoatManager.Tenders = {}
+BoatManager.__index = BoatManager
 
-function BoatManager.RegisterBoat(boatClass: Boat)
-	table.insert(BoatManager.Boats, boatClass)
+function BoatManager.New(playerState, tier, player: Player)
+	local self = setmetatable({}, BoatManager)
+
+	self.Tier = tier
+	self.BoatModel = self:FindBoatModel(player, tier) :: Model
+	self.LaneBoat = Boat.New(playerState, player, self.BoatModel)
+
+	self.TenderModel = self:FindTenderModel(player, tier)
+	self.LaneTender = Tender.New(playerState, player, self.TenderModel)
+
+	return self
 end
 
-function BoatManager.RegisterTender(tenderClass)
-	table.insert(BoatManager.Tenders, tenderClass)
-
-	local boat = BoatManager.Boats[1]
-
-	if boat then
-		FFGHelpers.PrintLog("Boat found: ", boat)
-		local model = boat.Model :: Model
-		local pp = model.PrimaryPart
-		local cf = pp.CFrame
-		tenderClass:MoveToBoat(boat, cf)
-	else
-		FFGHelpers.PrintLog("No boatClass found", BoatManager.Boats)
+function BoatManager:FindBoatModel(player, tier)
+	for _, taggedBoat in ipairs(taggedBoats) do
+		local taggedBoatTier = taggedBoat:GetAttribute("Tier")
+		if taggedBoatTier == tier then return taggedBoat end
 	end
+
+	return nil
 end
 
-function BoatManager.LoadFish(tenderClass: Tender, linkedBoatClass: Boat)
-	local tender = tenderClass
-	local boat = linkedBoatClass
-	local amount = math.max(boat.FishInStorage, tender.CurrentMaxStorage)
-	boat:RemoveFish(amount)
+function BoatManager:FindTenderModel(player, tier)
+	for _, taggedTender in ipairs(taggedTenders) do
+		local taggedTenderTier = taggedTender:GetAttribute("Tier")
+		if taggedTenderTier == tier then return taggedTender end
+	end
 
-	-- create function to locate the correct Boat the Tender is linked to
-	-- create function to attempt to add fish within a 5 second timeframe
-	-- create function to move the Tender to the Port/Original position
-	-- ReadyToOffload(state, boat)
-end
-
-function BoatManager.OffloadFish(tenderState, linkedBoat)
-	-- create function to attempt to remove fish within a 5 second timeframe
-	-- create function to move the Tender to the Port/Original position
-	-- ReadyForFish(tenderState, linkedBoat)
+	return nil
 end
 
 return BoatManager

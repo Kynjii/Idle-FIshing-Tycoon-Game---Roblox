@@ -12,8 +12,8 @@ local TenderType = require(ServerScriptService.Server.Classes.Types.TenderType)
 
 -- //SECTION - Tender Types
 type Tender = TenderType.Tender
-type TenderInstance = TenderType.TenderInstance
 type TenderProps = TenderType.TenderProps
+type TenderInstance = TenderType.TenderInstance
 -- //!SECTION
 
 -- //SECTION -  Tender Data

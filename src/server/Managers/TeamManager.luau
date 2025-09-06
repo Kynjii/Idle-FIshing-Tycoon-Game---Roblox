@@ -1,77 +1,89 @@
 local ServerScriptService = game:GetService("ServerScriptService")
-local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
 local BoatType = require(ServerScriptService.Server.Classes.Types.BoatType)
 local TenderType = require(ServerScriptService.Server.Classes.Types.TenderType)
-local TenderSetup = require(ServerScriptService.Server.Game.Init.SetupTenders)
-local BoatSetup = require(ServerScriptService.Server.Game.Init.SetupBoats)
+local Teams = game:GetService("Teams")
+local BoatManager = require(script.Parent.BoatManager)
+local PlayerDataTemplate = require(ServerScriptService.Server.Modules.PlayerDataTemplate)
 
 type BoatInstance = BoatType.BoatInstance
 type Tender = TenderType.Tender
+type ProfileData = PlayerDataTemplate.ProfileData
 
 local TeamManager = {}
 TeamManager.Teams = {
-	[1] = 1,
-	[2] = 2,
-	[3] = 3,
-	[4] = 4,
-	[5] = 5,
-	[6] = 6,
-	[7] = 7,
-	[8] = 8,
-	[9] = 9,
-	[10] = 10,
+	[1] = {
+		Name = "Islander 1",
+		TeamColor = BrickColor.new("Bright Red"),
+	},
+	[2] = {
+		Name = "Islander 2",
+		TeamColor = BrickColor.new("Really Red"),
+	},
+	[3] = {
+		Name = "Islander 3",
+		TeamColor = BrickColor.new("Bright Blue"),
+	},
+	[4] = {
+		Name = "Islander 4",
+		TeamColor = BrickColor.new("Really Blue"),
+	},
+	[5] = {
+		Name = "Islander 5",
+		TeamColor = BrickColor.new("Earth Green"),
+	},
+	[6] = {
+		Name = "Islander 6",
+		TeamColor = BrickColor.new("Dark Green"),
+	},
+	[7] = {
+		Name = "Islander 7",
+		TeamColor = BrickColor.new("Mint"),
+	},
+	[8] = {
+		Name = "Islander 8",
+		TeamColor = BrickColor.new("New Yeller"),
+	},
+	[9] = {
+		Name = "Islander 9",
+		TeamColor = BrickColor.new("Deep Orange"),
+	},
+	[10] = {
+		Name = "Islander 10",
+		TeamColor = BrickColor.new("Cork"),
+	},
 }
 
-local function SetupBoats(player, teamId)
-	if player then
-		BoatSetup.SetupTaggedBoats(player, teamId)
-	else
-		FFGHelpers.PrintLog("No player passed during initalization")
+TeamManager.BoatManagers = {}
+
+function TeamManager.CreateTeams()
+	for i, team in ipairs(TeamManager.Teams) do
+		local newTeam = Instance.new("Team")
+		newTeam.TeamColor = team.TeamColor
+		newTeam.Name = team.Name
+		newTeam.AutoAssignable = true
+		newTeam.Parent = Teams
+
+		newTeam.PlayerAdded:Connect(function(player)
+			local playersOnTeam = #newTeam:GetPlayers()
+			if playersOnTeam > 1 then player:Kick("The server is full, try again.") end
+		end)
 	end
 end
 
-local function SetupTenders(player, teamId)
-	if player then
-		TenderSetup.SetuptaggedTenders(player, teamId)
-	else
-		FFGHelpers.PrintLog("No player passed during initalization")
-	end
-end
+function TeamManager.AssignBoatManagers(profile: ProfileData, player: Player)
+	TeamManager.BoatManagers[player] = player
+	local currentRealmId = profile.CurrentRealm
+	local realmData = profile.Realms[currentRealmId]
 
-function TeamManager.AssignTeam(player: Player)
-	for i, v in ipairs(TeamManager.Teams) do
-		if v == i then
-			TeamManager.Teams[i] = player
-			return i
+	if realmData then
+		local numOfLanes = realmData.Lanes
+		print(numOfLanes)
+		for i = 0, numOfLanes, 1 do
+			local boatManager = BoatManager.New(profile, i, player)
+			table.insert(TeamManager.BoatManagers[player], boatManager)
 		end
+		print(TeamManager.BoatManagers[player])
 	end
-
-	return nil
-end
-
-function TeamManager.RemovePlayer(player: Player)
-	for i, v in ipairs(TeamManager.Teams) do
-		if v == player then
-			TeamManager.Teams[i] = i
-			break
-		end
-	end
-end
-
-function TeamManager.Initialize(player: Player)
-	if not player then
-		FFGHelpers.PrintLog("No Player object passed to TeamManager")
-		return
-	end
-
-	local teamId: number? = TeamManager.AssignTeam(player)
-	if not teamId then
-		FFGHelpers.PrintLog("[Error] Unable to assign team for player")
-		return
-	end
-
-	SetupBoats(player, teamId)
-	SetupTenders(player, teamId)
 end
 
 return TeamManager

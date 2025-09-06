@@ -6,6 +6,8 @@ local ProfileStore = require(ServerScriptService.Server.Libs.ProfileStore)
 local TeamManager = require(ServerScriptService.Server.Managers.TeamManager)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 
+TeamManager.CreateTeams()
+
 local PlayerStore = ProfileStore.New(FFGHelpers.GetStoreName(), PlayerDataTemplate)
 
 local function Initialize(player: Player, profile: typeof(PlayerStore:StartSessionAsync()))
@@ -31,7 +33,7 @@ local function PlayerAdded(player: Player)
 		if player.Parent == Players then
 			DataService.Profiles[player] = profile
 			Initialize(player, profile)
-			TeamManager.Initialize(player)
+			TeamManager.AssignBoatManagers(profile.Data, player)
 		else
 			profile:EndSession()
 		end
@@ -55,5 +57,4 @@ Players.PlayerRemoving:Connect(function(player)
 		end)
 	end
 	DataService.DetachReplica(player)
-	TeamManager.RemovePlayer(player)
 end)
