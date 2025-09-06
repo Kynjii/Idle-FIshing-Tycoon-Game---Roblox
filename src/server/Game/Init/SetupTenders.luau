@@ -9,10 +9,11 @@ type TenderInstance = Tender.TenderInstance
 
 local taggedTenders = CollectionService:GetTagged("Tender")
 
-function SetuptaggedTenders(player)
+function SetuptaggedTenders(player: Player, teamId: number)
 	if player then task.delay(1, function()
 		for _, taggedTender in ipairs(taggedTenders) do
-			SetupTender(taggedTender, player)
+			local teamIdAtt = taggedTender:GetAttribute("TeamId")
+			if teamId == teamIdAtt then SetupTender(taggedTender, player) end
 		end
 	end) end
 end
@@ -28,7 +29,7 @@ function SetupTender(tenderModel: Model, player: Player)
 	local Tender: TenderInstance = Tender.New(state[1], player, tenderModel)
 
 	Tender:Initialize()
-	BoatManager.RegisterTender(Tender)
+	-- BoatManager.RegisterTender(Tender)
 end
 
 function GetBoosts(player: Player)

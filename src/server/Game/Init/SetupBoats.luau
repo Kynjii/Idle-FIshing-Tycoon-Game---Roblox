@@ -9,10 +9,11 @@ type BoatInstance = Boat.BoatInstance
 
 local taggedBoats = CollectionService:GetTagged("Boat")
 
-function SetupTaggedBoats(player)
+function SetupTaggedBoats(player: Player, teamId: number)
 	if player then task.delay(1, function()
 		for _, taggedBoat in ipairs(taggedBoats) do
-			SetupBoat(taggedBoat, player)
+			local teamIdAtt = taggedBoat:GetAttribute("TeamId")
+			if teamId == teamIdAtt then SetupBoat(taggedBoat, player) end
 		end
 	end) end
 end
@@ -28,7 +29,7 @@ function SetupBoat(boatModel: Model, player: Player)
 	local Boat: BoatInstance = Boat.New(state[1], player, boatModel)
 
 	Boat:Initialize()
-	BoatManager.RegisterBoat(Boat)
+	-- BoatManager.RegisterBoat(Boat)
 end
 
 function GetBoosts(player: Player)

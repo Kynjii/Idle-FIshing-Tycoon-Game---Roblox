@@ -33,7 +33,7 @@ end
 function BoatManager.LoadFish(tenderClass, linkedBoatClass)
 	local tender = tenderClass :: TenderInstance
 	local boat = linkedBoatClass :: BoatInstance
-	local amount = math.max(boat.FishInStorage, maxStorage)
+	local amount = math.max(boat.FishInStorage, tender.CurrentMaxStorage)
 	boat:RemoveFish(amount)
 
 	-- create function to locate the correct Boat the Tender is linked to

@@ -1,32 +1,15 @@
 local Players = game:GetService("Players")
 local ServerScriptService = game:GetService("ServerScriptService")
-local Tender = require(ServerScriptService.Server.Game.Init.SetupTenders)
-local Boat = require(ServerScriptService.Server.Game.Init.SetupBoats)
 local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
 local PlayerDataTemplate = require(ServerScriptService.Server.Modules.PlayerDataTemplate)
 local ProfileStore = require(ServerScriptService.Server.Libs.ProfileStore)
+local TeamManager = require(ServerScriptService.Server.Managers.TeamManager)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 
 local PlayerStore = ProfileStore.New(FFGHelpers.GetStoreName(), PlayerDataTemplate)
 
 local function Initialize(player: Player, profile: typeof(PlayerStore:StartSessionAsync()))
 	DataService.AttachReplica(player, profile)
-end
-
-local function SetupBoats(player)
-	if player then
-		Boat.SetupTaggedBoats(player)
-	else
-		FFGHelpers.PrintLog("No player passed during initalization")
-	end
-end
-
-local function SetupTenders(player)
-	if player then
-		Tender.SetuptaggedTenders(player)
-	else
-		FFGHelpers.PrintLog("No player passed during initalization")
-	end
 end
 
 local function PlayerAdded(player: Player)
@@ -48,8 +31,7 @@ local function PlayerAdded(player: Player)
 		if player.Parent == Players then
 			DataService.Profiles[player] = profile
 			Initialize(player, profile)
-			SetupBoats(player)
-			SetupTenders(player)
+			TeamManager.Initialize(player)
 		else
 			profile:EndSession()
 		end
@@ -73,4 +55,5 @@ Players.PlayerRemoving:Connect(function(player)
 		end)
 	end
 	DataService.DetachReplica(player)
+	TeamManager.RemovePlayer(player)
 end)

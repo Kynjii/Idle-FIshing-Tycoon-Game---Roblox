@@ -8,8 +8,6 @@ local DeepWait = require(ReplicatedStorage.Shared.Utils.DeepWait)
 local FormatNumber = require(ReplicatedStorage.Shared.Utils.FormatNumber)
 local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
 local TweenService = game:GetService("TweenService")
-local BoatManager = require(ServerScriptService.Server.Managers.BoatManager)
-local Signal = require(ReplicatedStorage.Packages.Signal)
 
 -- //SECTION - Tender Types
 export type TenderProps = {
@@ -314,7 +312,7 @@ function Tender:MoveToBoat(boatClass, boatPos: CFrame)
 
 	tween:Play()
 
-	if tween.PlaybackState == Enum.PlaybackState.Completed then BoatManager.LoadFish(self, boatClass) end
+	-- if tween.PlaybackState == Enum.PlaybackState.Completed then BoatManager.LoadFish(self, boatClass) end
 end
 
 function Tender:MoveToPort(portPos: Vector3)
