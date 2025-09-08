@@ -30,8 +30,11 @@ function BoatManager.New(boatsArr: BoatType.BoatProps, TendersArr: TenderType.Te
 	self.TenderModel = self:FindTenderModel(player, tier) :: Model
 	self.LaneTender = Tender.New(TendersArr[tier], player, self.TenderModel, self.BoatModel)
 
-	-- attach listeners
-	if self.TenderModel then self:AttachAttListeners() end
+	-- Tender Travelling props
+	self.loadingTime = 1
+
+	-- Attach listeners to handle the Tender Travelling Cycle
+	self:AttachAttListeners()
 
 	return self
 end
@@ -60,40 +63,29 @@ function BoatManager:Initialize()
 end
 
 function BoatManager:AttachAttListeners()
+	-- isPurchased triggers the start of the interval
 	self.TenderModel.PrimaryPart:GetAttributeChangedSignal(FFGEnum.ATTRIBUTES.isPurchased):Connect(function()
-		self:HandleTenderService()
+		self:StartTenderInterval()
 	end)
 
-	if self.TenderModel.PrimaryPart:GetAttribute(FFGEnum.ATTRIBUTES.isPurchased) == true then self:HandleTenderService() end
+	-- atPort
+	self.TenderModel.PrimaryPart:GetAttributeChangedSignal(FFGEnum.ATTRIBUTES.atPort):Connect(function() end)
+
+	-- finishedLoading
+
+	-- atBoat
+
+	-- finishedOffloading
 end
 
-function BoatManager:HandleTenderService()
-	if not self.LaneTender.isPurchased then
-		self.TenderInterval = nil
-		return
-	end
-
-	self:StartTenderInterval()
-end
-
+-- //SECTION - Tender Travelling Cycle
 function BoatManager:StartTenderInterval()
 	local boatPos = self.BoatModel.PrimaryPart.CFrame
-	local loadingTime = 1
-	local travelTime = (self.LaneTender.CurrentTravelTime * 2) + loadingTime * 2
 
-	self.TenderInterval = SetInterval(function()
-		-- Move Tender to Boat
-		self.LaneTender:MoveToBoat(boatPos)
-		task.wait(loadingTime)
-
-		-- Transfer Fish
-		local amountToLoad = math.min(self.LaneBoat.FishInStorage, self.LaneTender.CurrentMaxStorage)
-		self.LaneBoat:RemoveFish(amountToLoad)
-		self.LaneTender:AddFish(amountToLoad)
-
-		task.wait(loadingTime)
-		print("Fish delivered:", amountToLoad)
-	end, travelTime)
+	-- Move Tender to Boat
+	self.LaneTender:MoveToBoat(boatPos)
 end
+
+-- //!SECTION
 
 return BoatManager

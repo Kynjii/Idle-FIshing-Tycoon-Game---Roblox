@@ -218,7 +218,7 @@ function Tender:MoveToBoat(boatPos: CFrame)
 
 	tween:Play()
 
-	return self.CurrentTravelTime
+	return
 end
 
 function Tender:MoveToPort()
@@ -234,7 +234,9 @@ function Tender:MoveToPort()
 
 	tween:Play()
 
-	return self.CurrentTravelTime
+	print("Boat at port")
+
+	return
 end
 
 function Tender:AddFish(amount: number)

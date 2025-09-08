@@ -20,7 +20,6 @@ export type BoatManagerInstance = {
 	AttachAttListeners: (self: BoatManagerInstance) -> (),
 
 	-- Handling Tender Service
-	HandleTenderService: (self: BoatManagerInstance) -> (),
 	StartTenderInterval: (self: BoatManagerInstance) -> (),
 
 	TenderInterval: thread,

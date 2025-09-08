@@ -81,6 +81,7 @@ FFGEnum.QUALITY = {
 
 FFGEnum.ATTRIBUTES = {
 	["isPurchased"] = "isPurchased",
+	["atPort"] = "atPort",
 }
 
 FFGEnum.CURRENCY_TYPES = {
