@@ -10,6 +10,7 @@ export type BoatManagerInstance = {
 	LaneBoat: BoatType.BoatInstance,
 	TenderModel: Model,
 	LaneTender: TenderType.TenderInstance,
+	Player: Player,
 
 	-- Main Actions
 	FindBoatModel: (self: BoatManagerInstance, player: Player, tier: number) -> Model | nil,
@@ -20,9 +21,11 @@ export type BoatManagerInstance = {
 	AttachAttListeners: (self: BoatManagerInstance) -> (),
 
 	-- Handling Tender Service
-	StartTenderInterval: (self: BoatManagerInstance) -> (),
+	StartTenderCycle: (self: BoatManagerInstance, bool: boolean?) -> (),
+	StartLoadingFish: (self: BoatManagerInstance) -> (),
+	StartUnloadingFish: (self: BoatManagerInstance) -> (),
 
-	TenderInterval: thread,
+	ResetTravellingAttributes: (self: BoatManagerInstance) -> (),
 }
 
 export type BoatManager = {

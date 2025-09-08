@@ -67,7 +67,7 @@ local Tender: TenderInstance = {}
 Tender.__index = Tender
 
 -- //SECTION - Constructor
-function Tender.New(state, player: Player, model: Model, associatedBoat: Model)
+function Tender.New(state, player: Player, model: Model)
 	local self: TenderInstance = setmetatable({}, Tender)
 
 	-- Start with default stats as base
@@ -88,7 +88,6 @@ function Tender.New(state, player: Player, model: Model, associatedBoat: Model)
 	self.Model = model
 	self.PortPos = model.PrimaryPart.CFrame
 	self.Name = self:GetName()
-	self.AssociatedModel = associatedBoat
 
 	-- Had to take this approach for type checking to work
 	if self.BaseCost == DEFAULTS.BaseCost then self.BaseCost = self:CalculateBaseCost() end
@@ -114,6 +113,7 @@ end
 -- //SECTION - Core Tender Actions
 function Tender:Purchase()
 	self.isPurchased = true
+	self.Model.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.isPurchased, true)
 end
 
 function Tender:Upgrade()
@@ -216,12 +216,16 @@ function Tender:MoveToBoat(boatPos: CFrame)
 	local tweenInfo = TweenInfo.new(self.CurrentTravelTime)
 	local tween = TweenService:Create(tenderModel.PrimaryPart, tweenInfo, tweenGoal)
 
-	tween:Play()
+	tween.Completed:Connect(function(playbackState)
+		self.Model.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.atBoat, true)
+	end)
 
-	return
+	tween:Play()
 end
 
 function Tender:MoveToPort()
+	self.Model.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.atBoat, false)
+
 	local tenderModel = self.Model
 	local portPos = self.PortPos
 
@@ -232,18 +236,18 @@ function Tender:MoveToPort()
 	local tweenInfo = TweenInfo.new(self.CurrentTravelTime)
 	local tween = TweenService:Create(tenderModel.PrimaryPart, tweenInfo, tweenGoal)
 
+	tween.Completed:Connect(function(playbackState)
+		self.Model.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.atPort, true)
+	end)
+
 	tween:Play()
-
-	print("Boat at port")
-
-	return
 end
 
 function Tender:AddFish(amount: number)
 	FFGHelpers.PrintLog("Adding Fish", amount)
 	self.FishInStorage += amount
 
-	if self.FishInStorage > self.CurrentMaxStorage then
+	if self.FishInStorage >= self.CurrentMaxStorage then
 		self.FishInStorage = self.CurrentMaxStorage
 		self:UpdateStorageStatus(true)
 	end
@@ -456,7 +460,7 @@ function Tender:CanUpgrade()
 end
 
 function Tender:IsStorageFull()
-	local status = self.FishInStorage == self.CurrentMaxStorage
+	local status = self.FishInStorage >= self.CurrentMaxStorage
 	if self.StorageFull ~= status then self:UpdateStorageStatus(status) end
 	return status
 end

@@ -67,6 +67,7 @@ export type TenderInstance = {
 	-- Travelling
 	MoveToBoat: (self: TenderInstance, position: Vector3) -> (),
 	MoveToPort: (self: TenderInstance) -> (),
+	StartLoadingFish: (self: TenderInstance) -> (),
 	AddFish: (self: TenderInstance, amount: number) -> boolean,
 	RemoveFish: (self: TenderInstance, amount: number) -> boolean,
 	UpdateStorageStatus: (self: TenderInstance, status: boolean) -> (),
@@ -94,7 +95,7 @@ export type TenderInstance = {
 }
 
 export type Tender = {
-	New: (props: TenderProps, player: Player, model: Model, associatedBoat: Model) -> TenderInstance,
+	New: (props: TenderProps, player: Player, model: Model) -> TenderInstance,
 }
 
 return TenderType

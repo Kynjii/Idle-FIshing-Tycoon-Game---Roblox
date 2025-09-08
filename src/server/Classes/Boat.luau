@@ -239,7 +239,7 @@ end
 function Boat:AddFish(amount: number)
 	self.FishInStorage += amount
 
-	if self.FishInStorage > self.CurrentMaxStorage then
+	if self.FishInStorage >= self.CurrentMaxStorage then
 		self.FishInStorage = self.CurrentMaxStorage
 		self:UpdateStorageStatus(true)
 	end

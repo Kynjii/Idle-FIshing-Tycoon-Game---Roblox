@@ -82,6 +82,9 @@ FFGEnum.QUALITY = {
 FFGEnum.ATTRIBUTES = {
 	["isPurchased"] = "isPurchased",
 	["atPort"] = "atPort",
+	["atBoat"] = "atBoat",
+	["finishedLoading"] = "finishedLoading",
+	["finishedUnloading"] = "finishedUnloading",
 }
 
 FFGEnum.CURRENCY_TYPES = {

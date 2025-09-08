@@ -90,8 +90,6 @@ function TeamManager.AssignBoatManagers(profile: ProfileData, player: Player)
 			boatManager:Initialize()
 		end
 	end
-
-	print(TeamManager.BoatManagers[player])
 end
 
 return TeamManager
