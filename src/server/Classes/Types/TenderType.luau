@@ -50,6 +50,7 @@ export type TenderInstance = {
 
 	-- (Not-Saved to DataStore) Props
 	Model: Model,
+	PortPos: CFrame,
 
 	-- Core Tender Actions
 	Purchase: (self: TenderInstance) -> (),
@@ -64,14 +65,13 @@ export type TenderInstance = {
 	CalculateTravelTime: (self: TenderInstance) -> (number, number),
 
 	-- Travelling
-	StartTenderService: (self: TenderInstance) -> (),
-	MoveToBoat: (self: TenderInstance, position: Vector3) -> (),
-	MoveToPort: (self: TenderInstance, position: Vector3) -> (),
-	AddFish: (self: TenderInstance, amount: number) -> (),
-	RemoveFish: (self: TenderInstance, amount: number) -> (),
+	MoveToBoat: (self: TenderInstance, position: Vector3) -> boolean,
+	MoveToPort: (self: TenderInstance, position: Vector3) -> boolean,
+	AddFish: (self: TenderInstance, amount: number) -> boolean,
+	RemoveFish: (self: TenderInstance, amount: number) -> boolean,
 	UpdateStorageStatus: (self: TenderInstance, status: boolean) -> (),
 
-	-- UI Setup
+	-- Setup
 	Initialize: (self: TenderInstance) -> (),
 	SetupPurchaseBoard: (self: TenderInstance) -> Part,
 	UpdatePurchaseBoardUI: (self: TenderInstance) -> (),
@@ -94,7 +94,7 @@ export type TenderInstance = {
 }
 
 export type Tender = {
-	New: (props: TenderProps, player: Player, model: Model) -> TenderInstance,
+	New: (props: TenderProps, player: Player, model: Model, associatedBoat: Model) -> TenderInstance,
 }
 
 return TenderType

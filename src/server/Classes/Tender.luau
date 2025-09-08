@@ -67,7 +67,7 @@ local Tender: TenderInstance = {}
 Tender.__index = Tender
 
 -- //SECTION - Constructor
-function Tender.New(state, player: Player, model: Model)
+function Tender.New(state, player: Player, model: Model, associatedBoat: Model)
 	local self: TenderInstance = setmetatable({}, Tender)
 
 	-- Start with default stats as base
@@ -86,11 +86,16 @@ function Tender.New(state, player: Player, model: Model)
 	self.Id = self.Id or HttpService:GenerateGUID(false)
 	self.Owner = self.Owner or player.UserId
 	self.Model = model
+	self.PortPos = model.PrimaryPart.CFrame
 	self.Name = self:GetName()
+	self.AssociatedModel = associatedBoat
 
 	-- Had to take this approach for type checking to work
 	if self.BaseCost == DEFAULTS.BaseCost then self.BaseCost = self:CalculateBaseCost() end
 	if not self.UpgradeCost then self.UpgradeCost = self:CalculateUpgradeCost() end
+
+	-- Apply attributes
+	if self.isPurchased then self.Model.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.isPurchased, self.isPurchased) end
 
 	-- Storage calcs
 	local curMaxStorage, nextLvlMaxStorage = self:CalculateMaxStorage()
@@ -200,7 +205,7 @@ end
 -- //!SECTION
 
 -- //SECTION - Handle Travelling
-function Tender:MoveToBoat(boatClass, boatPos: CFrame)
+function Tender:MoveToBoat(boatPos: CFrame)
 	local tenderModel = self.Model
 
 	local offset = CFrame.new(0, -12, 0)
@@ -213,11 +218,14 @@ function Tender:MoveToBoat(boatClass, boatPos: CFrame)
 
 	tween:Play()
 
-	-- if tween.PlaybackState == Enum.PlaybackState.Completed then BoatManager.LoadFish(self, boatClass) end
+	if tween.PlaybackState == Enum.PlaybackState.Completed then return true end
+
+	return false
 end
 
-function Tender:MoveToPort(portPos: Vector3)
+function Tender:MoveToPort()
 	local tenderModel = self.Model
+	local portPos = self.PortPos
 
 	local boatX = portPos.X
 	local boatY = portPos.Y
@@ -230,6 +238,10 @@ function Tender:MoveToPort(portPos: Vector3)
 	local tween = TweenService:Create(tenderModel, tweenInfo, moveGoal)
 
 	tween:Play()
+
+	if tween.PlaybackState == Enum.PlaybackState.Completed then return true end
+
+	return false
 end
 
 function Tender:AddFish(amount: number)
@@ -266,7 +278,6 @@ function Tender:Initialize()
 	else
 		self:Show()
 		self:CanCollide()
-		self:StartTenderService()
 	end
 end
 
@@ -351,7 +362,7 @@ function Tender:SetupProximityPrompt(purchaseBoard: Part)
 
 	proximityPrompt.HoldDuration = 0.5
 	proximityPrompt.ObjectText = self.isPurchased and "Upgrade Tender" or "Purchase"
-	proximityPrompt.ActionText = self.isPurchased and "Gold:  " .. FormatNumber(self.UpgradeCost) or "Gold: " .. FormatNumber(self.BaseCost)
+	proximityPrompt.ActionText = self.isPurchased and "Gold: " .. FormatNumber(self.UpgradeCost) or "Gold: " .. FormatNumber(self.BaseCost)
 
 	-- Handle not showing the prompt if the user is not the owner
 	proximityPrompt.PromptShown:Connect(function(player: Player)
@@ -397,7 +408,7 @@ function Tender:UpdateProximityPromptUI(proximityPrompt: ProximityPrompt)
 		proximityPrompt.ActionText = "Max Level Reached"
 	else
 		proximityPrompt.ObjectText = self.isPurchased and "Upgrade Tender" or "Purchase"
-		proximityPrompt.ActionText = self.isPurchased and "Gold:  " .. FormatNumber(self.UpgradeCost) or "Gold: " .. FormatNumber(self.BaseCost)
+		proximityPrompt.ActionText = self.isPurchased and "Gold: " .. FormatNumber(self.UpgradeCost) or "Gold: " .. FormatNumber(self.BaseCost)
 	end
 end
 -- //!SECTION

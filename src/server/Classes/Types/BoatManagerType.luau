@@ -11,10 +11,16 @@ export type BoatManagerInstance = {
 	TenderModel: Model,
 	LaneTender: TenderType.TenderInstance,
 
-	-- Methods
+	-- Main Actions
 	FindBoatModel: (self: BoatManagerInstance, player: Player, tier: number) -> Model | nil,
 	FindTenderModel: (self: BoatManagerInstance, player: Player, tier: number) -> Model | nil,
 	Initialize: (self: BoatManagerInstance) -> (),
+
+	-- Attribute listeners
+	AttachAttListeners: (self: BoatManagerInstance) -> (),
+
+	-- Handling Tender Service
+	HandleTenderService: (self: BoatManagerInstance) -> (),
 }
 
 export type BoatManager = {

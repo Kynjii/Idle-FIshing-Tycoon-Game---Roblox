@@ -363,7 +363,7 @@ function Boat:SetupProximityPrompt(purchaseBoard: Part)
 
 	proximityPrompt.HoldDuration = 0.5
 	proximityPrompt.ObjectText = self.isPurchased and "Upgrade Boat" or "Purchase"
-	proximityPrompt.ActionText = self.isPurchased and "Gold:  " .. FormatNumber(self.UpgradeCost) or "Gold: " .. FormatNumber(self.BaseCost)
+	proximityPrompt.ActionText = self.isPurchased and "Gold: " .. FormatNumber(self.UpgradeCost) or "Gold: " .. FormatNumber(self.BaseCost)
 
 	-- Handle not showing the prompt if the user is not the owner
 	proximityPrompt.PromptShown:Connect(function(player: Player)
@@ -411,7 +411,7 @@ function Boat:UpdateProximityPromptUI(proximityPrompt: ProximityPrompt)
 		proximityPrompt.ActionText = "Max Level Reached"
 	else
 		proximityPrompt.ObjectText = self.isPurchased and "Upgrade Boat" or "Purchase"
-		proximityPrompt.ActionText = self.isPurchased and "Gold:  " .. FormatNumber(self.UpgradeCost) or "Gold: " .. FormatNumber(self.BaseCost)
+		proximityPrompt.ActionText = self.isPurchased and "Gold: " .. FormatNumber(self.UpgradeCost) or "Gold: " .. FormatNumber(self.BaseCost)
 	end
 end
 -- //!SECTION
