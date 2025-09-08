@@ -68,20 +68,32 @@ function BoatManager:AttachAttListeners()
 end
 
 function BoatManager:HandleTenderService()
-	if not self.LaneTender.isPurchased then return end
+	if not self.LaneTender.isPurchased then
+		self.TenderInterval = nil
+		return
+	end
 
+	self:StartTenderInterval()
+end
+
+function BoatManager:StartTenderInterval()
 	local boatPos = self.BoatModel.PrimaryPart.CFrame
-	local timeToWait = self.LaneTender:MoveToBoat(boatPos)
+	local loadingTime = 1
+	local travelTime = (self.LaneTender.CurrentTravelTime * 2) + loadingTime * 2
 
-	task.delay(timeToWait + 1, function()
+	self.TenderInterval = SetInterval(function()
+		-- Move Tender to Boat
+		self.LaneTender:MoveToBoat(boatPos)
+		task.wait(loadingTime)
+
+		-- Transfer Fish
 		local amountToLoad = math.min(self.LaneBoat.FishInStorage, self.LaneTender.CurrentMaxStorage)
 		self.LaneBoat:RemoveFish(amountToLoad)
 		self.LaneTender:AddFish(amountToLoad)
 
-		local time = self.LaneTender:MoveToPort()
-		task.wait(time)
+		task.wait(loadingTime)
 		print("Fish delivered:", amountToLoad)
-	end)
+	end, travelTime)
 end
 
 return BoatManager

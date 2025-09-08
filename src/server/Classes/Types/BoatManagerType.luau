@@ -21,6 +21,9 @@ export type BoatManagerInstance = {
 
 	-- Handling Tender Service
 	HandleTenderService: (self: BoatManagerInstance) -> (),
+	StartTenderInterval: (self: BoatManagerInstance) -> (),
+
+	TenderInterval: thread,
 }
 
 export type BoatManager = {
