@@ -65,7 +65,6 @@ function TeamManager.CreateTeams()
 
 		newTeam.PlayerAdded:Connect(function(player)
 			local playersOnTeam = newTeam:GetPlayers()
-			-- //TODO - Attempt to re-assign first
 			if #playersOnTeam > 1 then player:Kick("The server is full, try again.") end
 		end)
 	end
