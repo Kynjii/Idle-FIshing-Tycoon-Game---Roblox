@@ -52,6 +52,7 @@ function PortStorage.New(state, player: Player, model: Model)
 	self.Id = self.Id or HttpService:GenerateGUID(false)
 	self.Owner = self.Owner or player.UserId
 	self.Model = model
+	self.Tier = self.Model:GetAttribute(FFGEnum.ATTRIBUTES.Tier) or DEFAULTS.Tier
 
 	-- Had to take this approach for type checking to work
 	if self.BaseCost == DEFAULTS.BaseCost then self.BaseCost = self:CalculateBaseCost() end
@@ -143,6 +144,8 @@ function PortStorage:CalculateUpgradeCost()
 	local realmMultiplier = math.pow(self.RealmId :: number, 2.25) -- scaling curve
 	local growthRate = DEFAULTS.CostGrowthRate
 	local cost = baseCost * math.pow(growthRate, self.Level :: number) * tierMultiplier * realmMultiplier
+
+	self.UpgradeCost = cost
 
 	-- //TODO - handle boosts
 
@@ -303,9 +306,6 @@ function PortStorage:SetupFishRemovalPrompt()
 	-- Create the proximity prompt
 	local parent = self.Model
 	local proximityPrompt = Instance.new("ProximityPrompt", parent)
-
-	-- -- Check if storage is empty
-	-- if self.FishInStorage <= 0 then return end
 
 	proximityPrompt.HoldDuration = 0.5
 	proximityPrompt.ObjectText = ""

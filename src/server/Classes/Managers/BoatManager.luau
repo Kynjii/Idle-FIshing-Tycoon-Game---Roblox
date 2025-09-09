@@ -49,8 +49,7 @@ function BoatManager.New(realmData, tier: number, player: Player)
 	-- Attach listeners to handle the Tender Travelling Cycle
 	self:AttachAttListeners()
 
-	local firstRun = true
-	if self.LaneTender.isPurchased then self:StartTenderCycle(firstRun) end
+	if self.LaneTender.isPurchased then self:StartTenderCycle() end
 
 	return self
 end
@@ -132,12 +131,8 @@ function BoatManager:ResetTravellingAttributes()
 	end
 end
 
-function BoatManager:StartTenderCycle(firstRun)
-	if firstRun then
-		self:ResetTravellingAttributes()
-	else
-		self.TenderModel.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.finishedUnloading, true)
-	end
+function BoatManager:StartTenderCycle()
+	self:ResetTravellingAttributes()
 
 	local boatPos = self.BoatModel.PrimaryPart.CFrame
 	self.LaneTender:MoveToBoat(boatPos)

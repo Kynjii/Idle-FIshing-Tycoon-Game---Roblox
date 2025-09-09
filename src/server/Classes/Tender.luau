@@ -88,9 +88,10 @@ function Tender.New(state, player: Player, model: Model)
 	self.Model = model
 	self.PortPos = model.PrimaryPart.CFrame
 	self.Name = self:GetName()
+	self.Tier = self.Model:GetAttribute(FFGEnum.ATTRIBUTES.Tier) or DEFAULTS.Tier
 
 	-- Had to take this approach for type checking to work
-	if self.BaseCost == DEFAULTS.BaseCost then self.BaseCost = self:CalculateBaseCost() end
+	if self.BaseCost == DEFAULTS.BaseCost then self:CalculateBaseCost() end
 	if not self.UpgradeCost then self.UpgradeCost = self:CalculateUpgradeCost() end
 
 	-- Apply attributes
@@ -164,6 +165,8 @@ function Tender:CalculateUpgradeCost(): number
 	local growthRate = DEFAULTS.CostGrowthRate
 	local cost = baseCost * math.pow(growthRate, self.Level :: number) * tierMultiplier * realmMultiplier
 
+	self.UpgradeCost = cost
+
 	-- //TODO - handle boosts
 
 	return cost
@@ -206,6 +209,8 @@ end
 
 -- //SECTION - Handle Travelling
 function Tender:MoveToBoat(boatPos: CFrame)
+	self.Model.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.atPort, false)
+
 	local tenderModel = self.Model
 
 	local offset = CFrame.new(0, -12, 0)

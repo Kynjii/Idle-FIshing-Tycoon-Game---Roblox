@@ -89,9 +89,10 @@ function Boat.New(state, player: Player, model: Model): Boat
 	self.Owner = self.Owner or player.UserId
 	self.Model = model
 	self.Name = self:GetName()
+	self.Tier = self.Model:GetAttribute(FFGEnum.ATTRIBUTES.Tier) or DEFAULTS.Tier
 
 	-- Had to take this approach for type checking to work
-	if self.BaseCost == DEFAULTS.BaseCost then self.BaseCost = self:CalculateBaseCost() end
+	if self.BaseCost == DEFAULTS.BaseCost then self:CalculateBaseCost() end
 	if not self.UpgradeCost then self.UpgradeCost = self:CalculateUpgradeCost() end
 
 	local curMaxStorage, nextLvlMaxStorage = self:CalculateMaxStorage()
@@ -161,6 +162,8 @@ function Boat:CalculateUpgradeCost()
 	local realmMultiplier = math.pow(self.RealmId :: number, 2.25) -- scaling curve
 	local growthRate = DEFAULTS.CostGrowthRate
 	local cost = baseCost * math.pow(growthRate, self.Level :: number) * tierMultiplier * realmMultiplier
+
+	self.UpgradeCost = cost
 
 	-- //TODO - handle boosts
 
