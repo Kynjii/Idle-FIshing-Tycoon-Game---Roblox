@@ -255,16 +255,63 @@ function Tender:AddFish(amount: number)
 		self.FishInStorage = self.CurrentMaxStorage
 		self:UpdateStorageStatus(true)
 	end
+
+	self:UpdateProgressBar()
 end
 
 function Tender:RemoveFish(amount: number)
 	self.FishInStorage = math.max(self.FishInStorage - amount, 0)
 
 	self:UpdateStorageStatus(false)
+	self:UpdateProgressBar()
 end
 
 function Tender:UpdateStorageStatus(status)
 	self.StorageFull = status
+end
+
+function Tender:ShowProgressBar()
+	local billboard: BillboardGui = DeepWait(self.Model, "Base", "Billboard", "BillboardGui")
+	local progressBarBG: ImageLabel = billboard:WaitForChild("ProgressBarBG")
+	local progressBar: ImageLabel = progressBarBG:WaitForChild("ProgressBar")
+
+	local tweenGoal: ImageLabel = {
+		ImageTransparency = 0,
+	}
+
+	local tweenInfo1 = TweenInfo.new(1)
+	local tweenInfo2 = TweenInfo.new(1)
+	local tween1 = TweenService:Create(progressBarBG, tweenInfo1, tweenGoal)
+	local tween2 = TweenService:Create(progressBar, tweenInfo2, tweenGoal)
+
+	tween1:Play()
+	tween2:Play()
+end
+
+function Tender:HideProgressBar()
+	local billboard: BillboardGui = DeepWait(self.Model, "Base", "Billboard", "BillboardGui")
+	local progressBarBG: ImageLabel = billboard:WaitForChild("ProgressBarBG")
+	local progressBar: ImageLabel = progressBarBG:WaitForChild("ProgressBar")
+
+	local tweenGoal: ImageLabel = {
+		ImageTransparency = 1,
+	}
+
+	local tweenInfo = TweenInfo.new(1)
+	local tween1 = TweenService:Create(progressBarBG, tweenInfo, tweenGoal)
+	local tween2 = TweenService:Create(progressBar, tweenInfo, tweenGoal)
+
+	tween1:Play()
+	tween2:Play()
+end
+
+function Tender:UpdateProgressBar()
+	local billboard: BillboardGui = DeepWait(self.Model, "Base", "Billboard", "BillboardGui")
+	local progressBar: ImageLabel = DeepWait(billboard, "ProgressBarBG", "ProgressBar")
+
+	local progress = self.FishInStorage / self.CurrentMaxStorage
+	print("Updating Progress Bar: ", progress)
+	progressBar.Size = UDim2.fromScale(progress, 1)
 end
 -- //!SECTION
 
@@ -282,6 +329,8 @@ function Tender:Initialize()
 		self:Show()
 		self:CanCollide()
 	end
+
+	self:ShowProgressBar()
 end
 
 function Tender:SetupPurchaseBoard()
