@@ -106,7 +106,9 @@ function Boat.New(state, player: Player, model: Model): Boat
 	self.NextFPS = self.NextFPS or nextFPS
 
 	self.FishingInterval = nil
-	if self.isPurchased and not self:IsStorageFull() then self:StartFishing() end
+	if self.isPurchased and not self:IsStorageFull() then task.delay(1, function()
+		self:StartFishing()
+	end) end
 
 	self._cleaner = CleanerService.new()
 
@@ -238,7 +240,7 @@ function Boat:StartFishing()
 			self:UpdatePurchaseBoardUI()
 		end
 	end, 1)
-	self._cleaner:add(self.FishingInterval)
+	if self.FishingInterval then self._cleaner:add(self.FishingInterval) end
 end
 
 function Boat:AddFish(amount: number)
@@ -523,6 +525,8 @@ function Boat:ClearAllAttributes(instance: Instance)
 end
 
 function Boat:Destroy()
+	self:Hide()
+
 	pcall(function()
 		self:Save()
 	end)

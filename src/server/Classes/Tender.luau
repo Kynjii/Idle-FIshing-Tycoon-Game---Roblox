@@ -565,6 +565,9 @@ function Tender:ClearAllAttributes(instance: Instance)
 end
 
 function Tender:Destroy()
+	self:MoveToPort()
+	self:Hide()
+
 	pcall(function()
 		self:Save()
 	end)
