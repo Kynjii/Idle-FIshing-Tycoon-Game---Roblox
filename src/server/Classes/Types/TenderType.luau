@@ -51,6 +51,8 @@ export type TenderInstance = {
 	-- (Not-Saved to DataStore) Props
 	Model: Model,
 	PortPos: CFrame,
+	BillBoard: BillboardGui,
+	ProgressBar: Frame,
 
 	-- Core Tender Actions
 	Purchase: (self: TenderInstance) -> (),
