@@ -111,8 +111,8 @@ function Tender.New(state, player: Player, model: Model)
 	self.NextLvlTravelTime = self.NextLvlTravelTime or nextLvlTravelTime
 
 	-- Progress Bars
-	self._BillBoard = DeepWait(self.Model, "Base", "Billboard", "BillboardGui")
-	self._ProgressBar = DeepWait(self._BillBoard, "ProgressBarBG", "ProgressBar")
+	self.BillBoard = DeepWait(self.Model, "Base", "Billboard", "BillboardGui")
+	self.ProgressBar = DeepWait(self.BillBoard, "ProgressBarBG", "ProgressBar")
 
 	-- Tweens
 	self.ProgressTween = nil
@@ -314,17 +314,17 @@ function Tender:UpdateStorageStatus(status)
 end
 
 function Tender:ShowProgressBar()
-	local billboard = self._BillBoard
+	local billboard = self.BillBoard
 	if billboard then ProgressBar.Show(billboard) end
 end
 
 function Tender:HideProgressBar()
-	local billboard = self._BillBoard
+	local billboard = self.BillBoard
 	if billboard then ProgressBar.Hide(billboard) end
 end
 
 function Tender:UpdateProgressBar()
-	ProgressBar.Update(self._ProgressBar, self.FishInStorage, self.CurrentMaxStorage)
+	ProgressBar.Update(self.ProgressBar, self.FishInStorage, self.CurrentMaxStorage)
 end
 -- //!SECTION
 
@@ -342,8 +342,6 @@ function Tender:Initialize()
 		self:Show()
 		self:CanCollide()
 	end
-
-	self:ShowProgressBar()
 end
 
 function Tender:SetupPurchaseBoard()

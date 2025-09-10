@@ -97,6 +97,7 @@ function BoatManager:AttachAttListeners()
 
 		-- atBoat
 		if attributeName == FFGEnum.ATTRIBUTES.atBoat and self.TenderModel.PrimaryPart:GetAttribute(attributeName) == true then
+			self.LaneTender:ShowProgressBar()
 			self:StartLoadingFish()
 			return
 		end
