@@ -33,6 +33,9 @@ local function _newCleaner()
 			elseif typeof(v) == "thread" then
 				task.cancel(v)
 			elseif typeof(v) == "Instance" then
+				if v.ClassName == "Tween" then pcall(function()
+					v:Cancel()
+				end) end
 				v:Destroy()
 			elseif type(v) == "function" then
 				pcall(v)
@@ -40,6 +43,7 @@ local function _newCleaner()
 			t[i] = nil
 		end
 	end
+
 	return t
 end
 -- //!SECTION
@@ -240,7 +244,7 @@ end
 
 function Boat:CalculateFPS()
 	local baseFPS = self.BaseFPS or DEFAULTS.BaseFPS
-	if baseFPS == DEFAULTS.BaseCost then baseFPS = self:CalculateBaseFPS() end
+	if baseFPS == DEFAULTS.BaseFPS then baseFPS = self:CalculateBaseFPS() end
 
 	local growthRate = DEFAULTS.GrowthRate :: number
 	local tierMultiplier = Formulas.TIER_MULTIPLIER[self.Tier]
@@ -385,7 +389,7 @@ end
 
 function Boat:SetupProximityPrompt(purchaseBoard: Part)
 	-- Create the proximity prompt
-	local proximityPrompt = self._cleaner:add(Instance.new("ProximityPrompt", purchaseBoard))
+	local proximityPrompt: ProximityPrompt = self._cleaner:add(Instance.new("ProximityPrompt", purchaseBoard))
 
 	-- Check if boat is at max level
 	if self.Level == self.MaxLevel then
@@ -400,7 +404,11 @@ function Boat:SetupProximityPrompt(purchaseBoard: Part)
 
 	-- Handle not showing the prompt if the user is not the owner
 	self._cleaner:add(proximityPrompt.PromptShown:Connect(function(player: Player)
-		if player.UserId ~= self.Owner then return end
+		if player.UserId ~= self.Owner then
+			proximityPrompt.Enabled = false
+		else
+			proximityPrompt.Enabled = true
+		end
 	end))
 
 	-- Handle proximity prompt triggered

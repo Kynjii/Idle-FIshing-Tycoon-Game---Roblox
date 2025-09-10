@@ -54,6 +54,8 @@ export type TenderInstance = {
 	BillBoard: BillboardGui,
 	ProgressBar: Frame,
 	Player: Player,
+	ProgressTween: Tween | nil,
+	MoveTween: Tween | nil,
 
 	-- Core Tender Actions
 	Purchase: (self: TenderInstance) -> (),
@@ -96,6 +98,9 @@ export type TenderInstance = {
 	GetName: (self: TenderInstance) -> string,
 	CanUpgrade: (self: TenderInstance) -> boolean,
 	IsStorageFull: (self: TenderInstance) -> boolean,
+
+	-- Cleaner Service
+	_cleaner: (any) -> any,
 
 	-- Saving and Loading
 	Serialize: (self: TenderInstance) -> { [string]: any },

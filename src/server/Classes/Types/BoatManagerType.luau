@@ -30,6 +30,9 @@ export type BoatManagerInstance = {
 	StartUnloadingFish: (self: BoatManagerInstance) -> (),
 
 	ResetTravellingAttributes: (self: BoatManagerInstance) -> (),
+
+	-- Cleaner Service
+	_cleaner: (any) -> any,
 }
 
 export type BoatManager = {

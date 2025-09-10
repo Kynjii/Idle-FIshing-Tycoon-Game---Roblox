@@ -17,6 +17,36 @@ type TenderProps = TenderType.TenderProps
 type TenderInstance = TenderType.TenderInstance
 -- //!SECTION
 
+-- //SECTION - Cleaner Service
+local function _newCleaner()
+	local t = {}
+	function t:add(v)
+		t[#t + 1] = v
+		return v
+	end
+	function t:clean()
+		for i = #t, 1, -1 do
+			local v = t[i]
+			if typeof(v) == "RBXScriptConnection" then
+				v:Disconnect()
+			elseif typeof(v) == "thread" then
+				task.cancel(v)
+			elseif typeof(v) == "Instance" then
+				if v.ClassName == "Tween" then pcall(function()
+					v:Cancel()
+				end) end
+				v:Destroy()
+			elseif type(v) == "function" then
+				pcall(v)
+			end
+			t[i] = nil
+		end
+	end
+
+	return t
+end
+-- //!SECTION
+
 -- //SECTION -  Tender Data
 local TENDER_PROMOTION_LEVELS = {
 	[1] = 1,
@@ -110,8 +140,14 @@ function Tender.New(state, player: Player, model: Model)
 	self.NextLvlTravelTime = self.NextLvlTravelTime or nextLvlTravelTime
 
 	-- Progress Bars
-	self.BillBoard = DeepWait(self.Model, "Base", "Billboard", "BillboardGui")
-	self.ProgressBar = DeepWait(self.BillBoard, "ProgressBarBG", "ProgressBar")
+	self._BillBoard = DeepWait(self.Model, "Base", "Billboard", "BillboardGui")
+	self._ProgressBar = DeepWait(self._BillBoard, "ProgressBarBG", "ProgressBar")
+
+	-- Tweens
+	self.ProgressTween = nil
+	self.MoveTween = nil
+
+	self._cleaner = _newCleaner()
 
 	return self
 end
@@ -211,7 +247,7 @@ function Tender:CalculateTravelTime()
 	local baseTime = self.BaseTravelTime
 
 	local travelTime = math.max(0.5, baseTime - self.Level * 0.005)
-	local nextLvlTravelTime = travelTime - math.max(0.5, baseTime - (self.Level + 1) * 0.005)
+	local nextLvlTravelTime = math.max(0.5, baseTime - (self.Level + 1) * 0.005)
 
 	return travelTime, nextLvlTravelTime
 end
@@ -220,6 +256,12 @@ end
 -- //SECTION - Handle Travelling
 function Tender:MoveToBoat(boatPos: CFrame)
 	self.Model.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.atPort, false)
+
+	-- cancel any existing motion/progress tweens first
+	if self.MoveTween then
+		self.MoveTween:Cancel()
+		self.MoveTween = nil
+	end
 
 	local tenderModel = self.Model
 
@@ -231,15 +273,24 @@ function Tender:MoveToBoat(boatPos: CFrame)
 	local tweenInfo = TweenInfo.new(self.CurrentTravelTime)
 	local tween = TweenService:Create(tenderModel.PrimaryPart, tweenInfo, tweenGoal)
 
-	tween.Completed:Connect(function(playbackState)
+	self.MoveTween = tween
+	self._cleaner:add(tween)
+
+	self._cleaner:add(tween.Completed:Once(function(playbackState)
 		self.Model.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.atBoat, true)
-	end)
+		if self.MoveTween == tween then self.MoveTween = nil end
+	end))
 
 	tween:Play()
 end
 
 function Tender:MoveToPort()
 	self.Model.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.atBoat, false)
+
+	if self.MoveTween then
+		self.MoveTween:Cancel()
+		self.MoveTween = nil
+	end
 
 	local tenderModel = self.Model
 	local portPos = self.PortPos
@@ -251,9 +302,13 @@ function Tender:MoveToPort()
 	local tweenInfo = TweenInfo.new(self.CurrentTravelTime)
 	local tween = TweenService:Create(tenderModel.PrimaryPart, tweenInfo, tweenGoal)
 
-	tween.Completed:Connect(function(playbackState)
+	self.MoveTween = tween
+	self._cleaner:add(tween)
+
+	self._cleaner:add(tween.Completed:Once(function(playbackState)
 		self.Model.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.atPort, true)
-	end)
+		if self.ProgressTween == tween then self.ProgressTween = nil end
+	end))
 
 	tween:Play()
 end
@@ -288,17 +343,17 @@ function Tender:UpdateStorageStatus(status)
 end
 
 function Tender:ShowProgressBar()
-	local billboard = self.BillBoard
+	local billboard = self._BillBoard
 	if billboard then ProgressBar.Show(billboard) end
 end
 
 function Tender:HideProgressBar()
-	local billboard = self.BillBoard
+	local billboard = self._BillBoard
 	if billboard then ProgressBar.Hide(billboard) end
 end
 
 function Tender:UpdateProgressBar()
-	ProgressBar.Update(self.ProgressBar, self.FishInStorage, self.CurrentMaxStorage)
+	ProgressBar.Update(self._ProgressBar, self.FishInStorage, self.CurrentMaxStorage)
 end
 -- //!SECTION
 
@@ -390,7 +445,7 @@ end
 
 function Tender:SetupProximityPrompt(purchaseBoard: Part)
 	-- Create the proximity prompt
-	local proximityPrompt = Instance.new("ProximityPrompt", purchaseBoard)
+	local proximityPrompt = self._cleaner:add(Instance.new("ProximityPrompt", purchaseBoard))
 
 	-- Check if tender is at max level
 	if self.Level == self.MaxLevel then
@@ -404,12 +459,16 @@ function Tender:SetupProximityPrompt(purchaseBoard: Part)
 	proximityPrompt.ActionText = self.isPurchased and "Gold: " .. FormatNumber(self.UpgradeCost) or "Gold: " .. FormatNumber(self.BaseCost)
 
 	-- Handle not showing the prompt if the user is not the owner
-	proximityPrompt.PromptShown:Connect(function(player: Player)
-		if player.UserId ~= self.Owner then return end
-	end)
+	self._cleaner:add(proximityPrompt.PromptShown:Connect(function(player: Player)
+		if player.UserId ~= self.Owner then
+			proximityPrompt.Enabled = false
+		else
+			proximityPrompt.Enabled = true
+		end
+	end))
 
 	-- Handle proximity prompt triggered
-	proximityPrompt.Triggered:Connect(function(player)
+	self._cleaner:add(proximityPrompt.Triggered:Connect(function(player)
 		-- Check max level again
 		if self.Level == self.MaxLevel then return end
 
@@ -435,7 +494,7 @@ function Tender:SetupProximityPrompt(purchaseBoard: Part)
 		-- Update UIs
 		self:UpdateProximityPromptUI(proximityPrompt)
 		self:UpdatePurchaseBoardUI()
-	end)
+	end))
 
 	return proximityPrompt
 end

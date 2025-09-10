@@ -13,6 +13,36 @@ local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
 
 -- //!SECTION
 
+-- //SECTION - Cleaner Service
+local function _newCleaner()
+	local t = {}
+	function t:add(v)
+		t[#t + 1] = v
+		return v
+	end
+	function t:clean()
+		for i = #t, 1, -1 do
+			local v = t[i]
+			if typeof(v) == "RBXScriptConnection" then
+				v:Disconnect()
+			elseif typeof(v) == "thread" then
+				task.cancel(v)
+			elseif typeof(v) == "Instance" then
+				if v.ClassName == "Tween" then pcall(function()
+					v:Cancel()
+				end) end
+				v:Destroy()
+			elseif type(v) == "function" then
+				pcall(v)
+			end
+			t[i] = nil
+		end
+	end
+
+	return t
+end
+-- //!SECTION
+
 -- //SECTION - Data
 local DEFAULTS = {
 	RealmId = 1,
@@ -61,6 +91,8 @@ function PortStorage.New(state, player: Player, model: Model)
 	local curMaxStorage, nextLvlMaxStorage = self:CalculateMaxStorage()
 	self.CurrentMaxStorage = self.CurrentMaxStorage or curMaxStorage
 	self.NextLvlMaxStorage = self.NextLvlMaxStorage or nextLvlMaxStorage
+
+	self._cleaner = _newCleaner()
 
 	return self
 end
@@ -261,14 +293,15 @@ function PortStorage:SetupProximityPrompt(purchaseBoard: Part)
 
 	-- Handle not showing the prompt if the user is not the owner
 	proximityPrompt.PromptShown:Connect(function(player: Player)
-		if player.UserId ~= self.Owner then return end
+		if player.UserId ~= self.Owner then
+			proximityPrompt.Enabled = false
+		else
+			proximityPrompt.Enabled = true
+		end
 	end)
 
 	-- Handle proximity prompt triggered
 	proximityPrompt.Triggered:Connect(function(player)
-		-- Another safety check
-		if player.UserId ~= self.Owner then return end
-
 		-- Check max level again
 		if self.Level == self.MaxLevel then return end
 
