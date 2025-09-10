@@ -229,10 +229,10 @@ function Tender:MoveToBoat(boatPos: CFrame)
 	self.Model.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.atPort, false)
 
 	-- cancel any existing motion/progress tweens first
-	if self.MoveTween then
+	if self.MoveTween then pcall(function()
 		self.MoveTween:Cancel()
 		self.MoveTween = nil
-	end
+	end) end
 
 	local tenderModel = self.Model
 
@@ -258,10 +258,10 @@ end
 function Tender:MoveToPort()
 	self.Model.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.atBoat, false)
 
-	if self.MoveTween then
+	if self.MoveTween then pcall(function()
 		self.MoveTween:Cancel()
 		self.MoveTween = nil
-	end
+	end) end
 
 	local tenderModel = self.Model
 	local portPos = self.PortPos

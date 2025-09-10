@@ -8,6 +8,7 @@ local CalculateProgress = require(ReplicatedStorage.Shared.Utils.CalculateProgre
 local DeepWait = require(ReplicatedStorage.Shared.Utils.DeepWait)
 local FormatNumber = require(ReplicatedStorage.Shared.Utils.FormatNumber)
 local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
+local ResizeFromEdge = require(ServerScriptService.Server.Modules.ResizeFromEdge)
 local CleanerService = require(ServerScriptService.Server.Services.CleanerService)
 
 -- //SECTION - Types
@@ -55,6 +56,9 @@ function PortStorage.New(state, player: Player, model: Model)
 	self.Model = model
 	self.Tier = self.Model:GetAttribute(FFGEnum.ATTRIBUTES.Tier) or DEFAULTS.Tier
 	self.Player = player
+
+	-- Tweens
+	self.ProgressTween = nil
 
 	self.FishModel = DeepWait(self.Model, "FishInStorage", "Base") :: UnionOperation
 
@@ -108,24 +112,17 @@ function PortStorage:RemoveFish(amount: number)
 end
 
 function PortStorage:UpdateFishModel()
+	local part: BasePart = self.FishModel
+	if not part or not part.Parent then return end
+
 	local maxHeight = 9
-	local modelBase = self.FishModel
-	if modelBase.Size.Y >= maxHeight then return end
+	local minHeight = 0.5
+	local max: number = self.CurrentMaxStorage or 0
+	local current: number = self.FishInStorage or 0
 
-	local currentAmount: number = self.FishInStorage
-	local originalCF = modelBase.CFrame
+	local ratio = (max > 0) and math.clamp(current / max, 0, 1) or 0
 
-	-- Grow/Shrink Y
-	modelBase.Size = Vector3.new(modelBase.Size.X, math.min(modelBase.Size.Y + currentAmount, maxHeight), modelBase.Size.Z)
-
-	-- Reposition so the bottom stays put (grow upward)
-	-- Move up by half of the increase (world up)
-	local upDelta = currentAmount / 2
-
-	-- Preserve original orientation while changing position:
-	-- (cf - cf.Position) extracts rotation; CFrame.new(newPos) sets position.
-	local newPos = originalCF.Position + Vector3.new(0, upDelta, 0)
-	modelBase.CFrame = CFrame.new(newPos) * (originalCF - originalCF.Position)
+	ResizeFromEdge.ResizeByRatio(part, ratio, maxHeight, { from = "bottom", cleaner = self._cleaner, minHeight = minHeight })
 end
 -- //!SECTION
 
@@ -201,6 +198,7 @@ function PortStorage:Initialize()
 	-- Setup Sell Prompt (temp)
 	-- //TODO - Replace so the player can remove the fish into their own backpack
 	self:SetupFishRemovalPrompt()
+	self:UpdateFishModel()
 end
 
 function PortStorage:SetupPurchaseBoard()
