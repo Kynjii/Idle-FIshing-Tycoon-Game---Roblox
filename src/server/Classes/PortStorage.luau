@@ -394,7 +394,7 @@ function PortStorage:CanUpgrade()
 end
 
 function PortStorage:IsStorageFull()
-	local status = self.FishInStorage == self.CurrentMaxStorage
+	local status = self.FishInStorage >= self.CurrentMaxStorage
 	if self.StorageFull ~= status then self:UpdateStorageStatus(status) end
 	return status
 end

@@ -124,11 +124,9 @@ end
 
 -- //SECTION - Tender Travelling Cycle Functions used by the AttListeners
 function BoatManager:ResetTravellingAttributes()
-	local attributes = self.TenderModel.PrimaryPart:GetAttributes()
-	for k, v in pairs(attributes) do
-		if k == FFGEnum.ATTRIBUTES.isPurchased then return end
-
-		v = false
+	local primary = self.TenderModel.PrimaryPart
+	for name, _ in pairs(primary:GetAttributes()) do
+		if name ~= FFGEnum.ATTRIBUTES.isPurchased then primary:SetAttribute(name, false) end
 	end
 end
 
@@ -163,17 +161,26 @@ end
 function BoatManager:StartUnloadingFish()
 	self.TenderModel.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.finishedLoading, false)
 
-	local storageEmpty = false
-	while not storageEmpty do
-		if self.LaneTender.FishInStorage <= 0 then
-			self.TenderModel.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.finishedUnloading, true)
-			storageEmpty = true
+	while true do
+		local tender = self.LaneTender
+		local storage = self.LaneStorage
+
+		local storageFree = storage.CurrentMaxStorage - storage.FishInStorage
+
+		if storageFree <= 0 then
+			task.wait(1)
+		else
+			local tickAmount = tender.CurrentMaxStorage / 10
+			local amount = math.min(tickAmount, tender.FishInStorage, storageFree)
+
+			tender:RemoveFish(amount)
+			storage:AddFish(amount)
 		end
 
-		local amount = self.LaneTender.CurrentMaxStorage / 10
-
-		self.LaneTender:RemoveFish(amount)
-		self.LaneStorage:AddFish(amount)
+		if tender.FishInStorage <= 0 then
+			self.TenderModel.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.finishedUnloading, true)
+			break
+		end
 
 		task.wait(1)
 	end
