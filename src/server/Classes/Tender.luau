@@ -9,6 +9,7 @@ local FormatNumber = require(ReplicatedStorage.Shared.Utils.FormatNumber)
 local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
 local TweenService = game:GetService("TweenService")
 local TenderType = require(ServerScriptService.Server.Classes.Types.TenderType)
+local ProgressBar = require(ServerScriptService.Server.Modules.ProgressBar)
 
 -- //SECTION - Tender Types
 type Tender = TenderType.Tender
@@ -276,42 +277,16 @@ end
 
 function Tender:ShowProgressBar()
 	local billboard = self.BillBoard
-	if billboard then
-		print(self.BillBoard)
-		for _, decendant in pairs(billboard:GetDescendants()) do
-			if decendant:IsA("Frame") then decendant.Visible = true end
-		end
-	end
+	if billboard then ProgressBar.Show(billboard) end
 end
 
 function Tender:HideProgressBar()
 	local billboard = self.BillBoard
-	if billboard then
-		for _, decendant in pairs(billboard:GetDescendants()) do
-			if decendant:IsA("Frame") then decendant.Visible = false end
-		end
-	end
+	if billboard then ProgressBar.Hide(billboard) end
 end
 
 function Tender:UpdateProgressBar()
-	local max = self.CurrentMaxStorage or 0
-	local have = self.FishInStorage or 0
-	local progress = (max > 0) and math.clamp(have / max, 0, 1) or 0
-
-	local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
-	local goal = { Size = UDim2.fromScale(progress, 1) }
-
-	if self._progressTween then
-		self._progressTween:Cancel()
-		self._progressTween = nil
-	end
-
-	local tween = TweenService:Create(self.ProgressBar, tweenInfo, goal)
-	tween:Play()
-
-	tween.Completed:Once(function()
-		if self._progressTween == tween then self._progressTween = nil end
-	end)
+	ProgressBar.Update(self.ProgressBar, self.FishInStorage, self.CurrentMaxStorage)
 end
 -- //!SECTION
 

@@ -4,7 +4,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local BoatType = require(ServerScriptService.Server.Classes.Types.BoatType)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local Formulas = require(ServerScriptService.Server.Math.Formulas)
-local Billboard = require(ServerScriptService.Server.Modules.Billboard)
+local PopUp = require(ServerScriptService.Server.Modules.PopUp)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local CalculateProgress = require(ReplicatedStorage.Shared.Utils.CalculateProgress)
 local DeepWait = require(ReplicatedStorage.Shared.Utils.DeepWait)
@@ -427,7 +427,7 @@ function Boat:UpdateBillboardGUI(amount: number)
 		clone.Parent = self.Model.PrimaryPart.Billboard
 		clone.Adornee = self.Model.PrimaryPart
 		clone.Name = "FishPopup"
-		Billboard.Animate(clone, amount)
+		PopUp.Animate(clone, amount)
 	end
 end
 -- //!SECTION
