@@ -96,7 +96,7 @@ function Tender.New(state, player: Player, model: Model)
 	if self.BaseCost == DEFAULTS.BaseCost then self:CalculateBaseCost() end
 	if not self.UpgradeCost then self.UpgradeCost = self:CalculateUpgradeCost() end
 
-	-- Apply attributes
+	-- Apply attributes for BoatManager
 	if self.isPurchased then self.Model.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.isPurchased, self.isPurchased) end
 
 	-- Storage calcs
@@ -121,6 +121,8 @@ end
 function Tender:Purchase()
 	self.isPurchased = true
 	self.Model.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.isPurchased, true)
+
+	self:Save()
 end
 
 function Tender:Upgrade()
@@ -142,6 +144,8 @@ function Tender:Upgrade()
 	local curTravelTime, nextLvlTravelTime = self:CalculateTravelTime()
 	self.CurrentTravelTime = curTravelTime
 	self.NextLvlTravelTime = nextLvlTravelTime
+
+	self:Save()
 end
 
 function Tender:IncreaseUpgradeStage(stage)
@@ -255,6 +259,11 @@ function Tender:MoveToPort()
 end
 
 function Tender:AddFish(amount: number)
+	if self:IsStorageFull() then
+		self:UpdateProgressBar()
+		return
+	end
+
 	self.FishInStorage += amount
 
 	if self.FishInStorage >= self.CurrentMaxStorage then
@@ -263,6 +272,7 @@ function Tender:AddFish(amount: number)
 	end
 
 	self:UpdateProgressBar()
+	self:Save()
 end
 
 function Tender:RemoveFish(amount: number)
@@ -270,6 +280,7 @@ function Tender:RemoveFish(amount: number)
 
 	self:UpdateStorageStatus(false)
 	self:UpdateProgressBar()
+	self:Save()
 end
 
 function Tender:UpdateStorageStatus(status)
@@ -424,8 +435,6 @@ function Tender:SetupProximityPrompt(purchaseBoard: Part)
 		-- Update UIs
 		self:UpdateProximityPromptUI(proximityPrompt)
 		self:UpdatePurchaseBoardUI()
-
-		DataService.SaveTenderState(player, self.Id, self:Serialize())
 	end)
 
 	return proximityPrompt
@@ -518,6 +527,10 @@ function Tender:Serialize(): TenderProps
 		CurrentTravelTime = self.CurrentTravelTime,
 		NextLvlTravelTime = self.NextLvlTravelTime,
 	}
+end
+
+function Tender:Save()
+	DataService.SaveTenderState(self.Player, self.Id, self:Serialize())
 end
 -- //!SECTION
 

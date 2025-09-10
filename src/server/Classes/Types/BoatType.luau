@@ -94,6 +94,7 @@ export type BoatInstance = {
 
 	-- Saving and Loading
 	Serialize: (self: BoatInstance) -> { [string]: any },
+	Save: (self: BoatInstance) -> (),
 }
 
 export type Boat = {

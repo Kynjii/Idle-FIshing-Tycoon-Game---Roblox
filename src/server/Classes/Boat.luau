@@ -114,6 +114,7 @@ end
 -- //SECTION - Core Boat Actions
 function Boat:Purchase()
 	self.isPurchased = true
+	self:Save()
 end
 
 function Boat:Upgrade()
@@ -135,6 +136,8 @@ function Boat:Upgrade()
 	local curFPS, nextFPS = self:CalculateFPS()
 	self.CurrentFPS = curFPS
 	self.NextFPS = nextFPS
+
+	self:Save()
 end
 
 function Boat:IncreaseUpgradeStage(stage)
@@ -248,11 +251,14 @@ function Boat:AddFish(amount: number)
 		self.FishInStorage = self.CurrentMaxStorage
 		self:UpdateStorageStatus(true)
 	end
+
+	self:Save()
 end
 
 function Boat:RemoveFish(amount: number)
 	self.FishInStorage = math.max(self.FishInStorage :: number - amount, 0)
 	self:UpdateStorageStatus(false)
+	self:Save()
 end
 
 function Boat:UpdateStorageStatus(status)
@@ -404,8 +410,6 @@ function Boat:SetupProximityPrompt(purchaseBoard: Part)
 		-- Update UIs
 		self:UpdateProximityPromptUI(proximityPrompt)
 		self:UpdatePurchaseBoardUI()
-
-		DataService.SaveBoatState(player, self.Id, self:Serialize())
 	end)
 
 	return proximityPrompt
@@ -510,6 +514,10 @@ function Boat:Serialize()
 		CurrentFPS = self.CurrentFPS,
 		NextFPS = self.NextFPS,
 	}
+end
+
+function Boat:Save()
+	DataService.SaveBoatState(self.Player, self.Id, self:Serialize())
 end
 -- //!SECTION
 
