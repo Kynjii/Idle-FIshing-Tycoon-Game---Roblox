@@ -517,6 +517,10 @@ end
 
 -- //SECTION - Cleanup
 function Boat:Destroy()
+	pcall(function()
+		self:Save()
+	end)
+
 	self._cleaner:clean()
 	self._cleaner = nil
 

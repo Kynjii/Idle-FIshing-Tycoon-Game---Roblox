@@ -54,6 +54,7 @@ function PortStorage.New(state, player: Player, model: Model)
 	self.Owner = self.Owner or player.UserId
 	self.Model = model
 	self.Tier = self.Model:GetAttribute(FFGEnum.ATTRIBUTES.Tier) or DEFAULTS.Tier
+	self.Player = player
 
 	-- Had to take this approach for type checking to work
 	if self.BaseCost == DEFAULTS.BaseCost then self.BaseCost = self:CalculateBaseCost() end
@@ -335,7 +336,7 @@ function PortStorage:SetupFishRemovalPrompt()
 		DataService.Earn(player, FFGEnum.CURRENCY_TYPES.Gold, amount * 2)
 
 		-- Save State
-		DataService.SaveStorageState(player, self.Id, self:Serialize())
+		self:Save()
 	end)
 end
 
@@ -423,10 +424,18 @@ function PortStorage:Serialize()
 		StorageFull = self.StorageFull,
 	}
 end
+
+function PortStorage:Save()
+	DataService.SaveStorageState(self.Player, self.Id, self:Serialize())
+end
 -- //!SECTION
 
 -- //SECTION - Cleanup
 function PortStorage:Destroy()
+	pcall(function()
+		self:Save()
+	end)
+
 	self._cleaner:clean()
 	self._cleaner = nil
 

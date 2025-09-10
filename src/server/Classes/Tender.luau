@@ -559,6 +559,10 @@ end
 
 -- //SECTION - Cleanup
 function Tender:Destroy()
+	pcall(function()
+		self:Save()
+	end)
+
 	if self.MoveTween then
 		pcall(function()
 			self.MoveTween:Cancel()
