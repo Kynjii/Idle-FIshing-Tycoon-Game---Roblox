@@ -51,6 +51,7 @@ export type BoatInstance = {
 	-- (Not-Saved to DataStore) Props
 	Model: Model,
 	FishingInterval: thread,
+	Player: Player,
 
 	-- Core Boat Actions
 	Purchase: (self: BoatInstance) -> (),

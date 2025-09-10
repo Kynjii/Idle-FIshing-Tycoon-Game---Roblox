@@ -90,6 +90,7 @@ function Boat.New(state, player: Player, model: Model): Boat
 	self.Model = model
 	self.Name = self:GetName()
 	self.Tier = self.Model:GetAttribute(FFGEnum.ATTRIBUTES.Tier) or DEFAULTS.Tier
+	self.Player = player
 
 	-- Had to take this approach for type checking to work
 	if self.BaseCost == DEFAULTS.BaseCost then self:CalculateBaseCost() end

@@ -53,6 +53,7 @@ export type TenderInstance = {
 	PortPos: CFrame,
 	BillBoard: BillboardGui,
 	ProgressBar: Frame,
+	Player: Player,
 
 	-- Core Tender Actions
 	Purchase: (self: TenderInstance) -> (),
