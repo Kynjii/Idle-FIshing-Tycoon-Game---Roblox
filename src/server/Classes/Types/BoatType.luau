@@ -68,7 +68,6 @@ export type BoatInstance = {
 
 	-- Fishing
 	StartFishing: (self: BoatInstance) -> (),
-	StopFishing: (self: BoatInstance) -> (),
 	AddFish: (self: BoatInstance, amount: number) -> (),
 	RemoveFish: (self: BoatInstance, amount: number) -> (),
 	UpdateStorageStatus: (self: BoatInstance, status: boolean) -> (),
@@ -91,6 +90,9 @@ export type BoatInstance = {
 	GetName: (self: BoatInstance) -> string,
 	CanUpgrade: (self: BoatInstance) -> boolean,
 	IsStorageFull: (self: BoatInstance) -> boolean,
+
+	-- Cleaner Service
+	_cleaner: (any) -> any,
 
 	-- Saving and Loading
 	Serialize: (self: BoatInstance) -> { [string]: any },

@@ -18,6 +18,32 @@ type BoatProps = BoatType.BoatProps
 type BoatInstance = BoatType.BoatInstance
 -- //!SECTION
 
+-- //SECTION - Cleaner Service
+local function _newCleaner()
+	local t = {}
+	function t:add(v)
+		t[#t + 1] = v
+		return v
+	end
+	function t:clean()
+		for i = #t, 1, -1 do
+			local v = t[i]
+			if typeof(v) == "RBXScriptConnection" then
+				v:Disconnect()
+			elseif typeof(v) == "thread" then
+				task.cancel(v)
+			elseif typeof(v) == "Instance" then
+				v:Destroy()
+			elseif type(v) == "function" then
+				pcall(v)
+			end
+			t[i] = nil
+		end
+	end
+	return t
+end
+-- //!SECTION
+
 -- //SECTION - Boat Data
 local BOAT_PROMOTION_LEVELS = {
 	[1] = 1,
@@ -106,6 +132,8 @@ function Boat.New(state, player: Player, model: Model): Boat
 
 	self.FishingInterval = nil
 	if self.isPurchased and not self:IsStorageFull() then self:StartFishing() end
+
+	self._cleaner = _newCleaner()
 
 	return self
 end
@@ -235,13 +263,7 @@ function Boat:StartFishing()
 			self:UpdatePurchaseBoardUI()
 		end
 	end, 1)
-end
-
-function Boat:StopFishing()
-	if self.FishingInterval then
-		task.cancel(self.FishingInterval)
-		self.FishingInterval = nil
-	end
+	self._cleaner(self.FishingInterval)
 end
 
 function Boat:AddFish(amount: number)
@@ -363,7 +385,7 @@ end
 
 function Boat:SetupProximityPrompt(purchaseBoard: Part)
 	-- Create the proximity prompt
-	local proximityPrompt = Instance.new("ProximityPrompt", purchaseBoard)
+	local proximityPrompt = self._cleaner:add(Instance.new("ProximityPrompt", purchaseBoard))
 
 	-- Check if boat is at max level
 	if self.Level == self.MaxLevel then
@@ -377,12 +399,12 @@ function Boat:SetupProximityPrompt(purchaseBoard: Part)
 	proximityPrompt.ActionText = self.isPurchased and "Gold: " .. FormatNumber(self.UpgradeCost) or "Gold: " .. FormatNumber(self.BaseCost)
 
 	-- Handle not showing the prompt if the user is not the owner
-	proximityPrompt.PromptShown:Connect(function(player: Player)
+	self._cleaner:add(proximityPrompt.PromptShown:Connect(function(player: Player)
 		if player.UserId ~= self.Owner then return end
-	end)
+	end))
 
 	-- Handle proximity prompt triggered
-	proximityPrompt.Triggered:Connect(function(player)
+	self._cleaner:add(proximityPrompt.Triggered:Connect(function(player)
 		-- Check max level again
 		if self.Level == self.MaxLevel then return end
 
@@ -410,7 +432,7 @@ function Boat:SetupProximityPrompt(purchaseBoard: Part)
 		-- Update UIs
 		self:UpdateProximityPromptUI(proximityPrompt)
 		self:UpdatePurchaseBoardUI()
-	end)
+	end))
 
 	return proximityPrompt
 end
