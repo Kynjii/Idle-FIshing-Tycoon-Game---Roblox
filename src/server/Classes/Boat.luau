@@ -133,11 +133,14 @@ function Boat:Upgrade()
 			break
 		end
 	end
+
 	self.UpgradeCost = self:CalculateUpgradeCost()
 
 	local curMaxStorage, nextLvlMaxStorage = self:CalculateMaxStorage()
-	self.CurrentMaxStorage = curMaxStorage
-	self.NextLvlMaxStorage = nextLvlMaxStorage
+	self.CurrentMaxStorage, self.NextLvlMaxStorage = curMaxStorage, nextLvlMaxStorage
+
+	local curFPS, nextFPS = self:CalculateFPS()
+	self.CurrentFPS, self.NextFPS = curFPS, nextFPS
 
 	self:Save()
 end
@@ -157,7 +160,7 @@ end
 function Boat:CalculateBaseCost()
 	local baseCost = DEFAULTS.BaseCost
 	local tierMultiplier = Formulas.TIER_MULTIPLIER[self.Tier]
-	local realmMultiplier = math.pow(self.RealmId :: number, 2.25) -- scaling curve
+	local realmMultiplier = math.pow(self.RealmId, 2.25) -- scaling curve
 	local base = baseCost * tierMultiplier * realmMultiplier
 
 	self.BaseCost = base
@@ -169,14 +172,10 @@ function Boat:CalculateUpgradeCost()
 	local baseCost = self.BaseCost or DEFAULTS.BaseCost
 	if baseCost == DEFAULTS.BaseCost then baseCost = self:CalculateBaseCost() end
 
-	local tierMultiplier = Formulas.TIER_MULTIPLIER[self.Tier]
-	local realmMultiplier = math.pow(self.RealmId :: number, 2.25) -- scaling curve
 	local growthRate = DEFAULTS.CostGrowthRate
-	local cost = baseCost * math.pow(growthRate, self.Level :: number) * tierMultiplier * realmMultiplier
+	local cost = baseCost * math.pow(growthRate, self.Level)
 
 	self.UpgradeCost = cost
-
-	-- //TODO - handle boosts
 
 	return cost
 end
@@ -184,7 +183,7 @@ end
 function Boat:CalculateBaseStorage()
 	local baseStorage = DEFAULTS.BaseStorage
 	local tierMultiplier = Formulas.TIER_MULTIPLIER[self.Tier]
-	local realmMultiplier = math.pow(self.RealmId :: number, 2.25) -- scaling curve
+	local realmMultiplier = math.pow(self.RealmId, 2.25)
 	local base = baseStorage * tierMultiplier * realmMultiplier
 
 	self.BaseStorage = base
@@ -196,12 +195,9 @@ function Boat:CalculateMaxStorage()
 	local baseStorage = self.BaseStorage or DEFAULTS.BaseStorage
 	if baseStorage == DEFAULTS.BaseStorage then baseStorage = self:CalculateBaseStorage() end
 
-	local tierMultiplier = Formulas.TIER_MULTIPLIER[self.Tier] :: number
-	local growthRate = DEFAULTS.GrowthRate + self.Tier * 0.02 :: number
-	local maxStorage = baseStorage * math.pow(growthRate :: number, self.Level :: number) * tierMultiplier :: number
-	local nextLvlMaxStorage = baseStorage * math.pow(growthRate :: number, self.Level :: number + 1) * tierMultiplier :: number
-
-	-- //TODO - handle boosts
+	local growthRate = DEFAULTS.GrowthRate + self.Tier * 0.02
+	local maxStorage = baseStorage * math.pow(growthRate, self.Level)
+	local nextLvlMaxStorage = baseStorage * math.pow(growthRate, self.Level + 1)
 
 	return maxStorage, nextLvlMaxStorage
 end
@@ -209,7 +205,7 @@ end
 function Boat:CalculateBaseFPS()
 	local baseFPS = DEFAULTS.BaseFPS
 	local tierMultiplier = Formulas.TIER_MULTIPLIER[self.Tier]
-	local realmMultiplier = math.pow(self.RealmId :: number, 2.25) -- scaling curve
+	local realmMultiplier = math.pow(self.RealmId, 2.25)
 	local base = baseFPS * tierMultiplier * realmMultiplier
 
 	self.BaseFPS = base
@@ -222,15 +218,10 @@ function Boat:CalculateFPS()
 	if baseFPS == DEFAULTS.BaseFPS then baseFPS = self:CalculateBaseFPS() end
 
 	local growthRate = DEFAULTS.GrowthRate
-	local tierMultiplier = Formulas.TIER_MULTIPLIER[self.Tier]
 	local level = self.Level
 
-	local fpsCalc = baseFPS * math.pow(growthRate, level) * tierMultiplier
-	local nextLvlFPS = baseFPS * math.pow(growthRate, level + 1) * tierMultiplier
-
-	if self:ShowUpgradeStageUpgrade() then nextLvlFPS = baseFPS * math.pow(growthRate, level + 2) * tierMultiplier end
-
-	-- //TODO - handle boosts
+	local fpsCalc = baseFPS * math.pow(growthRate, level)
+	local nextLvlFPS = baseFPS * math.pow(growthRate, level + 1)
 
 	return fpsCalc, nextLvlFPS
 end
