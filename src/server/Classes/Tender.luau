@@ -142,11 +142,14 @@ function Tender:Upgrade()
 			break
 		end
 	end
+
 	self.UpgradeCost = self:CalculateUpgradeCost()
 
 	local curMaxStorage, nextLvlMaxStorage = self:CalculateMaxStorage()
-	self.CurrentMaxStorage = curMaxStorage
-	self.NextLvlMaxStorage = nextLvlMaxStorage
+	self.CurrentMaxStorage, self.NextLvlMaxStorage = curMaxStorage, nextLvlMaxStorage
+
+	local curTravelTime, nextLvlTravelTime = self:CalculateTravelTime()
+	self.CurrentTravelTime, self.NextLvlTravelTime = curTravelTime, nextLvlTravelTime
 
 	self:Save()
 end
@@ -154,11 +157,6 @@ end
 function Tender:IncreaseUpgradeStage(stage)
 	self.UpgradeStage = stage
 	self.Name = self:GetName()
-
-	-- Tiered Upgrades
-	local curTravelTime, nextLvlTravelTime = self:CalculateTravelTime()
-	self.CurrentTravelTime = curTravelTime
-	self.NextLvlTravelTime = nextLvlTravelTime
 end
 -- //!SECTION
 
@@ -178,22 +176,18 @@ function Tender:CalculateUpgradeCost(): number
 	local baseCost = self.BaseCost or DEFAULTS.BaseCost
 	if baseCost == DEFAULTS.BaseCost then baseCost = self:CalculateBaseCost() end
 
-	local tierMultiplier = Formulas.TIER_MULTIPLIER[self.Tier]
-	local realmMultiplier = math.pow(self.RealmId :: number, 2.25) -- scaling curve
 	local growthRate = DEFAULTS.CostGrowthRate
-	local cost = baseCost * math.pow(growthRate, self.Level :: number) * tierMultiplier * realmMultiplier
+	local cost = baseCost * math.pow(growthRate, self.Level)
 
 	self.UpgradeCost = cost
-
-	-- //TODO - handle boosts
 
 	return cost
 end
 
 function Tender:CalculateBaseStorage()
-	local baseStorage = self.BaseStorage or DEFAULTS.BaseStorage
+	local baseStorage = DEFAULTS.BaseStorage
 	local tierMultiplier = Formulas.TIER_MULTIPLIER[self.Tier]
-	local realmMultiplier = math.pow(self.RealmId :: number, 2.25) -- scaling curve
+	local realmMultiplier = math.pow(self.RealmId, 2.25)
 	local base = baseStorage * tierMultiplier * realmMultiplier
 
 	self.BaseStorage = base
@@ -205,12 +199,9 @@ function Tender:CalculateMaxStorage()
 	local baseStorage = self.BaseStorage or DEFAULTS.BaseStorage
 	if baseStorage == DEFAULTS.BaseStorage then baseStorage = self:CalculateBaseStorage() end
 
-	local tierMultiplier = Formulas.TIER_MULTIPLIER[self.Tier] :: number
-	local growthRate = DEFAULTS.GrowthRate + self.Tier * 0.02 :: number
-	local maxStorage = baseStorage * math.pow(growthRate :: number, self.Level :: number) * tierMultiplier :: number
-	local nextLvlMaxStorage = baseStorage * math.pow(growthRate :: number, self.Level :: number + 1) * tierMultiplier :: number
-
-	-- //TODO - handle boosts
+	local growthRate = DEFAULTS.GrowthRate + self.Tier * 0.02
+	local maxStorage = baseStorage * math.pow(growthRate, self.Level)
+	local nextLvlMaxStorage = baseStorage * math.pow(growthRate, self.Level + 1)
 
 	return maxStorage, nextLvlMaxStorage
 end

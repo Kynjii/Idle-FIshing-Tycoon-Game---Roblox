@@ -148,11 +148,6 @@ end
 function Boat:IncreaseUpgradeStage(stage)
 	self.UpgradeStage = stage
 	self.Name = self:GetName()
-
-	-- Tiered Upgrades
-	local curFPS, nextFPS = self:CalculateFPS()
-	self.CurrentFPS = curFPS
-	self.NextFPS = nextFPS
 end
 -- //!SECTION
 
