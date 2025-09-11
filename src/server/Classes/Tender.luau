@@ -65,11 +65,11 @@ local DEFAULTS: TenderProps = {
 }
 -- //!SECTION
 
-local Tender: TenderInstance = {}
+local Tender = {} :: TenderInstance
 Tender.__index = Tender
 
 -- //SECTION - Constructor
-function Tender.New(state, player: Player, model: Model)
+function Tender.New(state, player, model)
 	local self: TenderInstance = setmetatable({}, Tender)
 
 	-- Start with default stats as base
@@ -164,7 +164,7 @@ end
 function Tender:CalculateBaseCost()
 	local baseCost = DEFAULTS.BaseCost
 	local tierMultiplier = Formulas.TIER_MULTIPLIER[self.Tier]
-	local realmMultiplier = math.pow(self.RealmId :: number, 2.25) -- scaling curve
+	local realmMultiplier = math.pow(self.RealmId, 2.25) -- scaling curve
 	local base = baseCost * tierMultiplier * realmMultiplier
 
 	self.BaseCost = base
@@ -172,7 +172,7 @@ function Tender:CalculateBaseCost()
 	return base
 end
 
-function Tender:CalculateUpgradeCost(): number
+function Tender:CalculateUpgradeCost()
 	local baseCost = self.BaseCost or DEFAULTS.BaseCost
 	if baseCost == DEFAULTS.BaseCost then baseCost = self:CalculateBaseCost() end
 
@@ -222,7 +222,7 @@ end
 -- //!SECTION
 
 -- //SECTION - Handle Travelling
-function Tender:MoveToBoat(boatPos: CFrame)
+function Tender:MoveToBoat(boatPos)
 	self.Model.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.atPort, false)
 
 	-- cancel any existing motion/progress tweens first
@@ -281,13 +281,13 @@ function Tender:MoveToPort()
 	tween:Play()
 end
 
-function Tender:AddFish(amount: number)
+function Tender:AddFish(amount)
 	if self:IsStorageFull() then
 		self:UpdateProgressBar()
 		return
 	end
 
-	self.FishInStorage += amount
+	self.FishInStorage += math.max(amount)
 
 	if self.FishInStorage >= self.CurrentMaxStorage then
 		self.FishInStorage = self.CurrentMaxStorage
@@ -298,7 +298,7 @@ function Tender:AddFish(amount: number)
 	self:Save()
 end
 
-function Tender:RemoveFish(amount: number)
+function Tender:RemoveFish(amount)
 	self.FishInStorage = math.max(self.FishInStorage - amount, 0)
 
 	self:UpdateStorageStatus(false)

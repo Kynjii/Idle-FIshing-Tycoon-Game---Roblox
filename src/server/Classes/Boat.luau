@@ -120,6 +120,8 @@ end
 -- //SECTION - Core Boat Actions
 function Boat:Purchase()
 	self.isPurchased = true
+	self.Model.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.isPurchased, true)
+
 	self:Save()
 end
 
@@ -232,7 +234,7 @@ function Boat:StartFishing()
 	if self.FishingInterval then self._cleaner:add(self.FishingInterval) end
 end
 
-function Boat:AddFish(amount: number)
+function Boat:AddFish(amount)
 	self.FishInStorage += amount
 	self:ShowFishPopUp(amount)
 	if self.FishInStorage >= self.CurrentMaxStorage then
@@ -243,8 +245,8 @@ function Boat:AddFish(amount: number)
 	self:Save()
 end
 
-function Boat:RemoveFish(amount: number)
-	self.FishInStorage = math.max(self.FishInStorage :: number - amount, 0)
+function Boat:RemoveFish(amount)
+	self.FishInStorage = math.max(self.FishInStorage - amount, 0)
 	self:UpdateStorageStatus(false)
 	self:Save()
 end
@@ -331,7 +333,7 @@ function Boat:UpdatePurchaseBoardUI()
 	pbDetails.CurrentMaxStorageLabel.Text = isPurchased and FormatNumber(self.CurrentMaxStorage) or ""
 	pbDetails.NextMaxStorageLabel.Text = isPurchased and FormatNumber(self.NextLvlMaxStorage) or ""
 	pbDetails.CurrentFPSLabel.Text = isPurchased and FormatNumber(self.CurrentFPS) or ""
-	print(self.NextFPS)
+
 	local showUpgradeStageUpgrade = self:ShowUpgradeStageUpgrade()
 	if showUpgradeStageUpgrade then
 		pbDetails.NextFPSLabel.Text = isPurchased and FormatNumber(self.NextFPS) or ""
@@ -416,7 +418,7 @@ function Boat:UpdateProximityPromptUI(proximityPrompt: ProximityPrompt)
 	end
 end
 
-function Boat:ShowFishPopUp(amount: number)
+function Boat:ShowFishPopUp(amount)
 	local billboard: BillboardGui = self.Model.PrimaryPart.Billboard:WaitForChild("FishPopupTemplate")
 	if billboard then
 		local clone = billboard:Clone()
@@ -430,7 +432,7 @@ end
 
 -- //SECTION - Visibility and Collision
 function Boat:Show()
-	local model = self.Model :: Model
+	local model = self.Model
 	local boatParts = model:GetChildren()
 	for _, part in pairs(boatParts) do
 		if part.Name == "Purchase_Board" then continue end
@@ -439,7 +441,7 @@ function Boat:Show()
 end
 
 function Boat:Hide()
-	local model = self.Model :: Model
+	local model = self.Model
 	local boatParts = model:GetChildren()
 	for _, part in pairs(boatParts) do
 		if part.Name == "Purchase_Board" then continue end
@@ -448,7 +450,7 @@ function Boat:Hide()
 end
 
 function Boat:CanCollide()
-	local model = self.Model :: Model
+	local model = self.Model
 	local boatParts = model:GetChildren()
 	for _, part in pairs(boatParts) do
 		if part.Name == "Purchase_Board" then continue end
@@ -457,7 +459,7 @@ function Boat:CanCollide()
 end
 
 function Boat:CannotCollide()
-	local model = self.Model :: Model
+	local model = self.Model
 	local boatParts = model:GetChildren()
 	for _, part in pairs(boatParts) do
 		if part.Name == "Purchase_Board" then continue end

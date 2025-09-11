@@ -94,7 +94,7 @@ end
 function BoatManager:AttachAttListeners()
 	self.TenderModel.PrimaryPart.AttributeChanged:Connect(function(attributeName)
 		-- isPurchased triggers the start of the cycle
-		if attributeName == FFGEnum.ATTRIBUTES.isPurchased and self.TenderModel.PrimaryPart:GetAttribute(attributeName) == true then
+		if attributeName == FFGEnum.ATTRIBUTES.isPurchased and self.TenderModel.PrimaryPart:GetAttribute(attributeName) == true and self.LaneBoat.isPurchased then
 			self:StartTenderCycle()
 			return
 		end
@@ -124,6 +124,14 @@ function BoatManager:AttachAttListeners()
 			return
 		end
 	end)
+
+	self.BoatModel.PrimaryPart.AttributeChanged:Connect(function(attributeName)
+		-- isPurchased triggers the start of the cycle
+		if attributeName == FFGEnum.ATTRIBUTES.isPurchased and self.BoatModel.PrimaryPart:GetAttribute(attributeName) == true and self.LaneTender.isPurchased then
+			self:StartTenderCycle()
+			return
+		end
+	end)
 end
 
 -- //SECTION - Tender Travelling Cycle Functions used by the AttListeners
@@ -149,11 +157,14 @@ function BoatManager:StartLoadingFish()
 		if self.LaneTender:IsStorageFull() then
 			self.TenderModel.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.finishedLoading, true)
 			storageFull = true
+			break
 		end
 
 		local availableStorage = self.LaneTender.CurrentMaxStorage - self.LaneTender.FishInStorage
 		local tickAmount = self.LaneTender.CurrentMaxStorage / 10
-		local amount = math.min(availableStorage, tickAmount)
+		local tenderAmount = math.min(availableStorage, tickAmount)
+		local boatAmount = math.min(self.LaneBoat.FishInStorage)
+		local amount = math.min(tenderAmount, boatAmount)
 
 		self.LaneBoat:RemoveFish(amount)
 		self.LaneTender:AddFish(amount)
@@ -183,6 +194,7 @@ function BoatManager:StartUnloadingFish()
 
 		if tender.FishInStorage <= 0 then
 			self.TenderModel.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.finishedUnloading, true)
+			tender.FishInStorage = 0
 			break
 		end
 

@@ -270,7 +270,6 @@ function PortStorage:SetupProximityPrompt(purchaseBoard: Part)
 		if self.Level == self.MaxLevel then return end
 
 		if not DataService.CanAfford(player, FFGEnum.CURRENCY_TYPES.Gold, self.UpgradeCost) then
-			-- //TODO - Show user the message
 			FFGHelpers.PrintLog("Unable to afford upgrade, cost is: ", self.UpgradeCost)
 			self:UpdateProximityPromptUI(proximityPrompt)
 			return
@@ -293,7 +292,7 @@ function PortStorage:SetupProximityPrompt(purchaseBoard: Part)
 		self:UpdateProximityPromptUI(proximityPrompt)
 		self:UpdatePurchaseBoardUI()
 
-		DataService.SaveBoatState(player, self.Id, self:Serialize())
+		self:Save()
 	end)
 
 	return proximityPrompt
@@ -319,14 +318,8 @@ function PortStorage:SetupFishRemovalPrompt()
 		-- Another safety check
 		if player.UserId ~= self.Owner then return end
 
-		-- //TODO - Remove dummy data
-		local MOCK_DATA = {
-			PlayerInventorySize = 50,
-			AvailableInventorySpace = 50,
-		}
-
 		-- Remove the Fish
-		local amount = math.min(self.FishInStorage, MOCK_DATA.AvailableInventorySpace)
+		local amount = math.min(self.FishInStorage, self.CurrentMaxStorage)
 		if amount == 0 then return end
 
 		self:RemoveFish(amount)
