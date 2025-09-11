@@ -158,6 +158,8 @@ end
 function Boat:CalculateBaseCost()
 	local base = ClassCalculators.CalculateBaseCost(DEFAULTS.BaseCost, self.Tier, self.RealmId)
 	self.BaseCost = base
+
+	return base
 end
 
 function Boat:CalculateUpgradeCost()
