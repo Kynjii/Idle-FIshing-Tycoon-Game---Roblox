@@ -248,7 +248,7 @@ function Boat:AddFish(amount)
 end
 
 function Boat:RemoveFish(amount)
-	self.FishInStorage = amount
+	self.FishInStorage -= amount
 	self:ShowFishPopUp(amount)
 	self:UpdateStorageStatus(false)
 	self:Save()
