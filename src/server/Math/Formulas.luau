@@ -1,22 +1,16 @@
--- Formulas.module.lua
-
--- =========================
--- Stage-driven growth config
--- =========================
 local MAX_LEVEL = 100
 
 -- Promotion start levels (stage 1 begins at 1, stage 2 at 10, etc.)
--- Matches your BOAT_PROMOTION_LEVELS
 local PROMO_LEVEL = { 1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
 
 -- Per-level multipliers INSIDE each stage
--- Early stages: earnings > costs (fast, kid-friendly)
--- Later stages: costs > earnings (gentle slow-down)
+-- Early stages: earnings > costs
+-- Later stages: costs > earnings
 local EARN_RATE = { 1.25, 1.16, 1.12, 1.10, 1.08, 1.08, 1.07, 1.06, 1.05, 1.05 } -- FPS / Storage
 local COST_RATE = { 1.14, 1.16, 1.18, 1.19, 1.20, 1.21, 1.22, 1.23, 1.24, 1.25 } -- Upgrade Cost
 
--- Optional one-time bonus when ENTERING a stage (by stage index after the bump).
--- Example: when you go from stage 1→2 (at level 10), apply +7% immediately.
+-- One-time bonus when ENTERING a stage (by stage index after the bump).
+-- Example: when a Boat goes from stage 1 -> 2 (at level 10), apply +7% immediately.
 local EARN_BONUS = {
 	[2] = 0.07,
 	[3] = 0.07,
@@ -29,9 +23,6 @@ local EARN_BONUS = {
 	[10] = 0.15,
 }
 
--- =========================
--- Helper builders
--- =========================
 local function stageForLevel(level: number): number
 	level = math.clamp(level, 1, MAX_LEVEL)
 	local stage = 1
@@ -46,7 +37,6 @@ local function stageForLevel(level: number): number
 end
 
 local function buildMultipliers(ratePerStage: { number }, bonusPerStage: { [number]: number }?)
-	-- mult[l] = product of per-level rates (and milestone bonuses) up to level l
 	local mult = table.create(MAX_LEVEL + 1, 1)
 	local cur = 1
 	local stage = stageForLevel(1)
@@ -69,21 +59,17 @@ local function buildMultipliers(ratePerStage: { number }, bonusPerStage: { [numb
 	return mult
 end
 
--- Precompute cumulative multipliers once (fast, preview-perfect)
 local EARN_MULT = buildMultipliers(EARN_RATE, EARN_BONUS)
 local COST_MULT = buildMultipliers(COST_RATE, nil)
 
--- ===============
--- Public API/data
--- ===============
 local FORMULAS = {
 	MAX_LEVEL = MAX_LEVEL,
-	PROMO_LEVEL = PROMO_LEVEL, -- [stage] -> starting level
+	PROMO_LEVEL = PROMO_LEVEL,
 	EARN_RATE = EARN_RATE, -- per-stage rates (for tuning UI/debug)
 	COST_RATE = COST_RATE,
 	EARN_BONUS = EARN_BONUS, -- optional
 
-	-- Cumulative products (use these!)
+	-- Cumulative products
 	EARN_MULT = EARN_MULT, -- EARN_MULT[level]
 	COST_MULT = COST_MULT, -- COST_MULT[level]
 
@@ -96,7 +82,6 @@ local FORMULAS = {
 		return COST_MULT[math.clamp(level, 1, MAX_LEVEL)]
 	end,
 
-	-- Your existing data (unchanged)
 	BOAT = {
 		BaseCost = 100,
 		BaseStorage = 100,
@@ -104,8 +89,6 @@ local FORMULAS = {
 	},
 	TENDER = {
 		BaseCost = 100,
-		GrowthRate = 1.1,
-		CostGrowthRate = 1.1,
 		BaseStorage = 95,
 	},
 	TIER_MULTIPLIER = {
