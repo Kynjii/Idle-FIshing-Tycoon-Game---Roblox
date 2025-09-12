@@ -194,8 +194,8 @@ function PortStorage:SetupPurchaseBoard()
 
 		-- STORAGE Stats
 		local currentStorage, nextStorage = self:CalculateMaxStorage()
-		pbDetails.CurrentMaxStorageLabel.Text = self.isPurchased and FormatNumber(currentStorage) or ""
-		pbDetails.NextMaxStorageLabel.Text = self.isPurchased and FormatNumber(nextStorage) or ""
+		pbDetails.CurrentMaxStorageLabel.Text = self.isPurchased and "Storage: " .. FormatNumber(currentStorage) or ""
+		pbDetails.NextMaxStorageLabel.Text = self.isPurchased and "Next Lvl Storage: " .. FormatNumber(nextStorage) or ""
 
 		-- Storage Progress Bar
 		local storageProgress = CalculateProgress(self.FishInStorage, self.CurrentMaxStorage)
@@ -215,14 +215,13 @@ function PortStorage:UpdatePurchaseBoardUI()
 	pbDetails.NextMaxStorageLabel = DeepWait(purchaseBoard, "SurfaceGui", "Main", "DetailsContainer", "StatsContainer", "NextMaxStorage", "TextLabel") :: TextLabel
 	pbDetails.StorageProgress = DeepWait(purchaseBoard, "SurfaceGui", "Main", "DetailsContainer", "StorageBar", "StorageProgress") :: Frame
 
-	pbDetails.CurrentMaxStorageLabel.Text = isPurchased and FormatNumber(self.CurrentMaxStorage) or ""
-	pbDetails.NextMaxStorageLabel.Text = isPurchased and FormatNumber(self.NextLvlMaxStorage) or ""
+	pbDetails.CurrentMaxStorageLabel.Text = isPurchased and "Storage: " .. FormatNumber(self.CurrentMaxStorage) or ""
+	pbDetails.NextMaxStorageLabel.Text = isPurchased and "Next Lvl Storage: " .. FormatNumber(self.NextLvlMaxStorage) or ""
 
 	local storageProgress = CalculateProgress(self.FishInStorage, self.CurrentMaxStorage)
 	pbDetails.StorageProgress.Size = UDim2.fromScale(1, storageProgress)
 
-	local level = self.Level
-	pbDetails.LevelLabel.Text = "Level: " .. level
+	pbDetails.LevelLabel.Text = "Level: " .. self.Level
 end
 
 function PortStorage:SetupProximityPrompt(purchaseBoard: Part)

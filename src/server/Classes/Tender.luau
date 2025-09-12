@@ -340,11 +340,11 @@ function Tender:SetupPurchaseBoard()
 
 		-- STORAGE Stats
 		local currentStorage, nextStorage = self:CalculateMaxStorage()
-		pbDetails.CurrentMaxStorageLabel.Text = self.isPurchased and FormatNumber(currentStorage) or ""
-		pbDetails.NextMaxStorageLabel.Text = self.isPurchased and FormatNumber(nextStorage) or ""
+		pbDetails.CurrentMaxStorageLabel.Text = self.isPurchased and "Storage: " .. FormatNumber(currentStorage) or ""
+		pbDetails.NextMaxStorageLabel.Text = self.isPurchased and "Next Lvl Storage: " .. FormatNumber(nextStorage) or ""
 
 		-- TRAVEL TIME Stats
-		pbDetails.CurrentTravelTimeLabel.Text = self.isPurchased and self.CurrentTravelTime or ""
+		pbDetails.CurrentTravelTimeLabel.Text = self.isPurchased and "Travel Time: " .. self.CurrentTravelTime or ""
 		if self:ShowUpgradeStageUpgrade() then pbDetails.NextTravelTimeLabel.Text = self.isPurchased and self.NextLvlTravelTime or "" end
 	end
 
@@ -363,24 +363,21 @@ function Tender:UpdatePurchaseBoardUI()
 	pbDetails.CurrentTravelTimeLabel = DeepWait(purchaseBoard, "SurfaceGui", "Main", "DetailsContainer", "StatsContainer", "CurrentTravelTime", "TextLabel") :: TextLabel
 	pbDetails.NextTravelTimeLabel = DeepWait(purchaseBoard, "SurfaceGui", "Main", "DetailsContainer", "StatsContainer", "NextTravelTime", "TextLabel") :: TextLabel
 
-	pbDetails.CurrentMaxStorageLabel.Text = isPurchased and FormatNumber(self.CurrentMaxStorage) or ""
-	pbDetails.NextMaxStorageLabel.Text = isPurchased and FormatNumber(self.NextLvlMaxStorage) or ""
-	pbDetails.CurrentTravelTimeLabel.Text = isPurchased and FormatNumber(self.CurrentTravelTime) or ""
+	pbDetails.CurrentMaxStorageLabel.Text = isPurchased and "Storage: " .. FormatNumber(self.CurrentMaxStorage) or ""
+	pbDetails.NextMaxStorageLabel.Text = isPurchased and "Next Lvl Storage: " .. FormatNumber(self.NextLvlMaxStorage) or ""
+	pbDetails.CurrentTravelTimeLabel.Text = isPurchased and "Travel Time: " .. FormatNumber(self.CurrentTravelTime) or ""
 
 	local showUpgradeStageUpgrade = self:ShowUpgradeStageUpgrade()
 	if showUpgradeStageUpgrade then
-		pbDetails.NextTravelTimeLabel.Text = isPurchased and FormatNumber(self.NextLvlTravelTime)
+		pbDetails.NextTravelTimeLabel.Text = isPurchased and "Next Lvl Travel Time: " .. FormatNumber(self.NextLvlTravelTime)
 		pbDetails.NextTravelTimeLabel.Visible = true
 	else
 		pbDetails.NextTravelTimeLabel.Visible = false
 	end
 
-	local level = self.Level
-	pbDetails.LevelLabel.Text = "Level: " .. level
+	pbDetails.LevelLabel.Text = "Level: " .. self.Level
 
-	local currentUpgradeStage = self.UpgradeStage
-
-	local qualityInfo = FFGEnum.QUALITY[currentUpgradeStage]
+	local qualityInfo = FFGEnum.QUALITY[self.UpgradeStage]
 	local color = qualityInfo.Color
 	pbDetails.NameLabel.TextColor3 = color
 	pbDetails.NameLabel.Text = self:GetName()
