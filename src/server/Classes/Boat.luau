@@ -241,9 +241,7 @@ function Boat:SetupPurchaseBoard()
 	pbDetails.StorageProgress = DeepWait(purchaseBoard, "SurfaceGui", "Main", "DetailsContainer", "StorageBar", "StorageProgress") :: Frame
 
 	if pbDetails then
-		local upgradeStage = self.UpgradeStage
-		local level = self.Level
-		local qualityInfo = FFGEnum.QUALITY[upgradeStage]
+		local qualityInfo = FFGEnum.QUALITY[self.UpgradeStage]
 		local color = qualityInfo.Color
 		pbDetails.NameLabel.TextColor3 = color
 
@@ -254,16 +252,16 @@ function Boat:SetupPurchaseBoard()
 			pbDetails.NameLabel.Parent.Visible = true
 		end
 
-		pbDetails.LevelLabel.Text = self.isPurchased and "Level: " .. level or "Purchase Boat"
+		pbDetails.LevelLabel.Text = self.isPurchased and "Level: " .. self.Level or "Purchase Boat"
 
 		-- STORAGE Stats
 		local currentStorage, nextStorage = self:CalculateMaxStorage()
-		pbDetails.CurrentMaxStorageLabel.Text = self.isPurchased and FormatNumber(currentStorage) or ""
-		pbDetails.NextMaxStorageLabel.Text = self.isPurchased and FormatNumber(nextStorage) or ""
+		pbDetails.CurrentMaxStorageLabel.Text = self.isPurchased and "Storage: " .. FormatNumber(currentStorage) or ""
+		pbDetails.NextMaxStorageLabel.Text = self.isPurchased and "Next Lvl Storage: " .. FormatNumber(nextStorage) or ""
 
 		-- FPS Stats
-		pbDetails.CurrentFPSLabel.Text = self.isPurchased and FormatNumber(self.CurrentFPS) or ""
-		if self:ShowUpgradeStageUpgrade() then pbDetails.NextFPSLabel.Text = self.isPurchased and FormatNumber(self.NextFPS) or "" end
+		pbDetails.CurrentFPSLabel.Text = self.isPurchased and "FPS: " .. FormatNumber(self.CurrentFPS) or ""
+		if self:ShowUpgradeStageUpgrade() then pbDetails.NextFPSLabel.Text = self.isPurchased and "Next Lvl FPS: " .. FormatNumber(self.NextFPS) or "" end
 
 		-- Storage Progress Bar
 		local storageProgress = CalculateProgress(self.FishInStorage, self.CurrentMaxStorage)
@@ -286,13 +284,13 @@ function Boat:UpdatePurchaseBoardUI()
 	pbDetails.NextFPSLabel = DeepWait(purchaseBoard, "SurfaceGui", "Main", "DetailsContainer", "StatsContainer", "NextFPS", "TextLabel") :: TextLabel
 	pbDetails.StorageProgress = DeepWait(purchaseBoard, "SurfaceGui", "Main", "DetailsContainer", "StorageBar", "StorageProgress") :: Frame
 
-	pbDetails.CurrentMaxStorageLabel.Text = isPurchased and FormatNumber(self.CurrentMaxStorage) or ""
-	pbDetails.NextMaxStorageLabel.Text = isPurchased and FormatNumber(self.NextLvlMaxStorage) or ""
-	pbDetails.CurrentFPSLabel.Text = isPurchased and FormatNumber(self.CurrentFPS) or ""
+	pbDetails.CurrentMaxStorageLabel.Text = isPurchased and "Storage: " .. FormatNumber(self.CurrentMaxStorage) or ""
+	pbDetails.NextMaxStorageLabel.Text = isPurchased and "Next Lvl Storage: " .. FormatNumber(self.NextLvlMaxStorage) or ""
+	pbDetails.CurrentFPSLabel.Text = isPurchased and "FPS: " .. FormatNumber(self.CurrentFPS) or ""
 
 	local showUpgradeStageUpgrade = self:ShowUpgradeStageUpgrade()
 	if showUpgradeStageUpgrade then
-		pbDetails.NextFPSLabel.Text = isPurchased and FormatNumber(self.NextFPS) or ""
+		pbDetails.NextFPSLabel.Text = isPurchased and "Next Lvl FPS: " .. FormatNumber(self.NextFPS) or ""
 		pbDetails.NextFPSLabel.Visible = true
 	else
 		pbDetails.NextFPSLabel.Visible = false
