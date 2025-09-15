@@ -79,6 +79,7 @@ function Boat.New(state, player: Player, model: Model): Boat
 	self.Id = self.Id or HttpService:GenerateGUID(false)
 	self.Owner = self.Owner or player.UserId
 	self.Model = model
+	self.VisualRoot = DeepWait(model, "Boat", "VisualRoot")
 	self.Name = self:GetName()
 	self.Tier = self.Model:GetAttribute(FFGEnum.ATTRIBUTES.Tier) or DEFAULTS.Tier
 	self.Player = player
@@ -90,6 +91,9 @@ function Boat.New(state, player: Player, model: Model): Boat
 	self.CurrentMaxStorage, self.NextLvlMaxStorage = self:CalculateMaxStorage()
 	self.CurrentFPS, self.NextFPS = self:CalculateFPS()
 
+	self.VisualModels = self:GetVisualModels()
+	self.CurrentVisualModel = nil
+
 	self._cleaner = CleanerService.new()
 
 	self.FishingInterval = nil
@@ -97,6 +101,7 @@ function Boat.New(state, player: Player, model: Model): Boat
 		self:StartFishing()
 	end) end
 
+	self:UpdateVisualModel()
 	self:StartAnimation()
 
 	return self
@@ -108,6 +113,7 @@ function Boat:Purchase()
 	self.isPurchased = true
 	self.Model.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.isPurchased, true)
 
+	self:UpdateVisualModel()
 	self:Save()
 end
 
@@ -118,7 +124,7 @@ function Boat:Upgrade()
 	for k, v in ipairs(Formulas.PROMO_LEVEL) do
 		if self.Level == v then
 			self:IncreaseUpgradeStage(k)
-
+			self:UpdateVisualModel()
 			self.CurrentFPS, self.NextFPS = self:CalculateFPS()
 			break
 		end
@@ -482,6 +488,52 @@ end
 
 function Boat:Save()
 	DataService.SaveBoatState(self.Player, self.Id, self:Serialize())
+end
+-- //!SECTION
+
+-- //SECTION - Visual Models
+function Boat:GetVisualModels()
+	local modelsFolder = DeepWait(game.Workspace, "Boats", "VisualStages")
+	local models = modelsFolder:GetChildren()
+
+	local templateModels: { [number]: Model } = {}
+	for i, model in ipairs(models) do
+		templateModels[tonumber(model.Name)] = model
+	end
+
+	return templateModels
+end
+
+function Boat:RemovePreviousVisualModel()
+	local visualModel = self.CurrentVisualModel
+	if not visualModel then return end
+
+	visualModel:Destroy()
+	self.CurrentVisualModel = nil
+end
+
+function Boat:UpdateVisualModel()
+	self:RemovePreviousVisualModel()
+
+	local templateModel = self.VisualModels[self.UpgradeStage]
+	local updatedModel = templateModel:Clone()
+
+	updatedModel.Name = templateModel.Name .. "_Clone"
+	updatedModel.Parent = self.VisualRoot
+	updatedModel:PivotTo(self.VisualRoot.CFrame)
+
+	for _, part in pairs(updatedModel:GetChildren()) do
+		if part:IsA("BasePart") then
+			local weld = Instance.new("WeldConstraint")
+			weld.Parent = part
+			weld.Part0 = part
+			weld.Part1 = self.VisualRoot
+			part.Transparency = 0
+			part.Anchored = false
+		end
+	end
+
+	self.CurrentVisualModel = updatedModel
 end
 -- //!SECTION
 

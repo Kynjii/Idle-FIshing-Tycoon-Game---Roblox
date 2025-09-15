@@ -50,9 +50,12 @@ export type BoatInstance = {
 
 	-- (Not-Saved to DataStore) Props
 	Model: Model,
+	VisualRoot: Part,
 	FishingInterval: thread,
 	Player: Player,
 	Animations: { [string]: Animation },
+	VisualModels: { [string]: Model },
+	CurrentVisualModel: Model | nil,
 
 	-- Core Boat Actions
 	Purchase: (self: BoatInstance) -> (),
@@ -95,6 +98,11 @@ export type BoatInstance = {
 
 	-- Animations
 	StartAnimation: (self: BoatInstance) -> (),
+
+	-- Models
+	UpdateVisualModel: (self: BoatInstance) -> (),
+	GetVisualModels: (self: BoatInstance) -> { [string]: Model },
+	RemovePreviousVisualModel: (self: BoatInstance) -> (),
 
 	-- Cleaner Service
 	_cleaner: (any) -> any,

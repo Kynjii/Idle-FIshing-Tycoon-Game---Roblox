@@ -13,8 +13,6 @@ function Animator.LoadAnimations()
 
 		Animator.Animations[k] = animation
 	end
-
-	print(Animator.Animations)
 end
 
 function Animator.GetAnimation(name: string): Animation
