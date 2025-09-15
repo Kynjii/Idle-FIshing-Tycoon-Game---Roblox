@@ -403,7 +403,9 @@ function Boat:Show()
 	local boatParts = model:GetChildren()
 	for _, part in pairs(boatParts) do
 		if part:IsA("Part") then
-			if part.Transparency and part.Transparency == 1 then part.Transparency = 0 end
+			if part.Name ~= "Base" or part.Name ~= "VisualRoot" then
+				if part.Transparency and part.Transparency == 1 then part.Transparency = 0 end
+			end
 		end
 	end
 end
