@@ -78,6 +78,7 @@ function Tender.New(state, player, model)
 	self.Id = self.Id or HttpService:GenerateGUID(false)
 	self.Owner = self.Owner or player.UserId
 	self.Model = model
+	self.VisualRoot = DeepWait(model, "Tender", "VisualRoot")
 	self.PortPos = model.PrimaryPart.CFrame
 	self.Name = self:GetName()
 	self.Tier = self.Model:GetAttribute(FFGEnum.ATTRIBUTES.Tier) or DEFAULTS.Tier
@@ -86,6 +87,9 @@ function Tender.New(state, player, model)
 	self.BaseCost = self:CalculateBaseCost()
 	self.UpgradeCost = self:CalculateUpgradeCost()
 	self.BaseStorage = self:CalculateBaseStorage()
+
+	self.VisualModels = self:GetVisualModels()
+	self.CurrentVisualModel = nil
 
 	-- Apply attributes for BoatManager
 	if self.isPurchased then self.Model.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.isPurchased, self.isPurchased) end
@@ -106,6 +110,7 @@ function Tender.New(state, player, model)
 
 	self._cleaner = CleanerService.new()
 
+	self:UpdateVisualModel()
 	self:StartAnimation()
 
 	return self
@@ -117,6 +122,7 @@ function Tender:Purchase()
 	self.isPurchased = true
 	self.Model.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.isPurchased, true)
 
+	self:UpdateVisualModel()
 	self:Save()
 end
 
@@ -127,7 +133,7 @@ function Tender:Upgrade()
 	for k, v in ipairs(Formulas.PROMO_LEVEL) do
 		if self.Level == v then
 			self:IncreaseUpgradeStage(k)
-
+			self:UpdateVisualModel()
 			self.CurrentTravelTime, self.NextLvlTravelTime = self:CalculateTravelTime()
 			break
 		end
@@ -457,7 +463,9 @@ function Tender:Show()
 	local tenderParts = model:GetChildren()
 	for _, part in pairs(tenderParts) do
 		if part:IsA("Part") then
-			if part.Transparency and part.Transparency == 1 then part.Transparency = 0 end
+			if part.Name ~= "Base" or part.Name ~= "VisualRoot" then
+				if part.Transparency and part.Transparency == 1 then part.Transparency = 0 end
+			end
 		end
 	end
 end
@@ -467,7 +475,9 @@ function Tender:Hide()
 	local tenderParts = model:GetChildren()
 	for _, part in pairs(tenderParts) do
 		if part:IsA("Part") then
-			if part.Transparency and part.Transparency == 0 then part.Transparency = 1 end
+			if part.Name ~= "Base" or part.Name ~= "VisualRoot" then
+				if part.Transparency and part.Transparency == 0 then part.Transparency = 1 end
+			end
 		end
 	end
 end
@@ -477,7 +487,9 @@ function Tender:CanCollide()
 	local tenderParts = model:GetChildren()
 	for _, part in pairs(tenderParts) do
 		if part:IsA("Part") then
-			if not part.CanCollide then part.CanCollide = true end
+			if part.Name ~= "Base" or part.Name ~= "VisualRoot" then
+				if not part.CanCollide then part.CanCollide = true end
+			end
 		end
 	end
 end
@@ -487,7 +499,9 @@ function Tender:CannotCollide()
 	local tenderParts = model:GetChildren()
 	for _, part in pairs(tenderParts) do
 		if part:IsA("Part") then
-			if part.CanCollide then part.CanCollide = false end
+			if part.Name ~= "Base" or part.Name ~= "VisualRoot" then
+				if part.CanCollide then part.CanCollide = false end
+			end
 		end
 	end
 end
@@ -545,6 +559,52 @@ end
 
 function Tender:Save()
 	DataService.SaveTenderState(self.Player, self.Id, self:Serialize())
+end
+-- //!SECTION
+
+-- //SECTION - Visual Models
+function Tender:GetVisualModels()
+	local modelsFolder = DeepWait(game.Workspace, "Tenders", "VisualStages")
+	local models = modelsFolder:GetChildren()
+
+	local templateModels: { [number]: Model } = {}
+	for i, model in ipairs(models) do
+		templateModels[tonumber(model.Name)] = model
+	end
+
+	return templateModels
+end
+
+function Tender:RemovePreviousVisualModel()
+	local visualModel = self.CurrentVisualModel
+	if not visualModel then return end
+
+	visualModel:Destroy()
+	self.CurrentVisualModel = nil
+end
+
+function Tender:UpdateVisualModel()
+	self:RemovePreviousVisualModel()
+
+	local templateModel = self.VisualModels[self.UpgradeStage]
+	local updatedModel = templateModel:Clone()
+
+	updatedModel.Name = templateModel.Name .. "_Clone"
+	updatedModel.Parent = self.VisualRoot
+	updatedModel:PivotTo(self.VisualRoot.CFrame)
+
+	for _, part in pairs(updatedModel:GetChildren()) do
+		if part:IsA("BasePart") then
+			local weld = Instance.new("WeldConstraint")
+			weld.Parent = part
+			weld.Part0 = part
+			weld.Part1 = self.VisualRoot
+			part.Transparency = 0
+			part.Anchored = false
+		end
+	end
+
+	self.CurrentVisualModel = updatedModel
 end
 -- //!SECTION
 

@@ -415,7 +415,9 @@ function Boat:Hide()
 	local boatParts = model:GetChildren()
 	for _, part in pairs(boatParts) do
 		if part:IsA("Part") then
-			if part.Transparency and part.Transparency == 0 then part.Transparency = 1 end
+			if part.Name ~= "Base" or part.Name ~= "VisualRoot" then
+				if part.Transparency and part.Transparency == 0 then part.Transparency = 1 end
+			end
 		end
 	end
 end
@@ -425,7 +427,9 @@ function Boat:CanCollide()
 	local boatParts = model:GetChildren()
 	for _, part in pairs(boatParts) do
 		if part:IsA("Part") then
-			if not part.CanCollide then part.CanCollide = true end
+			if part.Name ~= "Base" or part.Name ~= "VisualRoot" then
+				if not part.CanCollide then part.CanCollide = true end
+			end
 		end
 	end
 end
@@ -435,7 +439,9 @@ function Boat:CannotCollide()
 	local boatParts = model:GetChildren()
 	for _, part in pairs(boatParts) do
 		if part:IsA("Part") then
-			if part.CanCollide then part.CanCollide = false end
+			if part.Name ~= "Base" or part.Name ~= "VisualRoot" then
+				if part.CanCollide then part.CanCollide = false end
+			end
 		end
 	end
 end
