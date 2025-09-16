@@ -2,6 +2,7 @@ local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ClassCalculators = require(ServerScriptService.Server.Classes.Modules.ClassCalculators)
+local ClassVisualizer = require(ServerScriptService.Server.Classes.Modules.ClassVisualizer)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local Formulas = require(ServerScriptService.Server.Math.Formulas)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
@@ -322,39 +323,23 @@ end
 
 -- //SECTION - Visibility and Collision
 function PortStorage:Show()
-	local model = self.Model :: Model
-	local boatParts = model:GetChildren()
-	for _, part in pairs(boatParts) do
-		if part.Name == "Purchase_Board" or part.Name == "FishInStorage" or part.Name == "ProximityPrompt" then continue end
-		if part.Transparency and part.Transparency == 1 then part.Transparency = 0 end
-	end
+	ClassVisualizer.Show(self.Model.FishInStorage:GetChildren()[1])
+	ClassVisualizer.Show(self.Model.Storage)
 end
 
 function PortStorage:Hide()
-	local model = self.Model :: Model
-	local boatParts = model:GetChildren()
-	for _, part in pairs(boatParts) do
-		if part.Name == "Purchase_Board" or part.Name == "FishInStorage" or part.Name == "ProximityPrompt" then continue end
-		if part.Transparency and part.Transparency == 0 then part.Transparency = 1 end
-	end
+	ClassVisualizer.Hide(self.Model.FishInStorage:GetChildren()[1])
+	ClassVisualizer.Hide(self.Model.Storage)
 end
 
 function PortStorage:CanCollide()
-	local model = self.Model :: Model
-	local boatParts = model:GetChildren()
-	for _, part in pairs(boatParts) do
-		if part.Name == "Purchase_Board" or part.Name == "FishInStorage" or part.Name == "ProximityPrompt" then continue end
-		if not part.CanCollide then part.CanCollide = true end
-	end
+	ClassVisualizer.CanCollide(self.Model.FishInStorage:GetChildren()[1])
+	ClassVisualizer.CanCollide(self.Model.Storage)
 end
 
 function PortStorage:CannotCollide()
-	local model = self.Model :: Model
-	local boatParts = model:GetChildren()
-	for _, part in pairs(boatParts) do
-		if part.Name == "Purchase_Board" or part.Name == "FishInStorage" or part.Name == "ProximityPrompt" then continue end
-		if part.CanCollide then part.CanCollide = false end
-	end
+	ClassVisualizer.CannotCollide(self.Model.FishInStorage:GetChildren()[1])
+	ClassVisualizer.CannotCollide(self.Model.Storage)
 end
 -- //!SECTION
 

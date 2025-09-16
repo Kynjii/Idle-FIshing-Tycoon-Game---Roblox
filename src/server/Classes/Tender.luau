@@ -10,6 +10,7 @@ local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
 local TweenService = game:GetService("TweenService")
 local Animator = require(ServerScriptService.Server.Classes.Modules.Animator)
 local ClassCalculators = require(ServerScriptService.Server.Classes.Modules.ClassCalculators)
+local ClassVisualizer = require(ServerScriptService.Server.Classes.Modules.ClassVisualizer)
 local TenderType = require(ServerScriptService.Server.Classes.Types.TenderType)
 local ProgressBar = require(ServerScriptService.Server.Modules.Tweens.ProgressBar)
 local FadeEffect = require(ServerScriptService.Server.Modules.Tweens.FadeEffect)
@@ -460,55 +461,19 @@ end
 
 -- //SECTION - Visibility and Collision
 function Tender:Show()
-	local root = self.Model.Tender.VisualRoot
-	local visualModel = root:GetChildren()
-	if visualModel then
-		local tenderParts = visualModel[1]:GetChildren()
-		for _, part in pairs(tenderParts) do
-			if part:IsA("Part") then
-				if part.Transparency and part.Transparency == 1 then FadeEffect.In(part) end
-			end
-		end
-	end
+	ClassVisualizer.Show(self.Model.Tender.VisualRoot:GetChildren()[1])
 end
 
 function Tender:Hide()
-	local root = self.Model.Tender.VisualRoot
-	local visualModel = root:GetChildren()
-	if visualModel then
-		local tenderParts = visualModel[1]:GetChildren()
-		for _, part in pairs(tenderParts) do
-			if part:IsA("Part") then
-				if part.Transparency and part.Transparency == 0 then FadeEffect.Out(part) end
-			end
-		end
-	end
+	ClassVisualizer.Hide(self.Model.Tender.VisualRoot:GetChildren()[1])
 end
 
 function Tender:CanCollide()
-	local root = self.Model.Tender.VisualRoot
-	local visualModel = root:GetChildren()
-	if visualModel then
-		local tenderParts = visualModel[1]:GetChildren()
-		for _, part in pairs(tenderParts) do
-			if part:IsA("Part") then
-				if not part.CanCollide then part.CanCollide = true end
-			end
-		end
-	end
+	ClassVisualizer.CanCollide(self.Model.Tender.VisualRoot:GetChildren()[1])
 end
 
 function Tender:CannotCollide()
-	local root = self.Model.Tender.VisualRoot
-	local visualModel = root:GetChildren()
-	if visualModel then
-		local tenderParts = visualModel[1]:GetChildren()
-		for _, part in pairs(tenderParts) do
-			if part:IsA("Part") then
-				if part.CanCollide then part.CanCollide = false end
-			end
-		end
-	end
+	ClassVisualizer.CannotCollide(self.Model.Tender.VisualRoot:GetChildren()[1])
 end
 -- //!SECTION
 

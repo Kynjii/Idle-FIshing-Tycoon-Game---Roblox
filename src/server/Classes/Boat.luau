@@ -401,19 +401,19 @@ end
 
 -- //SECTION - Visibility and Collision
 function Boat:Show()
-	ClassVisualizer.Show(self.Model.Boat.VisualRoot)
+	ClassVisualizer.Show(self.Model.Boat.VisualRoot:GetChildren()[1])
 end
 
 function Boat:Hide()
-	ClassVisualizer.Hide(self.Model.Boat.VisualRoot)
+	ClassVisualizer.Hide(self.Model.Boat.VisualRoot:GetChildren()[1])
 end
 
 function Boat:CanCollide()
-	ClassVisualizer.CanCollide(self.Model.Boat.VisualRoot)
+	ClassVisualizer.CanCollide(self.Model.Boat.VisualRoot:GetChildren()[1])
 end
 
 function Boat:CannotCollide()
-	ClassVisualizer.CannotCollide(self.Model.Boat.VisualRoot)
+	ClassVisualizer.CannotCollide(self.Model.Boat.VisualRoot:GetChildren()[1])
 end
 -- //!SECTION
 
