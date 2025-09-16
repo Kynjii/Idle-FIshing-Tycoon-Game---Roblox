@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ClassCalculators = require(ServerScriptService.Server.Classes.Modules.ClassCalculators)
 local ClassVisualizer = require(ServerScriptService.Server.Classes.Modules.ClassVisualizer)
+local PortStorageType = require(ServerScriptService.Server.Classes.Types.PortStorageType)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local Formulas = require(ServerScriptService.Server.Math.Formulas)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
@@ -14,11 +15,13 @@ local ResizeFromEdge = require(ServerScriptService.Server.Modules.Tweens.ResizeF
 local CleanerService = require(ServerScriptService.Server.Services.CleanerService)
 
 -- //SECTION - Types
-
+type Storage = PortStorageType.Storage
+type StorageProps = PortStorageType.StorageProps
+type StorageInstance = PortStorageType.StorageInstance
 -- //!SECTION
 
 -- //SECTION - Data
-local DEFAULTS = {
+local DEFAULTS: StorageProps = {
 	RealmId = 1,
 	Tier = 1,
 	Level = 1,
@@ -31,12 +34,12 @@ local DEFAULTS = {
 }
 -- //!SECTION
 
-local PortStorage = {}
+local PortStorage = {} :: StorageInstance
 PortStorage.__index = PortStorage
 
 -- //SECTION - Constructor
-function PortStorage.New(state, player: Player, model: Model)
-	local self = setmetatable({}, PortStorage)
+function PortStorage.New(state, player: Player, model: Model): Storage
+	local self: StorageInstance = setmetatable({}, PortStorage)
 
 	-- Start with default stats as base
 	for key, value in pairs(DEFAULTS) do
