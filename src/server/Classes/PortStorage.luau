@@ -269,6 +269,7 @@ function PortStorage:SetupProximityPrompt(purchaseBoard: Part)
 	end
 
 	proximityPrompt.HoldDuration = 0.5
+	proximityPrompt.MaxActivationDistance = 5
 	proximityPrompt.ObjectText = self.isPurchased and "Upgrade Storage" or "Purchase"
 	proximityPrompt.ActionText = self.isPurchased and "Gold: " .. FormatNumber(self.UpgradeCost) or "Gold: " .. FormatNumber(self.BaseCost)
 
