@@ -7,7 +7,7 @@ local PortStorage = require(ServerScriptService.Server.Classes.PortStorage)
 local Tender: Tender = require(ServerScriptService.Server.Classes.Tender)
 local BoatType = require(ServerScriptService.Server.Classes.Types.BoatType)
 local TenderType = require(ServerScriptService.Server.Classes.Types.TenderType)
-local BoatManagerType = require(ServerScriptService.Server.Classes.Types.BoatManagerType)
+local ChainManagerType = require(ServerScriptService.Server.Classes.Types.ChainManagerType)
 
 local taggedBoats = CollectionService:GetTagged("Boat")
 local taggedTenders = CollectionService:GetTagged("Tender")
@@ -15,13 +15,13 @@ local taggedStorage = CollectionService:GetTagged("Storage")
 
 type Boat = BoatType.Boat
 type Tender = TenderType.Tender
-type BoatManager = BoatManagerType.BoatManagerInstance
+type ChainManager = ChainManagerType.ChainManagerInstance
 
-local BoatManager = {} :: BoatManager
-BoatManager.__index = BoatManager
+local ChainManager = {} :: ChainManager
+ChainManager.__index = ChainManager
 
-function BoatManager.New(realmData, tier: number, player: Player, teamId: number)
-	local self: BoatManager = setmetatable({}, BoatManager)
+function ChainManager.New(realmData, tier: number, player: Player, teamId: number)
+	local self: ChainManager = setmetatable({}, ChainManager)
 
 	local boatsArr = realmData.Boats
 	local tendersArr = realmData.Tenders
@@ -55,7 +55,7 @@ function BoatManager.New(realmData, tier: number, player: Player, teamId: number
 	return self
 end
 
-function BoatManager:FindBoatModel()
+function ChainManager:FindBoatModel()
 	for _, taggedBoat in ipairs(taggedBoats) do
 		local taggedBoatTier = taggedBoat:GetAttribute(FFGEnum.ATTRIBUTES.Tier)
 		local taggedBoatTeamId = taggedBoat:GetAttribute(FFGEnum.ATTRIBUTES.TeamId)
@@ -65,7 +65,7 @@ function BoatManager:FindBoatModel()
 	return nil
 end
 
-function BoatManager:FindTenderModel()
+function ChainManager:FindTenderModel()
 	for _, taggedTender in ipairs(taggedTenders) do
 		local taggedTenderTier = taggedTender:GetAttribute(FFGEnum.ATTRIBUTES.Tier)
 		local taggedTenderTeamId = taggedTender:GetAttribute(FFGEnum.ATTRIBUTES.TeamId)
@@ -75,7 +75,7 @@ function BoatManager:FindTenderModel()
 	return nil
 end
 
-function BoatManager:FindStorageModel()
+function ChainManager:FindStorageModel()
 	for _, taggedStorageUnit in ipairs(taggedStorage) do
 		local taggedStorageUnitTier = taggedStorageUnit:GetAttribute(FFGEnum.ATTRIBUTES.Tier)
 		local taggedStorageUnitTeamId = taggedStorageUnit:GetAttribute(FFGEnum.ATTRIBUTES.TeamId)
@@ -85,13 +85,13 @@ function BoatManager:FindStorageModel()
 	return nil
 end
 
-function BoatManager:Initialize()
+function ChainManager:Initialize()
 	self.LaneBoat:Initialize()
 	self.LaneTender:Initialize()
 	self.LaneStorage:Initialize()
 end
 
-function BoatManager:AttachAttListeners()
+function ChainManager:AttachAttListeners()
 	self.TenderModel.PrimaryPart.AttributeChanged:Connect(function(attributeName)
 		-- isPurchased triggers the start of the cycle
 		if attributeName == FFGEnum.ATTRIBUTES.isPurchased and self.TenderModel.PrimaryPart:GetAttribute(attributeName) == true and self.LaneBoat.isPurchased then
@@ -135,21 +135,21 @@ function BoatManager:AttachAttListeners()
 end
 
 -- //SECTION - Tender Travelling Cycle Functions used by the AttListeners
-function BoatManager:ResetTravellingAttributes()
+function ChainManager:ResetTravellingAttributes()
 	local primary = self.TenderModel.PrimaryPart
 	for name, _ in pairs(primary:GetAttributes()) do
 		if name ~= FFGEnum.ATTRIBUTES.isPurchased then primary:SetAttribute(name, false) end
 	end
 end
 
-function BoatManager:StartTenderCycle()
+function ChainManager:StartTenderCycle()
 	self:ResetTravellingAttributes()
 
 	local boatPos = self.BoatModel.PrimaryPart.CFrame * CFrame.new(0, -15, 0)
 	self.LaneTender:MoveToBoat(boatPos)
 end
 
-function BoatManager:StartLoadingFish()
+function ChainManager:StartLoadingFish()
 	self.TenderModel.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.finishedUnloading, false)
 
 	local storageFull = false
@@ -173,7 +173,7 @@ function BoatManager:StartLoadingFish()
 	end
 end
 
-function BoatManager:StartUnloadingFish()
+function ChainManager:StartUnloadingFish()
 	self.TenderModel.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.finishedLoading, false)
 
 	while true do
@@ -204,11 +204,11 @@ end
 -- //!SECTION
 
 -- //SECTION - Cleanup
-function BoatManager:Destroy()
+function ChainManager:Destroy()
 	self.LaneBoat:Destroy()
 	self.LaneTender:Destroy()
 	self.LaneStorage:Destroy()
 end
 -- //!SECTION
 
-return BoatManager
+return ChainManager

@@ -1,0 +1,43 @@
+local BoatType = require(script.Parent.BoatType)
+local TenderType = require(script.Parent.TenderType)
+
+local ChainManagerType = {}
+
+export type ChainManagerInstance = {
+	-- Props
+	Owner: number,
+	Tier: number,
+	BoatModel: Model,
+	LaneBoat: BoatType.BoatInstance,
+	TenderModel: Model,
+	LaneTender: TenderType.TenderInstance,
+	LaneStorageModel: Model,
+	LaneStorage: { [string]: any },
+	Player: Player,
+	TeamId: number,
+
+	-- Main Actions
+	FindBoatModel: (self: ChainManagerInstance, player: Player, tier: number) -> Model | nil,
+	FindTenderModel: (self: ChainManagerInstance, player: Player, tier: number) -> Model | nil,
+	FindStorageModel: (self: ChainManagerInstance, player: Player, tier: number) -> Model | nil,
+	Initialize: (self: ChainManagerInstance) -> (),
+
+	-- Attribute listeners
+	AttachAttListeners: (self: ChainManagerInstance) -> (),
+
+	-- Handling Tender Service
+	StartTenderCycle: (self: ChainManagerInstance) -> (),
+	StartLoadingFish: (self: ChainManagerInstance) -> (),
+	StartUnloadingFish: (self: ChainManagerInstance) -> (),
+
+	ResetTravellingAttributes: (self: ChainManagerInstance) -> (),
+
+	-- Cleanup
+	Destroy: (self: ChainManagerInstance) -> (),
+}
+
+export type ChainManager = {
+	New: (realmData: { [string]: any }, tier: number, player: Player, teamId: number) -> ChainManagerInstance,
+}
+
+return ChainManagerType

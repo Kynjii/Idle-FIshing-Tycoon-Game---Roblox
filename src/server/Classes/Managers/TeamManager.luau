@@ -2,12 +2,12 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local BoatType = require(ServerScriptService.Server.Classes.Types.BoatType)
 local TenderType = require(ServerScriptService.Server.Classes.Types.TenderType)
 local Teams = game:GetService("Teams")
-local BoatManager = require(script.Parent.BoatManager)
-local BoatManagerType = require(ServerScriptService.Server.Classes.Types.BoatManagerType)
+local ChainManager = require(script.Parent.ChainManager)
+local ChainManagerType = require(ServerScriptService.Server.Classes.Types.ChainManagerType)
 
 type BoatInstance = BoatType.BoatInstance
 type Tender = TenderType.Tender
-type BoatManager = BoatManagerType.BoatManagerInstance
+type ChainManager = ChainManagerType.ChainManagerInstance
 
 local TeamManager = {}
 TeamManager.Teams = {
@@ -53,7 +53,7 @@ TeamManager.Teams = {
 	},
 }
 
-TeamManager.BoatManagers = {}
+TeamManager.ChainManagers = {}
 
 function TeamManager.CreateTeams()
 	for i, team in ipairs(TeamManager.Teams) do
@@ -70,19 +70,19 @@ function TeamManager.CreateTeams()
 	end
 end
 
-function TeamManager.AssignBoatManagers(profile, player: Player, teamId: number)
-	TeamManager.BoatManagers[player.UserId] = TeamManager.BoatManagers[player.UserId] or { OwnerId = player.UserId }
+function TeamManager.AssignChainManagers(profile, player: Player, teamId: number)
+	TeamManager.ChainManagers[player.UserId] = TeamManager.ChainManagers[player.UserId] or { OwnerId = player.UserId }
 	local currentRealmId = profile.CurrentRealm
 	local realmData = profile.Realms[currentRealmId]
 
 	if not realmData then return end
 
 	for lane = 1, realmData.Lanes do
-		local boatManager: BoatManager = BoatManager.New(realmData, lane, player, teamId)
-		if not boatManager then break end
+		local ChainManager: ChainManager = ChainManager.New(realmData, lane, player, teamId)
+		if not ChainManager then break end
 
-		table.insert(TeamManager.BoatManagers[player.UserId], boatManager)
-		boatManager:Initialize()
+		table.insert(TeamManager.ChainManagers[player.UserId], ChainManager)
+		ChainManager:Initialize()
 	end
 end
 
@@ -101,7 +101,7 @@ function TeamManager.AssignTeam(player: Player)
 end
 
 function TeamManager.CleanupPlayer(userId: number)
-	local list = TeamManager.BoatManagers[userId]
+	local list = TeamManager.ChainManagers[userId]
 	if not list then return end
 
 	for i = #list, 1, -1 do
@@ -114,7 +114,7 @@ function TeamManager.CleanupPlayer(userId: number)
 		end
 		list[i] = nil
 	end
-	TeamManager.BoatManagers[userId] = nil
+	TeamManager.ChainManagers[userId] = nil
 end
 
 return TeamManager

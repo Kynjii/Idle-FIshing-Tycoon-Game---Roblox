@@ -94,7 +94,7 @@ function Tender.New(state, player, model)
 	self.VisualModels = self:GetVisualModels()
 	self.CurrentVisualModel = nil
 
-	-- Apply attributes for BoatManager
+	-- Apply attributes for ChainManager
 	if self.isPurchased then self.Model.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.isPurchased, self.isPurchased) end
 
 	-- Storage calcs
