@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local Animator = require(ServerScriptService.Server.Classes.Modules.Animator)
 local ClassCalculators = require(ServerScriptService.Server.Classes.Modules.ClassCalculators)
+local ClassVisualizer = require(ServerScriptService.Server.Classes.Modules.ClassVisualizer)
 local BoatType = require(ServerScriptService.Server.Classes.Types.BoatType)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local Formulas = require(ServerScriptService.Server.Math.Formulas)
@@ -400,55 +401,19 @@ end
 
 -- //SECTION - Visibility and Collision
 function Boat:Show()
-	local root = self.Model.Boat.VisualRoot
-	local visualModel = root:GetChildren()
-	if visualModel then
-		local boatParts = visualModel[1]:GetChildren()
-		for _, part in pairs(boatParts) do
-			if part:IsA("Part") then
-				if part.Transparency and part.Transparency == 1 then FadeEffect.In(part) end
-			end
-		end
-	end
+	ClassVisualizer.Show(self.Model.Boat.VisualRoot)
 end
 
 function Boat:Hide()
-	local root = self.Model.Boat.VisualRoot
-	local visualModel = root:GetChildren()
-	if visualModel then
-		local boatParts = visualModel[1]:GetChildren()
-		for _, part in pairs(boatParts) do
-			if part:IsA("Part") then
-				if part.Transparency and part.Transparency == 0 then FadeEffect.Out(part) end
-			end
-		end
-	end
+	ClassVisualizer.Hide(self.Model.Boat.VisualRoot)
 end
 
 function Boat:CanCollide()
-	local root = self.Model.Boat.VisualRoot
-	local visualModel = root:GetChildren()
-	if visualModel then
-		local boatParts = visualModel[1]:GetChildren()
-		for _, part in pairs(boatParts) do
-			if part:IsA("Part") then
-				if not part.CanCollide then part.CanCollide = true end
-			end
-		end
-	end
+	ClassVisualizer.CanCollide(self.Model.Boat.VisualRoot)
 end
 
 function Boat:CannotCollide()
-	local root = self.Model.Boat.VisualRoot
-	local visualModel = root:GetChildren()
-	if visualModel then
-		local boatParts = visualModel[1]:GetChildren()
-		for _, part in pairs(boatParts) do
-			if part:IsA("Part") then
-				if part.CanCollide then part.CanCollide = false end
-			end
-		end
-	end
+	ClassVisualizer.CannotCollide(self.Model.Boat.VisualRoot)
 end
 -- //!SECTION
 
