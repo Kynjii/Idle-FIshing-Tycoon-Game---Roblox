@@ -18,17 +18,43 @@ local CleanerService = require(ServerScriptService.Server.Services.CleanerServic
 -- //SECTION - Building Data
 local NAME = {
 	Market = {
-		[1] = "Market 1",
-		[2] = "Market 2",
-		[3] = "Market 3",
-		[4] = "Market 4",
-		[5] = "Market 5",
-		[6] = "Market 6",
-		[7] = "Market 7",
-		[8] = "Market 8",
-		[9] = "Market 9",
-		[10] = "Market 10",
-		[11] = "Market 11",
+		[1] = "Fishmonger’s Stall",
+		[2] = "Fish Cart",
+		[3] = "Fishmonger’s Hut",
+		[4] = "Wharf Stand",
+		[5] = "Harbor Market",
+		[6] = "Fisher’s Pavilion",
+		[7] = "Dockside Bazaar",
+		[8] = "Seafarer’s Market Hall",
+		[9] = "Maritime Exchange",
+		[10] = "Grand Harbor Market",
+		[11] = "Oceanfront City Market",
+	},
+	BoatStorageUpgrader = {
+		[1] = "Boatwright’s Shed",
+		[2] = "Carpenter’s Shack",
+		[3] = "Timber Workshop",
+		[4] = "Dockside Workshop",
+		[5] = "Shipwright’s Lodge",
+		[6] = "Pier Workshop",
+		[7] = "Drydock Hall",
+		[8] = "Harbor Shipyard",
+		[9] = "Great Shipwright’s Yard",
+		[10] = "Maritime Dockworks",
+		[11] = "Royal Shipyard",
+	},
+	BoatFPSUpgrader = {
+		[1] = "Net Spinner’s Hut",
+		[2] = "Rope Weaver’s Corner",
+		[3] = "Netting Shed",
+		[4] = "Spinner’s Workshop",
+		[5] = "Tangle Hall",
+		[6] = "Knotcrafter’s Den",
+		[7] = "Weaver’s Guildhouse",
+		[8] = "Fisher’s Loom Hall",
+		[9] = "Maritime Net Guild",
+		[10] = "Grand Loomworks",
+		[11] = "Oceanic Guild of Nets",
 	},
 }
 
@@ -172,7 +198,8 @@ function Building:SetupPurchaseBoard()
 			pbDetails.NameLabel.Parent.Visible = true
 		end
 
-		pbDetails.LevelLabel.Text = self.isPurchased and "Lvl: " .. self.Level or "Purchase Building"
+		pbDetails.LevelLabel.Text = self.isPurchased and "Lvl: " .. self.Level or "Purchase " .. self.Name
+		pbDetails.LevelLabel.TextXAlignment = "Center"
 	end
 
 	return purchaseBoard
@@ -209,7 +236,7 @@ function Building:SetupProximityPrompt(purchaseBoard: Part)
 
 	proximityPrompt.HoldDuration = 0.5
 	proximityPrompt.MaxActivationDistance = 5
-	proximityPrompt.ObjectText = self.isPurchased and "Upgrade Building" or "Purchase"
+	proximityPrompt.ObjectText = self.isPurchased and "Upgrade " .. self.Name or "Purchase"
 	proximityPrompt.ActionText = self.isPurchased and "Gold: " .. FormatNumber(self.UpgradeCost) or "Gold: " .. FormatNumber(self.BaseCost)
 
 	-- Handle proximity prompt triggered
