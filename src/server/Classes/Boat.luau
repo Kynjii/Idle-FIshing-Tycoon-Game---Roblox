@@ -211,7 +211,7 @@ function Boat:CalculateFPS()
 	if baseFPS == DEFAULTS.BaseFPS then baseFPS = self:CalculateBaseFPS() end
 	local fpsPercentBuff = self.Buffs[BOAT_BUFFS.FPS_Percent] and self.Buffs[BOAT_BUFFS.FPS_Percent].CurrentValue or nil
 
-	return ClassCalculators.CalculateFPS(baseFPS, self.UpgradeStage, fpsPercentBuff)
+	return ClassCalculators.CalculateFPS(baseFPS, self.Level, fpsPercentBuff)
 end
 -- //!SECTION
 
@@ -227,9 +227,12 @@ function Boat:StartFishing()
 end
 
 function Boat:AddFish(amount)
-	self.FishInStorage += amount
+	local availableStorage = self.CurrentMaxStorage - self.FishInStorage
+	local calcAmount = math.min(availableStorage, amount)
 
-	self:ShowFishPopUp(amount)
+	self.FishInStorage += calcAmount
+
+	self:ShowFishPopUp(calcAmount)
 	if self.FishInStorage >= self.CurrentMaxStorage then
 		self.FishInStorage = self.CurrentMaxStorage
 		self:UpdateStorageStatus(true)

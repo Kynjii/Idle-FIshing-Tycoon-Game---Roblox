@@ -197,6 +197,12 @@ function ChainManager:StartUnloadingFish()
 	local tender = self.LaneTender
 	local storage = self.LaneStorage
 
+	-- If there’s nothing to unload, finish immediately.
+	if (tender.FishInStorage or 0) <= 0 then
+		self.TenderModel.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.finishedUnloading, true)
+		return
+	end
+
 	-- Snapshot unload duration at start, capacity stays dynamic.
 	local rawUnload = tender.UnloadTime or 10
 	local unloadDuration = math.clamp(rawUnload, 0.5, math.huge)
@@ -217,20 +223,21 @@ function ChainManager:StartUnloadingFish()
 		-- Desired tender cargo at progress p (aim to be empty by p=1)
 		local currentTenderFish = tender.FishInStorage
 		local targetTenderFish = (p >= 1) and 0 or math.ceil(initialCargo * (1 - p))
+		if targetTenderFish < 0 then targetTenderFish = 0 end
 
 		-- Remove just enough to reach the target, bounded by storage space
 		local deltaToRemove = currentTenderFish - targetTenderFish
 		if deltaToRemove < 0 then deltaToRemove = 0 end
 
-		local amount = math.clamp(deltaToRemove, 0, storageFree)
+		local amount = math.clamp(deltaToRemove, 0, math.min(storageFree, currentTenderFish))
 		if amount > 0 then
 			tender:RemoveFish(amount)
 			storage:AddFish(amount)
 			if tender.Buffs then tender:UpdatePurchaseBoardUI() end
 		end
 
-		-- Finish either because time is up or tender is empty
-		if p >= 1 or tender.FishInStorage <= 0 then
+		-- Finish ONLY when the tender is empty.
+		if tender.FishInStorage <= 0 then
 			self.TenderModel.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.finishedUnloading, true)
 			break
 		end

@@ -19,7 +19,7 @@ local CleanerService = require(ServerScriptService.Server.Services.CleanerServic
 -- //SECTION - Building Data
 local NAME = {
 	Market = {
-		[1] = "Fishmonger’s Stall",
+		[1] = "Market",
 		[2] = "Fish Cart",
 		[3] = "Fishmonger’s Hut",
 		[4] = "Wharf Stand",
@@ -32,7 +32,7 @@ local NAME = {
 		[11] = "Oceanfront City Market",
 	},
 	BoatStorageUpgrader = {
-		[1] = "Boatwright’s Shed",
+		[1] = "Boat Storage Upgrader",
 		[2] = "Carpenter’s Shack",
 		[3] = "Timber Workshop",
 		[4] = "Dockside Workshop",
@@ -45,7 +45,7 @@ local NAME = {
 		[11] = "Royal Shipyard",
 	},
 	BoatFPSUpgrader = {
-		[1] = "Net Spinner’s Hut",
+		[1] = "Boat FPS Upgrader",
 		[2] = "Rope Weaver’s Corner",
 		[3] = "Netting Shed",
 		[4] = "Spinner’s Workshop",
@@ -58,7 +58,7 @@ local NAME = {
 		[11] = "Oceanic Guild of Nets",
 	},
 	TenderTTUpgrader = {
-		[1] = "Runner’s Post",
+		[1] = "Tender TT Upgrader",
 		[2] = "Wayfinder’s Stand",
 		[3] = "Courier’s Hut",
 		[4] = "Pilot’s Booth",
@@ -71,7 +71,7 @@ local NAME = {
 		[11] = "Royal Admiralty Relay",
 	},
 	TenderLoadUpgrader = {
-		[1] = "Dockhand’s Nook",
+		[1] = "Tender Load Upgrader",
 		[2] = "Porter’s Table",
 		[3] = "Stevedore’s Stall",
 		[4] = "Hoistman’s Shed",
@@ -173,6 +173,7 @@ function Building:Upgrade()
 	end
 
 	self:UpdateBuffValue()
+	self:UpdatePurchaseBoardUI()
 	self:Save()
 end
 
@@ -240,7 +241,7 @@ function Building:SetupPurchaseBoard()
 		pbDetails.LevelLabel.Text = self.isPurchased and "Lvl: " .. self.Level or "Purchase " .. self.Name
 		pbDetails.LevelLabel.TextXAlignment = "Center"
 
-		pbDetails.BuffLabel.Text = self.BuildingBuff and "+" .. (self.BuildingBuff.CurrentValue * 100) .. "%"
+		if self.isPurchased and self.BuildingBuff then pbDetails.BuffLabel.Text = "+" .. (self.BuildingBuff.CurrentValue * 100) .. "%" .. " " .. self.BuildingBuff.Name end
 	end
 
 	return purchaseBoard
@@ -262,7 +263,7 @@ function Building:UpdatePurchaseBoardUI()
 	pbDetails.NameLabel.TextColor3 = color
 	pbDetails.NameLabel.Text = self:GetName()
 
-	pbDetails.BuffLabel.Text = self.BuildingBuff and "+" .. (self.BuildingBuff.CurrentValue * 100) .. "%"
+	if self.isPurchased and self.BuildingBuff then pbDetails.BuffLabel.Text = "+" .. (self.BuildingBuff.CurrentValue * 100) .. "%" .. " " .. self.BuildingBuff.Name end
 
 	if self.isPurchased then pbDetails.NameLabel.Parent.Visible = true end
 end

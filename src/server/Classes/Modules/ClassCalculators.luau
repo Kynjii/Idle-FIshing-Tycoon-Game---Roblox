@@ -46,12 +46,12 @@ function ClassCalculator.CalculateMaxStorage(baseValue: number, level: number, p
 	return maxStorage, nextLvlStorage
 end
 
-function ClassCalculator.CalculateFPS(baseFPS: number, upgradeStage: number, percentBuffValue: number?)
-	local sNow = clampStage(upgradeStage)
-	local sNext = clampStage(upgradeStage + 1)
+function ClassCalculator.CalculateFPS(baseFPS: number, level: number, percentBuffValue: number?)
+	local lvl = clampLevel(level)
+	local nextLvl = clampLevel(level + 1)
 
-	local multNow = (Formulas.STAGE_EARN_MULT and Formulas.STAGE_EARN_MULT[sNow]) or 1
-	local multNext = (Formulas.STAGE_EARN_MULT and Formulas.STAGE_EARN_MULT[sNext]) or multNow
+	local multNow = (Formulas.EARN_MULT and Formulas.EARN_MULT[lvl]) or 1
+	local multNext = (Formulas.EARN_MULT and Formulas.EARN_MULT[nextLvl]) or multNow
 
 	local fpsNow = baseFPS * multNow
 	local fpsNext = baseFPS * multNext
