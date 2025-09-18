@@ -11,7 +11,12 @@ export type BuffState = {
 	Type: string,
 }
 
-local GROWTH_RATES = { Multiplier = { 1.08, 1.07, 1.06, 1.05, 1.04, 1.03, 1.03, 1.02, 1.02, 1.02 }, Production = { 2.2, 1.8, 1.7, 1.6, 1.5, 1.4, 1.3, 1.2, 1.1, 1.08 }, QoL = { 1.18, 1.15, 1.12, 1.10, 1.08, 1.07, 1.06, 1.05, 1.04, 1.03 }, Loop = { 1.14, 1.12, 1.10, 1.08, 1.07, 1.06, 1.05, 1.04, 1.03, 1.03 } }
+local GROWTH_RATES = {
+	Multiplier = { 1.08, 1.07, 1.06, 1.05, 1.04, 1.03, 1.03, 1.02, 1.02, 1.02 },
+	Production = { 2.2, 1.8, 1.7, 1.6, 1.5, 1.4, 1.3, 1.2, 1.1, 1.08 },
+	QoL = { 1.18, 1.15, 1.12, 1.10, 1.08, 1.07, 1.06, 1.05, 1.04, 1.03 },
+	Loop = { 1.14, 1.12, 1.10, 1.08, 1.07, 1.06, 1.05, 1.04, 1.03, 1.03 },
+}
 
 Buffs.Formulas = {
 	-- FISH
@@ -28,6 +33,7 @@ Buffs.Formulas = {
 	-- TRAVEL TIME
 	HelperTravelTime_Percent = { Name = "HelperTravelTime_Percent", BaseValue = 0.03, Type = "Loop" },
 	CaravanTravelTime_Percent = { Name = "CaravanTravelTime_Percent", BaseValue = 0.03, Type = "Loop" },
+	TenderTravelTime_Percent = { Name = "TenderTravelTime_Percent", BaseValue = 0.03, Type = "Loop" },
 
 	-- LOAD TIME
 	TenderLoadTime_Percent = { Name = "TenderLoadTime_Percent", BaseValue = 0.03, Type = "Loop" },

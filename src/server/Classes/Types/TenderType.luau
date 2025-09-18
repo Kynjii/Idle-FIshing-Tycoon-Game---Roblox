@@ -1,3 +1,5 @@
+local ServerScriptService = game:GetService("ServerScriptService")
+local Buffs = require(ServerScriptService.Server.Math.Buffs)
 local TenderType = {}
 
 export type TenderProps = {
@@ -59,6 +61,8 @@ export type TenderInstance = {
 	Animations: { [string]: Animation },
 	VisualModels: { [string]: Model },
 	CurrentVisualModel: Model | nil,
+	Buffs: { [string]: Buffs.BuffState },
+	LoadTime: number?,
 
 	-- Core Tender Actions
 	Purchase: (self: TenderInstance) -> (),
@@ -70,7 +74,8 @@ export type TenderInstance = {
 	CalculateUpgradeCost: (self: TenderInstance) -> number,
 	CalculateBaseStorage: (self: TenderInstance) -> number,
 	CalculateMaxStorage: (self: TenderInstance) -> (number, number),
-	CalculateTravelTime: (self: TenderInstance) -> (number, number),
+	CalculateTravelTime: (self: TenderInstance) -> number,
+	CalculateLoadTime: (self: TenderInstance) -> number,
 
 	-- Travelling
 	MoveToBoat: (self: TenderInstance, position: Vector3) -> (),
@@ -81,6 +86,10 @@ export type TenderInstance = {
 	UpdateStorageStatus: (self: TenderInstance, status: boolean) -> (),
 	UpdateProgressBar: (self: TenderInstance) -> (),
 	AttachAttListeners: (self: TenderInstance) -> (),
+
+	-- Buffs
+	GetBuffs: (self: TenderInstance) -> { [string]: any },
+	UpdateBuffs: (self: TenderInstance) -> (),
 
 	-- Setup
 	Initialize: (self: TenderInstance) -> (),

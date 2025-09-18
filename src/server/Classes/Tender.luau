@@ -12,6 +12,7 @@ local Animator = require(ServerScriptService.Server.Classes.Modules.Animator)
 local ClassCalculators = require(ServerScriptService.Server.Classes.Modules.ClassCalculators)
 local ClassVisualizer = require(ServerScriptService.Server.Classes.Modules.ClassVisualizer)
 local TenderType = require(ServerScriptService.Server.Classes.Types.TenderType)
+local Buffs = require(ServerScriptService.Server.Math.Buffs)
 local ProgressBar = require(ServerScriptService.Server.Modules.Tweens.ProgressBar)
 local FadeEffect = require(ServerScriptService.Server.Modules.Tweens.FadeEffect)
 local PopUp = require(ServerScriptService.Server.Modules.Tweens.PopUp)
@@ -21,6 +22,7 @@ local CleanerService = require(ServerScriptService.Server.Services.CleanerServic
 type Tender = TenderType.Tender
 type TenderProps = TenderType.TenderProps
 type TenderInstance = TenderType.TenderInstance
+type BuffState = Buffs.BuffState
 -- //!SECTION
 
 -- //SECTION -  Tender Data
@@ -51,10 +53,17 @@ local DEFAULTS: TenderProps = {
 	FishInStorage = 0,
 	StorageFull = false,
 	BaseTravelTime = 10, -- secs
+	BaseLoadTime = 10, -- secs
 }
 
 local ANIMATIONS = {
 	WaterBob = "WaterBob",
+}
+
+local TENDER_BUFFS = {
+	TenderStorage_Percent = FFGEnum.BUFFS.STORAGE.Tender_Percent,
+	TenderTravelTime_Percent = FFGEnum.BUFFS.TRAVEL_TIME.Tender_Percent,
+	TenderLoadTime_Percent = FFGEnum.BUFFS.LOAD_TIME.Tender_Percent,
 }
 -- //!SECTION
 
@@ -87,6 +96,8 @@ function Tender.New(state, player, model)
 	self.Tier = self.Model:GetAttribute(FFGEnum.ATTRIBUTES.Tier) or DEFAULTS.Tier
 	self.Player = player
 
+	self.Buffs = self:GetBuffs()
+
 	self.BaseCost = self:CalculateBaseCost()
 	self.UpgradeCost = self:CalculateUpgradeCost()
 	self.BaseStorage = self:CalculateBaseStorage()
@@ -100,8 +111,11 @@ function Tender.New(state, player, model)
 	-- Storage calcs
 	self.CurrentMaxStorage, self.NextLvlMaxStorage = self:CalculateMaxStorage()
 
+	-- Load Time calcs
+	self.LoadTime = self:CalculateLoadTime()
+
 	-- Travel Time calcs
-	self.CurrentTravelTime, self.NextLvlTravelTime = self:CalculateTravelTime()
+	self.CurrentTravelTime = self:CalculateTravelTime()
 
 	-- Progress Bars
 	self.BillBoard = DeepWait(self.Model, "Tender", "Base", "Billboard", "BillboardGui")
@@ -120,11 +134,22 @@ function Tender.New(state, player, model)
 end
 -- //!SECTION
 
+-- //SECTION - Buffs
+function Tender:GetBuffs()
+	return Buffs.GetBuffs(self.Player, TENDER_BUFFS)
+end
+
+function Tender:UpdateBuffs()
+	self.Buffs = self:GetBuffs()
+end
+-- //!SECTION
+
 -- //SECTION - Core Tender Actions
 function Tender:Purchase()
 	self.isPurchased = true
 	self.Model.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.isPurchased, true)
 
+	self:UpdateBuffs()
 	self:UpdateVisualModel()
 	self:Save()
 end
@@ -137,11 +162,13 @@ function Tender:Upgrade()
 		if self.Level == v then
 			self:IncreaseUpgradeStage(k)
 			self:UpdateVisualModel()
-			self.CurrentTravelTime, self.NextLvlTravelTime = self:CalculateTravelTime()
+			self.CurrentTravelTime = self:CalculateTravelTime()
+			self.LoadTime = self:CalculateLoadTime()
 			break
 		end
 	end
 
+	self:UpdateBuffs()
 	self.UpgradeCost = self:CalculateUpgradeCost()
 	self.CurrentMaxStorage, self.NextLvlMaxStorage = self:CalculateMaxStorage()
 
@@ -183,12 +210,19 @@ end
 function Tender:CalculateMaxStorage()
 	local baseStorage = self.BaseStorage or DEFAULTS.BaseStorage
 	if baseStorage == DEFAULTS.BaseStorage then baseStorage = self:CalculateBaseStorage() end
+	local storagePercentBuff = self.Buffs[TENDER_BUFFS.TenderStorage_Percent] and self.Buffs[TENDER_BUFFS.TenderStorage_Percent].CurrentValue or nil
 
-	return ClassCalculators.CalculateMaxStorage(baseStorage, self.Level)
+	return ClassCalculators.CalculateMaxStorage(baseStorage, self.Level, storagePercentBuff)
 end
 
 function Tender:CalculateTravelTime()
-	return ClassCalculators.CalculateTravelTime(self.BaseTravelTime, self.UpgradeStage)
+	local travelTimeBuff = self.Buffs[TENDER_BUFFS.TenderTravelTime_Percent] and self.Buffs[TENDER_BUFFS.TenderTravelTime_Percent].CurrentValue or nil
+	return ClassCalculators.CalculateTravelTime(DEFAULTS.BaseTravelTime, travelTimeBuff)
+end
+
+function Tender:CalculateLoadTime()
+	local loadTimeBuff = self.Buffs[TENDER_BUFFS.TenderLoadTime_Percent] and self.Buffs[TENDER_BUFFS.TenderLoadTime_Percent].CurrentValue or nil
+	return ClassCalculators.CalculateLoadTime(DEFAULTS.BaseTravelTime, loadTimeBuff)
 end
 -- //!SECTION
 
@@ -259,6 +293,8 @@ function Tender:AddFish(amount)
 	end
 
 	self.FishInStorage += math.max(amount)
+
+	print("fishinstorage:", self.FishInStorage)
 
 	self:ShowFishPopUp(amount)
 
@@ -338,7 +374,6 @@ function Tender:SetupPurchaseBoard()
 	pbDetails.CurrentMaxStorageLabel = DeepWait(purchaseBoard, "SurfaceGui", "Main", "DetailsContainer", "StatsContainer", "CurrentMaxStorage", "TextLabel") :: TextLabel
 	pbDetails.NextMaxStorageLabel = DeepWait(purchaseBoard, "SurfaceGui", "Main", "DetailsContainer", "StatsContainer", "NextMaxStorage", "TextLabel") :: TextLabel
 	pbDetails.CurrentTravelTimeLabel = DeepWait(purchaseBoard, "SurfaceGui", "Main", "DetailsContainer", "StatsContainer", "CurrentTravelTime", "TextLabel") :: TextLabel
-	pbDetails.NextTravelTimeLabel = DeepWait(purchaseBoard, "SurfaceGui", "Main", "DetailsContainer", "StatsContainer", "NextTravelTime", "TextLabel") :: TextLabel
 
 	if pbDetails then
 		local upgradeStage = self.UpgradeStage
@@ -363,7 +398,6 @@ function Tender:SetupPurchaseBoard()
 
 		-- TRAVEL TIME Stats
 		pbDetails.CurrentTravelTimeLabel.Text = self.isPurchased and "Travel Time: " .. self.CurrentTravelTime or ""
-		if self:ShowUpgradeStageUpgrade() then pbDetails.NextTravelTimeLabel.Text = self.isPurchased and self.NextLvlTravelTime or "" end
 	end
 
 	return purchaseBoard
@@ -383,15 +417,6 @@ function Tender:UpdatePurchaseBoardUI()
 
 	pbDetails.CurrentMaxStorageLabel.Text = isPurchased and "Storage: " .. FormatNumber(self.CurrentMaxStorage) or ""
 	pbDetails.NextMaxStorageLabel.Text = isPurchased and "Next Lvl Storage: " .. FormatNumber(self.NextLvlMaxStorage) or ""
-	pbDetails.CurrentTravelTimeLabel.Text = isPurchased and "Travel Time: " .. FormatNumber(self.CurrentTravelTime) or ""
-
-	local showUpgradeStageUpgrade = self:ShowUpgradeStageUpgrade()
-	if showUpgradeStageUpgrade then
-		pbDetails.NextTravelTimeLabel.Text = isPurchased and "Next Lvl Travel Time: " .. FormatNumber(self.NextLvlTravelTime)
-		pbDetails.NextTravelTimeLabel.Visible = true
-	else
-		pbDetails.NextTravelTimeLabel.Visible = false
-	end
 
 	pbDetails.LevelLabel.Text = "Lvl: " .. self.Level
 
@@ -503,7 +528,7 @@ end
 
 function Tender:IsStorageFull()
 	local status = self.FishInStorage >= self.CurrentMaxStorage
-	if self.StorageFull ~= status then self:UpdateStorageStatus(status) end
+	self:UpdateStorageStatus(status)
 	return status
 end
 
@@ -538,7 +563,6 @@ function Tender:Serialize(): TenderProps
 		FishInStorage = self.FishInStorage,
 		StorageFull = self.StorageFull,
 		CurrentTravelTime = self.CurrentTravelTime,
-		NextLvlTravelTime = self.NextLvlTravelTime,
 	}
 end
 

@@ -147,12 +147,12 @@ function Boat:Upgrade()
 		if self.Level == v then
 			self:IncreaseUpgradeStage(k)
 			self:UpdateVisualModel()
-			self.CurrentFPS, self.NextFPS = self:CalculateFPS()
 			break
 		end
 	end
 
 	self:UpdateBuffs()
+	self.CurrentFPS, self.NextFPS = self:CalculateFPS()
 	self.UpgradeCost = self:CalculateUpgradeCost()
 	self.CurrentMaxStorage, self.NextLvlMaxStorage = self:CalculateMaxStorage()
 
@@ -297,7 +297,7 @@ function Boat:SetupPurchaseBoard()
 
 		-- FPS Stats
 		pbDetails.CurrentFPSLabel.Text = self.isPurchased and "FPS: " .. FormatNumber(self.CurrentFPS) or ""
-		if self:ShowUpgradeStageUpgrade() then pbDetails.NextFPSLabel.Text = self.isPurchased and "Next Lvl FPS: " .. FormatNumber(self.NextFPS) or "" end
+		pbDetails.NextFPSLabel.Text = self.isPurchased and "Next Lvl FPS: " .. FormatNumber(self.NextFPS) or ""
 
 		-- Storage Progress Bar
 		local storageProgress = CalculateProgress(self.FishInStorage, self.CurrentMaxStorage)
@@ -323,14 +323,7 @@ function Boat:UpdatePurchaseBoardUI()
 	pbDetails.CurrentMaxStorageLabel.Text = isPurchased and "Storage: " .. FormatNumber(self.CurrentMaxStorage) or ""
 	pbDetails.NextMaxStorageLabel.Text = isPurchased and "Next Lvl Storage: " .. FormatNumber(self.NextLvlMaxStorage) or ""
 	pbDetails.CurrentFPSLabel.Text = isPurchased and "FPS: " .. FormatNumber(self.CurrentFPS) or ""
-
-	local showUpgradeStageUpgrade = self:ShowUpgradeStageUpgrade()
-	if showUpgradeStageUpgrade then
-		pbDetails.NextFPSLabel.Text = isPurchased and "Next Lvl FPS: " .. FormatNumber(self.NextFPS) or ""
-		pbDetails.NextFPSLabel.Visible = true
-	else
-		pbDetails.NextFPSLabel.Visible = false
-	end
+	pbDetails.NextFPSLabel.Text = isPurchased and "Next Lvl FPS: " .. FormatNumber(self.NextFPS) or ""
 
 	local storageProgress = CalculateProgress(self.FishInStorage, self.CurrentMaxStorage)
 	pbDetails.StorageProgress.Size = UDim2.fromScale(1, storageProgress)
@@ -339,7 +332,6 @@ function Boat:UpdatePurchaseBoardUI()
 	pbDetails.LevelLabel.Text = "Lvl: " .. level
 
 	local currentUpgradeStage = self.UpgradeStage
-
 	local qualityInfo = FFGEnum.QUALITY[currentUpgradeStage]
 	local color = qualityInfo.Color
 	pbDetails.NameLabel.TextColor3 = color

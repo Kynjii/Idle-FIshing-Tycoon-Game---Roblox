@@ -57,12 +57,40 @@ local NAME = {
 		[10] = "Grand Loomworks",
 		[11] = "Oceanic Guild of Nets",
 	},
+	TenderTTUpgrader = {
+		[1] = "Runner’s Post",
+		[2] = "Wayfinder’s Stand",
+		[3] = "Courier’s Hut",
+		[4] = "Pilot’s Booth",
+		[5] = "Quay Relay Shed",
+		[6] = "Harbor Waystation",
+		[7] = "Lighthouse Signal House",
+		[8] = "Port Dispatch Guild",
+		[9] = "Chartmaker’s Hall",
+		[10] = "Grand Pilotage Office",
+		[11] = "Royal Admiralty Relay",
+	},
+	TenderLoadUpgrader = {
+		[1] = "Dockhand’s Nook",
+		[2] = "Porter’s Table",
+		[3] = "Stevedore’s Stall",
+		[4] = "Hoistman’s Shed",
+		[5] = "Capstan House",
+		[6] = "Winchwright’s Workshop",
+		[7] = "Block-and-Tackle Hall",
+		[8] = "Wharf Loading Yard",
+		[9] = "Porters’ Guildhall",
+		[10] = "Grand Hoistworks",
+		[11] = "Royal Cargo Works",
+	},
 }
 
 local BUILDING_BUFFS = {
 	Market = FFGEnum.BUFFS.FISH.Fish_Percent,
 	BoatStorageUpgrader = FFGEnum.BUFFS.STORAGE.Boat_Percent,
 	BoatFPSUpgrader = FFGEnum.BUFFS.FPS.FPS_Percent,
+	TenderTTUpgrader = FFGEnum.BUFFS.TRAVEL_TIME.Tender_Percent,
+	TenderLoadUpgrader = FFGEnum.BUFFS.LOAD_TIME.Tender_Percent,
 }
 
 local DEFAULTS = {

@@ -149,22 +149,43 @@ end
 function ChainManager:StartLoadingFish()
 	self.TenderModel.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.finishedUnloading, false)
 
-	local storageFull = false
-	while not storageFull do
-		if self.LaneTender:IsStorageFull() then
-			self.TenderModel.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.finishedLoading, true)
-			storageFull = true
-			break
+	local boat = self.LaneBoat
+	local tender = self.LaneTender
+
+	-- Snapshot the load duration at start (prevents mid-load buff exploits).
+	local rawLoad = tender.LoadTime or 10
+	local loadDuration = math.clamp(rawLoad, 0.5, math.huge)
+	local startTime = os.clock()
+
+	while true do
+		-- Time-based progress 0..1
+		local elapsed = os.clock() - startTime
+		local p = math.clamp(elapsed / loadDuration, 0, 1)
+
+		-- Dynamic capacity support (upgrades mid-load)
+		local currentMaxStorage = tender.CurrentMaxStorage
+		local fishInStorage = tender.FishInStorage
+
+		-- If time is up, aim to be full once; otherwise aim for fraction of capacity
+		local targetStorage = (p >= 1) and currentMaxStorage or math.floor(currentMaxStorage * p)
+
+		-- Compute allowed transfer this tick
+		local delta = targetStorage - fishInStorage
+		local boatAmount = boat.FishInStorage
+		local availableStorage = currentMaxStorage - fishInStorage
+		local amount = math.clamp(delta, 0, math.min(boatAmount, availableStorage))
+
+		if amount > 0 then
+			boat:RemoveFish(amount)
+			tender:AddFish(amount)
+			if tender.Buffs then tender:UpdatePurchaseBoardUI() end
 		end
 
-		local availableStorage = self.LaneTender.CurrentMaxStorage - self.LaneTender.FishInStorage
-		local tickAmount = self.LaneTender.CurrentMaxStorage / 10
-		local tenderAmount = math.min(availableStorage, tickAmount)
-		local boatAmount = math.min(self.LaneBoat.FishInStorage)
-		local amount = math.min(tenderAmount, boatAmount)
-
-		self.LaneBoat:RemoveFish(amount)
-		self.LaneTender:AddFish(amount)
+		-- Finish either because time is up or storage is full
+		if p >= 1 or tender:IsStorageFull() then
+			self.TenderModel.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.finishedLoading, true)
+			break
+		end
 
 		task.wait(1)
 	end
@@ -173,31 +194,51 @@ end
 function ChainManager:StartUnloadingFish()
 	self.TenderModel.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.finishedLoading, false)
 
+	local tender = self.LaneTender
+	local storage = self.LaneStorage
+
+	-- Snapshot unload duration at start, capacity stays dynamic.
+	local rawUnload = tender.UnloadTime or 10
+	local unloadDuration = math.clamp(rawUnload, 0.5, math.huge)
+	local startTime = os.clock()
+
+	-- Snapshot how much the tender started with
+	local initialCargo = tender.FishInStorage or 0
+
 	while true do
-		local tender = self.LaneTender
-		local storage = self.LaneStorage
+		-- 0..1 progress based on time
+		local elapsed = os.clock() - startTime
+		local p = math.clamp(elapsed / unloadDuration, 0, 1)
 
-		local storageFree = storage.CurrentMaxStorage - storage.FishInStorage
+		-- Dynamic storage capacity/support mid-unload
+		local currentMaxStorage = storage.CurrentMaxStorage
+		local storageFree = currentMaxStorage - storage.FishInStorage
 
-		if storageFree <= 0 then
-			task.wait(1)
-		else
-			local tickAmount = tender.CurrentMaxStorage / 10
-			local amount = math.min(tickAmount, tender.FishInStorage, storageFree)
+		-- Desired tender cargo at progress p (aim to be empty by p=1)
+		local currentTenderFish = tender.FishInStorage
+		local targetTenderFish = (p >= 1) and 0 or math.ceil(initialCargo * (1 - p))
 
+		-- Remove just enough to reach the target, bounded by storage space
+		local deltaToRemove = currentTenderFish - targetTenderFish
+		if deltaToRemove < 0 then deltaToRemove = 0 end
+
+		local amount = math.clamp(deltaToRemove, 0, storageFree)
+		if amount > 0 then
 			tender:RemoveFish(amount)
 			storage:AddFish(amount)
+			if tender.Buffs then tender:UpdatePurchaseBoardUI() end
 		end
 
-		if tender.FishInStorage <= 0 then
+		-- Finish either because time is up or tender is empty
+		if p >= 1 or tender.FishInStorage <= 0 then
 			self.TenderModel.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.finishedUnloading, true)
-			tender.FishInStorage = 0
 			break
 		end
 
 		task.wait(1)
 	end
 end
+
 -- //!SECTION
 
 -- //SECTION - Cleanup

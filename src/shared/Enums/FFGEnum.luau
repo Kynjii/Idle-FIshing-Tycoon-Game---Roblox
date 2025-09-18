@@ -106,6 +106,7 @@ FFGEnum.BUFFS = {
 	TRAVEL_TIME = {
 		Helper_Percent = "HelperTravelTime_Percent",
 		Caravan_Percent = "CaravanTravelTime_Percent",
+		Tender_Percent = "TenderTravelTime_Percent",
 	},
 	LOAD_TIME = {
 		Tender_Percent = "TenderLoadTime_Percent",

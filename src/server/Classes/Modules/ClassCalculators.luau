@@ -66,16 +66,26 @@ function ClassCalculator.CalculateFPS(baseFPS: number, upgradeStage: number, per
 	return fpsNow, fpsNext
 end
 
-function ClassCalculator.CalculateTravelTime(baseValue: number, stage: number)
-	local travelTime = math.max(1, (baseValue - stage) + 1)
-	local nextLvlTravelTime = math.max(1, (baseValue - stage))
+function ClassCalculator.CalculateTravelTime(baseValue: number, percentBuffValue: number?)
+	local travelTime = math.max(1, baseValue)
 
-	if stage == 1 then
-		travelTime = 10
-		nextLvlTravelTime = 9
+	if percentBuffValue then
+		local buffedValue = percentBuffValue * travelTime
+		travelTime -= buffedValue
 	end
 
-	return travelTime, nextLvlTravelTime
+	return travelTime
+end
+
+function ClassCalculator.CalculateLoadTime(baseValue: number, percentBuffValue: number?)
+	local loadTime = baseValue
+
+	if percentBuffValue then
+		local buffedValue = percentBuffValue * loadTime
+		loadTime -= buffedValue
+	end
+
+	return loadTime
 end
 
 return ClassCalculator
