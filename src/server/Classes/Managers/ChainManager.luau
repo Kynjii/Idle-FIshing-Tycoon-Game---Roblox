@@ -20,7 +20,7 @@ type ChainManager = ChainManagerType.ChainManagerInstance
 local ChainManager = {} :: ChainManager
 ChainManager.__index = ChainManager
 
-function ChainManager.New(realmData, tier: number, player: Player, teamId: number)
+function ChainManager.New(realmData, tier: number, player: Player, teamId: number, buildingClasses: { [number]: { [string]: any } })
 	local self: ChainManager = setmetatable({}, ChainManager)
 
 	local boatsArr = realmData.Boats
@@ -30,6 +30,7 @@ function ChainManager.New(realmData, tier: number, player: Player, teamId: numbe
 	self.Player = player
 	self.Tier = tier
 	self.TeamId = teamId
+	self.Buildings = buildingClasses
 
 	-- Create Boat
 	self.BoatModel = self:FindBoatModel() :: Model
@@ -129,6 +130,12 @@ function ChainManager:AttachAttListeners()
 			return
 		end
 	end)
+
+	for _, building in ipairs(self.Buildings) do
+		building.BuildingPurchased:Connect(function()
+			print("Building purchased", building)
+		end)
+	end
 end
 
 -- //SECTION - Tender Travelling Cycle Functions used by the AttListeners

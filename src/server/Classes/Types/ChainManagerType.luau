@@ -16,6 +16,9 @@ export type ChainManagerInstance = {
 	Player: Player,
 	TeamId: number,
 
+	-- Derived Props
+	Buildings: { [number]: { [string]: any } },
+
 	-- Main Actions
 	FindBoatModel: (self: ChainManagerInstance, player: Player, tier: number) -> Model | nil,
 	FindTenderModel: (self: ChainManagerInstance, player: Player, tier: number) -> Model | nil,
@@ -37,7 +40,7 @@ export type ChainManagerInstance = {
 }
 
 export type ChainManager = {
-	New: (realmData: { [string]: any }, tier: number, player: Player, teamId: number) -> ChainManagerInstance,
+	New: (realmData: { [string]: any }, tier: number, player: Player, teamId: number, buildingClasses: { [number]: { [string]: any } }) -> ChainManagerInstance,
 }
 
 return ChainManagerType

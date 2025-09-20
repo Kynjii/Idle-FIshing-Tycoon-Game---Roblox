@@ -1,6 +1,7 @@
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
+local Signal = require(ReplicatedStorage.Packages.Signal)
 local ClassCalculators = require(ServerScriptService.Server.Classes.Modules.ClassCalculators)
 local ClassVisualizer = require(ServerScriptService.Server.Classes.Modules.ClassVisualizer)
 local Buffs = require(ServerScriptService.Server.Math.Buffs)
@@ -144,6 +145,9 @@ function Building.New(state, player: Player, model: Model, realmBuffs: { [string
 	self.BuildingBuff = realmBuffs[BUILDING_BUFFS[self.BuildingName]] or Buffs.Formulas[BUILDING_BUFFS[self.BuildingName]] :: Buffs.BuffState
 	self.BuildingBuff.CurrentValue = Buffs.CalculateBuffValue(self.UpgradeStage, self.BuildingBuff)
 
+	self.BuildingUpgraded = Signal.new()
+	self.BuildingPurchased = Signal.new()
+
 	self._cleaner = CleanerService.new()
 
 	self:UpdateVisualModel()
@@ -156,6 +160,7 @@ end
 function Building:Purchase()
 	self.isPurchased = true
 
+	self.BuildingPurchased:Fire(self)
 	self:UpdateVisualModel()
 	self:Save()
 end

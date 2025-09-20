@@ -80,9 +80,9 @@ function TeamManager.AssignChainManagers(profile, player: Player, teamId: number
 	local realmData = profile.Realms[currentRealmId]
 
 	if not realmData then return end
-
+	local buildingClasses = TeamManager.BuildingsManager[player.UserId] and TeamManager.BuildingsManager[player.UserId].Buildings or {}
 	for lane = 1, realmData.Lanes do
-		local ChainManager: ChainManager = ChainManager.New(realmData, lane, player, teamId)
+		local ChainManager: ChainManager = ChainManager.New(realmData, lane, player, teamId, buildingClasses)
 		if not ChainManager then break end
 
 		table.insert(TeamManager.ChainManagers[player.UserId], ChainManager)
@@ -100,7 +100,7 @@ function TeamManager.AssignBuildingsManager(profile, player: Player, teamId: num
 	local BuildingsManager: BuildingsManager = BuildingsManager.New(realmData, player, teamId)
 	if not BuildingsManager then return end
 
-	table.insert(TeamManager.BuildingsManager[player.UserId], BuildingsManager)
+	TeamManager.BuildingsManager[player.UserId] = BuildingsManager
 	BuildingsManager:Initialize()
 end
 
