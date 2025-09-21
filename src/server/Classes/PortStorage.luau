@@ -68,12 +68,12 @@ function PortStorage.New(state, player: Player, model: Model): Storage
 	self.Tier = self.Model:GetAttribute(FFGEnum.ATTRIBUTES.Tier) or DEFAULTS.Tier
 	self.Player = player
 
+	self.Buffs = self:GetBuffs()
 	self.BaseCost = self:CalculateBaseCost()
 	self.UpgradeCost = self:CalculateUpgradeCost()
 	self.BaseStorage = self:CalculateBaseStorage()
 	self.CurrentMaxStorage, self.NextLvlMaxStorage = self:CalculateMaxStorage()
 
-	self.Buffs = self:GetBuffs()
 	self.TakeFishPrompt = nil
 
 	self.VisualModels = self:GetVisualModels()
@@ -92,11 +92,11 @@ end
 -- //!SECTION
 
 -- //SECTION - Buffs
-function Tender:GetBuffs()
+function PortStorage:GetBuffs()
 	return Buffs.GetBuffs(self.Player, PORTSTORAGE_BUFFS)
 end
 
-function Tender:UpdateBuffs()
+function PortStorage:UpdateBuffs()
 	self.Buffs = self:GetBuffs()
 end
 

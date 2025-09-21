@@ -385,9 +385,7 @@ function Tender:SetupPurchaseBoard()
 	pbDetails.CurrentTravelTimeLabel = DeepWait(purchaseBoard, "SurfaceGui", "Main", "DetailsContainer", "StatsContainer", "CurrentTravelTime", "TextLabel") :: TextLabel
 
 	if pbDetails then
-		local upgradeStage = self.UpgradeStage
-		local level = self.Level
-		local qualityInfo = FFGEnum.QUALITY[upgradeStage]
+		local qualityInfo = FFGEnum.QUALITY[self.UpgradeStage]
 		local color = qualityInfo.Color
 		pbDetails.NameLabel.TextColor3 = color
 
@@ -398,15 +396,14 @@ function Tender:SetupPurchaseBoard()
 			pbDetails.NameLabel.Parent.Visible = true
 		end
 
-		pbDetails.LevelLabel.Text = self.isPurchased and "Lvl: " .. level or "Purchase Tender"
+		pbDetails.LevelLabel.Text = self.isPurchased and "Lvl: " .. self.Level or "Purchase Tender"
 
 		-- STORAGE Stats
-		local currentStorage, nextStorage = self:CalculateMaxStorage()
-		pbDetails.CurrentMaxStorageLabel.Text = self.isPurchased and "Storage: " .. FormatNumber(currentStorage) or ""
-		pbDetails.NextMaxStorageLabel.Text = self.isPurchased and "Next Lvl Storage: " .. FormatNumber(nextStorage) or ""
+		pbDetails.CurrentMaxStorageLabel.Text = self.isPurchased and "Storage: " .. FormatNumber(self.CurrentMaxStorage) or ""
+		pbDetails.NextMaxStorageLabel.Text = self.isPurchased and "Next Lvl Storage: " .. FormatNumber(self.NextLvlMaxStorage) or ""
 
 		-- TRAVEL TIME Stats
-		pbDetails.CurrentTravelTimeLabel.Text = self.isPurchased and "Travel Time: " .. self.CurrentTravelTime or ""
+		pbDetails.CurrentTravelTimeLabel.Text = self.isPurchased and "Travel Time: " .. self.CurrentTravelTime .. "secs" or ""
 	end
 
 	return purchaseBoard
@@ -426,6 +423,7 @@ function Tender:UpdatePurchaseBoardUI()
 
 	pbDetails.CurrentMaxStorageLabel.Text = isPurchased and "Storage: " .. FormatNumber(self.CurrentMaxStorage) or ""
 	pbDetails.NextMaxStorageLabel.Text = isPurchased and "Next Lvl Storage: " .. FormatNumber(self.NextLvlMaxStorage) or ""
+	pbDetails.CurrentTravelTimeLabel.Text = self.isPurchased and "Travel Time: " .. self.CurrentTravelTime .. "secs" or ""
 
 	pbDetails.LevelLabel.Text = "Lvl: " .. self.Level
 

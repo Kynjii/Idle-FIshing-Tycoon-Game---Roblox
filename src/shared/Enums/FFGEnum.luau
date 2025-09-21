@@ -90,7 +90,7 @@ FFGEnum.CLASS = {
 }
 
 FFGEnum.CURRENCY_TYPES = {
-	["Gold"] = "Gold",
+	Gold = "Gold",
 }
 
 FFGEnum.BUFFS = {

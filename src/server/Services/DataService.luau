@@ -15,15 +15,22 @@ function DataService.AttachReplica(player: Player, profile)
 	FFGHelpers.PrintLog("Attaching Replica for: ", player)
 
 	local currencies = {}
+	local buffs = {}
 
 	for currencyType, amount in pairs(profile.Data.Currencies) do
 		currencies[currencyType] = amount or PlayerDataTemplate.Currencies[currencyType]
+	end
+
+	local currentRealm = profile.Data.CurrentRealm or 1
+	for k, buff in pairs(profile.Data.Realms[currentRealm].Buffs) do
+		buffs[k] = buff
 	end
 
 	local replica = Replica.New({
 		Token = PlayerStateToken,
 		Data = {
 			Currencies = currencies,
+			RealmBuffs = buffs,
 		},
 	})
 	FFGHelpers.PrintLog("New Replica is: ", replica)
@@ -295,6 +302,9 @@ function DataService.SaveBuffState(player: Player, newState: { [string]: number 
 	if not profile.Data.Realms[currentRealm].Buffs then profile.Data.Realms[currentRealm].Buffs = {} end
 
 	profile.Data.Realms[currentRealm].Buffs[newState.Name] = newState
+
+	local replica = DataService.Replicas[player]
+	if replica then replica:Set({ "RealmBuffs", newState.Name }, newState) end
 
 	FFGHelpers.PrintLog("Saved buff state for player", player.Name, profile.Data.Realms[currentRealm].Buffs)
 	return true

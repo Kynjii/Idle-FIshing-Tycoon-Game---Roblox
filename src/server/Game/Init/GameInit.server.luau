@@ -39,11 +39,13 @@ local function PlayerAdded(player: Player)
 		if player.Parent == Players then
 			DataService.Profiles[player] = profile
 			Initialize(player, profile)
+
 			local teamId = TeamManager.AssignTeam(player)
 			if not teamId then
 				player:Kick("Server is full, try again")
 				return
 			end
+
 			TeamManager.AssignBuildingsManager(profile.Data, player, teamId)
 			TeamManager.AssignChainManagers(profile.Data, player, teamId)
 		else

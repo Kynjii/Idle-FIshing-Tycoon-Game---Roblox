@@ -50,6 +50,10 @@ Buffs.Formulas = {
 	UpgradeCost_Percent = { Name = "UpgradeCost_Percent", BaseValue = 0.04, Type = "Loop", Scope = "Global" },
 }
 
+function Buffs.GeneratePlayerDataTemplate()
+	return Buffs.Formulas
+end
+
 function Buffs.CalculateBuffValue(stage: number, buffState: BuffState): number
 	local growthRate = GROWTH_RATES[buffState.Type][stage]
 	local value = buffState.BaseValue * growthRate
