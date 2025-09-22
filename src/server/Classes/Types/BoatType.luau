@@ -3,6 +3,7 @@ local Buffs = require(ServerScriptService.Server.Math.Buffs)
 local BoatType = {}
 
 export type BoatProps = {
+	Entity: string,
 	Id: string,
 	Owner: number,
 	RealmId: number,
@@ -49,6 +50,7 @@ export type BoatInstance = {
 	NextFPS: number,
 	GrowthRate: number,
 	CostGrowthRate: number,
+	Entity: string,
 
 	-- (Not-Saved to DataStore) Props
 	Model: Model,
@@ -59,6 +61,8 @@ export type BoatInstance = {
 	VisualModels: { [string]: Model },
 	CurrentVisualModel: Model | nil,
 	Buffs: { [string]: Buffs.BuffState },
+	PurchaseBoard: Model,
+	PBDetails: { [string]: TextLabel | Frame },
 
 	-- Core Boat Actions
 	Purchase: (self: BoatInstance) -> (),
@@ -82,7 +86,7 @@ export type BoatInstance = {
 
 	-- UI Setup
 	Initialize: (self: BoatInstance) -> (),
-	SetupPurchaseBoard: (self: BoatInstance) -> Part,
+	SetupPurchaseBoard: (self: BoatInstance) -> Model,
 	UpdatePurchaseBoardUI: (self: BoatInstance) -> (),
 	SetupProximityPrompt: (self: BoatInstance, purchaseBoard: Part) -> ProximityPrompt,
 	UpdateProximityPromptUI: (self: BoatInstance, proximityPrompt: ProximityPrompt) -> (),

@@ -3,6 +3,7 @@ local Buffs = require(ServerScriptService.Server.Math.Buffs)
 local TenderType = {}
 
 export type TenderProps = {
+	Entity: string,
 	Id: string,
 	Owner: number,
 	RealmId: number,
@@ -49,6 +50,7 @@ export type TenderInstance = {
 	NextLvlTravelTime: number,
 	GrowthRate: number,
 	CostGrowthRate: number,
+	Entity: string,
 
 	-- (Not-Saved to DataStore) Props
 	Model: Model,
@@ -63,6 +65,7 @@ export type TenderInstance = {
 	CurrentVisualModel: Model | nil,
 	Buffs: { [string]: Buffs.BuffState },
 	LoadTime: number?,
+	PBDetails: { [string]: TextLabel | Frame },
 
 	-- Core Tender Actions
 	Purchase: (self: TenderInstance) -> (),
@@ -94,7 +97,7 @@ export type TenderInstance = {
 
 	-- Setup
 	Initialize: (self: TenderInstance) -> (),
-	SetupPurchaseBoard: (self: TenderInstance) -> Part,
+	SetupPurchaseBoard: (self: TenderInstance) -> Model,
 	UpdatePurchaseBoardUI: (self: TenderInstance) -> (),
 	SetupProximityPrompt: (self: TenderInstance, purchaseBoard: Part) -> ProximityPrompt,
 	UpdateProximityPromptUI: (self: TenderInstance, proximityPrompt: ProximityPrompt) -> (),

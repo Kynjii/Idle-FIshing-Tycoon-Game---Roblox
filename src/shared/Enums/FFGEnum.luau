@@ -87,6 +87,11 @@ FFGEnum.CLASS = {
 		BuildingId = "BuildingId",
 		BuildingName = "BuildingName",
 	},
+	ENTITY_NAME = {
+		Boat = "Boat",
+		Tender = "Tender",
+		PortStorage = "PortStorage",
+	},
 }
 
 FFGEnum.CURRENCY_TYPES = {

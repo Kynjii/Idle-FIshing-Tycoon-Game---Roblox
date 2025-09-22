@@ -3,12 +3,12 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ClassCalculators = require(ServerScriptService.Server.Classes.Modules.ClassCalculators)
 local ClassVisualizer = require(ServerScriptService.Server.Classes.Modules.ClassVisualizer)
+local PurchaseBoard = require(ServerScriptService.Server.Classes.Modules.PurchaseBoard)
 local PortStorageType = require(ServerScriptService.Server.Classes.Types.PortStorageType)
 local Buffs = require(ServerScriptService.Server.Math.Buffs)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local Formulas = require(ServerScriptService.Server.Math.Formulas)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
-local CalculateProgress = require(ReplicatedStorage.Shared.Utils.CalculateProgress)
 local DeepWait = require(ReplicatedStorage.Shared.Utils.DeepWait)
 local FormatNumber = require(ReplicatedStorage.Shared.Utils.FormatNumber)
 local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
@@ -23,7 +23,22 @@ type StorageInstance = PortStorageType.StorageInstance
 -- //!SECTION
 
 -- //SECTION - Data
+local NAME = {
+	[1] = "Driftwood Crates",
+	[2] = "Fisher’s Shack",
+	[3] = "Salted Net Loft",
+	[4] = "Harbor Shed",
+	[5] = "Guild Granary",
+	[6] = "Stone Wharfhouse",
+	[7] = "Ironclad Warehouse",
+	[8] = "Lord’s Storehall",
+	[9] = "Grand Harbor Vault",
+	[10] = "Dragonbone Strongroom",
+	[11] = "The Crown’s Keep",
+}
+
 local DEFAULTS: StorageProps = {
+	Entity = FFGEnum.CLASS.ENTITY_NAME.PortStorage,
 	RealmId = 1,
 	Tier = 1,
 	Level = 1,
@@ -62,8 +77,10 @@ function PortStorage.New(state, player: Player, model: Model): Storage
 
 	-- Calculate derived properties
 	self.Id = self.Id or HttpService:GenerateGUID(false)
+	self.Entity = self.Entity or DEFAULTS.Entity
 	self.Owner = self.Owner or player.UserId
 	self.Model = model
+	self.Name = self:GetName()
 	self.VisualRoot = DeepWait(model, "Storage", "VisualRoot")
 	self.Tier = self.Model:GetAttribute(FFGEnum.ATTRIBUTES.Tier) or DEFAULTS.Tier
 	self.Player = player
@@ -78,6 +95,8 @@ function PortStorage.New(state, player: Player, model: Model): Storage
 
 	self.VisualModels = self:GetVisualModels()
 	self.CurrentVisualModel = nil
+
+	self.PurchaseBoard, self.PBDetails = self:SetupPurchaseBoard()
 
 	-- Tweens
 	self.ProgressTween = nil
@@ -141,6 +160,7 @@ end
 
 function PortStorage:IncreaseUpgradeStage(stage)
 	self.UpgradeStage = stage
+	self.Name = self:GetName()
 end
 
 function PortStorage:AddFish(amount: number)
@@ -232,57 +252,12 @@ end
 
 function PortStorage:SetupPurchaseBoard()
 	local purchaseBoard = self.Model:WaitForChild("Purchase_Board")
-	local pbDetails = {}
-	pbDetails.NameLabel = DeepWait(purchaseBoard, "SurfaceGui", "Main", "Header", "Name", "TextLabel") :: TextLabel
-	pbDetails.LevelLabel = DeepWait(purchaseBoard, "SurfaceGui", "Main", "Header", "Level", "TextLabel") :: TextLabel
-	pbDetails.CurrentMaxStorageLabel = DeepWait(purchaseBoard, "SurfaceGui", "Main", "DetailsContainer", "StatsContainer", "CurrentMaxStorage", "TextLabel") :: TextLabel
-	pbDetails.NextMaxStorageLabel = DeepWait(purchaseBoard, "SurfaceGui", "Main", "DetailsContainer", "StatsContainer", "NextMaxStorage", "TextLabel") :: TextLabel
-	pbDetails.StorageProgress = DeepWait(purchaseBoard, "SurfaceGui", "Main", "DetailsContainer", "StorageBar", "StorageProgress") :: Frame
 
-	if pbDetails then
-		local qualityInfo = FFGEnum.QUALITY[self.UpgradeStage]
-		local color = qualityInfo.Color
-		pbDetails.NameLabel.TextColor3 = color
-
-		local level = self.Level
-
-		pbDetails.LevelLabel.Text = self.isPurchased and "Lvl: " .. level or "Purchase Storage"
-
-		-- STORAGE Stats
-		local currentStorage, nextStorage = self:CalculateMaxStorage()
-		pbDetails.CurrentMaxStorageLabel.Text = self.isPurchased and "Storage: " .. FormatNumber(currentStorage) or ""
-		pbDetails.NextMaxStorageLabel.Text = self.isPurchased and "Next Lvl Storage: " .. FormatNumber(nextStorage) or ""
-
-		-- Storage Progress Bar
-		local storageProgress = CalculateProgress(self.FishInStorage, self.CurrentMaxStorage)
-		pbDetails.StorageProgress.Size = UDim2.fromScale(1, storageProgress)
-	end
-
-	return purchaseBoard
+	return PurchaseBoard.CreatePB(purchaseBoard, self)
 end
 
 function PortStorage:UpdatePurchaseBoardUI()
-	local isPurchased = self.isPurchased
-	local purchaseBoard = self.Model:WaitForChild("Purchase_Board")
-
-	local pbDetails = {}
-	pbDetails.NameLabel = DeepWait(purchaseBoard, "SurfaceGui", "Main", "Header", "Name", "TextLabel") :: TextLabel
-	pbDetails.LevelLabel = DeepWait(purchaseBoard, "SurfaceGui", "Main", "Header", "Level", "TextLabel") :: TextLabel
-	pbDetails.CurrentMaxStorageLabel = DeepWait(purchaseBoard, "SurfaceGui", "Main", "DetailsContainer", "StatsContainer", "CurrentMaxStorage", "TextLabel") :: TextLabel
-	pbDetails.NextMaxStorageLabel = DeepWait(purchaseBoard, "SurfaceGui", "Main", "DetailsContainer", "StatsContainer", "NextMaxStorage", "TextLabel") :: TextLabel
-	pbDetails.StorageProgress = DeepWait(purchaseBoard, "SurfaceGui", "Main", "DetailsContainer", "StorageBar", "StorageProgress") :: Frame
-
-	pbDetails.CurrentMaxStorageLabel.Text = isPurchased and "Storage: " .. FormatNumber(self.CurrentMaxStorage) or ""
-	pbDetails.NextMaxStorageLabel.Text = isPurchased and "Next Lvl Storage: " .. FormatNumber(self.NextLvlMaxStorage) or ""
-
-	local storageProgress = CalculateProgress(self.FishInStorage, self.CurrentMaxStorage)
-	pbDetails.StorageProgress.Size = UDim2.fromScale(1, storageProgress)
-
-	pbDetails.LevelLabel.Text = "Lvl: " .. self.Level
-
-	local qualityInfo = FFGEnum.QUALITY[self.UpgradeStage]
-	local color = qualityInfo.Color
-	pbDetails.NameLabel.TextColor3 = color
+	PurchaseBoard.UpdatePB(self)
 end
 
 function PortStorage:SetupProximityPrompt(purchaseBoard: Part)
@@ -410,6 +385,10 @@ end
 -- //!SECTION
 
 -- //SECTION -  Boat Utilities
+function PortStorage:GetName()
+	return NAME[self.UpgradeStage]
+end
+
 function PortStorage:CanUpgrade()
 	return self.Level < self.MaxLevel
 end
@@ -428,6 +407,7 @@ end
 -- //SECTION - Loading and Saving
 function PortStorage:Serialize()
 	return {
+		Entity = self.Entity,
 		Id = self.Id,
 		Owner = self.Owner,
 		RealmId = self.RealmId,

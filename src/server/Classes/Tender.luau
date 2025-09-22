@@ -11,6 +11,7 @@ local TweenService = game:GetService("TweenService")
 local Animator = require(ServerScriptService.Server.Classes.Modules.Animator)
 local ClassCalculators = require(ServerScriptService.Server.Classes.Modules.ClassCalculators)
 local ClassVisualizer = require(ServerScriptService.Server.Classes.Modules.ClassVisualizer)
+local PurchaseBoard = require(ServerScriptService.Server.Classes.Modules.PurchaseBoard)
 local TenderType = require(ServerScriptService.Server.Classes.Types.TenderType)
 local Buffs = require(ServerScriptService.Server.Math.Buffs)
 local ProgressBar = require(ServerScriptService.Server.Modules.Tweens.ProgressBar)
@@ -41,6 +42,7 @@ local NAME = {
 }
 
 local DEFAULTS: TenderProps = {
+	Entity = FFGEnum.CLASS.ENTITY_NAME.Tender,
 	RealmId = 1,
 	Tier = 1,
 	Name = "Unnamed Tender",
@@ -90,6 +92,7 @@ function Tender.New(state, player, model)
 	self.Id = self.Id or HttpService:GenerateGUID(false)
 	self.Owner = self.Owner or player.UserId
 	self.Model = model
+	self.Entity = self.Entity or DEFAULTS.Entity
 	self.VisualRoot = DeepWait(model, "Tender", "VisualRoot")
 	self.PortPos = model.PrimaryPart.CFrame
 	self.Name = self:GetName()
@@ -120,6 +123,8 @@ function Tender.New(state, player, model)
 	-- Progress Bars
 	self.BillBoard = DeepWait(self.Model, "Tender", "Base", "Billboard", "BillboardGui")
 	self.ProgressBar = DeepWait(self.BillBoard, "ProgressBarBG", "ProgressBar")
+
+	self.PurchaseBoard, self.PBDetails = self:SetupPurchaseBoard()
 
 	-- Tweens
 	self.ProgressTween = nil
@@ -377,62 +382,12 @@ end
 
 function Tender:SetupPurchaseBoard()
 	local purchaseBoard = self.Model:WaitForChild("Purchase_Board")
-	local pbDetails = {}
-	pbDetails.NameLabel = DeepWait(purchaseBoard, "SurfaceGui", "Main", "Header", "Name", "TextLabel") :: TextLabel
-	pbDetails.LevelLabel = DeepWait(purchaseBoard, "SurfaceGui", "Main", "Header", "Level", "TextLabel") :: TextLabel
-	pbDetails.CurrentMaxStorageLabel = DeepWait(purchaseBoard, "SurfaceGui", "Main", "DetailsContainer", "StatsContainer", "CurrentMaxStorage", "TextLabel") :: TextLabel
-	pbDetails.NextMaxStorageLabel = DeepWait(purchaseBoard, "SurfaceGui", "Main", "DetailsContainer", "StatsContainer", "NextMaxStorage", "TextLabel") :: TextLabel
-	pbDetails.CurrentTravelTimeLabel = DeepWait(purchaseBoard, "SurfaceGui", "Main", "DetailsContainer", "StatsContainer", "CurrentTravelTime", "TextLabel") :: TextLabel
 
-	if pbDetails then
-		local qualityInfo = FFGEnum.QUALITY[self.UpgradeStage]
-		local color = qualityInfo.Color
-		pbDetails.NameLabel.TextColor3 = color
-
-		if not self.isPurchased then
-			pbDetails.NameLabel.Parent.Visible = false
-		else
-			pbDetails.NameLabel.Text = self:GetName()
-			pbDetails.NameLabel.Parent.Visible = true
-		end
-
-		pbDetails.LevelLabel.Text = self.isPurchased and "Lvl: " .. self.Level or "Purchase Tender"
-
-		-- STORAGE Stats
-		pbDetails.CurrentMaxStorageLabel.Text = self.isPurchased and "Storage: " .. FormatNumber(self.CurrentMaxStorage) or ""
-		pbDetails.NextMaxStorageLabel.Text = self.isPurchased and "Next Lvl Storage: " .. FormatNumber(self.NextLvlMaxStorage) or ""
-
-		-- TRAVEL TIME Stats
-		pbDetails.CurrentTravelTimeLabel.Text = self.isPurchased and "Travel Time: " .. self.CurrentTravelTime .. "secs" or ""
-	end
-
-	return purchaseBoard
+	return PurchaseBoard.CreatePB(purchaseBoard, self)
 end
 
 function Tender:UpdatePurchaseBoardUI()
-	local isPurchased = self.isPurchased
-	local purchaseBoard = self.Model:WaitForChild("Purchase_Board")
-
-	local pbDetails = {}
-	pbDetails.NameLabel = DeepWait(purchaseBoard, "SurfaceGui", "Main", "Header", "Name", "TextLabel") :: TextLabel
-	pbDetails.LevelLabel = DeepWait(purchaseBoard, "SurfaceGui", "Main", "Header", "Level", "TextLabel") :: TextLabel
-	pbDetails.CurrentMaxStorageLabel = DeepWait(purchaseBoard, "SurfaceGui", "Main", "DetailsContainer", "StatsContainer", "CurrentMaxStorage", "TextLabel") :: TextLabel
-	pbDetails.NextMaxStorageLabel = DeepWait(purchaseBoard, "SurfaceGui", "Main", "DetailsContainer", "StatsContainer", "NextMaxStorage", "TextLabel") :: TextLabel
-	pbDetails.CurrentTravelTimeLabel = DeepWait(purchaseBoard, "SurfaceGui", "Main", "DetailsContainer", "StatsContainer", "CurrentTravelTime", "TextLabel") :: TextLabel
-	pbDetails.NextTravelTimeLabel = DeepWait(purchaseBoard, "SurfaceGui", "Main", "DetailsContainer", "StatsContainer", "NextTravelTime", "TextLabel") :: TextLabel
-
-	pbDetails.CurrentMaxStorageLabel.Text = isPurchased and "Storage: " .. FormatNumber(self.CurrentMaxStorage) or ""
-	pbDetails.NextMaxStorageLabel.Text = isPurchased and "Next Lvl Storage: " .. FormatNumber(self.NextLvlMaxStorage) or ""
-	pbDetails.CurrentTravelTimeLabel.Text = self.isPurchased and "Travel Time: " .. self.CurrentTravelTime .. "secs" or ""
-
-	pbDetails.LevelLabel.Text = "Lvl: " .. self.Level
-
-	local qualityInfo = FFGEnum.QUALITY[self.UpgradeStage]
-	local color = qualityInfo.Color
-	pbDetails.NameLabel.TextColor3 = color
-	pbDetails.NameLabel.Text = self:GetName()
-
-	if self.isPurchased then pbDetails.NameLabel.Parent.Visible = true end
+	PurchaseBoard.UpdatePB(self)
 end
 
 function Tender:SetupProximityPrompt(purchaseBoard: Part)
@@ -553,6 +508,7 @@ end
 -- //SECTION - Loading and Saving
 function Tender:Serialize(): TenderProps
 	return {
+		Entity = self.Entity,
 		Id = self.Id,
 		Owner = self.Owner,
 		RealmId = self.RealmId,

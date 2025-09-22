@@ -3,6 +3,7 @@ local Buffs = require(ServerScriptService.Server.Math.Buffs)
 local PortStorageType = {}
 
 export type StorageProps = {
+	Entity: string,
 	Id: string,
 	Owner: number,
 	RealmId: number,
@@ -43,6 +44,7 @@ export type StorageInstance = {
 	StorageFull: boolean,
 	GrowthRate: number,
 	CostGrowthRate: number,
+	Entity: string,
 
 	-- (Not-Saved to DataStore) Props
 	Model: Model,
@@ -52,6 +54,7 @@ export type StorageInstance = {
 	CurrentVisualModel: Model | nil,
 	TakeFishPrompt: ProximityPrompt,
 	Buffs: { [string]: Buffs.BuffState },
+	PBDetails: { [string]: TextLabel | Frame },
 
 	-- Core Boat Actions
 	Purchase: (self: StorageInstance) -> (),
@@ -76,7 +79,7 @@ export type StorageInstance = {
 
 	-- UI Setup
 	Initialize: (self: StorageInstance) -> (),
-	SetupPurchaseBoard: (self: StorageInstance) -> Part,
+	SetupPurchaseBoard: (self: StorageInstance) -> Model,
 	UpdatePurchaseBoardUI: (self: StorageInstance) -> (),
 	SetupProximityPrompt: (self: StorageInstance, purchaseBoard: Part) -> ProximityPrompt,
 	UpdateProximityPromptUI: (self: StorageInstance, proximityPrompt: ProximityPrompt) -> (),
