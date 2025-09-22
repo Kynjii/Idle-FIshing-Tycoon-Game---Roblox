@@ -88,6 +88,8 @@ function PB.CreatePB(pbModel: Model, class: BoatType.BoatInstance | TenderType.T
 				else
 					pbDetails.BuffLabel.Text = "-" .. (class.BuildingBuff.CurrentValue * 100) .. "%" .. " " .. class.BuildingBuff.Label
 				end
+
+				pbDetails.BuffLabel.TextColor3 = Color3.fromHex("#55ff00")
 			end
 		end
 	end
@@ -111,10 +113,7 @@ function PB.UpdatePB(class: BoatType.BoatInstance | TenderType.TenderInstance | 
 	end
 
 	-- Tender
-	if class.Entity == FFGEnum.CLASS.ENTITY_NAME.Tender then
-		print(class)
-		class.PBDetails.CurrentTravelTimeLabel.Text = class.isPurchased and "Travel Time: " .. class.CurrentTravelTime .. "secs" or ""
-	end
+	if class.Entity == FFGEnum.CLASS.ENTITY_NAME.Tender then class.PBDetails.CurrentTravelTimeLabel.Text = class.isPurchased and "Travel Time: " .. class.CurrentTravelTime .. "secs" or "" end
 
 	-- Non-Building
 	if class.Entity ~= FFGEnum.CLASS.ENTITY_NAME.Building then
@@ -127,10 +126,12 @@ function PB.UpdatePB(class: BoatType.BoatInstance | TenderType.TenderInstance | 
 		if class.isPurchased and class.BuildingBuff then
 			local isPlus = class.BuildingBuff.IsPlus
 			if isPlus then
-				PBDetails.BuffLabel.Text = "+" .. (class.BuildingBuff.CurrentValue * 100) .. "%" .. " " .. class.BuildingBuff.Label
+				class.PBDetails.BuffLabel.Text = "+" .. (class.BuildingBuff.CurrentValue * 100) .. "%" .. " " .. class.BuildingBuff.Label
 			else
-				PBDetails.BuffLabel.Text = "-" .. (class.BuildingBuff.CurrentValue * 100) .. "%" .. " " .. class.BuildingBuff.Label
+				class.PBDetails.BuffLabel.Text = "-" .. (class.BuildingBuff.CurrentValue * 100) .. "%" .. " " .. class.BuildingBuff.Label
 			end
+
+			class.PBDetails.BuffLabel.TextColor3 = Color3.fromHex("#55ff00")
 		end
 	end
 
