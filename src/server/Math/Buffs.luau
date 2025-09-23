@@ -18,10 +18,26 @@ local GROWTH_RATES = {
 	Loop = { 1.20, 1.18, 1.15, 1.12, 1.10, 1.08, 1.06, 1.05, 1.04, 1.03, 1.02 },
 }
 
-function Buffs.CalculateBuffValue(stage: number, buffState: BuffState): number
+local LEVEL_GROWTH_RATES = {
+	Multiplier = 1.08,
+	Production = 1.12,
+	QoL = 1.06,
+	Loop = 1.10,
+}
+
+function Buffs.CalculateStageBuffValue(stage: number, buffState: BuffState): number
 	local growthRate = GROWTH_RATES[buffState.Type][stage]
-	local value = buffState.BaseValue * growthRate
-	return FormatNumber(value)
+	return buffState.BaseValue * growthRate
+end
+
+function Buffs.CalculateLevelBuffValue(stage: number, level: number, buffState: BuffState): number
+	local stageGrowthRate = GROWTH_RATES[buffState.Type][stage] or 1
+	local levelGrowthRate = LEVEL_GROWTH_RATES[buffState.Type] or 1.1
+
+	local stageValue = buffState.BaseValue * stageGrowthRate
+	local levelMultiplier = math.pow(levelGrowthRate, level - 1)
+
+	return stageValue * levelMultiplier
 end
 
 function Buffs.GetBuffs(player: Player, buffNames: { string })

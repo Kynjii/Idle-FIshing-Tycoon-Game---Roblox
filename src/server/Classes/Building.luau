@@ -173,7 +173,7 @@ function Building.New(state, player: Player, model: Model, realmBuffs: { [string
 	self.CurrentVisualModel = nil
 
 	self.BuildingBuff = realmBuffs[BUILDING_BUFFS[self.BuildingName]]
-	self.BuildingBuff.CurrentValue = self.isPurchased and Buffs.CalculateBuffValue(self.UpgradeStage, self.BuildingBuff) or nil
+	self.BuildingBuff.CurrentValue = self.isPurchased and Buffs.CalculateLevelBuffValue(self.UpgradeStage, self.Level, self.BuildingBuff) or nil
 
 	self.PurchaseBoard, self.PBDetails = self:SetupPurchaseBoard()
 
@@ -191,7 +191,7 @@ end
 -- //SECTION - Core Building Actions
 function Building:Purchase()
 	self.isPurchased = true
-	self.BuildingBuff.CurrentValue = Buffs.CalculateBuffValue(self.UpgradeStage, self.BuildingBuff)
+	self.BuildingBuff.CurrentValue = Buffs.CalculateLevelBuffValue(self.UpgradeStage, self.Level, self.BuildingBuff)
 
 	self:UpdateVisualModel()
 	self:Save()
@@ -207,10 +207,10 @@ function Building:Upgrade()
 		if self.Level == v then
 			self:IncreaseUpgradeStage(k)
 			self:UpdateVisualModel()
-			self:UpdateBuffValue()
 			break
 		end
 	end
+	self:UpdateBuffValue()
 
 	self:Save()
 
@@ -302,7 +302,7 @@ end
 
 -- //SECTION - Buffs
 function Building:UpdateBuffValue()
-	self.BuildingBuff.CurrentValue = Buffs.CalculateBuffValue(self.UpgradeStage, self.BuildingBuff)
+	self.BuildingBuff.CurrentValue = Buffs.CalculateLevelBuffValue(self.UpgradeStage, self.Level, self.BuildingBuff)
 end
 -- //!SECTION
 
