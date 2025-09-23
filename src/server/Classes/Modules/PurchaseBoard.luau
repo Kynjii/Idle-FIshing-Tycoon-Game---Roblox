@@ -86,9 +86,9 @@ function PB.CreatePB(pbModel: Model, class: BoatType.BoatInstance | TenderType.T
 			if class.isPurchased and class.BuildingBuff then
 				local isPlus = class.BuildingBuff.IsPlus
 				if isPlus then
-					pbDetails.BuffLabel.Text = "+" .. (class.BuildingBuff.CurrentValue * 100) .. "%" .. " " .. class.BuildingBuff.Label
+					pbDetails.BuffLabel.Text = "+" .. (FormatNumber(class.BuildingBuff.CurrentValue * 100)) .. "%" .. " " .. class.BuildingBuff.Label
 				else
-					pbDetails.BuffLabel.Text = "-" .. (class.BuildingBuff.CurrentValue * 100) .. "%" .. " " .. class.BuildingBuff.Label
+					pbDetails.BuffLabel.Text = "-" .. FormatNumber(class.BuildingBuff.CurrentValue * 100) .. "%" .. " " .. class.BuildingBuff.Label
 				end
 
 				pbDetails.BuffLabel.TextColor3 = Color3.fromHex("#55ff00")
@@ -132,9 +132,9 @@ function PB.UpdatePB(class: BoatType.BoatInstance | TenderType.TenderInstance | 
 		if class.isPurchased and class.BuildingBuff then
 			local isPlus = class.BuildingBuff.IsPlus
 			if isPlus then
-				class.PBDetails.BuffLabel.Text = "+" .. (class.BuildingBuff.CurrentValue * 100) .. "%" .. " " .. class.BuildingBuff.Label
+				class.PBDetails.BuffLabel.Text = "+" .. FormatNumber(class.BuildingBuff.CurrentValue * 100) .. "%" .. " " .. class.BuildingBuff.Label
 			else
-				class.PBDetails.BuffLabel.Text = "-" .. (class.BuildingBuff.CurrentValue * 100) .. "%" .. " " .. class.BuildingBuff.Label
+				class.PBDetails.BuffLabel.Text = "-" .. FormatNumber(class.BuildingBuff.CurrentValue * 100) .. "%" .. " " .. class.BuildingBuff.Label
 			end
 
 			class.PBDetails.BuffLabel.TextColor3 = Color3.fromHex("#55ff00")
