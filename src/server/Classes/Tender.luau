@@ -11,6 +11,7 @@ local Events = require(ReplicatedStorage.Shared.Events.Events)
 local Animator = require(ServerScriptService.Server.Classes.Modules.Animator)
 local ClassCalculators = require(ServerScriptService.Server.Classes.Modules.ClassCalculators)
 local ClassVisualizer = require(ServerScriptService.Server.Classes.Modules.ClassVisualizer)
+local ProximityPrompt = require(ServerScriptService.Server.Classes.Modules.ProximityPrompt)
 local PurchaseBoard = require(ServerScriptService.Server.Classes.Modules.PurchaseBoard)
 local TenderType = require(ServerScriptService.Server.Classes.Types.TenderType)
 local Buffs = require(ServerScriptService.Server.Math.Buffs)
@@ -394,62 +395,13 @@ function Tender:UpdatePurchaseBoardUI()
 end
 
 function Tender:SetupProximityPrompt(purchaseBoard: Part)
-	-- Create the proximity prompt
 	local proximityPrompt = self._cleaner:add(Instance.new("ProximityPrompt", purchaseBoard))
 
-	-- Check if tender is at max level
-	if self.Level == self.MaxLevel then
-		proximityPrompt.ObjectText = "Cannot Upgrade"
-		proximityPrompt.ActionText = "Max Level Reached"
-		return proximityPrompt
-	end
-
-	proximityPrompt.HoldDuration = 0.5
-	proximityPrompt.MaxActivationDistance = 5
-	proximityPrompt.ObjectText = self.isPurchased and "Upgrade Tender" or "Purchase"
-	proximityPrompt.ActionText = self.isPurchased and "Gold: " .. FormatNumber(self.UpgradeCost) or "Gold: " .. FormatNumber(self.BaseCost)
-
-	-- Handle proximity prompt triggered
-	self._cleaner:add(proximityPrompt.Triggered:Connect(function(player)
-		if player.UserId ~= self.Owner then return end
-
-		-- Check max level again
-		if self.Level == self.MaxLevel then return end
-
-		if not DataService.CanAfford(player, FFGEnum.CURRENCY_TYPES.Gold, not self.isPurchased and self.BaseCost or self.UpgradeCost) then
-			Events.FireEvent(Events.RemoteNames.WarningMsg, self.Player, "Not enough gold!")
-			return
-		end
-
-		-- Spend the currency
-		DataService.Spend(player, FFGEnum.CURRENCY_TYPES.Gold, not self.isPurchased and self.BaseCost or self.UpgradeCost)
-
-		if self.isPurchased then
-			-- Upgrade existing tender
-			self:Upgrade()
-		else
-			-- Purchase tender
-			self:Purchase()
-			self:Show()
-			self:CanCollide()
-		end
-
-		-- Update UIs
-		self:UpdateProximityPromptUI(proximityPrompt)
-		self:UpdatePurchaseBoardUI()
-	end))
-
-	return proximityPrompt
+	return ProximityPrompt.CreatePP(proximityPrompt, self)
 end
 
 function Tender:UpdateProximityPromptUI(proximityPrompt: ProximityPrompt)
-	if self.Level == self.MaxLevel then
-		proximityPrompt.ObjectText = "Cannot Upgrade"
-		proximityPrompt.ActionText = "Max Level Reached"
-	else
-		proximityPrompt.ObjectText = self.isPurchased and "Upgrade Tender" or "Purchase"
-		proximityPrompt.ActionText = self.isPurchased and "Gold: " .. FormatNumber(self.UpgradeCost) or "Gold: " .. FormatNumber(self.BaseCost)
-	end
+	ProximityPrompt.UpdatePP(proximityPrompt, self)
 end
 
 function Tender:ShowFishPopUp(amount)
