@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ClassCalculators = require(ServerScriptService.Server.Classes.Modules.ClassCalculators)
 local ClassVisualizer = require(ServerScriptService.Server.Classes.Modules.ClassVisualizer)
+local ProximityPrompt = require(ServerScriptService.Server.Classes.Modules.ProximityPrompt)
 local PurchaseBoard = require(ServerScriptService.Server.Classes.Modules.PurchaseBoard)
 local PortStorageType = require(ServerScriptService.Server.Classes.Types.PortStorageType)
 local Buffs = require(ServerScriptService.Server.Math.Buffs)
@@ -264,60 +265,13 @@ function PortStorage:UpdatePurchaseBoardUI()
 end
 
 function PortStorage:SetupProximityPrompt(purchaseBoard: Part)
-	-- Create the proximity prompt
 	local proximityPrompt = Instance.new("ProximityPrompt", purchaseBoard)
 
-	-- Check if storage is at max level
-	if self.Level == self.MaxLevel then
-		proximityPrompt.ObjectText = "Cannot Upgrade"
-		proximityPrompt.ActionText = "Max Level Reached"
-		return proximityPrompt
-	end
+	ProximityPrompt.CreatePP(proximityPrompt, self)
+end
 
-	proximityPrompt.HoldDuration = 0.5
-	proximityPrompt.MaxActivationDistance = 5
-	proximityPrompt.ObjectText = self.isPurchased and "Upgrade Storage" or "Purchase"
-	proximityPrompt.ActionText = self.isPurchased and "Gold: " .. FormatNumber(self.UpgradeCost) or "Gold: " .. FormatNumber(self.BaseCost)
-
-	-- Handle not showing the prompt if the user is not the owner
-	proximityPrompt.PromptShown:Connect(function(player: Player)
-		if player.UserId ~= self.Owner then return end
-	end)
-
-	-- Handle proximity prompt triggered
-	proximityPrompt.Triggered:Connect(function(player)
-		if player.UserId ~= self.Owner then return end
-
-		-- Check max level again
-		if self.Level == self.MaxLevel then return end
-
-		if not DataService.CanAfford(player, FFGEnum.CURRENCY_TYPES.Gold, not self.isPurchased and self.BaseCost or self.UpgradeCost) then
-			Events.FireEvent(Events.RemoteNames.WarningMsg, self.Player, "Not enough gold!")
-			self:UpdateProximityPromptUI(proximityPrompt)
-			return
-		end
-
-		-- Spend the currency
-		DataService.Spend(player, FFGEnum.CURRENCY_TYPES.Gold, not self.isPurchased and self.BaseCost or self.UpgradeCost)
-
-		if self.isPurchased then
-			-- Upgrade existing
-			self:Upgrade()
-		else
-			-- Purchase
-			self:Purchase()
-			self:Show()
-			self:CanCollide()
-		end
-
-		-- Update UIs
-		self:UpdateProximityPromptUI(proximityPrompt)
-		self:UpdatePurchaseBoardUI()
-
-		self:Save()
-	end)
-
-	return proximityPrompt
+function PortStorage:UpdateProximityPromptUI(proximityPrompt: ProximityPrompt)
+	ProximityPrompt.UpdatePP(proximityPrompt, self)
 end
 
 function PortStorage:SetupFishRemovalPrompt()
@@ -352,16 +306,6 @@ function PortStorage:SetupFishRemovalPrompt()
 		-- Save State
 		self:Save()
 	end)
-end
-
-function PortStorage:UpdateProximityPromptUI(proximityPrompt: ProximityPrompt)
-	if self.Level == self.MaxLevel then
-		proximityPrompt.ObjectText = "Cannot Upgrade"
-		proximityPrompt.ActionText = "Max Level Reached"
-	else
-		proximityPrompt.ObjectText = self.isPurchased and "Upgrade Boat" or "Purchase"
-		proximityPrompt.ActionText = self.isPurchased and "Gold: " .. FormatNumber(self.UpgradeCost) or "Gold: " .. FormatNumber(self.BaseCost)
-	end
 end
 -- //!SECTION
 

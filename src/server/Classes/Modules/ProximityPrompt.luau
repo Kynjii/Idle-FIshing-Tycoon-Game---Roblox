@@ -47,6 +47,8 @@ function PP.CreatePP(proximityPrompt: ProximityPrompt, class: BoatType.BoatInsta
 		-- Update UIs
 		class:UpdateProximityPromptUI(proximityPrompt)
 		class:UpdatePurchaseBoardUI()
+
+		class:Save()
 	end))
 
 	return proximityPrompt
