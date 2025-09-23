@@ -3,9 +3,9 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local FormatNumber = require(ReplicatedStorage.Shared.Utils.FormatNumber)
-local BoatType = require(ServerScriptService.Server.Classes.Types.BoatType)
-local PortStorageType = require(ServerScriptService.Server.Classes.Types.PortStorageType)
-local TenderType = require(ServerScriptService.Server.Classes.Types.TenderType)
+local BoatType = require(ServerScriptService.Server.Classes.Types.Classes.BoatType)
+local PortStorageType = require(ServerScriptService.Server.Classes.Types.Classes.PortStorageType)
+local TenderType = require(ServerScriptService.Server.Classes.Types.Classes.TenderType)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 
 local PP = {}

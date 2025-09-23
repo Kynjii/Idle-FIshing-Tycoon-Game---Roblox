@@ -1,6 +1,6 @@
-local BoatType = require(script.Parent.BoatType)
-local TenderType = require(script.Parent.TenderType)
-
+local ServerScriptService = game:GetService("ServerScriptService")
+local BoatType = require(ServerScriptService.Server.Classes.Types.Classes.BoatType)
+local TenderType = require(ServerScriptService.Server.Classes.Types.Classes.TenderType)
 local ChainManagerType = {}
 
 export type ChainManagerInstance = {

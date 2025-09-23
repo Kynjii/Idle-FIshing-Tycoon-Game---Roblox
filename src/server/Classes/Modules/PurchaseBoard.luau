@@ -1,12 +1,13 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
-local BoatType = require(ServerScriptService.Server.Classes.Types.BoatType)
-local PortStorageType = require(ServerScriptService.Server.Classes.Types.PortStorageType)
-local TenderType = require(ServerScriptService.Server.Classes.Types.TenderType)
+local BoatType = require(ServerScriptService.Server.Classes.Types.Classes.BoatType)
+local PortStorageType = require(ServerScriptService.Server.Classes.Types.Classes.PortStorageType)
+local TenderType = require(ServerScriptService.Server.Classes.Types.Classes.TenderType)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local CalculateProgress = require(ReplicatedStorage.Shared.Utils.CalculateProgress)
 local DeepWait = require(ReplicatedStorage.Shared.Utils.DeepWait)
 local FormatNumber = require(ReplicatedStorage.Shared.Utils.FormatNumber)
+
 local PB = {}
 
 function PB.CreatePB(pbModel: Model, class: BoatType.BoatInstance | TenderType.TenderInstance | PortStorageType.StorageInstance)
