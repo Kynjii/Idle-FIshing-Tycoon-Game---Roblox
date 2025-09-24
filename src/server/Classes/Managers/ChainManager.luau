@@ -250,6 +250,11 @@ function ChainManager:StartUnloadingFish()
 	local initialCargo = tender.FishInStorage or 0
 
 	while true do
+		if not storage.isPurchased then
+			task.wait(1)
+			continue
+		end
+
 		-- 0..1 progress based on time
 		local elapsed = os.clock() - startTime
 		local p = math.clamp(elapsed / unloadDuration, 0, 1)
