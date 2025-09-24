@@ -5,6 +5,11 @@ local DeepWait = require(ReplicatedStorage.Shared.Utils.DeepWait)
 
 local player = Players.LocalPlayer
 local entityDetailsUI: Frame = DeepWait(player.PlayerGui, "EntityDetails", "DetailsContainer")
+local upgradeButton: ImageButton = DeepWait(player.PlayerGui, "EntityDetails", "DetailsContainer", "UpgradeButton")
+
+-- Open/Close EntityDetails
+-- Default close
+entityDetailsUI.Visible = false
 
 local entityDetails = Events.GetRemote(Events.RemoteNames.OpenEntityDetails)
 if entityDetails then entityDetails.OnClientEvent:Connect(function(data)
@@ -28,4 +33,13 @@ function handleClosingEntityDetailsUI()
 
 		task.wait(0.5)
 	end
+end
+
+-- Upgrade Button
+if upgradeButton then upgradeButton.Activated:Connect(function()
+	handleUpgradeClick()
+end) end
+
+function handleUpgradeClick()
+	print("click")
 end
