@@ -6,6 +6,8 @@ local Events = {}
 Events.RemoteNames = {
 	WarningMsg = "WarningMsg",
 	OpenEntityDetails = "OpenEntityDetails",
+	EntityPurchased = "EntityPurchased",
+	EntityUpgraded = "EntityUpgraded",
 }
 
 local FOLDER_NAME = "Events"
@@ -44,7 +46,7 @@ function Events.FireEvent(name: string, player: Player, data: string)
 	local ev = folder and folder:FindFirstChild(name)
 	if ev and ev:IsA("RemoteEvent") then
 		local safeData = data
-		if type(data) == "table" then safeData = data:Serialize() end
+		if type(data) == "table" and data:Serialize() then safeData = data:Serialize() end
 		ev:FireClient(player, safeData)
 		return true
 	else

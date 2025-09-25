@@ -108,6 +108,9 @@ export type BoatInstance = {
 	IsStorageFull: (self: BoatInstance) -> boolean,
 	ShowUpgradeStageUpgrade: (self: BoatInstance) -> boolean,
 
+	-- Event Listener
+	AttachEventListeners: (self: BoatInstance) -> (),
+
 	-- Animations
 	StartAnimation: (self: BoatInstance) -> (),
 

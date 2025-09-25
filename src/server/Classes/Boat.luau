@@ -4,6 +4,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local Animator = require(ServerScriptService.Server.Classes.Modules.Animator)
 local ClassCalculators = require(ServerScriptService.Server.Classes.Modules.ClassCalculators)
 local ClassVisualizer = require(ServerScriptService.Server.Classes.Modules.ClassVisualizer)
+local EventListener = require(ServerScriptService.Server.Classes.Modules.EventListener)
 local ProximityPrompt = require(ServerScriptService.Server.Classes.Modules.ProximityPrompt)
 local PurchaseBoard = require(ServerScriptService.Server.Classes.Modules.PurchaseBoard)
 local BoatType = require(ReplicatedStorage.Shared.Types.Classes.BoatType)
@@ -12,6 +13,7 @@ local DataService = require(ServerScriptService.Server.Services.DataService)
 local Formulas = require(ServerScriptService.Server.Math.Formulas)
 local PopUp = require(ServerScriptService.Server.Modules.Tweens.PopUp)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
+local Events = require(ReplicatedStorage.Shared.Events.Events)
 local BuffType = require(ReplicatedStorage.Shared.Types.BuffType)
 local DeepWait = require(ReplicatedStorage.Shared.Utils.DeepWait)
 local SetInterval = require(ServerScriptService.Server.Modules.SetInterval)
@@ -111,6 +113,8 @@ function Boat.New(state, player: Player, model: Model): Boat
 	self.CurrentVisualModel = nil
 
 	self.PurchaseBoard, self.PBDetails = self:SetupPurchaseBoard()
+
+	self:AttachEventListeners()
 
 	self._cleaner = CleanerService.new()
 
@@ -442,6 +446,24 @@ function Boat:StartAnimation()
 
 	task.wait(math.random(0.5, 1.5))
 	animationTrack:Play()
+end
+-- //!SECTION
+
+-- //SECTION - Event Listeners
+function Boat:AttachEventListeners()
+	local purchasedEvent = Events.GetRemote(Events.RemoteNames.EntityPurchased)
+	if purchasedEvent then
+		purchasedEvent.OnServerEvent:Connect(function(player, data)
+			-- //TODO - add id and owner check before doing anything
+			-- //TODO - might be worth exploring adding addition checks to ensure they are not manipulating level amounts of if they can afford it or not
+			print("purchased data recieved from client", player, data)
+		end)
+	end
+
+	local upgradedEvent = Events.GetRemote(Events.RemoteNames.EntityUpgraded)
+	if upgradedEvent then upgradedEvent.OnServerEvent:Connect(function(player, data)
+		print("upgraded data recieved from client", player, data)
+	end) end
 end
 -- //!SECTION
 

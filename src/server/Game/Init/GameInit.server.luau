@@ -7,6 +7,7 @@ local PlayerDataTemplate = require(ServerScriptService.Server.Modules.PlayerData
 local ProfileStore = require(ServerScriptService.Server.Libs.ProfileStore)
 local TeamManager = require(ServerScriptService.Server.Classes.Managers.TeamManager)
 local Animator = require(ServerScriptService.Server.Classes.Modules.Animator)
+local EventListener = require(ServerScriptService.Server.Classes.Modules.EventListener)
 local MusicManager = require(ServerScriptService.Server.Music.MusicManager)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 
@@ -14,6 +15,9 @@ local DataService = require(ServerScriptService.Server.Services.DataService)
 
 -- Create Remotes
 Events.InitOnServer()
+
+-- Create Listeners
+EventListener.Init()
 
 -- Create Teams based on static data and kick someone if the team has more than one player
 TeamManager.CreateTeams()
