@@ -361,6 +361,7 @@ end
 function Boat:Serialize()
 	return {
 		Entity = self.Entity,
+		Description = self.Description,
 		Id = self.Id,
 		Owner = self.Owner,
 		RealmId = self.RealmId,

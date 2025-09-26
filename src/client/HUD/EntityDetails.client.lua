@@ -1,3 +1,4 @@
+local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterPlayer = game:GetService("StarterPlayer")
@@ -87,6 +88,8 @@ function handleClosingEntityDetailsUI()
 		local distance = player:DistanceFromCharacter(originalPosition)
 		if distance >= 8 then
 			entityDetailsUI.Visible = false
+			local blur: BlurEffect = Lighting.Blur
+			if blur then blur:Destroy() end
 			break
 		end
 
@@ -115,6 +118,8 @@ end
 -- Populate the Details Page
 function populateDetailsUI()
 	if not entityData then return end
+	local blur = Instance.new("BlurEffect")
+	blur.Parent = Lighting
 	local class: BoatType.BoatProps | TenderType.TenderProps | PortStorageType.StorageProps | BuildingType.BuildingProps = entityData
 
 	-- Hide all elements by default
@@ -134,7 +139,7 @@ function populateDetailsUI()
 	-- Level
 	details.LevelLabel.Text = class.isPurchased and "Lvl: " .. class.Level or ""
 	details.LevelLabel.Visible = true
-
+	print(class)
 	-- Description
 	details.Description.Text = class.Description or ""
 	details.Description.Visible = true
