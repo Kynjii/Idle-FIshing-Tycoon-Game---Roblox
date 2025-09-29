@@ -6,6 +6,7 @@ local Formulas = require(ServerScriptService.Server.Math.Formulas)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local DeepWait = require(ReplicatedStorage.Shared.Utils.DeepWait)
 local TweenService = game:GetService("TweenService")
+local Events = require(ReplicatedStorage.Shared.Events.Events)
 local BuffType = require(ReplicatedStorage.Shared.Types.BuffType)
 local Animator = require(ServerScriptService.Server.Classes.Modules.Animator)
 local ClassCalculators = require(ServerScriptService.Server.Classes.Modules.ClassCalculators)
@@ -132,6 +133,7 @@ function Tender.New(state, player, model)
 
 	self._cleaner = CleanerService.new()
 
+	self:AttachEventListeners()
 	self:UpdateVisualModel()
 	self:StartAnimation()
 
@@ -477,6 +479,7 @@ function Tender:Serialize(): TenderProps
 		FishInStorage = self.FishInStorage,
 		StorageFull = self.StorageFull,
 		CurrentTravelTime = self.CurrentTravelTime,
+		LoadTime = self.LoadTime,
 	}
 end
 
@@ -542,6 +545,51 @@ function Tender:StartAnimation()
 
 	task.wait(math.random(0.5, 1.5))
 	animationTrack:Play()
+end
+-- //!SECTION
+
+-- //SECTION - Event Listeners
+function Tender:AttachEventListeners()
+	-- Helper
+	local function handleStateUpdate(player)
+		if not DataService.CanAfford(player, FFGEnum.CURRENCY_TYPES.Gold, not self.isPurchased and self.BaseCost or self.UpgradeCost) then
+			Events.FireEvent(Events.RemoteNames.WarningMsg, self.Player, "Not enough gold!")
+			return
+		end
+
+		DataService.Spend(player, FFGEnum.CURRENCY_TYPES.Gold, not self.isPurchased and self.BaseCost or self.UpgradeCost)
+
+		if self.isPurchased then
+			self:Upgrade()
+		else
+			self:Purchase()
+			self:Show()
+			self:CanCollide()
+		end
+
+		-- Update UIs
+		self:UpdatePurchaseBoardUI()
+
+		self:Save()
+	end
+
+	-- Purchased Event
+	local purchasedEvent = Events.GetRemote(Events.RemoteNames.EntityPurchased)
+	if purchasedEvent then purchasedEvent.OnServerEvent:Connect(function(player, entityId)
+		if self.Player ~= player or self.Owner ~= player.UserId then return end
+		if self.Id ~= entityId then return end
+
+		handleStateUpdate(player)
+	end) end
+
+	-- Upgraded Event
+	local upgradedEvent = Events.GetRemote(Events.RemoteNames.EntityUpgraded)
+	if upgradedEvent then upgradedEvent.OnServerEvent:Connect(function(player, entityId)
+		if self.Player ~= player or self.Owner ~= player.UserId then return end
+		if self.Id ~= entityId then return end
+
+		handleStateUpdate(player)
+	end) end
 end
 -- //!SECTION
 

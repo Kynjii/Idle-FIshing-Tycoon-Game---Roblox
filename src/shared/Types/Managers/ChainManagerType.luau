@@ -11,7 +11,7 @@ export type ChainManagerInstance = {
 	LaneBoat: BoatType.BoatInstance,
 	TenderModel: Model,
 	LaneTender: TenderType.TenderInstance,
-	LaneStorageModel: Model,
+	StorageModel: Model,
 	LaneStorage: { [string]: any },
 	Player: Player,
 	TeamId: number,

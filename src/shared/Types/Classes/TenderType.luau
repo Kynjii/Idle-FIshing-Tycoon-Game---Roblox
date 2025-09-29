@@ -27,6 +27,7 @@ export type TenderProps = {
 	CostGrowthRate: number,
 	BaseLoadTime: number,
 	Description: string,
+	LoadTime: number,
 }
 
 export type TenderInstance = {
@@ -67,7 +68,6 @@ export type TenderInstance = {
 	VisualModels: { [string]: Model },
 	CurrentVisualModel: Model | nil,
 	Buffs: { BuffType.BuffState },
-	LoadTime: number?,
 	PurchaseBoard: Model,
 
 	-- Core Tender Actions
@@ -121,6 +121,9 @@ export type TenderInstance = {
 
 	-- Animation
 	StartAnimation: (self: TenderInstance) -> (),
+
+	-- Event Listener
+	AttachEventListeners: (self: TenderInstance) -> (),
 
 	-- Models
 	UpdateVisualModel: (self: TenderInstance) -> (),

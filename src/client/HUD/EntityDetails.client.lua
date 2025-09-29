@@ -22,37 +22,40 @@ local currentState = {
 	GlobalBuffs = {},
 }
 
-local details = {}
+local details = {
+	Defaults = {},
+	Stats = {},
+}
 -- Defaults
-details.NameLabel = entityDetailsUI:FindFirstChild("EntityName", true) :: TextLabel
-details.LevelLabel = entityDetailsUI:FindFirstChild("Level", true) :: TextLabel
-details.Description = entityDetailsUI:FindFirstChild("Description", true) :: TextLabel
+details.Defaults.NameLabel = entityDetailsUI:FindFirstChild("EntityName", true) :: TextLabel
+details.Defaults.LevelLabel = entityDetailsUI:FindFirstChild("Level", true) :: TextLabel
+details.Defaults.Description = entityDetailsUI:FindFirstChild("Description", true) :: TextLabel
 
 -- Boat
-details.CurrentFPSLabel = entityDetailsUI:FindFirstChild("CurrentFPSLabel", true) :: TextLabel
-details.CurrentFPSValue = entityDetailsUI:FindFirstChild("CurrentFPSValue", true) :: TextLabel
-details.NextFPSLabel = entityDetailsUI:FindFirstChild("NextFPSLabel", true) :: TextLabel
-details.NextFPSValue = entityDetailsUI:FindFirstChild("NextFPSValue", true) :: TextLabel
+details.Stats.CurrentFPSLabel = entityDetailsUI:FindFirstChild("CurrentFPSLabel", true) :: TextLabel
+details.Stats.CurrentFPSValue = entityDetailsUI:FindFirstChild("CurrentFPSValue", true) :: TextLabel
+details.Stats.NextFPSLabel = entityDetailsUI:FindFirstChild("NextFPSLabel", true) :: TextLabel
+details.Stats.NextFPSValue = entityDetailsUI:FindFirstChild("NextFPSValue", true) :: TextLabel
 
 -- Tender
-details.CurrentTravelTimeLabel = entityDetailsUI:FindFirstChild("CurrentTTLabel", true) :: TextLabel
-details.CurrentTravelTimeValue = entityDetailsUI:FindFirstChild("CurrentTTValue", true) :: TextLabel
-details.NextTravelTimeLabel = entityDetailsUI:FindFirstChild("NextTTLabel", true) :: TextLabel
-details.NextTravelTimeValue = entityDetailsUI:FindFirstChild("NextTTValue", true) :: TextLabel
-details.CurrentLoadTimeLabel = entityDetailsUI:FindFirstChild("CurrentLTLabel", true) :: TextLabel
-details.CurrentLoadTimeValue = entityDetailsUI:FindFirstChild("CurrentLTValue", true) :: TextLabel
-details.NextLoadTimeLabel = entityDetailsUI:FindFirstChild("NextLTLabel", true) :: TextLabel
-details.NextLoadTimeValue = entityDetailsUI:FindFirstChild("NextLTValue", true) :: TextLabel
+details.Stats.CurrentTravelTimeLabel = entityDetailsUI:FindFirstChild("CurrentTTLabel", true) :: TextLabel
+details.Stats.CurrentTravelTimeValue = entityDetailsUI:FindFirstChild("CurrentTTValue", true) :: TextLabel
+details.Stats.NextTravelTimeLabel = entityDetailsUI:FindFirstChild("NextTTLabel", true) :: TextLabel
+details.Stats.NextTravelTimeValue = entityDetailsUI:FindFirstChild("NextTTValue", true) :: TextLabel
+details.Stats.CurrentLoadTimeLabel = entityDetailsUI:FindFirstChild("CurrentLTLabel", true) :: TextLabel
+details.Stats.CurrentLoadTimeValue = entityDetailsUI:FindFirstChild("CurrentLTValue", true) :: TextLabel
+details.Stats.NextLoadTimeLabel = entityDetailsUI:FindFirstChild("NextLTLabel", true) :: TextLabel
+details.Stats.NextLoadTimeValue = entityDetailsUI:FindFirstChild("NextLTValue", true) :: TextLabel
 
 -- Non-Building
-details.CurrentMaxStorageLabel = entityDetailsUI:FindFirstChild("CurrentMaxStorageLabel", true) :: TextLabel
-details.CurrentMaxStorageValue = entityDetailsUI:FindFirstChild("CurrentMaxStorageValue", true) :: TextLabel
-details.NextMaxStorageLabel = entityDetailsUI:FindFirstChild("NextMaxStorageLabel", true) :: TextLabel
-details.NextMaxStorageValue = entityDetailsUI:FindFirstChild("NextMaxStorageValue", true) :: TextLabel
+details.Stats.CurrentMaxStorageLabel = entityDetailsUI:FindFirstChild("CurrentMaxStorageLabel", true) :: TextLabel
+details.Stats.CurrentMaxStorageValue = entityDetailsUI:FindFirstChild("CurrentMaxStorageValue", true) :: TextLabel
+details.Stats.NextMaxStorageLabel = entityDetailsUI:FindFirstChild("NextMaxStorageLabel", true) :: TextLabel
+details.Stats.NextMaxStorageValue = entityDetailsUI:FindFirstChild("NextMaxStorageValue", true) :: TextLabel
 
 -- Building
-details.CurrentBuffLabel = entityDetailsUI:FindFirstChild("CurrentBuffLabel", true) :: TextLabel
-details.CurrentBuffValue = entityDetailsUI:FindFirstChild("CurrentBuffValue", true) :: TextLabel
+details.Stats.CurrentBuffLabel = entityDetailsUI:FindFirstChild("CurrentBuffLabel", true) :: TextLabel
+details.Stats.CurrentBuffValue = entityDetailsUI:FindFirstChild("CurrentBuffValue", true) :: TextLabel
 
 -- EntityInteractiveFrame
 details.EntityInteractiveFrameLabel = entityDetailsUI:FindFirstChild("EntityInteractiveFrame", true) :: TextLabel
@@ -65,7 +68,7 @@ details.upgradeButton = entityDetailsUI:FindFirstChild("UpgradeButton", true) ::
 entityDetailsUI.Visible = false
 local detailsAreOpen = false
 
-local entityData: BoatType.BoatProps | TenderType.TenderProps | PortStorageType.StorageProps | BuildingType.BuildingProps | nil = nil
+local entityData: BoatType.BoatProps | TenderType.TenderProps | PortStorageType.StorageProps | BuildingType.BuildingProps = nil
 
 local entityDetails = Events.GetRemote(Events.RemoteNames.OpenEntityDetails)
 if entityDetails then entityDetails.OnClientEvent:Connect(function(data)
@@ -124,11 +127,6 @@ function populateDetailsUI()
 	local blur = Instance.new("BlurEffect")
 	blur.Parent = Lighting
 
-	-- Hide all elements by default
-	for k, element in pairs(details) do
-		element.Visible = false
-	end
-
 	updateName()
 	updateLevel()
 	writeDescription()
@@ -138,56 +136,68 @@ function populateDetailsUI()
 end
 
 function updateLevel()
-	details.LevelLabel.Text = entityData.isPurchased and "Lvl: " .. entityData.Level or ""
-	details.LevelLabel.Visible = true
+	details.Defaults.LevelLabel.Text = entityData.isPurchased and "Lvl: " .. entityData.Level or ""
+	details.Defaults.LevelLabel.Visible = true
 end
 function updateName()
-	details.NameLabel.Text = entityData.Name or entityData.Entity
+	details.Defaults.NameLabel.Text = entityData.Name or entityData.Entity
 	local qualityInfo = FFGEnum.QUALITY[entityData.UpgradeStage]
 	if qualityInfo then
 		local color = qualityInfo.Color
-		details.NameLabel.TextColor3 = color
+		details.Defaults.NameLabel.TextColor3 = color
 	end
 
-	if not details.NameLabel.Visible then details.NameLabel.Visible = true end
+	if not details.Defaults.NameLabel.Visible then details.Defaults.NameLabel.Visible = true end
 end
 function writeDescription()
-	details.Description.Text = entityData.Description or ""
-	details.Description.Visible = true
+	details.Defaults.Description.Text = entityData.Description or ""
+	details.Defaults.Description.Visible = true
 end
 function updateStats()
+	-- Default hide all
+	for k, element: TextLabel | ImageButton in pairs(details.Stats) do
+		local frameParent = element:FindFirstAncestorWhichIsA("Frame")
+		frameParent.Visible = false
+	end
+
 	-- Boat
 	if entityData.Entity == FFGEnum.CLASS.ENTITY_NAME.Boat then
-		details.CurrentFPSValue.Text = entityData.isPurchased and FormatNumber(entityData.CurrentFPS) or ""
-		details.NextFPSValue.Text = entityData.isPurchased and "+" .. FormatNumber(entityData.NextFPS - entityData.CurrentFPS) or ""
-		details.NextFPSValue.TextColor3 = Theme.color.green
+		details.Stats.CurrentFPSValue.Text = entityData.isPurchased and FormatNumber(entityData.CurrentFPS) or ""
+		details.Stats.NextFPSValue.Text = entityData.isPurchased and "+" .. FormatNumber(entityData.NextFPS - entityData.CurrentFPS) or ""
+		details.Stats.NextFPSValue.TextColor3 = Theme.color.green
 
-		details.CurrentFPSValue.Visible = entityData.isPurchased and true
-		details.NextFPSValue.Visible = entityData.isPurchased and true
-		details.CurrentFPSLabel.Visible = entityData.isPurchased and true
-		details.NextFPSLabel.Visible = entityData.isPurchased and true
+		local currentFPSParent = details.Stats.CurrentFPSValue:FindFirstAncestorWhichIsA("Frame")
+		currentFPSParent.Visible = entityData.isPurchased and true
+
+		local nextFPSValueParent = details.Stats.NextFPSValue:FindFirstAncestorWhichIsA("Frame")
+		nextFPSValueParent.Visible = entityData.isPurchased and true
 	end
 
 	-- Tender
 	if entityData.Entity == FFGEnum.CLASS.ENTITY_NAME.Tender then
-		details.CurrentTravelTimeValue.Text = entityData.isPurchased and FormatNumber(entityData.CurrentTravelTime) .. " secs" or ""
-		details.CurrentLoadTimeValue.Text = entityData.isPurchased and FormatNumber(entityData.LoadTime) .. " secs" or ""
+		details.Stats.CurrentTravelTimeValue.Text = entityData.isPurchased and FormatNumber(entityData.CurrentTravelTime) .. " secs" or ""
+		details.Stats.CurrentLoadTimeValue.Text = entityData.isPurchased and FormatNumber(entityData.LoadTime) .. " secs" or ""
 
-		details.CurrentTravelTimeValue.Visible = true
-		details.CurrentLoadTimeValue.Visible = true
+		-- //TODO - Add next times to Tender and reflect here
+		local currentTTParent = details.Stats.CurrentTravelTimeValue:FindFirstAncestorWhichIsA("Frame")
+		currentTTParent.Visible = entityData.isPurchased and true
+
+		local currentLTParent = details.Stats.CurrentLoadTimeValue:FindFirstAncestorWhichIsA("Frame")
+		currentLTParent.Visible = entityData.isPurchased and true
 	end
 
 	-- Non-Building
 	if entityData.Entity ~= FFGEnum.CLASS.ENTITY_NAME.Building then
 		-- STORAGE Stats
-		details.CurrentMaxStorageValue.Text = entityData.isPurchased and FormatNumber(entityData.CurrentMaxStorage) or ""
-		details.NextMaxStorageValue.Text = entityData.isPurchased and "+" .. FormatNumber(entityData.NextLvlMaxStorage - entityData.CurrentMaxStorage) or ""
-		details.NextMaxStorageValue.TextColor3 = Theme.color.green
+		details.Stats.CurrentMaxStorageValue.Text = entityData.isPurchased and FormatNumber(entityData.CurrentMaxStorage) or ""
+		details.Stats.NextMaxStorageValue.Text = entityData.isPurchased and "+" .. FormatNumber(entityData.NextLvlMaxStorage - entityData.CurrentMaxStorage) or ""
+		details.Stats.NextMaxStorageValue.TextColor3 = Theme.color.green
 
-		details.CurrentMaxStorageLabel.Visible = entityData.isPurchased and true
-		details.NextMaxStorageLabel.Visible = entityData.isPurchased and true
-		details.CurrentMaxStorageValue.Visible = entityData.isPurchased and true
-		details.NextMaxStorageValue.Visible = entityData.isPurchased and true
+		local currentMaxStorageParent = details.Stats.CurrentMaxStorageValue:FindFirstAncestorWhichIsA("Frame")
+		currentMaxStorageParent.Visible = entityData.isPurchased and true
+
+		local nextMaxStorageParent = details.Stats.NextMaxStorageValue:FindFirstAncestorWhichIsA("Frame")
+		nextMaxStorageParent.Visible = entityData.isPurchased and true
 	end
 
 	-- Building
@@ -195,13 +205,13 @@ function updateStats()
 		if entityData.isPurchased and entityData.BuildingBuff then
 			local isPlus = entityData.BuildingBuff.IsPlus
 			if isPlus then
-				details.CurrentBuffValue.Text = "+" .. (FormatNumber(entityData.BuildingBuff.CurrentValue * 100)) .. "%" .. " " .. entityData.BuildingBuff.Label
+				details.Stats.CurrentBuffValue.Text = "+" .. (FormatNumber(entityData.BuildingBuff.CurrentValue * 100)) .. "%" .. " " .. entityData.BuildingBuff.Label
 			else
-				details.CurrentBuffValue.Text = "-" .. FormatNumber(entityData.BuildingBuff.CurrentValue * 100) .. "%" .. " " .. entityData.BuildingBuff.Label
+				details.Stats.CurrentBuffValue.Text = "-" .. FormatNumber(entityData.BuildingBuff.CurrentValue * 100) .. "%" .. " " .. entityData.BuildingBuff.Label
 			end
 
-			details.CurrentBuffValue.TextColor3 = Theme.color.green
-			details.CurrentBuffValue.Visible = true
+			details.Stats.CurrentBuffValue.TextColor3 = Theme.color.green
+			details.Stats.CurrentBuffValue.Visible = true
 		end
 	end
 end
@@ -241,11 +251,6 @@ function updateButtonState()
 end
 
 function handleUpgradeClick()
-	if currentState.Currencies and currentState.Currencies.Gold then
-		local cost = entityData.isPurchased and entityData.UpgradeCost or entityData.BaseCost
-		if currentState.Currencies.Gold < cost then print("Cannot afford") end
-	end
-
 	local events = {
 		Purchased = Events.GetRemote(Events.RemoteNames.EntityPurchased),
 		Upgraded = Events.GetRemote(Events.RemoteNames.EntityUpgraded),

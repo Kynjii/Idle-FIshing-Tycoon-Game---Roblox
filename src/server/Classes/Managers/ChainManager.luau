@@ -45,11 +45,21 @@ function ChainManager.New(realmData, tier: number, player: Player, teamId: numbe
 
 	-- Create Tender
 	self.TenderModel = self:FindTenderModel() :: Model
-	self.LaneTender = Tender.New(tendersArr[tier], player, self.TenderModel, self.BoatModel)
+	if not self.TenderModel then return end
+	local tenderData = nil
+	for k, v in pairs(tendersArr) do
+		if v[FFGEnum.CLASS.PROPERTIES.Tier] == tier then tenderData = v end
+	end
+	self.LaneTender = Tender.New(tenderData, player, self.TenderModel, self.BoatModel)
 
 	-- Create Port Storage
 	self.StorageModel = self:FindStorageModel() :: Model
-	self.LaneStorage = PortStorage.New(storageArr[tier], player, self.StorageModel)
+	if not self.StorageModel then return end
+	local storageData = nil
+	for k, v in pairs(storageArr) do
+		if v[FFGEnum.CLASS.PROPERTIES.Tier] == tier then storageData = v end
+	end
+	self.LaneStorage = PortStorage.New(storageData, player, self.StorageModel)
 
 	-- Attach listeners
 	self.Signals = {
