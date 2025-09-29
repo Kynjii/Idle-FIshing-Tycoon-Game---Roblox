@@ -18,30 +18,6 @@ function PP.CreatePP(proximityPrompt: ProximityPrompt, class: BoatType.BoatInsta
 		if class.Level == class.MaxLevel then return end
 
 		Events.FireEvent(Events.RemoteNames.OpenEntityDetails, class.Player, class)
-
-		-- if not DataService.CanAfford(player, FFGEnum.CURRENCY_TYPES.Gold, not class.isPurchased and class.BaseCost or class.UpgradeCost) then
-		-- 	Events.FireEvent(Events.RemoteNames.WarningMsg, class.Player, "Not enough gold!")
-		-- 	class:UpdateProximityPromptUI(proximityPrompt)
-		-- 	return
-		-- end
-
-		-- DataService.Spend(player, FFGEnum.CURRENCY_TYPES.Gold, not class.isPurchased and class.BaseCost or class.UpgradeCost)
-
-		-- if class.isPurchased then
-		-- 	class:Upgrade()
-		-- else
-		-- 	class:Purchase()
-		-- 	class:Show()
-		-- 	class:CanCollide()
-
-		-- 	if class.Entity == FFGEnum.CLASS.ENTITY_NAME.Boat then class:StartFishing() end
-		-- end
-
-		-- -- Update UIs
-		-- class:UpdateProximityPromptUI(proximityPrompt)
-		-- class:UpdatePurchaseBoardUI()
-
-		-- class:Save()
 	end))
 
 	return proximityPrompt

@@ -37,7 +37,11 @@ function ChainManager.New(realmData, tier: number, player: Player, teamId: numbe
 	-- Create Boat
 	self.BoatModel = self:FindBoatModel() :: Model
 	if not self.BoatModel then return end
-	self.LaneBoat = Boat.New(boatsArr[tier], player, self.BoatModel)
+	local boatData = nil
+	for k, v in pairs(boatsArr) do
+		if v[FFGEnum.CLASS.PROPERTIES.Tier] == tier then boatData = v end
+	end
+	self.LaneBoat = Boat.New(boatData, player, self.BoatModel)
 
 	-- Create Tender
 	self.TenderModel = self:FindTenderModel() :: Model

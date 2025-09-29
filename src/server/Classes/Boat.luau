@@ -451,23 +451,47 @@ end
 
 -- //SECTION - Event Listeners
 function Boat:AttachEventListeners()
-	local purchasedEvent = Events.GetRemote(Events.RemoteNames.EntityPurchased)
-	if purchasedEvent then
-		purchasedEvent.OnServerEvent:Connect(function(player, entityId)
-			-- //TODO - add id and owner check before doing anything
-			if self.Player ~= player or self.Owner ~= player.UserId then return end
-			if self.Id ~= entityId then
-				print("not my id")
-				return
-			end
-			-- //TODO - might be worth exploring adding addition checks to ensure they are not manipulating level amounts of if they can afford it or not
-			print("purchased data recieved from client", player, entityId)
-		end)
+	-- Helper
+	local function handleStateUpdate(player)
+		if not DataService.CanAfford(player, FFGEnum.CURRENCY_TYPES.Gold, not self.isPurchased and self.BaseCost or self.UpgradeCost) then
+			Events.FireEvent(Events.RemoteNames.WarningMsg, self.Player, "Not enough gold!")
+			return
+		end
+
+		DataService.Spend(player, FFGEnum.CURRENCY_TYPES.Gold, not self.isPurchased and self.BaseCost or self.UpgradeCost)
+
+		if self.isPurchased then
+			self:Upgrade()
+		else
+			self:Purchase()
+			self:Show()
+			self:CanCollide()
+
+			if self.Entity == FFGEnum.CLASS.ENTITY_NAME.Boat then self:StartFishing() end
+		end
+
+		-- Update UIs
+		self:UpdatePurchaseBoardUI()
+
+		self:Save()
 	end
 
+	-- Purchased Event
+	local purchasedEvent = Events.GetRemote(Events.RemoteNames.EntityPurchased)
+	if purchasedEvent then purchasedEvent.OnServerEvent:Connect(function(player, entityId)
+		if self.Player ~= player or self.Owner ~= player.UserId then return end
+		if self.Id ~= entityId then return end
+
+		handleStateUpdate(player)
+	end) end
+
+	-- Upgraded Event
 	local upgradedEvent = Events.GetRemote(Events.RemoteNames.EntityUpgraded)
-	if upgradedEvent then upgradedEvent.OnServerEvent:Connect(function(player, data)
-		print("upgraded data recieved from client", player, data)
+	if upgradedEvent then upgradedEvent.OnServerEvent:Connect(function(player, entityId)
+		if self.Player ~= player or self.Owner ~= player.UserId then return end
+		if self.Id ~= entityId then return end
+
+		handleStateUpdate(player)
 	end) end
 end
 -- //!SECTION

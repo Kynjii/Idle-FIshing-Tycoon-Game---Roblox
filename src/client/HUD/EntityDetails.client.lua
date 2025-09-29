@@ -83,9 +83,19 @@ end) end
 function watchEntity()
 	local indexKey = entityData.Entity .. "s"
 	Replica.OnNew("PlayerState", function(replicaData)
+		-- General State
 		replicaData:OnSet({ "Realms", replicaData.Data.CurrentRealm, indexKey, entityData.Id }, function(newState)
 			entityData = newState
-			populateDetailsUI()
+			updateName()
+			updateLevel()
+			updateStats()
+			updateEntityInteractiveFrameLabel()
+		end)
+
+		-- Upgrade Button
+		replicaData:OnSet({ "Currencies", "Gold" }, function(newValue)
+			currentState.Currencies["Gold"] = newValue
+			updateButtonState()
 		end)
 	end)
 end
@@ -109,87 +119,95 @@ function handleClosingEntityDetailsUI()
 	end
 end
 
--- Populate the Details Page
 function populateDetailsUI()
 	if not entityData then return end
 	local blur = Instance.new("BlurEffect")
 	blur.Parent = Lighting
-	local class = entityData
 
 	-- Hide all elements by default
 	for k, element in pairs(details) do
 		element.Visible = false
 	end
 
-	-- Name
-	details.NameLabel.Text = class.Name or class.Entity
-	local qualityInfo = FFGEnum.QUALITY[class.UpgradeStage]
+	updateName()
+	updateLevel()
+	writeDescription()
+	updateEntityInteractiveFrameLabel()
+	updateButtonState()
+	updateStats()
+end
+
+function updateLevel()
+	details.LevelLabel.Text = entityData.isPurchased and "Lvl: " .. entityData.Level or ""
+	details.LevelLabel.Visible = true
+end
+function updateName()
+	details.NameLabel.Text = entityData.Name or entityData.Entity
+	local qualityInfo = FFGEnum.QUALITY[entityData.UpgradeStage]
 	if qualityInfo then
 		local color = qualityInfo.Color
 		details.NameLabel.TextColor3 = color
 	end
-	details.NameLabel.Visible = true
 
-	-- Level
-	details.LevelLabel.Text = class.isPurchased and "Lvl: " .. class.Level or ""
-	details.LevelLabel.Visible = true
-
-	-- Description
-	details.Description.Text = class.Description or ""
+	if not details.NameLabel.Visible then details.NameLabel.Visible = true end
+end
+function writeDescription()
+	details.Description.Text = entityData.Description or ""
 	details.Description.Visible = true
-
-	-- EntityInteractiveFrame
-	details.EntityInteractiveFrameLabel.Text = class.isPurchased and "Upgrade" or "Purchase"
-	details.EntityInteractiveFrameLabel.Visible = true
-
-	-- Upgrade Button
-	details.upgradeButton.Visible = true
-	updateButtonState()
-
+end
+function updateStats()
 	-- Boat
-	if class.Entity == FFGEnum.CLASS.ENTITY_NAME.Boat then
-		details.CurrentFPSValue.Text = class.isPurchased and FormatNumber(class.CurrentFPS) or ""
-		details.NextFPSValue.Text = class.isPurchased and "+" .. FormatNumber(class.NextFPS) or ""
-
-		details.CurrentFPSValue.Visible = true
+	if entityData.Entity == FFGEnum.CLASS.ENTITY_NAME.Boat then
+		details.CurrentFPSValue.Text = entityData.isPurchased and FormatNumber(entityData.CurrentFPS) or ""
+		details.NextFPSValue.Text = entityData.isPurchased and "+" .. FormatNumber(entityData.NextFPS - entityData.CurrentFPS) or ""
 		details.NextFPSValue.TextColor3 = Theme.color.green
-		details.NextFPSValue.Visible = true
+
+		details.CurrentFPSValue.Visible = entityData.isPurchased and true
+		details.NextFPSValue.Visible = entityData.isPurchased and true
+		details.CurrentFPSLabel.Visible = entityData.isPurchased and true
+		details.NextFPSLabel.Visible = entityData.isPurchased and true
 	end
 
 	-- Tender
-	if class.Entity == FFGEnum.CLASS.ENTITY_NAME.Tender then
-		details.CurrentTravelTimeValue.Text = class.isPurchased and FormatNumber(class.CurrentTravelTime) .. " secs" or ""
-		details.CurrentLoadTimeValue.Text = class.isPurchased and FormatNumber(class.LoadTime) .. " secs" or ""
+	if entityData.Entity == FFGEnum.CLASS.ENTITY_NAME.Tender then
+		details.CurrentTravelTimeValue.Text = entityData.isPurchased and FormatNumber(entityData.CurrentTravelTime) .. " secs" or ""
+		details.CurrentLoadTimeValue.Text = entityData.isPurchased and FormatNumber(entityData.LoadTime) .. " secs" or ""
 
 		details.CurrentTravelTimeValue.Visible = true
 		details.CurrentLoadTimeValue.Visible = true
 	end
 
 	-- Non-Building
-	if class.Entity ~= FFGEnum.CLASS.ENTITY_NAME.Building then
+	if entityData.Entity ~= FFGEnum.CLASS.ENTITY_NAME.Building then
 		-- STORAGE Stats
-		details.CurrentMaxStorageValue.Text = class.isPurchased and FormatNumber(class.CurrentMaxStorage) or ""
-		details.NextMaxStorageValue.Text = class.isPurchased and "+" .. FormatNumber(class.NextLvlMaxStorage) or ""
-
-		details.CurrentMaxStorageValue.Visible = true
+		details.CurrentMaxStorageValue.Text = entityData.isPurchased and FormatNumber(entityData.CurrentMaxStorage) or ""
+		details.NextMaxStorageValue.Text = entityData.isPurchased and "+" .. FormatNumber(entityData.NextLvlMaxStorage - entityData.CurrentMaxStorage) or ""
 		details.NextMaxStorageValue.TextColor3 = Theme.color.green
-		details.NextMaxStorageValue.Visible = true
+
+		details.CurrentMaxStorageLabel.Visible = entityData.isPurchased and true
+		details.NextMaxStorageLabel.Visible = entityData.isPurchased and true
+		details.CurrentMaxStorageValue.Visible = entityData.isPurchased and true
+		details.NextMaxStorageValue.Visible = entityData.isPurchased and true
 	end
 
 	-- Building
-	if class.Entity == FFGEnum.CLASS.ENTITY_NAME.Building then
-		if class.isPurchased and class.BuildingBuff then
-			local isPlus = class.BuildingBuff.IsPlus
+	if entityData.Entity == FFGEnum.CLASS.ENTITY_NAME.Building then
+		if entityData.isPurchased and entityData.BuildingBuff then
+			local isPlus = entityData.BuildingBuff.IsPlus
 			if isPlus then
-				details.CurrentBuffValue.Text = "+" .. (FormatNumber(class.BuildingBuff.CurrentValue * 100)) .. "%" .. " " .. class.BuildingBuff.Label
+				details.CurrentBuffValue.Text = "+" .. (FormatNumber(entityData.BuildingBuff.CurrentValue * 100)) .. "%" .. " " .. entityData.BuildingBuff.Label
 			else
-				details.CurrentBuffValue.Text = "-" .. FormatNumber(class.BuildingBuff.CurrentValue * 100) .. "%" .. " " .. class.BuildingBuff.Label
+				details.CurrentBuffValue.Text = "-" .. FormatNumber(entityData.BuildingBuff.CurrentValue * 100) .. "%" .. " " .. entityData.BuildingBuff.Label
 			end
 
 			details.CurrentBuffValue.TextColor3 = Theme.color.green
 			details.CurrentBuffValue.Visible = true
 		end
 	end
+end
+function updateEntityInteractiveFrameLabel()
+	details.EntityInteractiveFrameLabel.Text = entityData.isPurchased and "Upgrade" or "Purchase"
+	details.EntityInteractiveFrameLabel.Visible = true
 end
 
 -- Upgrade Button
@@ -199,6 +217,7 @@ end) end
 
 function updateButtonState()
 	if not detailsAreOpen then return end
+	details.upgradeButton.Visible = true
 
 	local currentGoldAmount = currentState.Currencies.Gold or 0
 	local cost = entityData.isPurchased and entityData.UpgradeCost or entityData.BaseCost
@@ -239,11 +258,10 @@ function handleUpgradeClick()
 	end
 end
 
--- Get PlayerState Updates
 Replica.OnNew("PlayerState", function(replicaData)
 	currentState = replicaData.Data
+
 	replicaData:OnSet({ "Currencies", "Gold" }, function(newValue)
-		currentState.Currencies["Gold"] = newValue
-		updateButtonState()
+		currentState.Currencies.Gold = newValue
 	end)
 end)

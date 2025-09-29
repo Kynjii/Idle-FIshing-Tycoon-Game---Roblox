@@ -59,6 +59,15 @@ end
 
 Replica.OnNew("PlayerState", function(replicaData)
 	local currentRealm = replicaData.Data.CurrentRealm or 1
+	-- Set intial snapshot
+	local goldAmount = replicaData.Data.Currencies.Gold
+	setCurrency("Gold", goldAmount)
+
+	local buffs = replicaData.Data.Realms[currentRealm].Buffs
+	for name, buff in pairs(buffs) do
+		setRealmBuff(name, buff)
+	end
+
 	-- Currencies
 	replicaData:OnSet({ "Currencies", "Gold" }, function(newValue)
 		setCurrency("Gold", newValue)
