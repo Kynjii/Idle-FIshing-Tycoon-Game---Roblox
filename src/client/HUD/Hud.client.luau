@@ -1,7 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local StarterPlayer = game:GetService("StarterPlayer")
-local ReplicaData = require(StarterPlayer.StarterPlayerScripts.Client.Modules.ReplicaData)
+local Replica = require(ReplicatedStorage.Shared.ReplicaClient)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local DeepWait = require(ReplicatedStorage.Shared.Utils.DeepWait)
 local FormatNumber = require(ReplicatedStorage.Shared.Utils.FormatNumber)
@@ -58,19 +57,25 @@ local function setRealmBuff(name: string, buff)
 	end
 end
 
-ReplicaData.StateChanged:Connect(function(playerData)
-	local data = playerData
+Replica.OnNew("PlayerState", function(replicaData)
+	local currentRealm = replicaData.Data.CurrentRealm or 1
+	-- Currencies
+	replicaData:OnSet({ "Currencies", "Gold" }, function(newValue)
+		setCurrency("Gold", newValue)
+	end)
 
-	-- Initial snapshot
-	if data.Currencies then
-		for k, n in pairs(data.Currencies) do
-			if typeof(n) == "number" then setCurrency(k, n) end
-		end
-	end
+	-- Global Buffs
+	-- //TODO - Set correct path once global buffs are defined
+	-- replicaData:OnSet("GlobalBuffs", function(newValue, oldValue)
+	-- 	setRealmBuff(newValue)
+	-- end)
 
-	if data.RealmBuffs then
-		for k, buff in pairs(data.RealmBuffs) do
-			if buff.CurrentValue then setRealmBuff(k, buff) end
+	-- Realm Buffs
+	replicaData:OnSet({ "Realms", currentRealm, "Buffs" }, function(newTable, oldTable)
+		for name, buff in pairs(newTable) do
+			if not oldTable or oldTable[name] ~= buff then setRealmBuff(name, buff) end
 		end
-	end
+	end)
 end)
+
+Replica.RequestData()

@@ -1,8 +1,6 @@
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local StarterPlayer = game:GetService("StarterPlayer")
-local ReplicaData = require(StarterPlayer.StarterPlayerScripts.Client.Modules.ReplicaData)
 local BoatType = require(ReplicatedStorage.Shared.Types.Classes.BoatType)
 local BuildingType = require(ReplicatedStorage.Shared.Types.Classes.BuildingType)
 local PortStorageType = require(ReplicatedStorage.Shared.Types.Classes.PortStorageType)
@@ -12,19 +10,17 @@ local Events = require(ReplicatedStorage.Shared.Events.Events)
 local Theme = require(ReplicatedStorage.Shared.Theme.Theme)
 local DeepWait = require(ReplicatedStorage.Shared.Utils.DeepWait)
 local FormatNumber = require(ReplicatedStorage.Shared.Utils.FormatNumber)
+local Replica = require(ReplicatedStorage.Shared.ReplicaClient)
 
 local player = Players.LocalPlayer
 local entityDetailsUI: Frame = DeepWait(player.PlayerGui, "EntityDetails", "DetailsContainer")
 
-local currentState = {}
-
--- Get PlayerState Updates
-ReplicaData.StateChanged:Connect(function(playerData)
-	if playerData then
-		currentState = playerData
-		populateDetailsUI()
-	end
-end)
+local currentState = {
+	Currencies = {
+		Gold = 0,
+	},
+	GlobalBuffs = {},
+}
 
 local details = {}
 -- Defaults
@@ -67,8 +63,9 @@ details.upgradeButton = entityDetailsUI:FindFirstChild("UpgradeButton", true) ::
 -- Open/Close EntityDetails
 -- Default close
 entityDetailsUI.Visible = false
+local detailsAreOpen = false
 
-local entityData = nil
+local entityData: BoatType.BoatProps | TenderType.TenderProps | PortStorageType.StorageProps | BuildingType.BuildingProps | nil = nil
 
 local entityDetails = Events.GetRemote(Events.RemoteNames.OpenEntityDetails)
 if entityDetails then entityDetails.OnClientEvent:Connect(function(data)
@@ -76,10 +73,22 @@ if entityDetails then entityDetails.OnClientEvent:Connect(function(data)
 		player.PlayerGui.EntityDetails.Enabled = true
 		entityDetailsUI.Visible = true
 		entityData = data
+		detailsAreOpen = true
+		watchEntity()
 		populateDetailsUI()
 		handleClosingEntityDetailsUI()
 	end
 end) end
+
+function watchEntity()
+	local indexKey = entityData.Entity .. "s"
+	Replica.OnNew("PlayerState", function(replicaData)
+		replicaData:OnSet({ "Realms", replicaData.Data.CurrentRealm, indexKey, entityData.Id }, function(newState)
+			entityData = newState
+			populateDetailsUI()
+		end)
+	end)
+end
 
 function handleClosingEntityDetailsUI()
 	local character = player.Character.PrimaryPart
@@ -89,6 +98,8 @@ function handleClosingEntityDetailsUI()
 		local distance = player:DistanceFromCharacter(originalPosition)
 		if distance >= 8 then
 			entityDetailsUI.Visible = false
+			detailsAreOpen = false
+			entityData = nil
 			local blur: BlurEffect = Lighting.Blur
 			if blur then blur:Destroy() end
 			break
@@ -98,28 +109,12 @@ function handleClosingEntityDetailsUI()
 	end
 end
 
-local function enableButton(btn)
-	btn.Active = true
-	btn.ImageColor3 = Theme.color.green
-	btn.HoverImage = Theme.button.hoverImage
-	btn.PressedImage = Theme.button.pressedImage
-	btn.Interactable = true
-end
-
-local function disableButton(btn)
-	btn.Active = false
-	btn.ImageColor3 = Theme.color.slateBlue
-	btn.HoverImage = ""
-	btn.PressedImage = ""
-	btn.Interactable = false
-end
-
 -- Populate the Details Page
 function populateDetailsUI()
 	if not entityData then return end
 	local blur = Instance.new("BlurEffect")
 	blur.Parent = Lighting
-	local class: BoatType.BoatProps | TenderType.TenderProps | PortStorageType.StorageProps | BuildingType.BuildingProps = entityData
+	local class = entityData
 
 	-- Hide all elements by default
 	for k, element in pairs(details) do
@@ -148,16 +143,8 @@ function populateDetailsUI()
 	details.EntityInteractiveFrameLabel.Visible = true
 
 	-- Upgrade Button
-	details.upgradeButton.TextLabel.Text = class.isPurchased and "Upgrade" or "Purchase"
 	details.upgradeButton.Visible = true
-	if currentState.Currencies and currentState.Currencies.Gold then
-		local cost = class.isPurchased and class.UpgradeCost or class.BaseCost
-		if currentState.Currencies.Gold < cost then
-			disableButton(details.upgradeButton)
-		else
-			enableButton(details.upgradeButton)
-		end
-	end
+	updateButtonState()
 
 	-- Boat
 	if class.Entity == FFGEnum.CLASS.ENTITY_NAME.Boat then
@@ -210,6 +197,30 @@ if details.upgradeButton then details.upgradeButton.Activated:Connect(function()
 	handleUpgradeClick()
 end) end
 
+function updateButtonState()
+	if not detailsAreOpen then return end
+
+	local currentGoldAmount = currentState.Currencies.Gold or 0
+	local cost = entityData.isPurchased and entityData.UpgradeCost or entityData.BaseCost
+	local enable = cost <= currentGoldAmount
+
+	if enable then
+		details.upgradeButton.Active = true
+		details.upgradeButton.ImageColor3 = Theme.color.green
+		details.upgradeButton.HoverImage = Theme.button.hoverImage
+		details.upgradeButton.PressedImage = Theme.button.pressedImage
+		details.upgradeButton.Interactable = true
+	else
+		details.upgradeButton.Active = false
+		details.upgradeButton.ImageColor3 = Theme.color.slateBlue
+		details.upgradeButton.HoverImage = ""
+		details.upgradeButton.PressedImage = ""
+		details.upgradeButton.Interactable = false
+	end
+
+	details.upgradeButton.TextLabel.Text = entityData.isPurchased and "Upgrade" or "Purchase"
+end
+
 function handleUpgradeClick()
 	if currentState.Currencies and currentState.Currencies.Gold then
 		local cost = entityData.isPurchased and entityData.UpgradeCost or entityData.BaseCost
@@ -226,9 +237,13 @@ function handleUpgradeClick()
 	else
 		events.Upgraded:FireServer(entityData[FFGEnum.CLASS.PROPERTIES.Id])
 	end
-
-	-- write another listener for the server and client that handle upgrading
-	-- client sends update event
-	-- Server listens (teammanager i think) and upgrades correct class as well as setting it to show/upgrade and startFishing
-	-- Server sends the latest class data for the UI to update (maytbe not, the ui listens to replica data)
 end
+
+-- Get PlayerState Updates
+Replica.OnNew("PlayerState", function(replicaData)
+	currentState = replicaData.Data
+	replicaData:OnSet({ "Currencies", "Gold" }, function(newValue)
+		currentState.Currencies["Gold"] = newValue
+		updateButtonState()
+	end)
+end)
