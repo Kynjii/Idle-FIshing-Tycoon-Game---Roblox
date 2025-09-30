@@ -288,14 +288,6 @@ function handleUpgradeClick()
 	end
 end
 
-Replica.OnNew("PlayerState", function(replicaData)
-	currentState = replicaData.Data
-
-	replicaData:OnSet({ "Currencies", "Gold" }, function(newValue)
-		currentState.Currencies.Gold = newValue
-	end)
-end)
-
 -- Close Button
 if details.closeButton then
 	local baseSize = details.closeButton.Size
@@ -316,3 +308,11 @@ function handleCloseClick()
 	clearExistingData()
 	closeDetails()
 end
+
+Replica.OnNew("PlayerState", function(replicaData)
+	currentState = replicaData.Data
+
+	replicaData:OnSet({ "Currencies", "Gold" }, function(newValue)
+		currentState.Currencies.Gold = newValue
+	end)
+end)

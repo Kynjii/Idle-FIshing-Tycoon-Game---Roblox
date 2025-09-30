@@ -32,6 +32,7 @@ local function setCurrency(name: string, v: number)
 end
 
 local realmBuffLabels = {}
+local realmBuffCount = 0
 
 local function setRealmBuff(name: string, buff)
 	if not buff.CurrentValue then return end
@@ -40,8 +41,10 @@ local function setRealmBuff(name: string, buff)
 	if realmBuffLabels[name] then
 		buffLabel = realmBuffLabels[name]
 	else
+		realmBuffCount += 1
 		buffLabel = realmBuffsTemplate:Clone() :: TextLabel
 		buffLabel.Name = name .. "_LabelClone"
+		buffLabel.LayoutOrder = realmBuffCount
 		buffLabel.Parent = realmBuffsTemplate.Parent
 		buffLabel.Visible = true
 		realmBuffLabels[name] = buffLabel
@@ -72,7 +75,6 @@ Replica.OnNew("PlayerState", function(replicaData)
 	replicaData:OnSet({ "Currencies", "Gold" }, function(newValue)
 		setCurrency("Gold", newValue)
 	end)
-
 	-- Global Buffs
 	-- //TODO - Set correct path once global buffs are defined
 	-- replicaData:OnSet("GlobalBuffs", function(newValue, oldValue)
@@ -80,11 +82,11 @@ Replica.OnNew("PlayerState", function(replicaData)
 	-- end)
 
 	-- Realm Buffs
-	replicaData:OnSet({ "Realms", currentRealm, "Buffs" }, function(newTable, oldTable)
-		for name, buff in pairs(newTable) do
-			if not oldTable or oldTable[name] ~= buff then setRealmBuff(name, buff) end
-		end
-	end)
+	for name, buff in pairs(buffs) do
+		replicaData:OnSet({ "Realms", currentRealm, "Buffs", name }, function(newValue)
+			setRealmBuff(name, newValue)
+		end)
+	end
 end)
 
 Replica.RequestData()
