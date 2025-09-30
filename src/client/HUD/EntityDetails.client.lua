@@ -70,10 +70,12 @@ entityDetailsUI.Visible = false
 local detailsAreOpen = false
 
 local _replica = nil
-local entityData: { [string]: BoatType.BoatProps | TenderType.TenderProps | PortStorageType.StorageProps | BuildingType.BuildingProps } = {}
+local entityData: BoatType.BoatInstance | TenderType.TenderInstance | PortStorageType.StorageInstance | BuildingType.BuildingInstance = {}
 
 local entityDetails = Events.GetRemote(Events.RemoteNames.OpenEntityDetails)
 if entityDetails then entityDetails.OnClientEvent:Connect(function(data)
+	clearExistingData()
+
 	if data then
 		player.PlayerGui.EntityDetails.Enabled = true
 		entityDetailsUI.Visible = true
@@ -102,13 +104,9 @@ function handleClosingEntityDetailsUI()
 	while true do
 		local distance = player:DistanceFromCharacter(originalPosition)
 		if distance >= 8 then
-			if _replica then
-				_replica:Disconnect()
-				_replica = nil
-			end
 			entityDetailsUI.Visible = false
 			detailsAreOpen = false
-			entityData = nil
+			clearExistingData()
 			local blur: BlurEffect = Lighting.Blur
 			if blur then blur:Destroy() end
 			break
@@ -116,6 +114,14 @@ function handleClosingEntityDetailsUI()
 
 		task.wait(0.5)
 	end
+end
+
+function clearExistingData()
+	if _replica then
+		_replica:Disconnect()
+		_replica = nil
+	end
+	entityData = nil
 end
 
 function populateDetailsUI()

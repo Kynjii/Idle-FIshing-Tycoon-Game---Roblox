@@ -38,7 +38,6 @@ function EventListeners.Attach(class: BoatType.Boat | TenderType.Tender | PortSt
 		if self.Player ~= player or self.Owner ~= player.UserId then return end
 		if self.Id ~= entityId then return end
 
-		print("purchased:", entityId)
 		handleStateUpdate(player)
 	end) end
 
@@ -47,7 +46,7 @@ function EventListeners.Attach(class: BoatType.Boat | TenderType.Tender | PortSt
 	if upgradedEvent then upgradedEvent.OnServerEvent:Connect(function(player, entityId)
 		if self.Player ~= player or self.Owner ~= player.UserId then return end
 		if self.Id ~= entityId then return end
-		print("upgraded:", entityId)
+
 		handleStateUpdate(player)
 	end) end
 end

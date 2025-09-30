@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local TableUtil = require(ReplicatedStorage.Packages.TableUtil)
+local BuildingType = require(ReplicatedStorage.Shared.Types.Classes.BuildingType)
 local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
 local PlayerDataTemplate = require(ServerScriptService.Server.Modules.PlayerDataTemplate)
 local Replica = require(ServerScriptService.Server.ReplicaServer)
@@ -210,7 +211,7 @@ end
 -- //!SECTION
 
 -- //SECTION - BUILDINGS
-function DataService.SaveBuildingState(player: Player, buildingId: string, newState): boolean
+function DataService.SaveBuildingState(player: Player, newState: BuildingType.BuildingInstance): boolean
 	local profile = DataService.Profiles[player]
 	if not profile then
 		FFGHelpers.PrintLog("No profile found when attempting to save building state for: ", player)
@@ -232,10 +233,10 @@ function DataService.SaveBuildingState(player: Player, buildingId: string, newSt
 	-- Initialize Buildings array if it doesn't exist
 	if not profile.Data.Realms[currentRealm].Buildings then profile.Data.Realms[currentRealm].Buildings = {} end
 
-	profile.Data.Realms[currentRealm].Buildings[buildingId] = newState
+	profile.Data.Realms[currentRealm].Buildings[newState.Id] = newState
 
 	local replica = DataService.Replicas[player]
-	if replica then replica:Set({ "Realms", currentRealm, "Buildings", buildingId }, newState) end
+	if replica then replica:Set({ "Realms", currentRealm, "Buildings", newState.Id }, newState) end
 end
 -- //!SECTION
 

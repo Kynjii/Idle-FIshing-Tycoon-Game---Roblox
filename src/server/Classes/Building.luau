@@ -276,6 +276,8 @@ function Building:Initialize()
 
 	-- Setup UI components
 	if self.PurchaseBoard then self:SetupProximityPrompt(self.PurchaseBoard) end
+
+	self:Save()
 end
 
 function Building:SetupPurchaseBoard()
@@ -359,7 +361,7 @@ end
 function Building:Save()
 	if self.isPurchased then DataService.SaveBuffState(self.Player, self.BuildingBuff) end
 
-	DataService.SaveBuildingState(self.Player, self.BuildingName, self:Serialize())
+	DataService.SaveBuildingState(self.Player, self:Serialize())
 end
 -- //!SECTION
 

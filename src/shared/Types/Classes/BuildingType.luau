@@ -27,6 +27,7 @@ export type BuildingProps = {
 	GrowthRate: number,
 	CostGrowthRate: number,
 	Description: string,
+	BuildingName: string,
 }
 
 export type BuildingInstance = {
@@ -45,6 +46,7 @@ export type BuildingInstance = {
 	GrowthRate: number,
 	CostGrowthRate: number,
 	Entity: string,
+	BuildingName: string,
 
 	-- (Not-Saved to DataStore) Props
 	Model: Model,
@@ -52,7 +54,6 @@ export type BuildingInstance = {
 	VisualModels: { [string]: Model },
 	CurrentVisualModel: Model | nil,
 	BuildingId: number,
-	BuildingName: string,
 	Description: string,
 	PurchaseBoard: Model,
 	BuildingBuff: { BuffType.BuffState },
