@@ -411,6 +411,26 @@ function Tender:ShowFishPopUp(amount)
 		PopUp.Animate(clone, amount, clone.Boat)
 	end
 end
+
+function Tender:ShowTenderStoppedBillboard()
+	local billboard: BillboardGui = game.Workspace.BillBoards:FindFirstChild("TenderStopped", true)
+	local existing = self.PurchaseBoard:FindFirstChild("TenderStopped_Clone", true)
+	if billboard and not existing then
+		local clone: BillboardGui = billboard:Clone()
+		clone.Parent = self.PurchaseBoard.PrimaryPart
+		clone.Adornee = self.PurchaseBoard.PrimaryPart
+		clone.Name = "TenderStopped_Clone"
+
+		local canvasGroup: CanvasGroup = clone:FindFirstChild("CanvasGroup")
+		canvasGroup.Visible = true
+	end
+end
+
+function Tender:DestroyTenderStoppedBillboard()
+	local clonedBillboard = self.Model:FindFirstChild("TenderStopped_Clone", true)
+
+	if clonedBillboard then clonedBillboard:Destroy() end
+end
 -- //!SECTION
 
 -- //SECTION - Visibility and Collision

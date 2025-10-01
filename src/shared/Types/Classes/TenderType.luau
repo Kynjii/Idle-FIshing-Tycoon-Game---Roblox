@@ -122,6 +122,10 @@ export type TenderInstance = {
 	-- Animation
 	StartAnimation: (self: TenderInstance) -> (),
 
+	-- BillBoard Alerts
+	ShowTenderStoppedBillboard: (self: TenderInstance) -> (),
+	DestroyTenderStoppedBillboard: (self: TenderInstance) -> (),
+
 	-- Event Listener
 	AttachEventListeners: (self: TenderInstance) -> (),
 

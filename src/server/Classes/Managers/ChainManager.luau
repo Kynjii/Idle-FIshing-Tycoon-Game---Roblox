@@ -288,9 +288,12 @@ function ChainManager:StartUnloadingFish()
 
 		local amount = math.clamp(deltaToRemove, 0, math.min(storageFree, currentTenderFish))
 		if amount > 0 then
+			tender:DestroyTenderStoppedBillboard()
 			tender:RemoveFish(amount)
 			storage:AddFish(amount)
 			if tender.Buffs then tender:UpdatePurchaseBoardUI() end
+		else
+			tender:ShowTenderStoppedBillboard()
 		end
 
 		-- Finish ONLY when the tender is empty.
