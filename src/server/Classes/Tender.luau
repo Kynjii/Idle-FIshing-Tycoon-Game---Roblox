@@ -427,7 +427,8 @@ function Tender:ShowTenderStoppedBillboard()
 end
 
 function Tender:DestroyTenderStoppedBillboard()
-	local clonedBillboard = self.Model:FindFirstChild("TenderStopped_Clone", true)
+	local clonedBillboard = nil
+	if self.Model then clonedBillboard = self.Model:FindFirstChild("TenderStopped_Clone", true) end
 
 	if clonedBillboard then clonedBillboard:Destroy() end
 end

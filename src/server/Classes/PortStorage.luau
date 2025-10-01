@@ -321,7 +321,8 @@ function PortStorage:ShowStorageFullBillboard()
 end
 
 function PortStorage:DestroyStorageFullBillboard()
-	local clonedBillboard = self.Model:FindFirstChild("StorageFullAlert_Clone", true)
+	local clonedBillboard = nil
+	if self.Model then clonedBillboard = self.Model:FindFirstChild("StorageFullAlert_Clone", true) end
 
 	if clonedBillboard then clonedBillboard:Destroy() end
 end

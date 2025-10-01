@@ -69,6 +69,7 @@ export type TenderInstance = {
 	CurrentVisualModel: Model | nil,
 	Buffs: { BuffType.BuffState },
 	PurchaseBoard: Model,
+	PBDetails: { [string]: TextLabel | ImageLabel },
 
 	-- Core Tender Actions
 	Purchase: (self: TenderInstance) -> (),

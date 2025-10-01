@@ -64,6 +64,7 @@ export type BoatInstance = {
 	CurrentVisualModel: Model | nil,
 	Buffs: { BuffType.BuffState },
 	PurchaseBoard: Model,
+	PBDetails: { [string]: TextLabel | ImageLabel },
 
 	-- Core Boat Actions
 	Purchase: (self: BoatInstance) -> (),

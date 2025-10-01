@@ -239,6 +239,8 @@ function Boat:StartFishing()
 		if not self:IsStorageFull() then
 			self:AddFish(self.CurrentFPS)
 			self:UpdatePurchaseBoardUI()
+		else
+			self:UpdateStorageStatus(true)
 		end
 	end, 1)
 	if self.FishingInterval then self._cleaner:add(self.FishingInterval) end
@@ -337,7 +339,8 @@ function Boat:ShowStorageFullBillboard()
 end
 
 function Boat:DestroyStorageFullBillboard()
-	local clonedBillboard = self.Model:FindFirstChild("StorageFullAlert_Clone", true)
+	local clonedBillboard = nil
+	if self.Model then clonedBillboard = self.Model:FindFirstChild("StorageFullAlert_Clone", true) end
 
 	if clonedBillboard then clonedBillboard:Destroy() end
 end

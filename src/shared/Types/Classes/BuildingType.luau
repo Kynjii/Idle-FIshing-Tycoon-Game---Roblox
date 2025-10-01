@@ -57,6 +57,7 @@ export type BuildingInstance = {
 	Description: string,
 	PurchaseBoard: Model,
 	BuildingBuff: { BuffType.BuffState },
+	PBDetails: { [string]: TextLabel | ImageLabel },
 
 	-- Core Building Actions
 	Purchase: (self: BuildingInstance) -> (),

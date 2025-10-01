@@ -1,3 +1,5 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Theme = {
 	font = Font.fromId(12187371840),
 
@@ -47,6 +49,13 @@ local Theme = {
 		image = "rbxassetid://80427328338898",
 		hoverImage = "rbxassetid://80427328338898",
 		pressedImage = "rbxassetid://72623624680339",
+	},
+
+	textColor = {
+		[FFGEnum.CLASS.ENTITY_NAME.Boat] = Color3.fromRGB(92, 64, 51),
+		[FFGEnum.CLASS.ENTITY_NAME.Tender] = Color3.fromRGB(181, 136, 99),
+		[FFGEnum.CLASS.ENTITY_NAME.PortStorage] = Color3.fromRGB(249, 132, 74),
+		[FFGEnum.CLASS.ENTITY_NAME.Building] = Color3.fromRGB(39, 125, 161),
 	},
 }
 

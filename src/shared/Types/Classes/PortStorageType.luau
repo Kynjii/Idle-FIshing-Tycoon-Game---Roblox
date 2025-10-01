@@ -57,6 +57,7 @@ export type StorageInstance = {
 	TakeFishPrompt: ProximityPrompt,
 	Buffs: { BuffType.BuffState },
 	PurchaseBoard: Model,
+	PBDetails: { [string]: TextLabel | ImageLabel },
 
 	-- Core Boat Actions
 	Purchase: (self: StorageInstance) -> (),

@@ -293,6 +293,7 @@ function ChainManager:StartUnloadingFish()
 			storage:AddFish(amount)
 			if tender.Buffs then tender:UpdatePurchaseBoardUI() end
 		else
+			print("amount", amount)
 			tender:ShowTenderStoppedBillboard()
 		end
 
