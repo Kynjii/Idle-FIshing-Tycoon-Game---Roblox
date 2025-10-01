@@ -84,7 +84,7 @@ export type StorageInstance = {
 	Initialize: (self: StorageInstance) -> (),
 	SetupPurchaseBoard: (self: StorageInstance) -> Model,
 	UpdatePurchaseBoardUI: (self: StorageInstance) -> (),
-	SetupProximityPrompt: (self: StorageInstance, purchaseBoard: Part) -> ProximityPrompt,
+	SetupProximityPrompt: (self: StorageInstance, purchaseBoard: Model) -> ProximityPrompt,
 	SetupFishRemovalPrompt: (self: StorageInstance) -> (),
 
 	-- Visibility and Collision

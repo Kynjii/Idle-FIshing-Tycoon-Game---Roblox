@@ -6,11 +6,12 @@ local PortStorageType = require(ReplicatedStorage.Shared.Types.Classes.PortStora
 local TenderType = require(ReplicatedStorage.Shared.Types.Classes.TenderType)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Theme = require(ReplicatedStorage.Shared.Theme.Theme)
+local BuildingType = require(ReplicatedStorage.Shared.Types.Classes.BuildingType)
 local FormatNumber = require(ReplicatedStorage.Shared.Utils.FormatNumber)
 
 local PB = {}
 
-function PB.CreatePB(pbModel: Model, class: BoatType.BoatInstance | TenderType.TenderInstance | PortStorageType.StorageInstance)
+function PB.CreatePB(pbModel: Model, class: BoatType.BoatInstance | TenderType.TenderInstance | PortStorageType.StorageInstance | BuildingType.BuildingInstance)
 	local purchaseBoard = pbModel
 
 	local pbDetails = {}

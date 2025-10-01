@@ -15,7 +15,6 @@ local ProximityPrompt = require(ServerScriptService.Server.Classes.Modules.Proxi
 local PurchaseBoard = require(ServerScriptService.Server.Classes.Modules.PurchaseBoard)
 local TenderType = require(ReplicatedStorage.Shared.Types.Classes.TenderType)
 local Buffs = require(ServerScriptService.Server.Math.Buffs)
-local ProgressBar = require(ServerScriptService.Server.Modules.Tweens.ProgressBar)
 local FadeEffect = require(ServerScriptService.Server.Modules.Tweens.FadeEffect)
 local PopUp = require(ServerScriptService.Server.Modules.Tweens.PopUp)
 local CleanerService = require(ServerScriptService.Server.Services.CleanerService)
@@ -121,11 +120,7 @@ function Tender.New(state, player, model)
 	-- Travel Time calcs
 	self.CurrentTravelTime = self:CalculateTravelTime()
 
-	-- Progress Bars
-	self.BillBoard = DeepWait(self.Model, "Tender", "Base", "Billboard", "BillboardGui")
-	self.ProgressBar = DeepWait(self.BillBoard, "ProgressBarBG", "ProgressBar")
-
-	self.PurchaseBoard, self.PBDetails = nil
+	self.PurchaseBoard, self.PBDetails = self:SetupPurchaseBoard()
 
 	-- Tweens
 	self.ProgressTween = nil
@@ -143,7 +138,8 @@ end
 
 -- //SECTION - Buffs
 function Tender:GetBuffs()
-	return Buffs.GetBuffs(self.Player, TENDER_BUFFS)
+	local buffs = Buffs.GetBuffs(self.Player, TENDER_BUFFS)
+	return buffs
 end
 
 function Tender:UpdateBuffs()
@@ -343,7 +339,6 @@ function Tender:Initialize()
 	end
 
 	-- Setup UI components
-	self.PurchaseBoard, self.PBDetails = self:SetupPurchaseBoard()
 	if self.PurchaseBoard then self:SetupProximityPrompt(self.PurchaseBoard) end
 
 	-- Apply attributes for ChainManager

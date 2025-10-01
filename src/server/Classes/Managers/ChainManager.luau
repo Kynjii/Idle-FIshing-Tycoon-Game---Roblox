@@ -2,21 +2,18 @@ local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
-local Boat: Boat = require(ServerScriptService.Server.Classes.Boat)
-local PortStorage: PortStorageType = require(ServerScriptService.Server.Classes.PortStorage)
-local Tender: Tender = require(ServerScriptService.Server.Classes.Tender)
-local BoatType = require(ReplicatedStorage.Shared.Types.Classes.BoatType)
 local TenderType = require(ReplicatedStorage.Shared.Types.Classes.TenderType)
+local BoatType = require(ReplicatedStorage.Shared.Types.Classes.BoatType)
 local ChainManagerType = require(ReplicatedStorage.Shared.Types.Managers.ChainManagerType)
 local PortStorageType = require(ReplicatedStorage.Shared.Types.Classes.PortStorageType)
+local Boat: BoatType.Boat = require(ServerScriptService.Server.Classes.Boat)
+local PortStorage: PortStorageType.Storage = require(ServerScriptService.Server.Classes.PortStorage)
+local Tender: TenderType.Tender = require(ServerScriptService.Server.Classes.Tender)
 
 local taggedBoats = CollectionService:GetTagged("Boat")
 local taggedTenders = CollectionService:GetTagged("Tender")
 local taggedStorage = CollectionService:GetTagged("Storage")
 
-type Boat = BoatType.Boat
-type Tender = TenderType.Tender
-type PortStorageType = PortStorageType.Storage
 type ChainManager = ChainManagerType.ChainManagerInstance
 
 local ChainManager = {} :: ChainManager
@@ -114,7 +111,11 @@ function ChainManager:AttachAttListeners()
 	self.TenderModel.PrimaryPart.AttributeChanged:Connect(function(attributeName)
 		-- isPurchased triggers the start of the cycle
 		if attributeName == FFGEnum.ATTRIBUTES.isPurchased and self.TenderModel.PrimaryPart:GetAttribute(attributeName) == true and self.LaneBoat.isPurchased then
-			self:StartTenderCycle()
+			if self.LaneTender.FishInStorage > 0 and not self.LaneStorage:IsStorageFull() then
+				self.TenderModel.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.atPort, true)
+			else
+				self:StartTenderCycle()
+			end
 			return
 		end
 
@@ -222,9 +223,11 @@ function ChainManager:StartLoadingFish()
 
 		-- Compute allowed transfer this tick
 		local delta = targetStorage - fishInStorage
-		local boatAmount = boat.FishInStorage
-		local availableStorage = currentMaxStorage - fishInStorage
-		local amount = math.clamp(delta, 0, math.min(boatAmount, availableStorage))
+		local boatAmount = math.max(0, boat.FishInStorage)
+		local availableStorage = math.max(0, currentMaxStorage - fishInStorage)
+
+		local maxTransfer = math.min(boatAmount, availableStorage)
+		local amount = math.clamp(delta, 0, math.max(0, maxTransfer))
 
 		if amount > 0 then
 			boat:RemoveFish(amount)
@@ -277,16 +280,16 @@ function ChainManager:StartUnloadingFish()
 		local p = math.clamp(activeUnloadTime / unloadDuration, 0, 1)
 
 		local currentMaxStorage = storage.CurrentMaxStorage
-		local storageFree = currentMaxStorage - storage.FishInStorage
+		local storageFree = math.max(0, currentMaxStorage - storage.FishInStorage)
 
-		local currentTenderFish = tender.FishInStorage
+		local currentTenderFish = math.max(0, tender.FishInStorage)
 		local targetTenderFish = (p >= 1) and 0 or math.ceil(initialCargo * (1 - p))
 		if targetTenderFish < 0 then targetTenderFish = 0 end
 
-		local deltaToRemove = currentTenderFish - targetTenderFish
-		if deltaToRemove < 0 then deltaToRemove = 0 end
+		local deltaToRemove = math.max(0, currentTenderFish - targetTenderFish)
 
-		local amount = math.clamp(deltaToRemove, 0, math.min(storageFree, currentTenderFish))
+		local maxAmount = math.min(storageFree, currentTenderFish)
+		local amount = math.clamp(deltaToRemove, 0, math.max(0, maxAmount))
 
 		if amount > 0 then
 			tender:DestroyTenderStoppedBillboard()

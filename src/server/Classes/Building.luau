@@ -12,6 +12,7 @@ local Buffs = require(ServerScriptService.Server.Math.Buffs)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local Formulas = require(ServerScriptService.Server.Math.Formulas)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
+local BuffType = require(ReplicatedStorage.Shared.Types.BuffType)
 local DeepWait = require(ReplicatedStorage.Shared.Utils.DeepWait)
 local FadeEffect = require(ServerScriptService.Server.Modules.Tweens.FadeEffect)
 local CleanerService = require(ServerScriptService.Server.Services.CleanerService)
@@ -154,7 +155,7 @@ local Building = {} :: BuildingInstance
 Building.__index = Building
 
 -- //SECTION - Constructor
-function Building.New(state, player: Player, model: Model, realmBuffs: { [string]: number }): Building
+function Building.New(state, player: Player, model: Model, realmBuffs: BuffType.BuffState): Building
 	local self: BuildingInstance = setmetatable({}, Building)
 
 	-- Start with default stats as base
@@ -189,17 +190,16 @@ function Building.New(state, player: Player, model: Model, realmBuffs: { [string
 	self.CurrentVisualModel = nil
 
 	self.BuildingBuff = realmBuffs[BUILDING_BUFFS[self.BuildingName]]
-	self.BuildingBuff.CurrentValue = self.isPurchased and Buffs.CalculateLevelBuffValue(self.UpgradeStage, self.Level, self.BuildingBuff) or nil
+	if not self.BuildingBuff.CurrentValue then self.BuildingBuff.CurrentValue = self.isPurchased and Buffs.CalculateLevelBuffValue(self.UpgradeStage, self.Level, self.BuildingBuff) or nil end
 
 	self.PurchaseBoard, self.PBDetails = self:SetupPurchaseBoard()
-
-	self:AttachEventListeners()
 
 	self._cleaner = CleanerService.new()
 
 	self.Upgraded = self._cleaner:add(Signal.new())
 	self.Purchased = self._cleaner:add(Signal.new())
 
+	self:AttachEventListeners()
 	self:UpdateVisualModel()
 
 	return self
@@ -212,9 +212,9 @@ function Building:Purchase()
 	self.BuildingBuff.CurrentValue = Buffs.CalculateLevelBuffValue(self.UpgradeStage, self.Level, self.BuildingBuff)
 
 	self:UpdateVisualModel()
-	self:Save()
 
 	self.Purchased:Fire(self)
+	self:Save()
 end
 
 function Building:Upgrade()
@@ -230,11 +230,10 @@ function Building:Upgrade()
 	end
 	self:UpdateBuffValue()
 
-	self:Save()
-
 	self.UpgradeCost = self:CalculateUpgradeCost()
 	self:UpdatePurchaseBoardUI()
 	self.Upgraded:Fire(self)
+	self:Save()
 end
 
 function Building:IncreaseUpgradeStage(stage)
@@ -281,7 +280,7 @@ function Building:Initialize()
 end
 
 function Building:SetupPurchaseBoard()
-	local purchaseBoard = self.Model:WaitForChild("Purchase_Board")
+	local purchaseBoard: Model = self.Model:WaitForChild("Purchase_Board")
 
 	return PurchaseBoard.CreatePB(purchaseBoard, self)
 end
@@ -290,7 +289,7 @@ function Building:UpdatePurchaseBoardUI()
 	PurchaseBoard.UpdatePB(self)
 end
 
-function Building:SetupProximityPrompt(purchaseBoard: Part)
+function Building:SetupProximityPrompt(purchaseBoard: Model)
 	local proximityPrompt: ProximityPrompt = self._cleaner:add(Instance.new("ProximityPrompt", purchaseBoard))
 
 	ProximityPrompt.CreatePP(proximityPrompt, self)

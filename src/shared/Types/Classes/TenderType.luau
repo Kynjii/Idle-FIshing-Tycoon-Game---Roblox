@@ -60,9 +60,7 @@ export type TenderInstance = {
 	Model: Model,
 	PortPos: CFrame,
 	BillBoard: BillboardGui,
-	ProgressBar: Frame,
 	Player: Player,
-	ProgressTween: Tween | nil,
 	MoveTween: Tween | nil,
 	Animations: { [string]: Animation },
 	VisualModels: { [string]: Model },
@@ -102,7 +100,7 @@ export type TenderInstance = {
 	Initialize: (self: TenderInstance) -> (),
 	SetupPurchaseBoard: (self: TenderInstance) -> Model,
 	UpdatePurchaseBoardUI: (self: TenderInstance) -> (),
-	SetupProximityPrompt: (self: TenderInstance, purchaseBoard: Part) -> ProximityPrompt,
+	SetupProximityPrompt: (self: TenderInstance, purchaseBoard: Model) -> ProximityPrompt,
 	ShowFishPopUp: (self: TenderInstance) -> (),
 
 	-- Visibility and Collision

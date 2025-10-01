@@ -307,7 +307,7 @@ function Boat:UpdatePurchaseBoardUI()
 	PurchaseBoard.UpdatePB(self)
 end
 
-function Boat:SetupProximityPrompt(purchaseBoard: Part)
+function Boat:SetupProximityPrompt(purchaseBoard: Model)
 	local proximityPrompt: ProximityPrompt = self._cleaner:add(Instance.new("ProximityPrompt", purchaseBoard))
 
 	return ProximityPrompt.CreatePP(proximityPrompt, self)

@@ -266,7 +266,7 @@ function PortStorage:UpdatePurchaseBoardUI()
 	PurchaseBoard.UpdatePB(self)
 end
 
-function PortStorage:SetupProximityPrompt(purchaseBoard: Part)
+function PortStorage:SetupProximityPrompt(purchaseBoard: Model)
 	local proximityPrompt = Instance.new("ProximityPrompt", purchaseBoard)
 
 	ProximityPrompt.CreatePP(proximityPrompt, self)
