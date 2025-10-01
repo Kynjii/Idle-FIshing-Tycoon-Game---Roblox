@@ -267,6 +267,12 @@ end
 
 function Boat:UpdateStorageStatus(status)
 	self.StorageFull = status
+
+	if status then
+		self:ShowStorageFullBillboard()
+	else
+		self:DestroyStorageFullBillboard()
+	end
 end
 -- //!SECTION
 
@@ -314,6 +320,26 @@ function Boat:ShowFishPopUp(amount)
 		clone.Name = "Popup_Clone"
 		PopUp.Animate(clone, amount, clone.Fish)
 	end
+end
+
+function Boat:ShowStorageFullBillboard()
+	local billboard: BillboardGui = game.Workspace.BillBoards:FindFirstChild("StorageFullAlert", true)
+	local existing = self.PurchaseBoard:FindFirstChild("StorageFullAlert_Clone", true)
+	if billboard and not existing then
+		local clone: BillboardGui = billboard:Clone()
+		clone.Parent = self.PurchaseBoard.PrimaryPart
+		clone.Adornee = self.PurchaseBoard.PrimaryPart
+		clone.Name = "StorageFullAlert_Clone"
+
+		local canvasGroup: CanvasGroup = clone:FindFirstChild("CanvasGroup")
+		canvasGroup.Visible = true
+	end
+end
+
+function Boat:DestroyStorageFullBillboard()
+	local clonedBillboard = self.Model:FindFirstChild("StorageFullAlert_Clone", true)
+
+	if clonedBillboard then clonedBillboard:Destroy() end
 end
 -- //!SECTION
 

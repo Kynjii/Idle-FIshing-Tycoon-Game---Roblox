@@ -1,3 +1,4 @@
+local BulkImportService = game:GetService("BulkImportService")
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -119,7 +120,10 @@ end
 function closeDetails()
 	entityDetailsUI.Visible = false
 	detailsAreOpen = false
-	if Lighting and Lighting.Blur then Lighting.Blur:Destroy() end
+	if Lighting then
+		local blur = Lighting:FindFirstChild("Blur")
+		if blur then blur:Destroy() end
+	end
 end
 
 function clearExistingData()

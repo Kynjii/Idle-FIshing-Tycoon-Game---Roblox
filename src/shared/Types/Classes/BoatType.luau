@@ -111,6 +111,10 @@ export type BoatInstance = {
 	-- Animations
 	StartAnimation: (self: BoatInstance) -> (),
 
+	-- BillBoard Alerts
+	ShowStorageFullBillboard: (self: BoatInstance) -> (),
+	DestroyStorageFullBillboard: (self: BoatInstance) -> (),
+
 	-- Event Listener
 	AttachEventListeners: (self: BoatInstance) -> (),
 

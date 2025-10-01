@@ -103,6 +103,10 @@ export type StorageInstance = {
 	GetVisualModels: (self: StorageInstance) -> { [string]: Model },
 	RemovePreviousVisualModel: (self: StorageInstance) -> (),
 
+	-- BillBoard Alerts
+	ShowStorageFullBillboard: (self: StorageInstance) -> (),
+	DestroyStorageFullBillboard: (self: StorageInstance) -> (),
+
 	-- Event Listener
 	AttachEventListeners: (self: StorageInstance) -> (),
 

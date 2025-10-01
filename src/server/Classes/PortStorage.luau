@@ -185,6 +185,8 @@ function PortStorage:RemoveFish(amount: number)
 
 	self:UpdatePurchaseBoardUI()
 	self:UpdateFishModel()
+
+	self:Save()
 end
 
 function PortStorage:UpdateFishModel()
@@ -303,6 +305,26 @@ function PortStorage:SetupFishRemovalPrompt()
 		self:Save()
 	end)
 end
+
+function PortStorage:ShowStorageFullBillboard()
+	local billboard: BillboardGui = game.Workspace.BillBoards:FindFirstChild("StorageFullAlert", true)
+	local existing = self.PurchaseBoard:FindFirstChild("StorageFullAlert_Clone", true)
+	if billboard and not existing then
+		local clone: BillboardGui = billboard:Clone()
+		clone.Parent = self.PurchaseBoard.PrimaryPart
+		clone.Adornee = self.PurchaseBoard.PrimaryPart
+		clone.Name = "StorageFullAlert_Clone"
+
+		local canvasGroup: CanvasGroup = clone:FindFirstChild("CanvasGroup")
+		canvasGroup.Visible = true
+	end
+end
+
+function PortStorage:DestroyStorageFullBillboard()
+	local clonedBillboard = self.Model:FindFirstChild("StorageFullAlert_Clone", true)
+
+	if clonedBillboard then clonedBillboard:Destroy() end
+end
 -- //!SECTION
 
 -- //SECTION - Visibility and Collision
@@ -344,6 +366,12 @@ end
 
 function PortStorage:UpdateStorageStatus(status)
 	self.StorageFull = status
+
+	if status then
+		self:ShowStorageFullBillboard()
+	else
+		self:DestroyStorageFullBillboard()
+	end
 end
 -- //!SECTION
 
