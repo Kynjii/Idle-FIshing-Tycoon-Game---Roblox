@@ -6,12 +6,23 @@ local PortStorageType = require(ReplicatedStorage.Shared.Types.Classes.PortStora
 local TenderType = require(ReplicatedStorage.Shared.Types.Classes.TenderType)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Theme = require(ReplicatedStorage.Shared.Theme.Theme)
-local BuildingType = require(ReplicatedStorage.Shared.Types.Classes.BuildingType)
 local FormatNumber = require(ReplicatedStorage.Shared.Utils.FormatNumber)
 
 local PB = {}
 
-function PB.CreatePB(pbModel: Model, class: BoatType.BoatInstance | TenderType.TenderInstance | PortStorageType.StorageInstance | BuildingType.BuildingInstance)
+type PurchaseBoardEntity = {
+	GetName: (self: any) -> string,
+	UpgradeStage: number,
+	Entity: string,
+	isPurchased: boolean,
+	Level: number,
+	FishInStorage: number?, -- Optional since Buildings don't have this
+	CurrentMaxStorage: number,
+	PBDetails: any?, -- Optional, only used in UpdatePB
+	BuildingBuff: { [string]: any }?,
+}
+
+function PB.CreatePB(pbModel: Model, class: PurchaseBoardEntity)
 	local purchaseBoard = pbModel
 
 	local pbDetails = {}
@@ -54,11 +65,12 @@ function PB.CreatePB(pbModel: Model, class: BoatType.BoatInstance | TenderType.T
 		end
 
 		-- Building Buff
+		if class.Entity == FFGEnum.CLASS.ENTITY_NAME.Building then pbDetails.EntityLabel.Text = tostring(class.BuildingBuff and (class.BuildingBuff.CurrentValue :: number)) end
 
 		-- Progress Bar
 		if class.Entity ~= FFGEnum.CLASS.ENTITY_NAME.Building then
 			pbDetails.StorageLabel.Text = FormatNumber(class.FishInStorage) .. "/" .. FormatNumber(class.CurrentMaxStorage)
-			ProgressBar.Update(pbDetails.ProgressBar, class.FishInStorage, class.CurrentMaxStorage)
+			ProgressBar.Update(pbDetails.ProgressBar, class.FishInStorage or 0, class.CurrentMaxStorage)
 		else
 			if progressContainer then progressContainer.Visible = false end
 		end
@@ -66,9 +78,9 @@ function PB.CreatePB(pbModel: Model, class: BoatType.BoatInstance | TenderType.T
 	return purchaseBoard, pbDetails
 end
 
-function PB.UpdatePB(class: BoatType.BoatInstance | TenderType.TenderInstance | PortStorageType.StorageInstance)
+function PB.UpdatePB(class: PurchaseBoardEntity)
 	-- Name
-	class.PBDetails.NameLabel.Text = class:GetName()
+	class.PBDetails.NameLabel.Text = (class :: any):GetName()
 
 	-- Quality
 	local qualityInfo = FFGEnum.QUALITY[class.UpgradeStage]
@@ -97,7 +109,7 @@ function PB.UpdatePB(class: BoatType.BoatInstance | TenderType.TenderInstance | 
 	-- Progress Bar
 	if class.Entity ~= FFGEnum.CLASS.ENTITY_NAME.Building then
 		class.PBDetails.StorageLabel.Text = FormatNumber(class.FishInStorage) .. "/" .. FormatNumber(class.CurrentMaxStorage)
-		ProgressBar.Update(class.PBDetails.ProgressBar, class.FishInStorage, class.CurrentMaxStorage)
+		ProgressBar.Update(class.PBDetails.ProgressBar, class.FishInStorage or 0, class.CurrentMaxStorage)
 	else
 		if progressContainer then progressContainer.Visible = false end
 	end

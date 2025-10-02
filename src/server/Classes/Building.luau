@@ -156,7 +156,7 @@ Building.__index = Building
 
 -- //SECTION - Constructor
 function Building.New(state, player: Player, model: Model, realmBuffs: BuffType.BuffState): Building
-	local self: BuildingInstance = setmetatable({}, Building)
+	local self = setmetatable({}, Building)
 
 	-- Start with default stats as base
 	for key, value in pairs(DEFAULTS) do
@@ -290,7 +290,8 @@ function Building:UpdatePurchaseBoardUI()
 end
 
 function Building:SetupProximityPrompt(purchaseBoard: Model)
-	local proximityPrompt: ProximityPrompt = self._cleaner:add(Instance.new("ProximityPrompt", purchaseBoard))
+	local proximityPrompt: ProximityPrompt = self._cleaner:add(Instance.new("ProximityPrompt"))
+	proximityPrompt.Parent = purchaseBoard
 
 	ProximityPrompt.CreatePP(proximityPrompt, self)
 end
@@ -371,7 +372,8 @@ function Building:GetVisualModels()
 
 	local templateModels: { [number]: Model } = {}
 	for i, model in ipairs(models) do
-		templateModels[tonumber(model.Name)] = model
+		local num = tonumber(model.Name)
+		if num then templateModels[num] = model end
 	end
 
 	return templateModels
