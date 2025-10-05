@@ -437,12 +437,7 @@ function PortStorage.GetVisualModels(self: PortStorage): { [number]: Model }
 	local modelsFolder = DeepWait(game.Workspace, "Storage", "VisualStages")
 	local models = modelsFolder:GetChildren()
 
-	local templateModels: { [number]: Model } = {}
-	for i, model in ipairs(models) do
-		templateModels[model.Name] = model
-	end
-
-	return templateModels
+	return models
 end
 
 function PortStorage.RemovePreviousVisualModel(self: PortStorage)

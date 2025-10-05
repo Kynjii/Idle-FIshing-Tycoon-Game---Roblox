@@ -486,12 +486,7 @@ function Tender.GetVisualModels(self: Tender): { [number]: Model }
 	local modelsFolder = DeepWait(game.Workspace, "Tenders", "VisualStages")
 	local models = modelsFolder:GetChildren()
 
-	local templateModels: { [number]: Model } = {}
-	for i, model in ipairs(models) do
-		templateModels[tonumber(model.Name) or 0] = model
-	end
-
-	return templateModels
+	return models
 end
 
 function Tender.RemovePreviousVisualModel(self: Tender)

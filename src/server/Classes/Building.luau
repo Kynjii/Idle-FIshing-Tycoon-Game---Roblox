@@ -373,13 +373,7 @@ function Building.GetVisualModels(self: Building): { [number]: Model }
 	local modelsFolder = DeepWait(game.Workspace, "Buildings", "VisualStages", self.BuildingName)
 	local models = modelsFolder:GetChildren()
 
-	local templateModels: { [number]: Model } = {}
-	for i, model in ipairs(models) do
-		local num = tonumber(model.Name)
-		if num then templateModels[num] = model end
-	end
-
-	return templateModels
+	return models
 end
 
 function Building.RemovePreviousVisualModel(self: Building): ()
