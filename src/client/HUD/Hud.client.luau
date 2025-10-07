@@ -5,6 +5,8 @@ local Theme = require(ReplicatedStorage.Shared.Theme.Theme)
 local DeepWait = require(ReplicatedStorage.Shared.Utils.DeepWait)
 local FormatNumber = require(ReplicatedStorage.Shared.Utils.FormatNumber)
 
+local boldFont = Font.fromId(12187374954, Enum.FontWeight.Bold)
+
 local player = Players.LocalPlayer
 local hud: Frame = DeepWait(player, "PlayerGui", "HUD", "Main")
 
@@ -27,7 +29,7 @@ local function setCurrency(name: string, v: number)
 		currencyLabels[name] = currencyLabel
 	end
 
-	currencyLabel.FontFace = Theme.font
+	currencyLabel.FontFace = boldFont
 	currencyLabel.Text = FormatNumber(v)
 end
 
@@ -46,6 +48,7 @@ local function setRealmBuff(name: string, buff)
 		buffLabel.Name = name .. "_LabelClone"
 		buffLabel.LayoutOrder = realmBuffCount
 		buffLabel.Parent = realmBuffsTemplate.Parent
+		buffLabel.Size = UDim2.fromScale(1, 0.1)
 		buffLabel.Visible = true
 		realmBuffLabels[name] = buffLabel
 	end
