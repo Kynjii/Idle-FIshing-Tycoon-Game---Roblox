@@ -29,6 +29,7 @@ function PP.CreatePP(proximityPrompt: ProximityPrompt, class: Boat | Tender | Po
 
 	proximityPrompt.HoldDuration = 0
 	proximityPrompt.MaxActivationDistance = 5
+	proximityPrompt.MaxIndicatorDistance = proximityPrompt.MaxActivationDistance * 5
 	proximityPrompt.ObjectText = "Open"
 	proximityPrompt.ActionText = `{class.Entity} Details`
 

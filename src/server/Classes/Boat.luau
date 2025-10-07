@@ -435,7 +435,12 @@ function Boat.GetVisualModels(self: Boat): { [number]: Model }
 	local modelsFolder = DeepWait(game.Workspace, "Boats", "VisualStages")
 	local models = modelsFolder:GetChildren()
 
-	return models
+	local sortedModels = {}
+	for k, v in pairs(models) do
+		sortedModels[tonumber(v.Name)] = v
+	end
+
+	return sortedModels
 end
 
 function Boat.RemovePreviousVisualModel(self: Boat): ()
@@ -458,7 +463,7 @@ function Boat.UpdateVisualModel(self: Boat): ()
 	updatedModel.Parent = self.VisualRoot
 	updatedModel:PivotTo(self.VisualRoot.CFrame)
 
-	for _, part in pairs(updatedModel:GetChildren()) do
+	for _, part in pairs(updatedModel:GetDescendants()) do
 		if part:IsA("BasePart") then
 			local weld = Instance.new("WeldConstraint")
 			weld.Parent = part
@@ -466,7 +471,7 @@ function Boat.UpdateVisualModel(self: Boat): ()
 			weld.Part1 = self.VisualRoot
 			part.Anchored = false
 
-			if self.isPurchased then FadeEffect.In(part) end
+			if self.isPurchased and part.Name ~= "Base" then FadeEffect.In(part) end
 		end
 	end
 
