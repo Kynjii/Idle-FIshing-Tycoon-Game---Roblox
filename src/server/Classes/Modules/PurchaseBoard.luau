@@ -17,7 +17,6 @@ type Building = BuildingType.BuildingInstance
 local PB = {}
 
 function PB.CreatePB(pbModel: Model, class: Boat | Tender | PortStorage | Building)
-	print("class", class)
 	local typedClass
 	if class.Entity == FFGEnum.CLASS.ENTITY_NAME.Boat then
 		typedClass = class :: Boat
@@ -28,7 +27,6 @@ function PB.CreatePB(pbModel: Model, class: Boat | Tender | PortStorage | Buildi
 	elseif class.Entity == FFGEnum.CLASS.ENTITY_NAME.Building then
 		typedClass = class :: Building
 	else
-		print(class)
 		error("Invalid entity passed to CreatePB")
 	end
 
