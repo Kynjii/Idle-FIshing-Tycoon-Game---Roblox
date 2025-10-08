@@ -11,6 +11,8 @@ local DataService = {}
 DataService.Profiles = {}
 DataService.Replicas = {}
 
+type ReplicaType = Replica.Replica
+
 function DataService.AttachReplica(player: Player, profile)
 	-- Global
 	local currencies = {}
@@ -41,9 +43,20 @@ function DataService.AttachReplica(player: Player, profile)
 			GlobalBuffs = globalBuffs,
 			Realms = realms,
 		},
-	})
+	}) :: ReplicaType
 
-	replica:Subscribe(player)
+	if replica.ReadyPlayers[player] then
+		replica:Subscribe(player)
+	else
+		local connection
+		connection = replica.NewReadyPlayer:Connect(function(readyPlayer)
+			if readyPlayer == player then
+				replica:Subscribe(player)
+				connection:Disconnect()
+			end
+		end)
+	end
+
 	DataService.Replicas[player] = replica
 	return replica
 end
