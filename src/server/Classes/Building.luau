@@ -371,7 +371,12 @@ function Building.GetVisualModels(self: Building): { [number]: Model }
 	local modelsFolder = DeepWait(game.Workspace, "Buildings", "VisualStages", self.BuildingName)
 	local models = modelsFolder:GetChildren()
 
-	return models
+	local sortedModels = {}
+	for k, v in pairs(models) do
+		sortedModels[tonumber(v.Name)] = v
+	end
+
+	return sortedModels
 end
 
 function Building.RemovePreviousVisualModel(self: Building): ()
