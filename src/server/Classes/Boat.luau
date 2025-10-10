@@ -120,9 +120,6 @@ function Boat.New(state: { [string]: any }?, player: Player, model: Model): Boat
 
 	self.FishingInterval = nil
 
-	self:UpdateVisualModel()
-	self:StartAnimation()
-
 	return self
 end
 -- //!SECTION
@@ -289,6 +286,9 @@ function Boat.Initialize(self: Boat): ()
 		self:Show()
 		self:CanCollide()
 	end
+
+	self:UpdateVisualModel()
+	self:StartAnimation()
 
 	-- Setup UI components
 	if self.PurchaseBoard then self:SetupProximityPrompt(self.PurchaseBoard) end

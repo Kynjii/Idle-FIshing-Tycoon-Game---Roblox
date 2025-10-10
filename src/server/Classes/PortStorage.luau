@@ -111,8 +111,6 @@ function PortStorage.New(state: { [string]: any }?, player: Player, model: Model
 
 	self._cleaner = Trove.new()
 
-	self:UpdateVisualModel()
-
 	return self
 end
 -- //!SECTION
@@ -251,6 +249,8 @@ function PortStorage.Initialize(self: PortStorage): ()
 		self:Show()
 		self:CanCollide()
 	end
+
+	self:UpdateVisualModel()
 
 	-- Setup UI components
 	if self.PurchaseBoard then self:SetupProximityPrompt(self.PurchaseBoard) end

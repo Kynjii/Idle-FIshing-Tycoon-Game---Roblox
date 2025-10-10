@@ -331,17 +331,16 @@ end
 
 -- //SECTION - UI Setup
 function Tender.Initialize(self: Tender)
-	print("int", self)
 	-- Handle visibility based on purchase status
 	if not self.isPurchased then
 		self:Hide()
 		self:CannotCollide()
 	else
-		self:UpdateVisualModel()
 		self:Show()
 		self:CanCollide()
 	end
 
+	self:UpdateVisualModel()
 	self:StartAnimation()
 
 	-- Setup UI components

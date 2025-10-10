@@ -202,7 +202,6 @@ function Building.New(state: { [string]: any }?, player: Player, model: Model, r
 	self.Purchased = self._cleaner:Add(Signal.new())
 
 	self:AttachEventListeners()
-	self:UpdateVisualModel()
 
 	return self
 end
@@ -274,6 +273,8 @@ function Building.Initialize(self: Building)
 		self:Show()
 		self:CanCollide()
 	end
+
+	self:UpdateVisualModel()
 
 	-- Setup UI components
 	if self.PurchaseBoard then self:SetupProximityPrompt(self.PurchaseBoard) end
