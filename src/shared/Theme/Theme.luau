@@ -15,7 +15,7 @@ local Theme = {
 		coral = Color3.fromRGB(249, 132, 74),
 		yellow = Color3.fromRGB(249, 199, 79),
 
-		green = Color3.fromRGB(144, 190, 109),
+		green = Color3.fromHex("#1dea2b"),
 		teal = Color3.fromRGB(67, 170, 139),
 		tealBlue = Color3.fromRGB(77, 144, 142),
 		slateBlue = Color3.fromRGB(87, 117, 144),
