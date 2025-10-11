@@ -69,6 +69,35 @@ function DataService.DetachReplica(player: Player)
 	end
 end
 
+local function calculateBuffedAmount(player, amount)
+	local validBuffs = {
+		"Gold_Multi",
+		"Fish_Multi",
+		"Fish_Percent",
+	}
+
+	local buffState = DataService.GetBuffState(player, validBuffs)
+
+	if not buffState or #buffState == 0 then return amount end
+
+	local fishPercent = buffState["Fish_Percent"] and buffState["Fish_Percent"].CurrentValue or nil
+	local fishMulti = buffState["Fish_Multi"] and buffState["Fish_Multi"].CurrentValue or nil
+	local goldMulti = buffState["Gold_Multi"] and buffState["Gold_Multi"].CurrentValue or nil
+
+	local buffedAmount = amount
+	if fishPercent then buffedAmount = amount * fishPercent end
+
+	if fishMulti then
+		buffedAmount *= fishMulti
+	end
+
+	if goldMulti then
+		buffedAmount *= goldMulti
+	end
+
+	return buffedAmount
+end
+
 function DataService.Earn(player: Player, currencyType: string, amount: number)
 	local profile = DataService.Profiles[player]
 	if not profile then
@@ -85,7 +114,9 @@ function DataService.Earn(player: Player, currencyType: string, amount: number)
 	end
 
 	local current = tonumber(profile.Data.Currencies[currencyType]) or 0
-	local newValue = current + amount
+	local buffedAmount = calculateBuffedAmount(player, amount)
+
+	local newValue = current + buffedAmount
 	profile.Data.Currencies[currencyType] = newValue
 
 	local leaderStats = player:FindFirstChild("leaderstats")
