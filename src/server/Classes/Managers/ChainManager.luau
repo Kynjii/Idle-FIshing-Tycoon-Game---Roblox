@@ -67,7 +67,7 @@ function ChainManager.New(realmData, tier: number, player: Player, teamId: numbe
 		UpgradedEvent = nil,
 	}
 
-	if self.LaneTender.isPurchased then self:StartTenderCycle() end
+	if self.LaneTender.isPurchased and self.LaneBoat.isPurchased then self:StartTenderCycle() end
 
 	return self
 end
