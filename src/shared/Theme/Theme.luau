@@ -52,10 +52,10 @@ local Theme = {
 	},
 
 	textColor = {
-		[FFGEnum.CLASS.ENTITY_NAME.Boat] = Color3.fromRGB(180, 123, 65),
-		[FFGEnum.CLASS.ENTITY_NAME.Tender] = Color3.fromRGB(181, 136, 99),
-		[FFGEnum.CLASS.ENTITY_NAME.PortStorage] = Color3.fromRGB(249, 132, 74),
-		[FFGEnum.CLASS.ENTITY_NAME.Building] = Color3.fromRGB(39, 125, 161),
+		[FFGEnum.CLASS.ENTITY_NAME.Boat] = Color3.fromRGB(30, 90, 168),
+		[FFGEnum.CLASS.ENTITY_NAME.Tender] = Color3.fromRGB(88, 171, 65),
+		[FFGEnum.CLASS.ENTITY_NAME.PortStorage] = Color3.fromRGB(250, 200, 10),
+		[FFGEnum.CLASS.ENTITY_NAME.Building] = Color3.fromRGB(214, 121, 35),
 	},
 }
 
