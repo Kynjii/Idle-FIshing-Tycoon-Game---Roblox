@@ -363,7 +363,7 @@ function Tender.UpdatePurchaseBoardUI(self: Tender)
 end
 
 function Tender.SetupProximityPrompt(self: Tender, purchaseBoard: Model): ProximityPrompt
-	local proximityPrompt: ProximityPrompt = Instance.new("ProximityPrompt")
+	local proximityPrompt: ProximityPrompt = self._cleaner and self._cleaner:Add(Instance.new("ProximityPrompt"))
 	proximityPrompt.Parent = purchaseBoard
 	if self._cleaner then self._cleaner:Add(proximityPrompt) end
 
@@ -565,6 +565,7 @@ function Tender.Destroy(self: Tender)
 	self:MoveToPort()
 	self:Hide()
 	self:CannotCollide()
+	self:RemovePreviousVisualModel()
 
 	pcall(function()
 		self:Save()

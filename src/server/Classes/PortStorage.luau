@@ -269,7 +269,7 @@ function PortStorage.UpdatePurchaseBoardUI(self: PortStorage)
 end
 
 function PortStorage.SetupProximityPrompt(self: PortStorage, purchaseBoard: Model)
-	local proximityPrompt: ProximityPrompt = Instance.new("ProximityPrompt")
+	local proximityPrompt: ProximityPrompt = self._cleaner and self._cleaner:Add(Instance.new("ProximityPrompt"))
 	proximityPrompt.Parent = purchaseBoard
 	if self._cleaner then self._cleaner:Add(proximityPrompt) end
 
@@ -485,6 +485,7 @@ end
 function PortStorage.Destroy(self: PortStorage)
 	self:Hide()
 	self:CannotCollide()
+	self:RemovePreviousVisualModel()
 
 	pcall(function()
 		self:Save()

@@ -292,7 +292,7 @@ function Building.UpdatePurchaseBoardUI(self: Building): ()
 end
 
 function Building.SetupProximityPrompt(self: Building, purchaseBoard: Model): ()
-	local proximityPrompt = Instance.new("ProximityPrompt")
+	local proximityPrompt = self._cleaner and self._cleaner:Add(Instance.new("ProximityPrompt"))
 	proximityPrompt.Parent = purchaseBoard
 	if self._cleaner then self._cleaner:Add(proximityPrompt) end
 	ProximityPrompt.CreatePP(proximityPrompt, self :: any)
@@ -424,6 +424,7 @@ end
 function Building.Destroy(self: Building): ()
 	self:Hide()
 	self:CannotCollide()
+	self:RemovePreviousVisualModel()
 
 	pcall(function()
 		self:Save()

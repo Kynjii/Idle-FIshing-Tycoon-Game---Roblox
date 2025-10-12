@@ -74,6 +74,7 @@ local function PlayerAdded(player: Player)
 
 			TeamManager.AssignBuildingsManager(profile.Data, player, teamId)
 			TeamManager.AssignChainManagers(profile.Data, player, teamId)
+			TeamManager.ListenForReset(player)
 
 			Badges.CheckAlphaBadgeStatus(player)
 		else
@@ -91,6 +92,7 @@ end
 Players.PlayerAdded:Connect(PlayerAdded)
 
 Players.PlayerRemoving:Connect(function(player)
+	print("player leaving,", player)
 	pcall(function()
 		TeamManager.CleanupPlayer(player.UserId)
 	end)

@@ -309,7 +309,7 @@ function Boat.UpdatePurchaseBoardUI(self: Boat): ()
 end
 
 function Boat.SetupProximityPrompt(self: Boat, purchaseBoard: Model): ()
-	local proximityPrompt: ProximityPrompt = Instance.new("ProximityPrompt")
+	local proximityPrompt: ProximityPrompt = self._cleaner and self._cleaner:Add(Instance.new("ProximityPrompt"))
 	proximityPrompt.Parent = purchaseBoard
 	if self._cleaner then self._cleaner:Add(proximityPrompt) end
 
@@ -517,6 +517,7 @@ end
 function Boat.Destroy(self: Boat)
 	self:Hide()
 	self:CannotCollide()
+	self:RemovePreviousVisualModel()
 
 	pcall(function()
 		self:Save()
