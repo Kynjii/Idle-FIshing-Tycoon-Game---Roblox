@@ -20,7 +20,7 @@ Events.InitOnServer()
 TeamManager.CreateTeams()
 
 -- Setup leaderboard
-local function leaderboardSetup(player, playerData)
+local function addPlayerToLeaderboard(player, playerData)
 	local leaderstats = Instance.new("Folder")
 	leaderstats.Name = "leaderstats"
 	leaderstats.Parent = player
@@ -70,7 +70,7 @@ local function PlayerAdded(player: Player)
 				return
 			end
 
-			leaderboardSetup(player, profile.Data)
+			addPlayerToLeaderboard(player, profile.Data)
 
 			TeamManager.AssignBuildingsManager(profile.Data, player, teamId)
 			TeamManager.AssignChainManagers(profile.Data, player, teamId)

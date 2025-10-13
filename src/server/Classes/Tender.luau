@@ -314,6 +314,7 @@ function Tender.AddFish(self: Tender, amount: number)
 		self:UpdateStorageStatus(true)
 	end
 
+	self:UpdatePurchaseBoardUI()
 	self:Save()
 end
 
@@ -321,6 +322,7 @@ function Tender.RemoveFish(self: Tender, amount: number)
 	self.FishInStorage = math.max(self.FishInStorage - amount, 0)
 
 	self:UpdateStorageStatus(false)
+	self:UpdatePurchaseBoardUI()
 	self:Save()
 end
 
@@ -358,8 +360,12 @@ function Tender.SetupPurchaseBoard(self: Tender): (Model, { [string]: any })
 	return PurchaseBoard.CreatePB(purchaseBoard, self :: any)
 end
 
-function Tender.UpdatePurchaseBoardUI(self: Tender)
-	PurchaseBoard.UpdatePB(self :: any)
+function Tender.UpdatePurchaseBoardUI(self: Tender, reset: boolean?)
+	if reset then
+		PurchaseBoard.ResetPB(self.PurchaseBoard)
+	else
+		PurchaseBoard.UpdatePB(self :: any)
+	end
 end
 
 function Tender.SetupProximityPrompt(self: Tender, purchaseBoard: Model): ProximityPrompt
@@ -566,6 +572,7 @@ function Tender.Destroy(self: Tender)
 	self:Hide()
 	self:CannotCollide()
 	self:RemovePreviousVisualModel()
+	self:UpdatePurchaseBoardUI(true)
 
 	pcall(function()
 		self:Save()

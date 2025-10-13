@@ -235,7 +235,6 @@ function ChainManager:StartLoadingFish()
 		if amount > 0 then
 			boat:RemoveFish(amount)
 			tender:AddFish(amount)
-			if tender.Buffs then tender:UpdatePurchaseBoardUI() end
 		end
 
 		-- Finish either because time is up or storage is full
@@ -298,7 +297,6 @@ function ChainManager:StartUnloadingFish()
 			tender:DestroyTenderStoppedBillboard()
 			tender:RemoveFish(amount)
 			storage:AddFish(amount)
-			if tender.Buffs then tender:UpdatePurchaseBoardUI() end
 		elseif amount <= 0 and storage:IsStorageFull() then
 			tender:ShowTenderStoppedBillboard()
 			lastUpdateTime = currentTime

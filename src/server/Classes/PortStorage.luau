@@ -264,8 +264,12 @@ function PortStorage.SetupPurchaseBoard(self: PortStorage): (Model, { [string]: 
 	return PurchaseBoard.CreatePB(purchaseBoard, self :: any)
 end
 
-function PortStorage.UpdatePurchaseBoardUI(self: PortStorage)
-	PurchaseBoard.UpdatePB(self :: any)
+function PortStorage.UpdatePurchaseBoardUI(self: PortStorage, reset: boolean?)
+	if reset then
+		PurchaseBoard.ResetPB(self.PurchaseBoard)
+	else
+		PurchaseBoard.UpdatePB(self :: any)
+	end
 end
 
 function PortStorage.SetupProximityPrompt(self: PortStorage, purchaseBoard: Model)
@@ -486,6 +490,7 @@ function PortStorage.Destroy(self: PortStorage)
 	self:Hide()
 	self:CannotCollide()
 	self:RemovePreviousVisualModel()
+	self:UpdatePurchaseBoardUI(true)
 
 	pcall(function()
 		self:Save()

@@ -1,9 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerScriptService = game:GetService("ServerScriptService")
 local Teams = game:GetService("Teams")
-local TableUtil = require(ReplicatedStorage.Packages.TableUtil)
-local Events = require(ReplicatedStorage.Shared.Events.Events)
-local DataService = require(ServerScriptService.Server.Services.DataService)
 local BuildingsManager = require(script.Parent.BuildingsManager)
 local ChainManager = require(script.Parent.ChainManager)
 local BuildingsManagerType = require(ReplicatedStorage.Shared.Types.Managers.BuildingsManagerType)
@@ -114,32 +110,6 @@ function TeamManager.AssignTeam(player: Player)
 
 			player:LoadCharacter()
 			return i
-		end
-	end
-
-	return nil
-end
-
-function TeamManager.GetTeam(player: Player)
-	local teams = Teams:GetTeams()
-
-	for _, playerTeam in pairs(teams) do
-		local players = playerTeam:GetPlayers()
-		if #players == 0 then return end
-
-		local playerFound = false
-		for i, teamPlayer in ipairs(players) do
-			if teamPlayer == player then
-				playerFound = true
-				break
-			end
-		end
-
-		if playerFound then
-			local id = TableUtil.Find(TeamManager.Teams, function(team)
-				return team.Name == playerTeam
-			end)
-			return id or nil
 		end
 	end
 

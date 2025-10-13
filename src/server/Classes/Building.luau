@@ -287,8 +287,12 @@ function Building.SetupPurchaseBoard(self: Building): (Model, { [string]: any })
 	return PurchaseBoard.CreatePB(purchaseBoard, self :: any)
 end
 
-function Building.UpdatePurchaseBoardUI(self: Building): ()
-	PurchaseBoard.UpdatePB(self :: any)
+function Building.UpdatePurchaseBoardUI(self: Building, reset: boolean?): ()
+	if reset then
+		PurchaseBoard.ResetPB(self.PurchaseBoard)
+	else
+		PurchaseBoard.UpdatePB(self :: any)
+	end
 end
 
 function Building.SetupProximityPrompt(self: Building, purchaseBoard: Model): ()
@@ -425,6 +429,7 @@ function Building.Destroy(self: Building): ()
 	self:Hide()
 	self:CannotCollide()
 	self:RemovePreviousVisualModel()
+	self:UpdatePurchaseBoardUI(true)
 
 	pcall(function()
 		self:Save()

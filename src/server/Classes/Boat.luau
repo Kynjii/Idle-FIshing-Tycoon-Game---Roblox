@@ -304,8 +304,12 @@ function Boat.SetupPurchaseBoard(self: Boat): (Model, { [string]: any })
 	return PurchaseBoard.CreatePB(purchaseBoard, self :: any)
 end
 
-function Boat.UpdatePurchaseBoardUI(self: Boat): ()
-	PurchaseBoard.UpdatePB(self :: any)
+function Boat.UpdatePurchaseBoardUI(self: Boat, reset: boolean?): ()
+	if reset then
+		PurchaseBoard.ResetPB(self.PurchaseBoard)
+	else
+		PurchaseBoard.UpdatePB(self :: any)
+	end
 end
 
 function Boat.SetupProximityPrompt(self: Boat, purchaseBoard: Model): ()
@@ -518,6 +522,7 @@ function Boat.Destroy(self: Boat)
 	self:Hide()
 	self:CannotCollide()
 	self:RemovePreviousVisualModel()
+	self:UpdatePurchaseBoardUI(true)
 
 	pcall(function()
 		self:Save()
