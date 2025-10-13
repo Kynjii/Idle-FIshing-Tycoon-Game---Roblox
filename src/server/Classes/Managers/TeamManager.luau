@@ -176,14 +176,4 @@ function TeamManager.CleanupPlayer(userId: number)
 	TeamManager.BuildingsManager[userId] = nil
 end
 
-function TeamManager.ListenForReset(player: Player)
-	local resetEvent = Events.GetRemote(Events.RemoteNames.GameReset)
-	if resetEvent then resetEvent.OnServerEvent:Connect(function(playerInst)
-		if playerInst == player then
-			DataService.ResetAllPlayerData(playerInst)
-			player:Kick("Game Reset, please rejoin.")
-		end
-	end) end
-end
-
 return TeamManager
