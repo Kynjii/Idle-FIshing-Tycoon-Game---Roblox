@@ -281,6 +281,10 @@ function ChainManager:StartUnloadingFish()
 			lastUpdateTime = currentTime
 			task.wait(1)
 			continue
+		end
+
+		if storage:IsStorageFull() then
+			tender:ShowTenderStoppedBillboard()
 		else
 			tender:DestroyTenderStoppedBillboard()
 		end

@@ -162,6 +162,7 @@ function PortStorage.Upgrade(self: PortStorage): ()
 	self:UpdateBuffs()
 	self.UpgradeCost = self:CalculateUpgradeCost()
 	self.CurrentMaxStorage, self.NextLvlMaxStorage = self:CalculateMaxStorage()
+	self:IsStorageFull()
 
 	self:Save()
 end
@@ -298,27 +299,29 @@ function PortStorage.SetupFishRemovalPrompt(self: PortStorage)
 	proximityPrompt.UIOffset = Vector2.new(-100, 0)
 
 	-- Handle not showing the prompt if the user is not the owner
-	proximityPrompt.PromptShown:Connect(function(player: Player)
-		if player.UserId ~= self.Owner then return end
-	end)
+	if self._cleaner then
+		self._cleaner:Add(proximityPrompt.PromptShown:Connect(function(player: Player)
+			if player.UserId ~= self.Owner then return end
+		end))
 
-	-- Handle proximity prompt triggered
-	proximityPrompt.Triggered:Connect(function(player)
-		-- Another safety check
-		if player.UserId ~= self.Owner then return end
+		-- Handle proximity prompt triggered
+		self._cleaner:Add(proximityPrompt.Triggered:Connect(function(player)
+			-- Another safety check
+			if player.UserId ~= self.Owner then return end
 
-		-- Remove the Fish
-		local amount = math.min(self.FishInStorage, self.CurrentMaxStorage)
-		if amount == 0 then return end
+			-- Remove the Fish
+			local amount = math.min(self.FishInStorage, self.CurrentMaxStorage)
+			if amount == 0 then return end
 
-		self:RemoveFish(amount)
+			self:RemoveFish(amount)
 
-		-- Spend the currency
-		DataService.Earn(player, FFGEnum.CURRENCY_TYPES.Gold, amount * 2)
+			-- Spend the currency
+			DataService.Earn(player, FFGEnum.CURRENCY_TYPES.Gold, amount * 2)
 
-		-- Save State
-		self:Save()
-	end)
+			-- Save State
+			self:Save()
+		end))
+	end
 end
 
 function PortStorage.ShowStorageFullBillboard(self: PortStorage): ()
