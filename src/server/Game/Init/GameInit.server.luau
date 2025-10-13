@@ -97,7 +97,9 @@ Players.PlayerRemoving:Connect(function(player)
 
 	local profile = DataService.Profiles[player]
 	if profile then
-		profile:EndSession()
+		task.delay(1, function()
+			profile:EndSession()
+		end)
 
 		task.delay(1, function()
 			DataService.Profiles[player] = nil

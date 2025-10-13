@@ -380,6 +380,8 @@ function Tender.SetupProximityPrompt(self: Tender, purchaseBoard: Model): Proxim
 end
 
 function Tender.ShowFishPopUp(self: Tender, amount: number)
+	if not self.Model then return end
+
 	local billboard = self.Model:FindFirstChild("BoatPopupTemplate", true) :: BillboardGui
 	if billboard and self.Model.PrimaryPart then
 		local billboardFolder = self.Model.PrimaryPart:FindFirstChild("Billboard")

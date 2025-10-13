@@ -270,57 +270,40 @@ function ChainManager:StartUnloadingFish()
 	local unloadDuration = math.clamp(rawUnload, 0.5, math.huge)
 	local initialCargo = tender.FishInStorage or 0
 
-	local activeUnloadTime = 0
-	local lastUpdateTime = os.clock()
+	-- Simple approach: calculate fish per second and track remaining unload time
+	local fishPerSecond = initialCargo / unloadDuration
+	local remainingUnloadTime = unloadDuration
 
-	while true do
-		local currentTime = os.clock()
+	while remainingUnloadTime > 0 and tender.FishInStorage > 0 do
+		-- Check if we can unload
+		local canUnload = storage.isPurchased and not storage:IsStorageFull()
 
-		if not storage.isPurchased then
-			tender:ShowTenderStoppedBillboard()
-			lastUpdateTime = currentTime
-			task.wait(1)
-			continue
-		end
-
-		if storage:IsStorageFull() then
-			tender:ShowTenderStoppedBillboard()
-		else
+		if canUnload then
 			tender:DestroyTenderStoppedBillboard()
-		end
 
-		local deltaTime = currentTime - lastUpdateTime
-		activeUnloadTime = activeUnloadTime + deltaTime
-		lastUpdateTime = currentTime
+			-- Calculate how much fish to unload this second
+			local fishToUnload = math.min(fishPerSecond, tender.FishInStorage)
+			local storageSpace = storage.CurrentMaxStorage - storage.FishInStorage
+			local actualUnload = math.min(fishToUnload, storageSpace)
 
-		local p = math.clamp(activeUnloadTime / unloadDuration, 0, 1)
+			if actualUnload > 0 then
+				tender:RemoveFish(actualUnload)
+				storage:AddFish(actualUnload)
+			end
 
-		local currentMaxStorage = storage.CurrentMaxStorage
-		local storageFree = math.max(0, currentMaxStorage - storage.FishInStorage)
-
-		local currentTenderFish = math.max(0, tender.FishInStorage or 0)
-		local targetTenderFish = (p >= 1) and 0 or math.ceil(initialCargo * (1 - p))
-		if targetTenderFish < 0 then targetTenderFish = 0 end
-
-		local deltaToRemove = math.max(0, currentTenderFish - targetTenderFish)
-
-		local maxAmount = math.min(storageFree, currentTenderFish)
-		local amount = math.clamp(deltaToRemove, 0, math.max(0, maxAmount))
-
-		if amount > 0 then
-			tender:RemoveFish(amount)
-			storage:AddFish(amount)
-		elseif amount <= 0 and storage:IsStorageFull() then
-			lastUpdateTime = currentTime
-		end
-
-		if tender.FishInStorage <= 0 then
-			self.TenderModel.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.finishedUnloading, true)
-			break
+			-- Decrease remaining time only when actually unloading
+			remainingUnloadTime = remainingUnloadTime - 1
+		else
+			-- Storage is full or not purchased - show stopped billboard but don't count time
+			tender:ShowTenderStoppedBillboard()
 		end
 
 		task.wait(1)
 	end
+
+	-- Finished unloading
+	tender:DestroyTenderStoppedBillboard()
+	self.TenderModel.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.finishedUnloading, true)
 end
 -- //!SECTION
 
