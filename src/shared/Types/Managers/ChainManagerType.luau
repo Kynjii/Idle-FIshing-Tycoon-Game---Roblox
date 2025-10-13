@@ -30,7 +30,7 @@ export type ChainManagerInstance = {
 	AttachAttListeners: (self: ChainManagerInstance) -> (),
 
 	-- Building Events
-	HandleBuildingEvent: (self: ChainManagerInstance) -> (),
+	HandleBuildingEvent: (self: ChainManagerInstance, building: Instance) -> (),
 
 	-- Handling Tender Service
 	StartTenderCycle: (self: ChainManagerInstance) -> (),
@@ -40,6 +40,7 @@ export type ChainManagerInstance = {
 	ResetTravellingAttributes: (self: ChainManagerInstance) -> (),
 
 	-- Cleanup
+	_cleaner: any?,
 	Destroy: (self: ChainManagerInstance) -> (),
 }
 

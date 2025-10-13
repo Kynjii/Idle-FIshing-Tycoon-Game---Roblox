@@ -1,6 +1,7 @@
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
+local Trove = require(ReplicatedStorage.Packages.Trove)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local ChainManagerType = require(ReplicatedStorage.Shared.Types.Managers.ChainManagerType)
 local Boat = require(ServerScriptService.Server.Classes.Boat)
@@ -61,18 +62,14 @@ function ChainManager.New(realmData, tier: number, player: Player, teamId: numbe
 	end
 	self.LaneStorage = PortStorage.New(storageData, player, self.StorageModel)
 
-	-- Attach listeners
-	self.Signals = {
-		PurchasedEvent = nil,
-		UpgradedEvent = nil,
-	}
+	self._cleaner = Trove.new()
 
 	if self.LaneTender.isPurchased and self.LaneBoat.isPurchased then self:StartTenderCycle() end
 
 	return self
 end
 
-function ChainManager:FindBoatModel()
+function ChainManager.FindBoatModel(self: ChainManagerInstance): Model?
 	for _, taggedBoat in ipairs(taggedBoats) do
 		local taggedBoatTier = taggedBoat:GetAttribute(FFGEnum.ATTRIBUTES.Tier)
 		local taggedBoatTeamId = taggedBoat:GetAttribute(FFGEnum.ATTRIBUTES.TeamId)
@@ -82,7 +79,7 @@ function ChainManager:FindBoatModel()
 	return nil
 end
 
-function ChainManager:FindTenderModel()
+function ChainManager.FindTenderModel(self: ChainManagerInstance): Model?
 	for _, taggedTender in ipairs(taggedTenders) do
 		local taggedTenderTier = taggedTender:GetAttribute(FFGEnum.ATTRIBUTES.Tier)
 		local taggedTenderTeamId = taggedTender:GetAttribute(FFGEnum.ATTRIBUTES.TeamId)
@@ -92,7 +89,7 @@ function ChainManager:FindTenderModel()
 	return nil
 end
 
-function ChainManager:FindStorageModel()
+function ChainManager.FindStorageModel(self: ChainManagerInstance): Model?
 	for _, taggedStorageUnit in ipairs(taggedStorage) do
 		local taggedStorageUnitTier = taggedStorageUnit:GetAttribute(FFGEnum.ATTRIBUTES.Tier)
 		local taggedStorageUnitTeamId = taggedStorageUnit:GetAttribute(FFGEnum.ATTRIBUTES.TeamId)
@@ -102,7 +99,7 @@ function ChainManager:FindStorageModel()
 	return nil
 end
 
-function ChainManager:Initialize()
+function ChainManager.Initialize(self: ChainManagerInstance)
 	self.LaneBoat:Initialize()
 	self.LaneTender:Initialize()
 	self.LaneStorage:Initialize()
@@ -110,63 +107,74 @@ function ChainManager:Initialize()
 	self:AttachAttListeners()
 end
 
-function ChainManager:AttachAttListeners()
-	self.TenderModel.PrimaryPart.AttributeChanged:Connect(function(attributeName)
-		-- isPurchased triggers the start of the cycle
-		if attributeName == FFGEnum.ATTRIBUTES.isPurchased and self.TenderModel.PrimaryPart:GetAttribute(attributeName) == true and self.LaneBoat.isPurchased then
-			if self.LaneTender.FishInStorage > 0 and not self.LaneStorage:IsStorageFull() then
-				self.TenderModel.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.atPort, true)
-			else
-				self:StartTenderCycle()
-			end
-			return
-		end
+function ChainManager.AttachAttListeners(self: ChainManagerInstance)
+	if self.TenderModel and self.TenderModel.PrimaryPart then
+		if self._cleaner then
+			self._cleaner:Add(self.TenderModel.PrimaryPart.AttributeChanged:Connect(function(attributeName)
+				-- isPurchased triggers the start of the cycle
+				if attributeName == FFGEnum.ATTRIBUTES.isPurchased and self.TenderModel.PrimaryPart:GetAttribute(attributeName) == true and self.LaneBoat.isPurchased then
+					if self.LaneTender.FishInStorage > 0 and not self.LaneStorage:IsStorageFull() then
+						self.TenderModel.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.atPort, true)
+					else
+						self:StartTenderCycle()
+					end
+					return
+				end
 
-		-- atBoat
-		if attributeName == FFGEnum.ATTRIBUTES.atBoat and self.TenderModel.PrimaryPart:GetAttribute(attributeName) == true then
-			self:StartLoadingFish()
-			return
-		end
+				-- atBoat
+				if attributeName == FFGEnum.ATTRIBUTES.atBoat and self.TenderModel.PrimaryPart:GetAttribute(attributeName) == true then
+					self:StartLoadingFish()
+					return
+				end
 
-		-- finishedLoading
-		if attributeName == FFGEnum.ATTRIBUTES.finishedLoading and self.TenderModel.PrimaryPart:GetAttribute(attributeName) == true then
-			self.LaneTender:MoveToPort()
-			return
-		end
+				-- finishedLoading
+				if attributeName == FFGEnum.ATTRIBUTES.finishedLoading and self.TenderModel.PrimaryPart:GetAttribute(attributeName) == true then
+					self.LaneTender:MoveToPort()
+					return
+				end
 
-		-- atPort
-		if attributeName == FFGEnum.ATTRIBUTES.atPort and self.TenderModel.PrimaryPart:GetAttribute(attributeName) == true then
-			self:StartUnloadingFish()
-			return
-		end
+				-- atPort
+				if attributeName == FFGEnum.ATTRIBUTES.atPort and self.TenderModel.PrimaryPart:GetAttribute(attributeName) == true then
+					self:StartUnloadingFish()
+					return
+				end
 
-		-- finishedUnloading
-		if attributeName == FFGEnum.ATTRIBUTES.finishedUnloading and self.TenderModel.PrimaryPart:GetAttribute(attributeName) == true then
-			self:StartTenderCycle()
-			return
+				-- finishedUnloading
+				if attributeName == FFGEnum.ATTRIBUTES.finishedUnloading and self.TenderModel.PrimaryPart:GetAttribute(attributeName) == true then
+					self:StartTenderCycle()
+					return
+				end
+			end))
 		end
-	end)
+	end
 
-	self.BoatModel.PrimaryPart.AttributeChanged:Connect(function(attributeName)
-		-- isPurchased triggers the start of the cycle
-		if attributeName == FFGEnum.ATTRIBUTES.isPurchased and self.BoatModel.PrimaryPart:GetAttribute(attributeName) == true and self.LaneTender.isPurchased then
-			self:StartTenderCycle()
-			return
+	if self.BoatModel and self.BoatModel.PrimaryPart then
+		if self._cleaner then
+			self._cleaner:Add(self.BoatModel.PrimaryPart.AttributeChanged:Connect(function(attributeName)
+				-- isPurchased triggers the start of the cycle
+				if attributeName == FFGEnum.ATTRIBUTES.isPurchased and self.BoatModel.PrimaryPart:GetAttribute(attributeName) == true and self.LaneTender.isPurchased then
+					self:StartTenderCycle()
+					return
+				end
+			end))
 		end
-	end)
+	end
 
 	for _, building in pairs(self.Buildings) do
-		self.Signals.PurchasedEvent = building.Purchased:Connect(function(purchasedBuilding)
-			self:HandleBuildingEvent(purchasedBuilding)
-		end)
-		self.Signals.UpgradedEvent = building.Upgraded:Connect(function(upgradedBuilding)
-			self:HandleBuildingEvent(upgradedBuilding)
-		end)
+		if self._cleaner then
+			self._cleaner:Add(building.Purchased:Connect(function(purchasedBuilding)
+				self:HandleBuildingEvent(purchasedBuilding)
+			end))
+
+			self._cleaner:Add(building.Upgraded:Connect(function(upgradedBuilding)
+				self:HandleBuildingEvent(upgradedBuilding)
+			end))
+		end
 	end
 end
 
 -- //SECTION - Handle Building Events
-function ChainManager:HandleBuildingEvent(building)
+function ChainManager.HandleBuildingEvent(self: ChainManagerInstance, building)
 	if building.Owner ~= self.Player.UserId then return end
 
 	local actions = {
@@ -310,18 +318,20 @@ function ChainManager:StartUnloadingFish()
 		task.wait(1)
 	end
 end
-
 -- //!SECTION
 
 -- //SECTION - Cleanup
 function ChainManager:Destroy()
+	if self._cleaner then
+		self._cleaner:Clean()
+		self._cleaner = nil
+	end
+
 	self.LaneBoat:Destroy()
 	self.LaneTender:Destroy()
 	self.LaneStorage:Destroy()
 
-	for k, v in pairs(self.Signals) do
-		if v.Connected then v:Destroy() end
-	end
+	self:ResetTravellingAttributes()
 end
 -- //!SECTION
 

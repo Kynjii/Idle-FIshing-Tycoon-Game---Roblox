@@ -52,7 +52,7 @@ local Theme = {
 	},
 
 	textColor = {
-		[FFGEnum.CLASS.ENTITY_NAME.Boat] = Color3.fromRGB(30, 90, 168),
+		[FFGEnum.CLASS.ENTITY_NAME.Boat] = Color3.fromRGB(88, 57, 39),
 		[FFGEnum.CLASS.ENTITY_NAME.Tender] = Color3.fromRGB(88, 171, 65),
 		[FFGEnum.CLASS.ENTITY_NAME.PortStorage] = Color3.fromRGB(250, 200, 10),
 		[FFGEnum.CLASS.ENTITY_NAME.Building] = Color3.fromRGB(214, 121, 35),
