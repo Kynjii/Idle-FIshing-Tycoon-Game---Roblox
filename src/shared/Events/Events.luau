@@ -50,7 +50,7 @@ function Events.FireEvent(name: string, player: Player, data: any)
 	local ev = folder and folder:FindFirstChild(name)
 	if ev and ev:IsA("RemoteEvent") then
 		local safeData = data
-		if type(data) == "table" and data:Serialize() then safeData = data:Serialize() end
+		if type(data) == "table" and type(data.Serialize) == "function" then safeData = data:Serialize() end
 		ev:FireClient(player, safeData)
 		return true
 	else

@@ -108,13 +108,13 @@ function PortStorage.New(state: { [string]: any }?, player: Player, model: Model
 	-- Warnings
 	self.ClonedBillboard = nil
 
-	self:AttachEventListeners()
-
 	-- Tweens
 	self.ProgressTween = nil
 	self.FishModel = DeepWait(self.Model, "FishInStorage", "Base")
 
 	self._cleaner = Trove.new()
+
+	self:AttachEventListeners()
 
 	return self
 end

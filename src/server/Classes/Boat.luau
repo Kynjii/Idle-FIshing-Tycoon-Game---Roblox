@@ -119,9 +119,9 @@ function Boat.New(state: { [string]: any }?, player: Player, model: Model, teamI
 	-- Warnings
 	self.ClonedBillboard = nil
 
-	self:AttachEventListeners()
-
 	self._cleaner = Trove.new()
+
+	self:AttachEventListeners()
 
 	self.FishingInterval = nil
 

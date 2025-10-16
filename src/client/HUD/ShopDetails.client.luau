@@ -4,16 +4,52 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterPlayer = game:GetService("StarterPlayer")
 local AnimateButtonHover = require(StarterPlayer.StarterPlayerScripts.Client.HUD.Utils.AnimateButtonHover)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
+local ShopItems = require(ReplicatedStorage.Shared.Items.ShopItems)
 local Theme = require(ReplicatedStorage.Shared.Theme.Theme)
-local DeepWait = require(ReplicatedStorage.Shared.Utils.DeepWait)
 local FormatNumber = require(ReplicatedStorage.Shared.Utils.FormatNumber)
 local Replica = require(ReplicatedStorage.Shared.ReplicaClient)
 
 local player = Players.LocalPlayer
-local shopDetailsUI: Frame = DeepWait(player.PlayerGui, "IslandShopGUI", "DetailsContainer")
+local islandShopUI = player.PlayerGui:WaitForChild("IslandShopGUI") :: ScreenGui
+local shopDetailsUI = islandShopUI:WaitForChild("DetailsContainer") :: Frame
 
--- //TODO -
--- 1. Get all items and add them to the shopgui
+local shopItemsContainer = shopDetailsUI:FindFirstChild("ShopItemsContainer", true)
+
+local itemCatalog = ShopItems
+local itemElements = {}
+
+function createShopItemElement(item: ShopItems.ShopItem)
+	local template = shopItemsContainer:WaitForChild("ShopItemTemplate")
+
+	local clone
+	if template then
+		clone = template:Clone() :: Frame
+
+		local itemNameLabel = clone:FindFirstChild("ItemName", true) :: TextLabel
+		if itemNameLabel then itemNameLabel.Text = item.name end
+
+		local buttonText = clone:FindFirstChild("ItemCost", true) :: TextLabel
+		if buttonText then buttonText.Text = item.baseCost end
+
+		local category = shopItemsContainer:FindFirstChild(`Category_{item.category}`) :: Frame
+		local itemParent = category:FindFirstChild("ShopItems") :: ScrollingFrame
+		if itemParent then
+			clone.Visible = true
+			clone.Parent = itemParent
+		else
+			return
+		end
+	end
+
+	return clone
+end
+
+if shopItemsContainer then
+	for i, item in ipairs(itemCatalog) do
+		local itemElement = createShopItemElement(item)
+		itemElements[i] = itemElement
+	end
+end
 
 local currentState = {
 	Currencies = {
@@ -42,13 +78,6 @@ local detailsAreOpen = false
 
 local _replica = nil
 local shopData: any = {}
-
-function createShopItemElement(scrollingFrame: ScrollingFrame)
-	local container = Instance.new("Frame")
-
-	container.Parent = scrollingFrame
-	return container
-end
 
 function clearExistingData()
 	if _replica then
@@ -189,7 +218,7 @@ if shopDetails then shopDetails.OnClientEvent:Connect(function(data)
 	clearExistingData()
 
 	if data then
-		player.PlayerGui.MockShopGUI.Enabled = true
+		player.PlayerGui.IslandShopGUI.Enabled = true
 		shopDetailsUI.Visible = true
 		detailsAreOpen = true
 		shopData = data

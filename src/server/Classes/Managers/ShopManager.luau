@@ -32,9 +32,9 @@ function ShopManager.New(playerItemData: { ShopItems.ShopItem }, player: Player,
 	self.PlayerItemData = playerItemData
 	self.ShopCatalog = shopCatalog
 
-	self:AttachEventListeners()
-
 	self._cleaner = Trove.new()
+
+	self:AttachEventListeners()
 
 	return self
 end

@@ -16,6 +16,7 @@ export type ShopItem = {
 local Catalog: { ShopItem } = {
 	{ id = "helper_1", name = "Helper 1", baseCost = 100, currencyType = "Gold", category = Category.Helper },
 	{ id = "helper_2", name = "Helper 2", baseCost = 200, currencyType = "Gold", category = Category.Helper },
+	{ id = "booster_1", name = "Boost 1", baseCost = 10000, currencyType = "Gold", category = Category.Booster },
 }
 
 table.freeze(Catalog)
