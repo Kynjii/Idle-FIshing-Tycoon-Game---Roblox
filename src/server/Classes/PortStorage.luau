@@ -280,10 +280,9 @@ function PortStorage.UpdatePurchaseBoardUI(self: PortStorage, reset: boolean?)
 	end
 end
 
-function PortStorage.SetupProximityPrompt(self: PortStorage, purchaseBoard: Model)
+function PortStorage.SetupProximityPrompt(self: PortStorage, purchaseBoard: Model): ()
 	local proximityPrompt: ProximityPrompt = self._cleaner and self._cleaner:Add(Instance.new("ProximityPrompt"))
 	proximityPrompt.Parent = purchaseBoard
-	if self._cleaner then self._cleaner:Add(proximityPrompt) end
 
 	ProximityPrompt.CreatePP(proximityPrompt, self :: any)
 end

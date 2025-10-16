@@ -322,9 +322,8 @@ end
 function Boat.SetupProximityPrompt(self: Boat, purchaseBoard: Model): ()
 	local proximityPrompt: ProximityPrompt = self._cleaner and self._cleaner:Add(Instance.new("ProximityPrompt"))
 	proximityPrompt.Parent = purchaseBoard
-	if self._cleaner then self._cleaner:Add(proximityPrompt) end
 
-	return ProximityPrompt.CreatePP(proximityPrompt, self :: any)
+	ProximityPrompt.CreatePP(proximityPrompt, self :: any)
 end
 
 function Boat.ShowFishPopUp(self: Boat, amount: number): ()

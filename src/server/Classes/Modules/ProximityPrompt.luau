@@ -23,28 +23,41 @@ function PP.CreatePP(proximityPrompt: ProximityPrompt, class: Boat | Tender | Po
 		typedClass = class :: PortStorage
 	elseif class.Entity == FFGEnum.CLASS.ENTITY_NAME.Building then
 		typedClass = class :: Building
+	elseif class.Entity == FFGEnum.CLASS.ENTITY_NAME.Shop then
+		typedClass = class
 	else
 		error("Invalid entity passed to CreatePB")
 	end
 
 	proximityPrompt.HoldDuration = 0
-	proximityPrompt.MaxActivationDistance = 5
+	proximityPrompt.MaxActivationDistance = typedClass.Entity ~= FFGEnum.CLASS.ENTITY_NAME.Shop and 5 or 15
 	proximityPrompt.MaxIndicatorDistance = proximityPrompt.MaxActivationDistance * 5
 	proximityPrompt.ObjectText = "Open"
 	proximityPrompt.ActionText = `{class.Entity} Details`
 
-	class._cleaner:Add(proximityPrompt.Triggered:Connect(function(player)
-		if player.UserId ~= class.Owner then
-			print("Not the owner", player.UserId, class.Owner)
-			return
-		end
-		if class.Level == class.MaxLevel then
-			print("max level")
-			return
-		end
+	if typedClass.Entity ~= FFGEnum.CLASS.ENTITY_NAME.Shop then
+		class._cleaner:Add(proximityPrompt.Triggered:Connect(function(player)
+			if player.UserId ~= class.Owner then
+				print("Not the owner", player.UserId, class.Owner)
+				return
+			end
+			if class.Level == class.MaxLevel then
+				print("max level")
+				return
+			end
 
-		Events.FireEvent(Events.RemoteNames.OpenEntityDetails, class.Player, typedClass)
-	end))
+			Events.FireEvent(Events.RemoteNames.OpenEntityDetails, class.Player, typedClass)
+		end))
+	else
+		class._cleaner:Add(proximityPrompt.Triggered:Connect(function(player)
+			if player.UserId ~= class.Owner then
+				print("Not the owner", player.UserId, class.Owner)
+				return
+			end
+
+			Events.FireEvent(Events.RemoteNames.OpenShopDetails, class.Player, typedClass)
+		end))
+	end
 
 	return proximityPrompt
 end

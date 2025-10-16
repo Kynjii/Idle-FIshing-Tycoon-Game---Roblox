@@ -22,7 +22,7 @@ function BuildingsManager.New(realmData, player: Player, teamId: number)
 	self.Player = player
 	self.TeamId = teamId
 
-	self.BuildingModels = self:FindBuildingModels()
+	self.BuildingModels = self.FindBuildingModels()
 	local buildingsArr = realmData.Buildings
 	local realmBuffs = realmData.Buffs
 	self.Buildings = self:CreateBuildings(buildingsArr, realmBuffs)

@@ -27,6 +27,9 @@ function EventListeners.Attach(class: Boat | Tender | PortStorage | Building)
 		typedClass = class :: PortStorage
 	elseif class.Entity == FFGEnum.CLASS.ENTITY_NAME.Building then
 		typedClass = class :: Building
+	elseif class.Entity == FFGEnum.CLASS.ENTITY_NAME.Shop then
+		-- //TODO - add type
+		typedClass = class
 	else
 		error("Invalid entity passed to CreatePB")
 	end

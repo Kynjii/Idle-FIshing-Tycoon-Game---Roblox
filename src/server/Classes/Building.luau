@@ -298,7 +298,7 @@ end
 function Building.SetupProximityPrompt(self: Building, purchaseBoard: Model): ()
 	local proximityPrompt = self._cleaner and self._cleaner:Add(Instance.new("ProximityPrompt"))
 	proximityPrompt.Parent = purchaseBoard
-	if self._cleaner then self._cleaner:Add(proximityPrompt) end
+
 	ProximityPrompt.CreatePP(proximityPrompt, self :: any)
 end
 -- //!SECTION

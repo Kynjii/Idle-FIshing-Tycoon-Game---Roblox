@@ -372,6 +372,38 @@ function DataService.GetBuffState(player: Player, buffNames: { string }): { [str
 end
 -- //!SECTION
 
+-- //SECTION - SHOP
+function DataService.SaveShopState(player: Player, shopId: string, newState): boolean
+	local profile = DataService.Profiles[player]
+	if not profile then
+		FFGHelpers.PrintLog("No profile found when attempting to save shop state for: ", player)
+		return false
+	end
+
+	-- Ensure the data structure exists
+	if not profile.Data.Realms then
+		FFGHelpers.PrintLog("No Realms data structure found")
+		return false
+	end
+
+	local currentRealm = profile.Data.CurrentRealm or 1
+	if not profile.Data.Realms[currentRealm] then
+		FFGHelpers.PrintLog("No data structure found for Realm:", currentRealm)
+		return false
+	end
+
+	-- Initialize Shop array if it doesn't exist
+	if not profile.Data.Realms[currentRealm].Shop then profile.Data.Realms[currentRealm].Shop = {} end
+
+	profile.Data.Realms[currentRealm].Shop[shopId] = newState
+
+	local replica = DataService.Replicas[player]
+	if replica then replica:Set({ "Realms", currentRealm, "Shop" }, newState) end
+
+	return true
+end
+-- //!SECTION
+
 -- //SECTION - TUTORIAL
 function DataService.SaveTutorialState(player: Player, completedStage: number)
 	local profile = DataService.Profiles[player]

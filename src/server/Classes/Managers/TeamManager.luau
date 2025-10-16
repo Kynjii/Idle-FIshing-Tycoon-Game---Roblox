@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Teams = game:GetService("Teams")
 local BuildingsManager = require(script.Parent.BuildingsManager)
 local ChainManager = require(script.Parent.ChainManager)
+local ShopManager = require(script.Parent.ShopManager)
 local BuildingsManagerType = require(ReplicatedStorage.Shared.Types.Managers.BuildingsManagerType)
 local ChainManagerType = require(ReplicatedStorage.Shared.Types.Managers.ChainManagerType)
 
@@ -54,6 +55,7 @@ TeamManager.Teams = {
 
 TeamManager.ChainManagers = {}
 TeamManager.BuildingsManager = {}
+TeamManager.ShopManagers = {}
 
 function TeamManager.CreateTeams()
 	for i, team in ipairs(TeamManager.Teams) do
@@ -100,6 +102,19 @@ function TeamManager.AssignBuildingsManager(profile, player: Player, teamId: num
 	buildingsManager:Initialize()
 end
 
+function TeamManager.AssignShopManager(profile, player: Player, teamId: number)
+	TeamManager.ShopManagers[player.UserId] = TeamManager.ShopManagers[player.UserId] or { OwnerId = player.UserId }
+	local currentRealm = profile.CurrentRealm or 1
+	local realmData = profile and profile.Realms[currentRealm]
+	local state = realmData.Shop
+
+	local shopManager = ShopManager.New(state, player, teamId)
+	if not shopManager then return end
+
+	TeamManager.ShopManagers[player.UserId] = shopManager
+	shopManager:Initialize()
+end
+
 function TeamManager.AssignTeam(player: Player)
 	local teams = Teams:GetTeams()
 	for i, team in ipairs(teams) do
@@ -119,7 +134,8 @@ end
 function TeamManager.CleanupPlayer(userId: number)
 	local chainList = TeamManager.ChainManagers[userId]
 	local buildingList = TeamManager.BuildingsManager[userId]
-	if not chainList or not buildingList then return end
+	local shopList = TeamManager.ShopManagers[userId]
+	if not chainList or not buildingList or not shopList then return end
 
 	for i = #chainList, 1, -1 do
 		local manager = chainList[i]
@@ -144,6 +160,18 @@ function TeamManager.CleanupPlayer(userId: number)
 		buildingList[i] = nil
 	end
 	TeamManager.BuildingsManager[userId] = nil
+
+	for i = #shopList, 1, -1 do
+		local manager = shopList[i]
+		if typeof(manager) == "table" and manager.Destroy then
+			local ok, err = pcall(function()
+				manager:Destroy()
+			end)
+			if not ok then warn("[TeamManager] ShopManager destroy error:", err) end
+		end
+		shopList[i] = nil
+	end
+	TeamManager.ShopManagers[userId] = nil
 end
 
 return TeamManager

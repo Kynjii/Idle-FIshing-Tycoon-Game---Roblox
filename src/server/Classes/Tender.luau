@@ -375,12 +375,11 @@ function Tender.UpdatePurchaseBoardUI(self: Tender, reset: boolean?)
 	end
 end
 
-function Tender.SetupProximityPrompt(self: Tender, purchaseBoard: Model): ProximityPrompt
+function Tender.SetupProximityPrompt(self: Tender, purchaseBoard: Model): ()
 	local proximityPrompt: ProximityPrompt = self._cleaner and self._cleaner:Add(Instance.new("ProximityPrompt"))
 	proximityPrompt.Parent = purchaseBoard
-	if self._cleaner then self._cleaner:Add(proximityPrompt) end
 
-	return ProximityPrompt.CreatePP(proximityPrompt, self :: any)
+	ProximityPrompt.CreatePP(proximityPrompt, self :: any)
 end
 
 function Tender.ShowFishPopUp(self: Tender, amount: number)
