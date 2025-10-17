@@ -403,12 +403,6 @@ function Boat.IsStorageFull(self: Boat): boolean
 	if self.StorageFull ~= status then self:UpdateStorageStatus(status) end
 	return status
 end
-
-function Boat.ShowUpgradeStageUpgrade(self: Boat): boolean
-	local nextStart = Formulas.PROMO_LEVEL[self.UpgradeStage + 1]
-	if not nextStart then return false end
-	return self.Level == (nextStart - 1)
-end
 -- //!SECTION
 
 -- //SECTION - Loading and Saving
