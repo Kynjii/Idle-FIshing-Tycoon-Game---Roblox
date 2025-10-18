@@ -3,6 +3,11 @@
 registry = "test"
 
 [[package]]
+name = "centau/vide"
+version = "0.3.1"
+dependencies = []
+
+[[package]]
 name = "csqrl/sift"
 version = "0.0.11"
 dependencies = []
@@ -10,7 +15,7 @@ dependencies = []
 [[package]]
 name = "dtbur/ffg-idle-roblox"
 version = "0.1.0"
-dependencies = [["Find", "sleitnick/find@1.0.0"], ["Sift", "csqrl/sift@0.0.11"], ["Signal", "sleitnick/signal@1.5.0"], ["TableUtil", "sleitnick/table-util@1.2.1"], ["Trove", "sleitnick/trove@1.5.1"]]
+dependencies = [["Find", "sleitnick/find@1.0.0"], ["Sift", "csqrl/sift@0.0.11"], ["Signal", "sleitnick/signal@1.5.0"], ["TableUtil", "sleitnick/table-util@1.2.1"], ["Trove", "sleitnick/trove@1.5.1"], ["vide", "centau/vide@0.3.1"]]
 
 [[package]]
 name = "sleitnick/find"

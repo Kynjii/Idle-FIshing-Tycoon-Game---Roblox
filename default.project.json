@@ -13,7 +13,7 @@
       "Shared": {
         "$path": "src/shared"
       },
-      "Packages": { "$path": "Packages" }
+      "Packages": { "$path": "src/packages" }
     },
 
     "ServerScriptService": {
