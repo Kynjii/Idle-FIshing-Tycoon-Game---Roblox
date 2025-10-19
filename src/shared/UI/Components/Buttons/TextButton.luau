@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local vide = require(ReplicatedStorage.Packages.vide)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
+local GetColor3 = require(ReplicatedStorage.Shared.Utils.GetColor3)
 
 -- //SECTION -  Vide functions
 local create = vide.create
@@ -9,17 +10,18 @@ local effect = vide.effect
 local spring = vide.spring
 -- //!SECTION
 
+local getColor = GetColor3
+
 local function TextButton(
 	props: {
 		Text: string,
-		TextColor: Color3?,
-		BGColor: Color3?,
+		TextColor3: Color3?,
+		BackgroundColor3: Color3? | (() -> Color3)?,
+		BackgroundTransparency: number?,
 		Size: UDim2,
 		AnchorPoint: Vector2?,
 		Position: UDim2?, -- default to {.5 .5}
 		Rounded: UDim?, -- defines a size
-		BackgroundTransparency: number?,
-		HoverStyle: string?,
 		Visible: boolean?, -- defaulted to show if not passed
 		Disabled: () -> boolean?, -- external source (vide.source())
 		Activated: () -> (),
@@ -34,11 +36,11 @@ local function TextButton(
 	local springDebounce = false
 
 	local textButton = create("TextButton")({
-		BackgroundColor3 = props.BGColor or Color3.fromRGB(255, 255, 255),
-		BackgroundTransparency = props.BackgroundTransparency or props.BGColor and 0 or 1,
+		BackgroundColor3 = getColor(props.BackgroundColor3, FFGEnum.THEME.color.white),
+		BackgroundTransparency = props.BackgroundTransparency or (props.BackgroundColor3 and 0 or 1),
 		AnchorPoint = props.AnchorPoint or Vector2.new(0.5, 0.5),
 		Position = props.Position or UDim2.fromScale(0.5, 0.5),
-		TextColor3 = props.TextColor or Color3.fromRGB(0, 0, 0),
+		TextColor3 = props.TextColor3 or FFGEnum.THEME.color.black,
 		Size = size,
 		Visible = props.Visible or true,
 		Text = props.Text,
@@ -67,7 +69,7 @@ local function TextButton(
 		else
 			textButton.Active = true
 			textButton.Interactable = true
-			textButton.BackgroundColor3 = props.BGColor or Color3.fromRGB(255, 255, 255)
+			textButton.BackgroundColor3 = getColor(props.BackgroundColor3, FFGEnum.THEME.color.white)
 		end
 	end)
 

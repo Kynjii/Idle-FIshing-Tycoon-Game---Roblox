@@ -4,7 +4,7 @@ local vide = require(ReplicatedStorage.Packages.vide)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local CreateVideStory = UILabs.CreateVideStory
 
-local button = require(ReplicatedStorage.Shared.UI.Components.Buttons.ImageButton)
+local button = require(ReplicatedStorage.Shared.UI.Components.Buttons.TextButton)
 
 local isDisabled = vide.source(false)
 
@@ -20,7 +20,9 @@ end
 local controls = {
 	Visible = true,
 	Text = UILabs.String("Purchase"),
+	TextColor3 = FFGEnum.THEME.color.white,
 	Disabled = isDisabled(),
+	BackgroundColor3 = FFGEnum.THEME.color.white,
 }
 
 local story = CreateVideStory({
@@ -32,13 +34,12 @@ local story = CreateVideStory({
 	end)
 
 	return button({
-		Size = UDim2.fromScale(0.5, 0.3),
-		ImageAsset = FFGEnum.THEME.button.shopBuy,
-		HoverAsset = FFGEnum.THEME.button.shopBuyHover,
-		ScaleType = Enum.ScaleType.Slice,
-		SliceCenter = Rect.new(32, 83, 32, 83),
-		Position = UDim2.fromScale(0.5, 0.5),
 		Text = props.controls.Text,
+		TextColor3 = props.controls.TextColor3,
+		BackgroundColor3 = props.controls.BackgroundColor3,
+		Size = UDim2.fromScale(0.5, 0.3),
+		Position = UDim2.fromScale(0.5, 0.5),
+		Rounded = FFGEnum.THEME.button.cornerRadius,
 		Visible = props.controls.Visible,
 		Disabled = props.controls.Disabled,
 		Activated = function()

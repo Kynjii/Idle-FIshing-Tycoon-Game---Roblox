@@ -187,6 +187,7 @@ FFGEnum.THEME = {
 	radius = 8,
 	padding = 10,
 	strokeTransparency = 0.25,
+	hoverStrokeColor = Color3.fromRGB(67, 170, 139),
 
 	sizes = {
 		button = UDim2.fromScale(0.40, 0.10),
@@ -200,7 +201,11 @@ FFGEnum.THEME = {
 		image = "rbxassetid://80427328338898",
 		hoverImage = "rbxassetid://80427328338898",
 		pressedImage = "rbxassetid://72623624680339",
-		cornerRadius = UDim.new(0.05),
+		cornerRadius = UDim.new(0.1),
+	},
+
+	shopItem = {
+		bgColor = Color3.fromRGB(23, 139, 241),
 	},
 
 	sounds = {

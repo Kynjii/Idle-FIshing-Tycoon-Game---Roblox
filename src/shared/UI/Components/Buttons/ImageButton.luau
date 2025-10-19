@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local vide = require(ReplicatedStorage.Packages.vide)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
+local GetColor3 = require(ReplicatedStorage.Shared.Utils.GetColor3)
 
 -- //SECTION -  Vide functions
 local create = vide.create
@@ -9,12 +10,15 @@ local source = vide.source
 local spring = vide.spring
 -- //!SECTION
 
+local getColor = GetColor3
+
 local function ImageButton(
 	props: {
 		ImageAsset: string,
 		HoverAsset: string?,
+		PressedAsset: string?,
 		Text: string?,
-		TextColor: Color3?,
+		TextColor: Color3? | (() -> Color3)?,
 		Size: UDim2,
 		AnchorPoint: Vector2?,
 		Position: UDim2?, -- default to {.5 .5}
@@ -22,7 +26,6 @@ local function ImageButton(
 		ScaleType: Enum?,
 		SliceCenter: Rect?,
 		BackgroundTransparency: number?,
-		HoverStyle: string?,
 		Visible: boolean?, -- defaulted to show if not passed
 		Disabled: () -> boolean?, -- external source (vide.source())
 		Activated: () -> (),
@@ -39,6 +42,7 @@ local function ImageButton(
 	local imageButton = create("ImageButton")({
 		Image = props.ImageAsset or "",
 		HoverImage = props.HoverAsset or "",
+		PressedImage = props.PressedAsset or props.HoverAsset or "",
 		BackgroundTransparency = props.BackgroundTransparency or 1,
 		Size = size,
 		AnchorPoint = props.AnchorPoint or Vector2.new(0.5, 0.5),
@@ -46,6 +50,7 @@ local function ImageButton(
 		ScaleType = props.ScaleType,
 		SliceCenter = props.SliceCenter or Rect.new(50, 50, 37, 37),
 		SliceScale = props.ImageAsset and 1,
+		ResampleMode = Enum.ResamplerMode.Pixelated,
 		Visible = props.Visible,
 
 		Activated = props.Activated,
@@ -73,7 +78,7 @@ local function ImageButton(
 			imageButton.Image = props.ImageAsset or ""
 			imageButton.Active = true
 			imageButton.HoverImage = props.HoverAsset or ""
-			imageButton.PressedImage = ""
+			imageButton.PressedImage = props.PressedAsset or props.HoverAsset or ""
 			imageButton.Interactable = true
 		end
 	end)
@@ -86,7 +91,7 @@ local function ImageButton(
 	end
 
 	if props.Text then create("TextLabel")({
-		TextColor3 = props.TextColor or Color3.fromRGB(255, 255, 255),
+		TextColor3 = getColor(props.TextColor, FFGEnum.THEME.color.black),
 		Font = FFGEnum.THEME.font,
 		Text = props.Text,
 		BackgroundTransparency = props.BackgroundTransparency or 1,
