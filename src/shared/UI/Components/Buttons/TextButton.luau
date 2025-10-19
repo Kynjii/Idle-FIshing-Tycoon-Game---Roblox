@@ -17,8 +17,7 @@ local function TextButton(
 		Size: UDim2,
 		AnchorPoint: Vector2?,
 		Position: UDim2?, -- default to {.5 .5}
-		Rounded: boolean?, -- only adds a corner if passed
-		CornerRadius: number?,
+		Rounded: UDim?, -- defines a size
 		BackgroundTransparency: number?,
 		HoverStyle: string?,
 		Visible: boolean?, -- defaulted to show if not passed
@@ -74,15 +73,9 @@ local function TextButton(
 
 	if props.Rounded then
 		local corner = create("UICorner")({
-			CornerRadius = props.CornerRadius,
+			CornerRadius = props.Rounded,
 		})
 		corner.Parent = textButton
-	end
-
-	if props.HoverStyle then
-		local button = textButton
-		-- //TODO - Add animation
-		if button then button.MouseEnter:Connect(function() end) end
 	end
 
 	return textButton

@@ -9,7 +9,7 @@ local source = vide.source
 local spring = vide.spring
 -- //!SECTION
 
-local function ImageButton(
+local function ShopItem(
 	props: {
 		ImageAsset: string,
 		HoverAsset: string?,
@@ -18,25 +18,28 @@ local function ImageButton(
 		Size: UDim2,
 		AnchorPoint: Vector2?,
 		Position: UDim2?, -- default to {.5 .5}
-		Rounded: UDim?, -- defines a size
+		Rounded: boolean?, -- only adds a corner if passed
+		CornerRadius: number?,
 		ScaleType: Enum?,
 		SliceCenter: Rect?,
 		BackgroundTransparency: number?,
 		HoverStyle: string?,
 		Visible: boolean?, -- defaulted to show if not passed
 		Disabled: () -> boolean?, -- external source (vide.source())
+		Purchased: () -> boolean?, -- external source (vide.source())
 		Activated: () -> (),
 	}
 )
 	-- External source
 	local isDisabled = props.Disabled
+	local isPurchased = props.Purchased
 
 	-- Animate source/variables
 	local sizeSource = source(props.Size)
 	local size = spring(sizeSource, 0.2)
 	local springDebounce = false
 
-	local imageButton = create("ImageButton")({
+	local imageButton = create("Frame")({
 		Image = props.ImageAsset or "",
 		HoverImage = props.HoverAsset or "",
 		BackgroundTransparency = props.BackgroundTransparency or 1,
@@ -80,7 +83,7 @@ local function ImageButton(
 
 	if props.Rounded then
 		local corner = create("UICorner")({
-			CornerRadius = props.Rounded,
+			CornerRadius = props.CornerRadius,
 		})
 		corner.Parent = imageButton
 	end
@@ -100,4 +103,4 @@ local function ImageButton(
 	return imageButton
 end
 
-return ImageButton
+return ShopItem

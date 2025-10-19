@@ -1,5 +1,4 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Vide = require(ReplicatedStorage.Packages.vide)
 local UILabs = require(ReplicatedStorage.Packages.uilabs)
 local vide = require(ReplicatedStorage.Packages.vide)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
@@ -25,10 +24,10 @@ local controls = {
 }
 
 local story = CreateVideStory({
-	vide = Vide,
+	vide = vide,
 	controls = controls,
 }, function(props)
-	Vide.cleanup(function()
+	vide.cleanup(function()
 		print("Story is getting unmounted")
 	end)
 
