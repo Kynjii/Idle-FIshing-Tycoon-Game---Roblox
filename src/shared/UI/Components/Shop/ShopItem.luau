@@ -10,15 +10,6 @@ local source = vide.source
 local spring = vide.spring
 -- //!SECTION
 
-local alignment = {
-	position = {
-		center = UDim2.fromScale(0.5, 0.5),
-	},
-	anchor = {
-		center = Vector2.new(0.5, 0.5),
-	},
-}
-
 local function ShopItem(
 	props: {
 		BackgroundColor3: Color3?,
@@ -48,15 +39,15 @@ local function ShopItem(
 		BackgroundTransparency = props.BackgroundTransparency or 1,
 		Size = props.Size,
 		BackgroundColor3 = props.BackgroundColor3 or FFGEnum.THEME.color.white,
-		AnchorPoint = props.AnchorPoint or alignment.anchor.center,
-		Position = props.Position or alignment.position.center,
+		AnchorPoint = props.AnchorPoint or FFGEnum.THEME.alignment.anchor.center,
+		Position = props.Position or FFGEnum.THEME.alignment.position.center,
 		Visible = props.Visible or true,
 
 		MouseEnter = function()
 			if not GetValue(props.HoverEffect) then return end
 			if springDebounce then return end
 			springDebounce = true
-			strokeThicknessSource(FFGEnum.THEME.shopItem.outlineThickness)
+			strokeThicknessSource(FFGEnum.THEME.shop.shopItem.outlineThickness)
 		end,
 		MouseLeave = function()
 			if not GetValue(props.HoverEffect) then return end
@@ -67,7 +58,7 @@ local function ShopItem(
 
 	-- //SECTION - Shop Item Outline
 	local containerStroke = create("UIStroke")({
-		Color = props.HoverEffect and FFGEnum.THEME.shopItem.outline or Color3.new(0, 0, 0),
+		Color = props.HoverEffect and FFGEnum.THEME.shop.shopItem.outline or Color3.new(0, 0, 0),
 		StrokeSizingMode = Enum.StrokeSizingMode.FixedSize,
 		Thickness = strokeThickness,
 	})
@@ -88,8 +79,8 @@ local function ShopItem(
 	-- //SECTION Holds all the main elements
 	local mainContainer = create("Frame")({
 		Size = UDim2.fromScale(0.9, 0.9),
-		Position = alignment.position.center,
-		AnchorPoint = alignment.anchor.center,
+		Position = FFGEnum.THEME.alignment.position.center,
+		AnchorPoint = FFGEnum.THEME.alignment.anchor.center,
 		BackgroundTransparency = 1,
 	})
 	mainContainer.Parent = shopItemContainer
@@ -107,7 +98,7 @@ local function ShopItem(
 	-- //SECTION -  Buy Button
 	local buttonSize = UDim2.fromScale(1, 0.2)
 	local sizeSource = source(buttonSize)
-	local buttonColor = source(FFGEnum.THEME.shopItem.buttonColor)
+	local buttonColor = source(FFGEnum.THEME.shop.shopItem.buttonColor)
 	local buttonText = source("Purchase")
 	local size = spring(sizeSource, 0.2)
 	local sizeSpringDebounce = false
@@ -117,9 +108,12 @@ local function ShopItem(
 		PressedImage = FFGEnum.THEME.button.white,
 		Image = FFGEnum.THEME.button.white,
 		HoverImage = FFGEnum.THEME.button.white,
+		ResampleMode = Enum.ResamplerMode.Pixelated,
 		ImageColor3 = buttonColor,
 		ScaleType = props.ScaleType,
 		SliceCenter = props.SliceCenter,
+		LayoutOrder = 2,
+		Parent = mainContainer,
 		Size = size,
 		Activated = function(input)
 			isOwned(true)
@@ -135,8 +129,6 @@ local function ShopItem(
 			sizeSpringDebounce = false
 		end,
 	})
-	buyButton.LayoutOrder = 2
-	buyButton.Parent = mainContainer
 
 	local buttonTxt = create("TextLabel")({
 		Position = UDim2.fromScale(0.5, 0.45),

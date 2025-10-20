@@ -6,13 +6,11 @@ local CreateVideStory = UILabs.CreateVideStory
 
 local Datatype = UILabs.Datatype
 
-local shopItem = require(ReplicatedStorage.Shared.UI.Components.Shop.ShopItem)
+local shopTooltip = require(ReplicatedStorage.Shared.UI.Components.Shop.ShopTooltip)
 
 -- UILab controls
 local controls = {
 	BackgroundColor3 = Datatype.Color3(FFGEnum.THEME.shop.shopItem.bgColor), -- Color3 is inside "Datatype", this is to avoid name collisions
-	BackgroundTransparency = UILabs.Number(0),
-	HoverEffect = UILabs.Boolean(false),
 	Visible = UILabs.Boolean(true),
 }
 
@@ -24,16 +22,15 @@ local story = CreateVideStory({
 		print("Story is getting unmounted")
 	end)
 
-	return shopItem({
+	return shopTooltip({
 		ItemImage = "rbxassetid://135112095865386",
 		BackgroundColor3 = props.controls.BackgroundColor3,
-		BackgroundTransparency = props.controls.BackgroundTransparency,
-		Size = UDim2.fromOffset(100, 100),
+		Size = UDim2.fromOffset(150, 300),
 		Rounded = FFGEnum.THEME.button.cornerRadius,
-		HoverEffect = props.controls.HoverEffect,
 		Visible = props.controls.Visible,
-		ScaleType = Enum.ScaleType.Slice,
-		SliceCenter = Rect.new(32, 83, 32, 83),
+		ItemCost = "1.2k",
+		ItemName = "Flynn's Hammer",
+		ItemDescription = "This hammer is the mightiest hammer in all of Fur Land.",
 	})
 end)
 

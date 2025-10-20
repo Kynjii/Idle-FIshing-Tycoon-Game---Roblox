@@ -152,10 +152,65 @@ FFGEnum.THEME = {
 	font = Enum.Font.FredokaOne,
 
 	color = {
-		panel = Color3.fromRGB(181, 136, 99), -- Oak
-		border = Color3.fromRGB(180, 123, 65), -- Walnut frame
-		text = Color3.fromRGB(250, 240, 210), -- Parchment
-		subtle = Color3.fromRGB(95, 85, 80), -- Stone/secondary text
+		primary_900 = Color3.fromHex("#fc8500"),
+		primary_800 = Color3.fromHex("#fdaf00"),
+		primary_700 = Color3.fromHex("#fdc80e"),
+		primary_600 = Color3.fromHex("#fce01d"),
+		primary_500 = Color3.fromHex("#f2ea14"),
+		primary_400 = Color3.fromHex("#f5ef43"),
+		primary_300 = Color3.fromHex("#f8f467"),
+		primary_200 = Color3.fromHex("#fbf890"),
+		primary_100 = Color3.fromHex("#fdfcb7"),
+		primary_50 = Color3.fromHex("#ffffdd"),
+
+		complementary_900 = Color3.fromHex("#6d4eb4"),
+		complementary_800 = Color3.fromHex("#7a62cb"),
+		complementary_700 = Color3.fromHex("#816dd7"),
+		complementary_600 = Color3.fromHex("#8c79e6"),
+		complementary_500 = Color3.fromHex("#9483f2"),
+		complementary_400 = Color3.fromHex("#a199f7"),
+		complementary_300 = Color3.fromHex("#b2b0fc"),
+		complementary_200 = Color3.fromHex("#c8c8fe"),
+		complementary_100 = Color3.fromHex("#ddddff"),
+		complementary_50 = Color3.fromHex("#f2f2ff"),
+
+		orange_900 = Color3.fromHex("#d41912"),
+		orange_800 = Color3.fromHex("#df4110"),
+		orange_700 = Color3.fromHex("#e6540d"),
+		orange_600 = Color3.fromHex("#ed6408"),
+		orange_500 = Color3.fromHex("#f17002"),
+		orange_400 = Color3.fromHex("#f58420"),
+		orange_300 = Color3.fromHex("#f89a44"),
+		orange_200 = Color3.fromHex("#fbb777"),
+		orange_100 = Color3.fromHex("#fed4ac"),
+		orange_50 = Color3.fromHex("#ffeedd"),
+
+		green_900 = Color3.fromHex("#639950"),
+		green_800 = Color3.fromHex("#86bd63"),
+		green_700 = Color3.fromHex("#99d26e"),
+		green_600 = Color3.fromHex("#afe97a"),
+		green_500 = Color3.fromHex("#bdf781"),
+		green_400 = Color3.fromHex("#c8fa95"),
+		green_300 = Color3.fromHex("#d4fcab"),
+		green_200 = Color3.fromHex("#e1fec5"),
+		green_100 = Color3.fromHex("#eeffdd"),
+		green_50 = Color3.fromHex("#f8fff2"),
+
+		teal_900 = Color3.fromHex("#298782"),
+		teal_800 = Color3.fromHex("#2eacaf"),
+		teal_700 = Color3.fromHex("#31c1c7"),
+		teal_600 = Color3.fromHex("#35d9e3"),
+		teal_500 = Color3.fromHex("#38eaf7"),
+		teal_400 = Color3.fromHex("#46eff7"),
+		teal_300 = Color3.fromHex("#61f4f9"),
+		teal_200 = Color3.fromHex("#8af9fb"),
+		teal_100 = Color3.fromHex("#b4fcfc"),
+		teal_50 = Color3.fromHex("#ddffff"),
+
+		panel = Color3.fromHex("ffffdd"),
+		border = Color3.fromHex("b9bc98"),
+		text = Color3.fromHex("697d76"),
+		subtle = Color3.fromRGB(95, 85, 80),
 
 		red = Color3.fromRGB(249, 65, 68),
 		orange = Color3.fromRGB(243, 114, 44),
@@ -207,12 +262,34 @@ FFGEnum.THEME = {
 		cornerRadius = UDim.new(0.1),
 	},
 
-	shopItem = {
-		buttonColor = Color3.fromHex("e88f57"),
-		bgColor = Color3.fromHex("ffffdd"),
-		outline = Color3.fromHex("b9bc98"),
-		element = Color3.fromHex("f6c794"),
-		outlineThickness = 3,
+	shop = {
+		shopItem = {
+			buttonColor = Color3.fromHex("e88f57"),
+			bgColor = Color3.fromHex("ffffdd"),
+			outline = Color3.fromHex("b9bc98"),
+			element = Color3.fromHex("f6c794"),
+			outlineThickness = 3,
+		},
+		shopTooltip = {
+			frameTriangle = "rbxassetid://108183848038135",
+			outlineThickness = 1,
+		},
+	},
+
+	alignment = {
+		position = {
+			center = UDim2.fromScale(0.5, 0.5),
+			frameHeader = UDim2.fromScale(0.5, -0.03),
+			top = UDim2.fromScale(0.5, 0),
+			bottom = UDim2.fromScale(0.5, 1),
+			textCenter = UDim2.fromScale(0.5, 0.45),
+			textFrameHeaderCenter = UDim2.fromScale(0.5, 0.35),
+		},
+		anchor = {
+			top = Vector2.new(0.5, 0),
+			bottom = Vector2.new(0.5, 1),
+			center = Vector2.new(0.5, 0.5),
+		},
 	},
 
 	sounds = {
