@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Teams = game:GetService("Teams")
 local BuildingsManager = require(script.Parent.BuildingsManager)
 local ChainManager = require(script.Parent.ChainManager)
-local ShopManager = require(script.Parent.ShopManager)
+local HelperManager = require(script.Parent.HelperManager)
 local BuildingsManagerType = require(ReplicatedStorage.Shared.Types.Managers.BuildingsManagerType)
 local ChainManagerType = require(ReplicatedStorage.Shared.Types.Managers.ChainManagerType)
 
@@ -55,7 +55,7 @@ TeamManager.Teams = {
 
 TeamManager.ChainManagers = {}
 TeamManager.BuildingsManager = {}
-TeamManager.ShopManagers = {}
+TeamManager.HelperManager = {}
 
 function TeamManager.CreateTeams(): ()
 	for i, team in ipairs(TeamManager.Teams) do
@@ -102,17 +102,17 @@ function TeamManager.AssignBuildingsManager(profile, player: Player, teamId: num
 	buildingsManager:Initialize()
 end
 
-function TeamManager.AssignShopManager(profile, player: Player, teamId: number): ()
-	TeamManager.ShopManagers[player.UserId] = TeamManager.ShopManagers[player.UserId] or { OwnerId = player.UserId }
+function TeamManager.AssignHelperManager(profile, player: Player, teamId: number): ()
+	TeamManager.HelperManager[player.UserId] = TeamManager.HelperManager[player.UserId] or { OwnerId = player.UserId }
 	local currentRealm = profile.CurrentRealm or 1
 	local realmData = profile and profile.Realms[currentRealm]
-	local playerItemState = realmData.Items
+	local playerItemState = realmData.Helpers
 
-	local shopManager = ShopManager.New(playerItemState, player, teamId)
-	if not shopManager then return end
+	local helperManager = HelperManager.New(playerItemState, player, teamId)
+	if not helperManager then return end
 
-	TeamManager.ShopManagers[player.UserId] = shopManager
-	shopManager:Initialize()
+	TeamManager.HelperManager[player.UserId] = helperManager
+	HelperManager:Initialize()
 end
 
 function TeamManager.AssignTeam(player: Player): number?
@@ -154,18 +154,18 @@ local function listClean(list, userId, managerType): ()
 	elseif managerType == managerTypes.Building then
 		TeamManager.BuildingsManager[userId] = nil
 	elseif managerType == managerTypes.Shop then
-		TeamManager.ShopManagers[userId] = nil
+		TeamManager.HelperManager[userId] = nil
 	end
 end
 
 function TeamManager.CleanupPlayer(userId: number): ()
 	local chainList = TeamManager.ChainManagers[userId]
 	local buildingList = TeamManager.BuildingsManager[userId]
-	local shopList = TeamManager.ShopManagers[userId]
+	local helperList = TeamManager.HelperManager[userId]
 
 	if chainList then listClean(chainList, userId, managerTypes.Chain) end
 	if buildingList then listClean(buildingList, userId, managerTypes.Building) end
-	if shopList then listClean(shopList, userId, managerTypes.Shop) end
+	if helperList then listClean(helperList, userId, managerTypes.Shop) end
 end
 
 export type TeamManager = typeof(TeamManager)

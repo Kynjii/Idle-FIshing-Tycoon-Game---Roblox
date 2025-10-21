@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local Economy = require(ServerScriptService.Server.Analytics.Economy)
 local TableUtil = require(ReplicatedStorage.Packages.TableUtil)
-local ShopItems = require(ReplicatedStorage.Shared.Items.ShopItems)
+local Helpers = require(ReplicatedStorage.Shared.Inventory.Helpers)
 local BuildingType = require(ReplicatedStorage.Shared.Types.Classes.BuildingType)
 local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
 local PlayerDataTemplate = require(ServerScriptService.Server.Modules.PlayerDataTemplate)
@@ -23,6 +23,7 @@ local stateTypes = {
 	Building = "save Building",
 	PortStorage = "save PortStorage",
 	Item = "save Item",
+	Helper = "save Helper",
 	SaveTutorialState = "save Tutorial",
 	CompletedTutorial = "complete Tutorial",
 	GetTutorialState = "get Tutorial",
@@ -362,9 +363,9 @@ function DataService.GetBuffState(player: Player, buffNames: { string }): { [str
 end
 -- //!SECTION
 
--- //SECTION - SHOP
-function DataService.SaveItem(player: Player, item: ShopItems.ShopItem): boolean
-	local profile = getProfile(player, stateTypes.Item)
+-- //SECTION - HELPER
+function DataService.SaveHelper(player: Player, helper: Helpers.Helper): boolean
+	local profile = getProfile(player, stateTypes.Helper)
 	if not profile then return false end
 
 	local hasRealms = getRealms(profile)
@@ -373,19 +374,10 @@ function DataService.SaveItem(player: Player, item: ShopItems.ShopItem): boolean
 	local currentRealm = getRealmData(profile)
 	if not currentRealm then return false end
 
-	-- Initialize Shop array if it doesn't exist
-	if not profile.Data.Realms[currentRealm].Items then profile.Data.Realms[currentRealm].Items = {} end
+	-- Initialize Helpers array if it doesn't exist
+	if not profile.Data.Realms[currentRealm].Helpers then profile.Data.Realms[currentRealm].Helpers = {} end
 
-	-- Create a clean copy to avoid nested/circular reference issues
-	local itemData = {
-		id = item.id,
-		name = item.name,
-		baseCost = item.baseCost,
-		jobCategory = item.jobCategory,
-		currencyType = item.currencyType,
-	}
-
-	profile.Data.Realms[currentRealm].Items[item.id] = itemData
+	profile.Data.Realms[currentRealm].Helpers[helper.Id] = helper
 
 	local replica = DataService.Replicas[player]
 	if replica then replica:Set({ "Realms", currentRealm, "Items" }, profile.Data.Realms[currentRealm].Items) end

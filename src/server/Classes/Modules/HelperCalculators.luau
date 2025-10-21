@@ -219,7 +219,7 @@ end
 -- ========= Apply exact (key -> value) set; stable for previews =========
 function HelperCalculator.GenerateStatsWithPerkValues(jobCategory: string, level: number, qualityId: number, perkValues: { [string]: number }): ({ [string]: number }, { string })
 	-- Base stats (deterministic)
-	local stats = select(1, HelperCalculator.GenerateStats(jobCategory, level, qualityId))
+	local stats = select(1, HelperCalculator.CalculateStats(jobCategory, level, qualityId))
 	local applied: { string } = {}
 
 	-- Apply in PERKS_DEF order for consistent stacking
@@ -312,7 +312,7 @@ end
 -- Returns base stats (Defaults + this jobCategory’s stats) with:
 -- (base + perLevelAdd*(level-1)) × stageMult × qualityMult  for “up” stats
 -- base × (1 - stageReduction(stage)) × (1 / qualityMult) with a floor for “timeDown”
-function HelperCalculator.GenerateStats(jobCategory: string, level: number, qualityId: number?): (StatsTable, { string })
+function HelperCalculator.CalculateStats(jobCategory: string, level: number, qualityId: number?): (StatsTable, { string })
 	local lvl = clampLevel(level)
 	local stgIndex = getStageForLevel(lvl)
 	local stageMult = getStageMult(stgIndex)

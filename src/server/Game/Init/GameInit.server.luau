@@ -89,7 +89,7 @@ local function PlayerAdded(player: Player)
 
 			TeamManager.AssignBuildingsManager(profile.Data, player, teamId)
 			TeamManager.AssignChainManagers(profile.Data, player, teamId)
-			TeamManager.AssignShopManager(profile.Data, player, teamId)
+			TeamManager.AssignHelperManager(profile.Data, player, teamId)
 
 			Badges.CheckAlphaBadgeStatus(player)
 		else

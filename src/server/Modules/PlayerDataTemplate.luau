@@ -42,7 +42,7 @@ return {
 			Storages = {},
 			Buildings = {},
 			Buffs = realmBuffs,
-			Items = {},
+			Helpers = {},
 		},
 		[2] = {
 			Lanes = 6,
@@ -52,7 +52,7 @@ return {
 			Storages = {},
 			Buildings = {},
 			Buffs = realmBuffs,
-			Items = {},
+			Helpers = {},
 		},
 		[3] = {
 			Lanes = 6,
@@ -62,7 +62,7 @@ return {
 			Storages = {},
 			Buildings = {},
 			Buffs = realmBuffs,
-			Items = {},
+			Helpers = {},
 		},
 		[4] = {
 			Lanes = 6,
@@ -72,7 +72,7 @@ return {
 			Storages = {},
 			Buildings = {},
 			Buffs = realmBuffs,
-			Items = {},
+			Helpers = {},
 		},
 	},
 	Currencies = {
