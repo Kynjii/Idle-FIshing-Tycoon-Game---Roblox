@@ -159,13 +159,13 @@ FORMULAS.QUALITY_MULT = {
 	[6] = 2.30, -- Mythic
 }
 
--- Base stats (defaults exist for all; per-category are exclusive)
+-- Base stats (defaults exist for all; per-jobCategory are exclusive)
 FORMULAS.HELPER_BASE = {
 	Defaults = {
 		WalkSpeed = 10, -- “up”
 		Storage = 50, -- “up”
 	},
-	PerCategory = {
+	PerJobCategory = {
 		Fishing = { CatchRate = 5, Luck = 0, CastTime = 6 }, -- CastTime “timeDown”
 		Woodcutting = { ChopRate = 5, Sturdiness = 0, SwingTime = 5 },
 		Mining = { OreYield = 4, Prospecting = 0, SwingTime = 6 },
@@ -179,7 +179,7 @@ FORMULAS.HELPER_PER_LEVEL_ADD = {
 		WalkSpeed = 0.35,
 		Storage = 3.00,
 	},
-	PerCategory = {
+	PerJobCategory = {
 		Fishing = { CatchRate = 0.30, Luck = 0.15, CastTime = 0.00 },
 		Woodcutting = { ChopRate = 0.30, Sturdiness = 0.15, SwingTime = 0.00 },
 		Mining = { OreYield = 0.28, Prospecting = 0.15, SwingTime = 0.00 },
@@ -263,22 +263,5 @@ FORMULAS.PERK_SELECTION_WEIGHTS = {
 	-- StoneSense = 1.2,
 	-- RoadCraft = 1.2,
 }
-
--- =========================
--- Hot reload support (Studio)
--- =========================
-
-function FORMULAS.Rebuild()
-	FORMULAS.EARN_MULT = buildMultipliers(FORMULAS.EARN_RATE, FORMULAS.EARN_BONUS)
-	FORMULAS.COST_MULT = buildMultipliers(FORMULAS.COST_RATE, nil)
-
-	FORMULAS.STAGE_COUNT = #FORMULAS.PROMO_LEVEL
-	local stageMult = table.create(FORMULAS.STAGE_COUNT, 1)
-	for s = 1, FORMULAS.STAGE_COUNT do
-		local lvlAtStage = FORMULAS.PROMO_LEVEL[s]
-		stageMult[s] = FORMULAS.EARN_MULT[lvlAtStage]
-	end
-	FORMULAS.STAGE_EARN_MULT = stageMult
-end
 
 return FORMULAS

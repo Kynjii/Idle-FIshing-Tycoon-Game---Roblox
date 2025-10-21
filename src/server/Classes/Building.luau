@@ -138,12 +138,10 @@ function Building.Upgrade(self: Building): ()
 	if not self:CanUpgrade() then return end
 
 	self.Level += 1
-	for k, v in ipairs(Formulas.PROMO_LEVEL) do
-		if self.Level == v then
-			self:IncreaseUpgradeStage(k)
-			self:UpdateVisualModel()
-			break
-		end
+	local stage = Formulas.StageForLevel(self.Level)
+	if self.UpgradeStage < stage then
+		self:IncreaseUpgradeStage(stage)
+		self:UpdateVisualModel()
 	end
 	self:UpdateBuffValue()
 

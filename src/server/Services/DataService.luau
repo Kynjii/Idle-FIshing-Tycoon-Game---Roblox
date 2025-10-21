@@ -381,7 +381,7 @@ function DataService.SaveItem(player: Player, item: ShopItems.ShopItem): boolean
 		id = item.id,
 		name = item.name,
 		baseCost = item.baseCost,
-		category = item.category,
+		jobCategory = item.jobCategory,
 		currencyType = item.currencyType,
 	}
 

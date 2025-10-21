@@ -10,7 +10,7 @@ local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 
 -- //SECTION - Boat Data
 local NAME = {
-	Fishing = "Fisher", -- [Category]: Name
+	Fishing = "Fisher", -- [Job]: Name
 	Woodcutting = "Woodcutter",
 	Mining = "Miner",
 	Transport = "Hauler",
@@ -62,8 +62,7 @@ function Helper.New(state: { [string]: any }?, player: Player, teamId: number): 
 	self.Player = player
 	self.Owner = self.Owner or player.UserId
 	self.TeamId = teamId
-	self.CategoryFocus = state and state.CategoryFocus or self:GenerateCategoryFocus()
-	print("Category Focus:", self.CategoryFocus)
+	self.JobCategory = state and state.JobCategory or self:GenerateJobCategory()
 	self.Name = self:GetName()
 
 	self.BaseCost = self:CalculateBaseCost()
@@ -89,12 +88,8 @@ function Helper.Upgrade(self: Helper): ()
 	if not self:CanUpgrade() then return end
 
 	self.Level += 1
-	for k, v in ipairs(Formulas.PROMO_LEVEL) do
-		if self.Level == v then
-			self:IncreaseUpgradeStage(k)
-			break
-		end
-	end
+	local stage = Formulas.StageForLevel(self.Level)
+	if self.UpgradeStage < stage then self:IncreaseUpgradeStage(stage) end
 
 	self.CurrentFPS, self.NextFPS = self:CalculateFPS()
 	self.UpgradeCost = self:CalculateUpgradeCost()
@@ -151,9 +146,9 @@ end
 -- //!SECTION
 
 -- //SECTION - Generators
-function Helper.GenerateCategoryFocus(self: Helper): number
-	local categories = FFGEnum.CATEGORIES
-	return categories[math.random(1, #categories)]
+function Helper.GenerateJobCategory(self: Helper): number
+	local jobs = FFGEnum.JOBS
+	return jobs[math.random(1, #jobs)]
 end
 
 function Helper.GenerateStats(self: Helper)

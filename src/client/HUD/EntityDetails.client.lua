@@ -122,6 +122,11 @@ function closeDetails()
 	end
 end
 
+function updateName()
+	local stage = FFGEnum.STAGES[entityData.UpgradeStage].Label
+	if details.Defaults.NameLabel then details.Defaults.NameLabel.Text = `{entityData.Name} | {stage or "Stage I"}` end
+end
+
 function updateLevel()
 	if not entityData.isPurchased then
 		details.Defaults.LevelLabel.Parent.Visible = false
@@ -288,6 +293,7 @@ Replica.OnNew("PlayerState", function(replicaData)
 end)
 
 function updateUI()
+	updateName()
 	updateLevel()
 	updateStats()
 	updateEntityInteractiveFrameLabel()

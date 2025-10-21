@@ -141,12 +141,10 @@ function PortStorage.Upgrade(self: PortStorage): ()
 	if not self:CanUpgrade() then return end
 
 	self.Level += 1
-	for k, v in ipairs(Formulas.PROMO_LEVEL) do
-		if self.Level == v then
-			self:IncreaseUpgradeStage(k)
-			self:UpdateVisualModel()
-			break
-		end
+	local stage = Formulas.StageForLevel(self.Level)
+	if self.UpgradeStage < stage then
+		self:IncreaseUpgradeStage(stage)
+		self:UpdateVisualModel()
 	end
 
 	self:UpdateBuffs()
@@ -410,6 +408,7 @@ function PortStorage.Serialize(self: PortStorage): { [string]: any }
 		RealmId = self.RealmId,
 		Name = self.Name,
 		Tier = self.Tier,
+		UpgradeStage = self.UpgradeStage,
 		Level = self.Level,
 		MaxLevel = self.MaxLevel,
 		BaseCost = self.BaseCost,

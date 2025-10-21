@@ -162,14 +162,12 @@ function Tender.Upgrade(self: Tender)
 	if not self:CanUpgrade() then return end
 
 	self.Level += 1
-	for k, v in ipairs(Formulas.PROMO_LEVEL) do
-		if self.Level == v then
-			self:IncreaseUpgradeStage(k)
-			self:UpdateVisualModel()
-			self.CurrentTravelTime = self:CalculateTravelTime()
-			self.LoadTime = self:CalculateLoadTime()
-			break
-		end
+	local stage = Formulas.StageForLevel(self.Level)
+	if self.UpgradeStage < stage then
+		self:IncreaseUpgradeStage(stage)
+		self:UpdateVisualModel()
+		self.CurrentTravelTime = self:CalculateTravelTime()
+		self.LoadTime = self:CalculateLoadTime()
 	end
 
 	self:UpdateBuffs()

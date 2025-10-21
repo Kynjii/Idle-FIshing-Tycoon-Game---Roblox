@@ -95,7 +95,7 @@ FFGEnum.CLASS = {
 	},
 }
 
-FFGEnum.CATEGORIES = {
+FFGEnum.JOBS = {
 	[1] = "Fishing",
 	[2] = "Woodcutting",
 	[3] = "Mining",

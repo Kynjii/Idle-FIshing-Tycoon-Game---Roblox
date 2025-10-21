@@ -44,7 +44,7 @@ local function getQualityMult(qualityId: number?): number
 end
 -- //!SECTION
 
--- //SECTION -  Perks (category-aware, value-driven)
+-- //SECTION -  Perks (jobjobCategory-aware, value-driven)
 
 type PerkDef = {
 	Key: string,
@@ -152,22 +152,22 @@ local function weightedDraw(rng, items: { any }, getWeight): any
 end
 -- //!SECTION
 
--- ========= Build eligible perk pool for (category, quality) =========
-local function buildPerkPool(category: string, qualityId: number)
+-- ========= Build eligible perk pool for (jobCategory, quality) =========
+local function buildPerkPool(jobCategory: string, qualityId: number)
 	local pool = {}
 	for _, perk in ipairs(PERKS_DEF) do
-		if perk.MinQuality <= qualityId and perk.Allowed[category] then table.insert(pool, perk) end
+		if perk.MinQuality <= qualityId and perk.Allowed[jobCategory] then table.insert(pool, perk) end
 	end
 	return pool
 end
 
 -- ========= Randomly choose perk KEYS (no duplicates), seeded =========
 -- Returns up to slotCount keys from the eligible pool. If pool < slots, returns all.
-function HelperCalculator.ChooseRandomPerkKeys(category: string, qualityId: number, seed: number?): { string }
+function HelperCalculator.ChooseRandomPerkKeys(jobCategory: string, qualityId: number, seed: number?): { string }
 	local slotCount = (Formulas.QUALITY_PERK_COUNT and Formulas.QUALITY_PERK_COUNT[qualityId]) or 0
 	if slotCount <= 0 then return {} end
 
-	local pool = buildPerkPool(category, qualityId)
+	local pool = buildPerkPool(jobCategory, qualityId)
 	if #pool == 0 then return {} end
 
 	local weights = Formulas.PERK_SELECTION_WEIGHTS or {}
@@ -217,15 +217,15 @@ function HelperCalculator.RollPerkValuesForKeys(perkKeys: { string }, qualityId:
 end
 
 -- ========= Apply exact (key -> value) set; stable for previews =========
-function HelperCalculator.GenerateStatsWithPerkValues(category: string, level: number, qualityId: number, perkValues: { [string]: number }): ({ [string]: number }, { string })
+function HelperCalculator.GenerateStatsWithPerkValues(jobCategory: string, level: number, qualityId: number, perkValues: { [string]: number }): ({ [string]: number }, { string })
 	-- Base stats (deterministic)
-	local stats = select(1, HelperCalculator.GenerateStats(category, level, qualityId))
+	local stats = select(1, HelperCalculator.GenerateStats(jobCategory, level, qualityId))
 	local applied: { string } = {}
 
 	-- Apply in PERKS_DEF order for consistent stacking
 	for _, perk in ipairs(PERKS_DEF) do
 		local value = perkValues[perk.Key]
-		if value and perk.MinQuality <= qualityId and perk.Allowed[category] then
+		if value and perk.MinQuality <= qualityId and perk.Allowed[jobCategory] then
 			perk.Apply(stats, value)
 			table.insert(applied, string.format("%s (+%d%%)", perk.Key, math.floor(value * 100 + 0.5)))
 		end
@@ -235,9 +235,9 @@ function HelperCalculator.GenerateStatsWithPerkValues(category: string, level: n
 end
 
 -- ========= Compare current vs next with SAME locked perks/values =========
-function HelperCalculator.CompareLevelsWithPerks(category: string, level: number, qualityId: number, perkValues: { [string]: number })
-	local cur = select(1, HelperCalculator.GenerateStatsWithPerkValues(category, level, qualityId, perkValues))
-	local nxt = select(1, HelperCalculator.GenerateStatsWithPerkValues(category, level + 1, qualityId, perkValues))
+function HelperCalculator.CompareLevelsWithPerks(jobCategory: string, level: number, qualityId: number, perkValues: { [string]: number })
+	local cur = select(1, HelperCalculator.GenerateStatsWithPerkValues(jobCategory, level, qualityId, perkValues))
+	local nxt = select(1, HelperCalculator.GenerateStatsWithPerkValues(jobCategory, level + 1, qualityId, perkValues))
 
 	local delta: { [string]: number } = {}
 	for k, v in pairs(cur) do
@@ -251,7 +251,7 @@ function HelperCalculator.CompareLevelsWithPerks(category: string, level: number
 end
 
 -- ========= Upgrading quality: add new slots without touching existing picks =========
-function HelperCalculator.AddSlotsOnQualityUpgrade(category: string, oldQualityId: number, newQualityId: number, existingKeys: { string }, existingValues: { [string]: number }, seed: number?): ({ string }, { [string]: number })
+function HelperCalculator.AddSlotsOnQualityUpgrade(jobCategory: string, oldQualityId: number, newQualityId: number, existingKeys: { string }, existingValues: { [string]: number }, seed: number?): ({ string }, { [string]: number })
 	local oldSlots = (Formulas.QUALITY_PERK_COUNT and Formulas.QUALITY_PERK_COUNT[oldQualityId]) or 0
 	local newSlots = (Formulas.QUALITY_PERK_COUNT and Formulas.QUALITY_PERK_COUNT[newQualityId]) or 0
 	if newSlots <= oldSlots then
@@ -260,7 +260,7 @@ function HelperCalculator.AddSlotsOnQualityUpgrade(category: string, oldQualityI
 	local need = newSlots - oldSlots
 
 	-- Build pool for NEW quality, remove already-chosen keys
-	local pool = buildPerkPool(category, newQualityId)
+	local pool = buildPerkPool(jobCategory, newQualityId)
 	local taken = {}
 	for _, k in ipairs(existingKeys) do
 		taken[k] = true
@@ -309,10 +309,10 @@ end
 
 -- Main API (BASE STATS ONLY — no RNG, no perks)
 
--- Returns base stats (Defaults + this category’s stats) with:
+-- Returns base stats (Defaults + this jobCategory’s stats) with:
 -- (base + perLevelAdd*(level-1)) × stageMult × qualityMult  for “up” stats
 -- base × (1 - stageReduction(stage)) × (1 / qualityMult) with a floor for “timeDown”
-function HelperCalculator.GenerateStats(category: string, level: number, qualityId: number?): (StatsTable, { string })
+function HelperCalculator.GenerateStats(jobCategory: string, level: number, qualityId: number?): (StatsTable, { string })
 	local lvl = clampLevel(level)
 	local stgIndex = getStageForLevel(lvl)
 	local stageMult = getStageMult(stgIndex)
@@ -323,10 +323,10 @@ function HelperCalculator.GenerateStats(category: string, level: number, quality
 	local typeMap = Formulas.HELPER_STAT_TYPES
 
 	local defaults = (baseDefs and baseDefs.Defaults) or {}
-	local catBase = (baseDefs and baseDefs.PerCategory and baseDefs.PerCategory[category]) or {}
+	local catBase = (baseDefs and baseDefs.PerjobCategory and baseDefs.PerjobCategory[jobCategory]) or {}
 
 	local defaultsAdd = (addDefs and addDefs.Defaults) or {}
-	local catAdd = (addDefs and addDefs.PerCategory and addDefs.PerCategory[category]) or {}
+	local catAdd = (addDefs and addDefs.PerjobCategory and addDefs.PerjobCategory[jobCategory]) or {}
 
 	local stats: StatsTable = {}
 
@@ -348,7 +348,7 @@ function HelperCalculator.GenerateStats(category: string, level: number, quality
 		end
 	end
 
-	-- Category-only
+	-- jobCategory-only
 	for key, baseValue in pairs(catBase) do
 		local perLevel = (catAdd and catAdd[key]) or 0
 		local statType = typeMap[key] or "up"
