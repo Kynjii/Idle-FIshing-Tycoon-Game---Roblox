@@ -207,9 +207,10 @@ FFGEnum.THEME = {
 		teal_100 = Color3.fromHex("#b4fcfc"),
 		teal_50 = Color3.fromHex("#ddffff"),
 
-		panel = Color3.fromHex("ffffdd"),
-		border = Color3.fromHex("b9bc98"),
-		text = Color3.fromHex("697d76"),
+		panel = Color3.fromHex("#bdae92"),
+		border = Color3.fromHex("#bfb893"),
+		text = Color3.fromHex("#5e777c"),
+		buttons = Color3.fromHex("#e88f57"),
 		subtle = Color3.fromRGB(95, 85, 80),
 
 		red = Color3.fromRGB(249, 65, 68),
@@ -289,6 +290,7 @@ FFGEnum.THEME = {
 			top = Vector2.new(0.5, 0),
 			bottom = Vector2.new(0.5, 1),
 			center = Vector2.new(0.5, 0.5),
+			left = Vector2.new(0, 0.5),
 		},
 	},
 

@@ -11,12 +11,9 @@ local ShopItem = require(ReplicatedStorage.Shared.UI.Components.Shop.ShopItem)
 local FormatNumber = require(ReplicatedStorage.Shared.Utils.FormatNumber)
 
 local player = Players.LocalPlayer
-if not player.PlayerGui then
-	print("waiting")
-	task.wait(3)
-end
+local playerGui = player:WaitForChild("PlayerGui")
 local helperShopUI = ShopGUI.Create({ ShopName = "Crew Shop", ScreenGuiName = "HelperShop" })
-helperShopUI.Parent = player.PlayerGui
+helperShopUI.Parent = playerGui
 
 local shopDetailsUI = helperShopUI:WaitForChild("DetailsContainer") :: Frame
 local main = shopDetailsUI:WaitForChild("Main") :: Frame
@@ -36,22 +33,24 @@ function createShopItemElement(helper: ShopHelpers.Helper)
 		ItemImage = helper.ItemImage,
 		ItemName = helper.Name,
 		ItemId = helper.Id,
+		ItemDescription = "Wee wooo",
 		ItemPrice = FormatNumber(helper.BaseCost),
 		BackgroundColor3 = FFGEnum.THEME.shop.shopItem.bgColor,
 		BackgroundTransparency = 0,
-		Size = UDim2.fromOffset(100, 100),
+		Size = UDim2.fromScale(1, 1),
 		Rounded = FFGEnum.THEME.button.cornerRadius,
 		HoverEffect = true,
 		Visible = true,
 		ScaleType = Enum.ScaleType.Slice,
 		SliceCenter = Rect.new(32, 83, 32, 83),
+		Parent = shopItemsContainer,
+		ShopInstance = main,
 	})
 end
 
 if shopItemsContainer then
 	for i, item in ipairs(itemCatalog) do
 		local itemElement = createShopItemElement(item)
-		itemElement.Parent = shopItemsContainer
 		itemElements[i] = itemElement
 	end
 end
@@ -79,6 +78,8 @@ function handleClosingShopDetailsUI()
 	while true do
 		local distance = player:DistanceFromCharacter(originalPosition)
 		if distance >= 8 then
+			local tooltip = main:FindFirstChild("ShopTooltip", true)
+			if tooltip then tooltip:Destroy() end
 			ShopGUI.CloseShop(helperShopUI)
 			break
 		end
@@ -123,7 +124,9 @@ if shopDetails then shopDetails.OnClientEvent:Connect(function(data)
 		shopData = data
 		watchPlayerItems()
 		populateDetailsUI()
-		handleClosingShopDetailsUI()
+		task.spawn(function()
+			handleClosingShopDetailsUI()
+		end)
 	end
 end) end
 

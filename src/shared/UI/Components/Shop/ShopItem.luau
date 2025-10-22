@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
+local Events = require(ReplicatedStorage.Shared.Events.Events)
 
 local function ShopItem(
 	props: {
@@ -17,6 +18,9 @@ local function ShopItem(
 		ItemPrice: string,
 		ItemName: string,
 		ItemId: string,
+		ItemDescription: string,
+		Parent: Instance,
+		ShopInstance: Instance,
 	}
 )
 	local shopItemContainer = Instance.new("CanvasGroup")
@@ -28,6 +32,7 @@ local function ShopItem(
 	shopItemContainer.Position = props.Position or FFGEnum.THEME.alignment.position.center
 	shopItemContainer.Visible = props.Visible or true
 	shopItemContainer.ClipsDescendants = true
+	shopItemContainer.Parent = props.Parent or nil
 
 	local strokeThickness = 0
 	shopItemContainer.MouseEnter:Connect(function()
@@ -39,20 +44,29 @@ local function ShopItem(
 
 	-- //SECTION - Shop Item Outline
 	local containerStroke = Instance.new("UIStroke")
-	containerStroke.Color = props.HoverEffect and FFGEnum.THEME.shop.shopItem.outline or Color3.new(0, 0, 0)
+	containerStroke.Color = props.HoverEffect and FFGEnum.THEME.color.buttons or Color3.new(0, 0, 0)
 	containerStroke.StrokeSizingMode = Enum.StrokeSizingMode.FixedSize
 	containerStroke.Thickness = strokeThickness
 
 	containerStroke.Parent = shopItemContainer
 
+	local containerStroke2 = Instance.new("UIStroke")
+	containerStroke2.Color = props.HoverEffect and FFGEnum.THEME.color.white or Color3.new(0, 0, 0)
+	containerStroke2.StrokeSizingMode = Enum.StrokeSizingMode.FixedSize
+	containerStroke2.BorderStrokePosition = Enum.BorderStrokePosition.Inner
+	containerStroke2.Thickness = (strokeThickness / 2)
+	containerStroke2.Transparency = 0.9
+
+	containerStroke2.Parent = shopItemContainer
+
 	shopItemContainer.MouseEnter:Connect(function()
 		strokeThickness = FFGEnum.THEME.shop.shopItem.outlineThickness
-		containerStroke.Thickness = strokeThickness
+		containerStroke2.Thickness = strokeThickness
 	end)
 
 	shopItemContainer.MouseLeave:Connect(function()
 		strokeThickness = 0
-		containerStroke.Thickness = strokeThickness
+		containerStroke2.Thickness = strokeThickness
 	end)
 	-- //!SECTION
 
@@ -104,6 +118,34 @@ local function ShopItem(
 	uiList.VerticalFlex = Enum.UIFlexAlignment.SpaceBetween
 	uiList.Parent = mainContainer
 	-- //!SECTION
+
+	-- //SECTION - Hover Effects
+	shopItemContainer.MouseEnter:Connect(function()
+		-- UIStroke
+		strokeThickness = FFGEnum.THEME.shop.shopItem.outlineThickness
+		containerStroke.Thickness = strokeThickness
+
+		-- Shop Tooltips
+		local bindableEvent = Events.GetBindableEvent(Events.BindableNames.ShowShopTooltip)
+		if bindableEvent then
+			local itemData = {
+				Image = props.ItemImage,
+				Price = props.ItemPrice,
+				Name = props.ItemName,
+				Id = props.ItemId,
+				Description = props.ItemDescription,
+			}
+
+			local fired = Events.FireBindableEvent(Events.BindableNames.ShowShopTooltip, itemData)
+			if not fired then print("did not fire") end
+		end
+	end)
+
+	shopItemContainer.MouseLeave:Connect(function()
+		-- UIStroke
+		strokeThickness = 0
+		containerStroke.Thickness = strokeThickness
+	end)
 
 	return shopItemContainer
 end

@@ -1,5 +1,9 @@
 local Lighting = game:GetService("Lighting")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterPlayer = game:GetService("StarterPlayer")
+local ShopTooltip = require(script.Parent.ShopTooltip)
+local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
+local Events = require(ReplicatedStorage.Shared.Events.Events)
 local AnimateButtonHover = require(StarterPlayer.StarterPlayerScripts.Client.HUD.Utils.AnimateButtonHover)
 
 local ShopGUI = {}
@@ -11,9 +15,11 @@ function ShopGUI.Create(props: {
 	local shopScreenGui = Instance.new("ScreenGui")
 	shopScreenGui.Name = props.ScreenGuiName
 	shopScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	shopScreenGui.ResetOnSpawn = false
 	shopScreenGui.Enabled = true
 
 	local detailsContainer = Instance.new("Frame")
+	detailsContainer.Visible = true
 	detailsContainer.Name = "DetailsContainer"
 	detailsContainer.AnchorPoint = Vector2.new(0.5, 0.5)
 	detailsContainer.BackgroundTransparency = 1
@@ -23,7 +29,7 @@ function ShopGUI.Create(props: {
 	local main = Instance.new("Frame")
 	main.Name = "Main"
 	main.AnchorPoint = Vector2.new(0.5, 0.5)
-	main.BackgroundColor3 = Color3.fromRGB(246, 250, 252)
+	main.BackgroundColor3 = FFGEnum.THEME.color.panel
 	main.Position = UDim2.fromScale(0.490615, 0.518226)
 	main.Size = UDim2.fromScale(0.499, 0.611)
 
@@ -34,13 +40,14 @@ function ShopGUI.Create(props: {
 
 	local uIStroke = Instance.new("UIStroke")
 	uIStroke.Name = "UIStroke"
+	uIStroke.Color = FFGEnum.THEME.shop.shopItem.bgColor
 	uIStroke.Thickness = 5
 	uIStroke.Parent = main
 
 	local title = Instance.new("Frame")
 	title.Name = "Title"
+	title.BackgroundColor3 = FFGEnum.THEME.color.primary_900
 	title.AnchorPoint = Vector2.new(0.5, 0.5)
-	title.BackgroundColor3 = Color3.new(1, 1, 1)
 	title.Position = UDim2.fromScale(0.176558, -0.03)
 	title.Size = UDim2.fromScale(0.252294, 0.124159)
 	title.ZIndex = 2
@@ -50,18 +57,18 @@ function ShopGUI.Create(props: {
 	title1.AnchorPoint = Vector2.new(0.5, 0.5)
 	title1.BackgroundTransparency = 1
 	title1.Font = Enum.Font.FredokaOne
-	title1.Position = UDim2.fromScale(0.490228, 0.5)
-	title1.Size = UDim2.fromScale(0.895789, 1)
+	title1.Position = UDim2.fromScale(0.5, 0.5)
+	title1.Size = UDim2.fromScale(0.9, 0.9)
 	title1.Text = props.ShopName
 	title1.TextColor3 = Color3.new(1, 1, 1)
 	title1.TextScaled = true
 	title1.TextStrokeTransparency = 0.7
 	title1.Parent = title
 
-	local uIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
-	uIAspectRatioConstraint.Name = "UIAspectRatioConstraint"
-	uIAspectRatioConstraint.AspectRatio = 3.14286
-	uIAspectRatioConstraint.Parent = title
+	local uICornerTitle = Instance.new("UICorner")
+	uICornerTitle.Name = "UICorner"
+	uICornerTitle.CornerRadius = UDim.new(0.2, 0)
+	uICornerTitle.Parent = title1
 
 	local uICorner1 = Instance.new("UICorner")
 	uICorner1.Name = "UICorner"
@@ -70,25 +77,18 @@ function ShopGUI.Create(props: {
 
 	local uIStroke1 = Instance.new("UIStroke")
 	uIStroke1.Name = "UIStroke"
-	uIStroke1.Thickness = 4
+	uIStroke1.Color = FFGEnum.THEME.shop.shopItem.bgColor
+	uIStroke1.Thickness = FFGEnum.THEME.shop.shopItem.outlineThickness
 	uIStroke1.Parent = title
-
-	local uIGradient = Instance.new("UIGradient")
-	uIGradient.Name = "UIGradient"
-	uIGradient.Color = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(29, 234, 43)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 182, 12)),
-	})
-	uIGradient.Parent = title
 
 	title.Parent = main
 
 	local closeButton = Instance.new("ImageButton")
 	closeButton.Name = "CloseButton"
 	closeButton.AnchorPoint = Vector2.new(0.5, 0.5)
-	closeButton.BackgroundColor3 = Color3.new(1, 1, 1)
+	closeButton.BackgroundColor3 = FFGEnum.THEME.color.orange_900
 	closeButton.Position = UDim2.fromScale(1.00485, -0.00189609)
-	closeButton.Size = UDim2.fromScale(0.059633, 0.0922324)
+	closeButton.Size = UDim2.fromScale(0.06, 0.09)
 
 	local baseSize = closeButton.Size
 	closeButton.Activated:Connect(function()
@@ -108,17 +108,10 @@ function ShopGUI.Create(props: {
 	uICorner2.CornerRadius = UDim.new(0.2, 0)
 	uICorner2.Parent = closeButton
 
-	local uIGradient1 = Instance.new("UIGradient")
-	uIGradient1.Name = "UIGradient"
-	uIGradient1.Color = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(249, 87, 152)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(249, 85, 107)),
-	})
-	uIGradient1.Parent = closeButton
-
 	local uIStroke2 = Instance.new("UIStroke")
 	uIStroke2.Name = "UIStroke"
-	uIStroke2.Thickness = 3
+	uIStroke2.Color = FFGEnum.THEME.shop.shopItem.bgColor
+	uIStroke2.Thickness = FFGEnum.THEME.shop.shopItem.outlineThickness
 	uIStroke2.Parent = closeButton
 
 	local textLabel = Instance.new("TextLabel")
@@ -161,6 +154,7 @@ function ShopGUI.Create(props: {
 
 	local uiGridLayout = Instance.new("UIGridLayout")
 	uiGridLayout.Name = "UIGridLayout"
+	uiGridLayout.CellSize = UDim2.fromScale(0.15, 0.3)
 	uiGridLayout.CellPadding = UDim2.fromScale(0.05, 0.05)
 	uiGridLayout.FillDirection = Enum.FillDirection.Horizontal
 	uiGridLayout.FillDirectionMaxCells = 5
@@ -173,12 +167,54 @@ function ShopGUI.Create(props: {
 	gridPadding.PaddingLeft = UDim.new(0.01, 0)
 	gridPadding.PaddingRight = UDim.new(0.01, 0)
 	gridPadding.PaddingTop = UDim.new(0.01, 0)
+	gridPadding.Parent = shopItemsContainer
 
 	shopItemsContainer.Parent = main
 
 	main.Parent = detailsContainer
 
 	detailsContainer.Parent = shopScreenGui
+
+	local tooltip = ShopTooltip({
+		ItemImage = "",
+		ItemCost = "",
+		ItemDescription = "",
+		ItemName = "",
+		Parent = main,
+		Size = UDim2.fromScale(0.3, 1),
+		Rounded = FFGEnum.THEME.button.cornerRadius,
+		Visible = false,
+	})
+
+	-- //SECTION - Bindables
+	type itemData = {
+		Image: string,
+		Price: number,
+		Name: string,
+		Id: string,
+		Description: string,
+	}
+
+	local bindableEvent = Events.GetBindableEvent(Events.BindableNames.ShowShopTooltip)
+	if bindableEvent then bindableEvent.Event:Connect(function(data: itemData)
+		if not data then
+			error("Not data was passed when attempting to open shop tooltip", data)
+			return
+		end
+
+		if tooltip then tooltip:Destroy() end
+		tooltip = ShopTooltip({
+			ItemCost = data.Price,
+			ItemDescription = data.Description,
+			ItemName = data.Name,
+			ItemImage = data.Image,
+			Size = UDim2.fromScale(0.3, 1),
+			Rounded = FFGEnum.THEME.button.cornerRadius,
+			Visible = true,
+			Parent = main,
+		})
+	end) end
+	-- //!SECTION
 
 	return shopScreenGui
 end

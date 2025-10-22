@@ -1,232 +1,189 @@
--- local ReplicatedStorage = game:GetService("ReplicatedStorage")
--- local vide = require(ReplicatedStorage.Packages.vide)
--- local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
--- local GetValue = require(ReplicatedStorage.Shared.Utils.GetValue)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local StarterPlayer = game:GetService("StarterPlayer")
+local AnimateButtonHover = require(StarterPlayer.StarterPlayerScripts.Client.HUD.Utils.AnimateButtonHover)
+local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 
--- -- //SECTION -  Vide functions
--- local create = vide.create
--- local effect = vide.effect
--- local source = vide.source
--- local spring = vide.spring
--- -- //!SECTION
+local function ShopTooltip(props: {
+	BackgroundColor3: Color3?,
+	Size: UDim2,
+	Rounded: UDim?,
+	Visible: boolean?,
+	ItemImage: string,
+	ItemCost: string,
+	ItemName: string,
+	ItemDescription: string,
+	Parent: Instance?,
+})
+	-- //SECTION - Shop Tooltip Container
+	local shopTooltipContainer = Instance.new("Frame")
+	shopTooltipContainer.Name = "ShopTooltip"
+	shopTooltipContainer.Parent = props.Parent or nil
+	shopTooltipContainer.Size = props.Size
+	shopTooltipContainer.BackgroundColor3 = props.BackgroundColor3 or FFGEnum.THEME.color.panel
+	shopTooltipContainer.AnchorPoint = FFGEnum.THEME.alignment.anchor.left
+	shopTooltipContainer.Position = UDim2.fromScale(1.05, 0.5)
+	shopTooltipContainer.Visible = props.Visible or false
 
--- local function ShopTooltip(props: {
--- 	BackgroundColor3: Color3?,
--- 	Size: UDim2,
--- 	Rounded: UDim?,
--- 	Visible: boolean?,
--- 	ItemImage: string,
--- 	ItemCost: string,
--- 	ItemName: string,
--- 	ItemDescription: string,
--- })
--- 	local isOwned = source(false)
+	-- //SECTION - Shop Item Outline
+	local containerStroke = Instance.new("UIStroke")
+	containerStroke.Color = FFGEnum.THEME.shop.shopItem.outline or Color3.new(0, 0, 0)
+	containerStroke.StrokeSizingMode = Enum.StrokeSizingMode.FixedSize
+	containerStroke.Thickness = FFGEnum.THEME.shop.shopItem.outlineThickness
+	containerStroke.Parent = shopTooltipContainer
+	-- //!SECTION
 
--- 	-- //SECTION - Shop Tooltip Container
--- 	local shopTooltipContainer = create("Frame")({
--- 		Size = props.Size,
--- 		BackgroundColor3 = props.BackgroundColor3 or FFGEnum.THEME.color.white,
--- 		AnchorPoint = FFGEnum.THEME.alignment.anchor.center,
--- 		Position = FFGEnum.THEME.alignment.position.center,
--- 		Visible = props.Visible or true,
--- 	})
+	-- //SECTION -  Shop Item Corner
+	local corner = Instance.new("UICorner")
+	corner.Parent = shopTooltipContainer
 
--- 	-- //SECTION - Shop Item Outline
--- 	local containerStroke = create("UIStroke")({
--- 		Color = FFGEnum.THEME.shop.shopItem.outline or Color3.new(0, 0, 0),
--- 		StrokeSizingMode = Enum.StrokeSizingMode.FixedSize,
--- 		Thickness = FFGEnum.THEME.shop.shopItem.outlineThickness,
--- 	})
--- 	containerStroke.Parent = shopTooltipContainer
--- 	-- //!SECTION
+	if props.Rounded then
+		corner.CornerRadius = props.Rounded
+	else
+		corner.CornerRadius = UDim.new(0)
+	end
+	-- //!SECTION
 
--- 	-- //SECTION -  Shop Item Corner
--- 	local corner = create("UICorner")({})
--- 	corner.Parent = shopTooltipContainer
+	-- //SECTION - Frame Header
+	local frameHeader = Instance.new("ImageLabel")
+	frameHeader.Image = FFGEnum.THEME.shop.shopTooltip.frameTriangle
+	frameHeader.Size = UDim2.fromScale(0.9, 0.1)
+	frameHeader.AnchorPoint = FFGEnum.THEME.alignment.anchor.top
+	frameHeader.Position = FFGEnum.THEME.alignment.position.frameHeader
+	frameHeader.ResampleMode = Enum.ResamplerMode.Default
+	frameHeader.BackgroundTransparency = 1
+	frameHeader.Parent = shopTooltipContainer
 
--- 	if GetValue(props.Rounded) then
--- 		corner.CornerRadius = props.Rounded
--- 	else
--- 		corner.CornerRadius = UDim.new(0)
--- 	end
--- 	-- //!SECTION
+	-- //SECTION -  Item Name
+	local itemLabel = Instance.new("TextLabel")
+	itemLabel.BackgroundTransparency = 1
+	itemLabel.Size = UDim2.fromScale(0.85, 0.80)
+	itemLabel.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
+	itemLabel.Position = FFGEnum.THEME.alignment.position.textFrameHeaderCenter
+	itemLabel.TextStrokeTransparency = 0
+	itemLabel.Text = props.ItemName
+	itemLabel.Font = FFGEnum.THEME.font
+	itemLabel.TextColor3 = FFGEnum.THEME.color.white
+	itemLabel.TextScaled = true
+	itemLabel.Parent = frameHeader
+	-- //!SECTION
+	-- //!SECTION
 
--- 	-- //SECTION - Frame Header
--- 	local frameHeader = create("ImageLabel")({
--- 		Image = FFGEnum.THEME.shop.shopTooltip.frameTriangle,
--- 		Size = UDim2.fromScale(0.9, 0.1),
--- 		AnchorPoint = FFGEnum.THEME.alignment.anchor.top,
--- 		Position = FFGEnum.THEME.alignment.position.frameHeader,
--- 		ResampleMode = Enum.ResamplerMode.Default,
--- 		BackgroundTransparency = 1,
--- 		Parent = shopTooltipContainer,
--- 	})
+	-- //SECTION Holds all the main elements
+	local mainContainer = Instance.new("Frame")
+	mainContainer.Size = UDim2.fromScale(0.9, 0.9)
+	mainContainer.Position = FFGEnum.THEME.alignment.position.center
+	mainContainer.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
+	mainContainer.BackgroundTransparency = 1
+	mainContainer.Parent = shopTooltipContainer
+	-- //!SECTION
 
--- 	-- //SECTION -  Item Name
--- 	create("TextLabel")({
--- 		BackgroundTransparency = 1,
--- 		Size = UDim2.fromScale(0.85, 0.85),
--- 		AnchorPoint = FFGEnum.THEME.alignment.anchor.center,
--- 		Position = FFGEnum.THEME.alignment.position.textFrameHeaderCenter,
--- 		TextStrokeTransparency = 0,
--- 		Text = props.ItemName,
--- 		Font = FFGEnum.THEME.font,
--- 		TextColor3 = FFGEnum.THEME.color.white,
--- 		TextScaled = true,
--- 		Parent = frameHeader,
--- 	})
--- 	-- //!SECTION
--- 	-- //!SECTION
+	-- //SECTION - Item Info Container
+	local itemInfoContainer = Instance.new("Frame")
+	itemInfoContainer.Size = UDim2.fromScale(1, 0.4)
+	itemInfoContainer.Position = UDim2.fromScale(0.5, 0.05)
+	itemInfoContainer.AnchorPoint = FFGEnum.THEME.alignment.anchor.top
+	itemInfoContainer.BackgroundTransparency = 1
+	itemInfoContainer.Parent = mainContainer
 
--- 	-- //SECTION Holds all the main elements
--- 	local mainContainer = create("Frame")({
--- 		Size = UDim2.fromScale(0.9, 0.9),
--- 		Position = FFGEnum.THEME.alignment.position.center,
--- 		AnchorPoint = FFGEnum.THEME.alignment.anchor.center,
--- 		BackgroundTransparency = 1,
--- 		Parent = shopTooltipContainer,
--- 	})
--- 	-- //!SECTION
+	-- //SECTION -  Item Image
+	local itemImageContainer = Instance.new("Frame")
+	itemImageContainer.BackgroundColor3 = FFGEnum.THEME.shop.shopItem.outline
+	itemImageContainer.Size = UDim2.fromScale(0.3, 0.3)
+	itemImageContainer.Parent = itemInfoContainer
 
--- 	-- //SECTION - Item Info Container
--- 	local itemInfoContainer = create("Frame")({
--- 		Size = UDim2.fromScale(1, 0.4),
--- 		Position = UDim2.fromScale(0.5, 0.05),
--- 		AnchorPoint = FFGEnum.THEME.alignment.anchor.top,
--- 		BackgroundTransparency = 1,
--- 		Parent = mainContainer,
--- 	})
+	local imageLabel = Instance.new("ImageLabel")
+	imageLabel.Image = props.ItemImage
+	imageLabel.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
+	imageLabel.Position = FFGEnum.THEME.alignment.position.center
+	imageLabel.BackgroundTransparency = 1
+	imageLabel.Size = UDim2.fromScale(0.9, 0.9)
+	imageLabel.Parent = itemImageContainer
 
--- 	-- //SECTION -  Item Image
--- 	local itemImageContainer = create("Frame")({
--- 		BackgroundColor3 = FFGEnum.THEME.shop.shopItem.outline,
--- 		Size = UDim2.fromScale(0.3, 0.3),
--- 		Parent = itemInfoContainer,
--- 	})
--- 	create("ImageLabel")({
--- 		Image = props.ItemImage,
--- 		AnchorPoint = FFGEnum.THEME.alignment.anchor.center,
--- 		Position = FFGEnum.THEME.alignment.position.center,
--- 		BackgroundTransparency = 1,
--- 		Size = UDim2.fromScale(0.9, 0.9),
--- 		Parent = itemImageContainer,
--- 	})
+	local imageCorner = Instance.new("UICorner")
+	imageCorner.CornerRadius = FFGEnum.THEME.button.cornerRadius
+	imageCorner.Parent = itemImageContainer
 
--- 	create("UICorner")({
--- 		CornerRadius = FFGEnum.THEME.button.cornerRadius,
--- 		Parent = itemImageContainer,
--- 	})
+	local imageStroke = Instance.new("UIStroke")
+	imageStroke.Color = FFGEnum.THEME.color.teal_900
+	imageStroke.StrokeSizingMode = Enum.StrokeSizingMode.FixedSize
+	imageStroke.Thickness = 1
+	imageStroke.Parent = itemImageContainer
+	-- //!SECTION
 
--- 	create("UIStroke")({
--- 		Color = FFGEnum.THEME.color.teal_900,
--- 		StrokeSizingMode = Enum.StrokeSizingMode.FixedSize,
--- 		Thickness = 1,
--- 		Parent = itemImageContainer,
--- 	})
--- 	-- //!SECTION
+	-- //SECTION - Item Price
+	local priceLabel = Instance.new("TextLabel")
+	priceLabel.Text = props.ItemCost
+	priceLabel.Font = FFGEnum.THEME.font
+	priceLabel.TextColor3 = FFGEnum.THEME.intent.notice
+	priceLabel.TextStrokeTransparency = 0
+	priceLabel.TextScaled = true
+	priceLabel.BackgroundTransparency = 1
+	priceLabel.Size = UDim2.fromScale(0.9, 0.15)
+	priceLabel.Parent = itemInfoContainer
+	-- //!SECTION
 
--- 	-- //SECTION - Item Price
--- 	create("TextLabel")({
--- 		Text = props.ItemCost,
--- 		Font = FFGEnum.THEME.font,
--- 		TextColor3 = FFGEnum.THEME.intent.notice,
--- 		TextStrokeTransparency = 0,
--- 		TextScaled = true,
--- 		BackgroundTransparency = 1,
--- 		Size = UDim2.fromScale(0.9, 0.15),
--- 		Parent = itemInfoContainer,
--- 	})
--- 	-- //!SECTION
+	-- //SECTION - Item Description
+	local descriptionLabel = Instance.new("TextLabel")
+	descriptionLabel.Text = props.ItemDescription
+	descriptionLabel.TextColor3 = FFGEnum.THEME.color.teal_900
+	descriptionLabel.TextWrapped = true
+	descriptionLabel.TextScaled = true
+	descriptionLabel.Font = FFGEnum.THEME.font
+	descriptionLabel.BackgroundTransparency = 1
+	descriptionLabel.Size = UDim2.fromScale(0.9, 0.35)
+	descriptionLabel.Parent = itemInfoContainer
+	-- //!SECTION
 
--- 	-- //SECTION - Item Description
--- 	create("TextLabel")({
--- 		Text = props.ItemDescription,
--- 		TextColor3 = FFGEnum.THEME.color.teal_900,
--- 		TextWrapped = true,
--- 		TextScaled = true,
--- 		Font = FFGEnum.THEME.font,
--- 		BackgroundTransparency = 1,
--- 		Size = UDim2.fromScale(0.9, 0.35),
--- 		Parent = itemInfoContainer,
--- 	})
--- 	-- //!SECTION
+	-- //SECTION - Buy Button
+	local buyButton = Instance.new("ImageButton")
+	buyButton.BackgroundTransparency = 1
+	buyButton.PressedImage = FFGEnum.THEME.button.white
+	buyButton.Image = FFGEnum.THEME.button.white
+	buyButton.HoverImage = FFGEnum.THEME.button.white
+	buyButton.ResampleMode = Enum.ResamplerMode.Pixelated
+	buyButton.ImageColor3 = FFGEnum.THEME.shop.shopItem.buttonColor
+	buyButton.ScaleType = Enum.ScaleType.Slice
+	buyButton.SliceCenter = Rect.new(32, 83, 32, 83)
+	buyButton.AnchorPoint = FFGEnum.THEME.alignment.anchor.bottom
+	buyButton.Position = FFGEnum.THEME.alignment.position.bottom
+	buyButton.Parent = mainContainer
+	buyButton.Size = UDim2.fromScale(1, 0.1)
 
--- 	-- //SECTION - Buy Button
--- 	local buttonSize = UDim2.fromScale(1, 0.1)
--- 	local sizeSource = source(buttonSize)
--- 	local buttonColor = source(FFGEnum.THEME.shop.shopItem.buttonColor)
--- 	local buttonText = source("Purchase")
--- 	local size = spring(sizeSource, 0.2)
--- 	local sizeSpringDebounce = false
+	local baseSize = buyButton.Size
+	buyButton.Activated:Connect(function()
+		--
+	end)
+	buyButton.MouseEnter:Connect(function()
+		AnimateButtonHover.Enter(buyButton, baseSize)
+	end)
+	buyButton.MouseLeave:Connect(function()
+		AnimateButtonHover.Leave(buyButton, baseSize)
+	end)
 
--- 	local buyButton = create("ImageButton")({
--- 		BackgroundTransparency = 1,
--- 		PressedImage = FFGEnum.THEME.button.white,
--- 		Image = FFGEnum.THEME.button.white,
--- 		HoverImage = FFGEnum.THEME.button.white,
--- 		ResampleMode = Enum.ResamplerMode.Pixelated,
--- 		ImageColor3 = buttonColor,
--- 		ScaleType = Enum.ScaleType.Slice,
--- 		SliceCenter = Rect.new(32, 83, 32, 83),
--- 		AnchorPoint = FFGEnum.THEME.alignment.anchor.bottom,
--- 		Position = FFGEnum.THEME.alignment.position.bottom,
--- 		Parent = mainContainer,
--- 		Size = size,
--- 		Activated = function(input)
--- 			isOwned(true)
--- 		end,
--- 		MouseEnter = function()
--- 			if sizeSpringDebounce then return end
--- 			sizeSpringDebounce = true
--- 			local size = buttonSize + UDim2.fromScale(0.01, 0.01)
--- 			sizeSource(size)
--- 		end,
--- 		MouseLeave = function()
--- 			sizeSource(buttonSize)
--- 			sizeSpringDebounce = false
--- 		end,
--- 	})
+	local buttonTxt = Instance.new("TextLabel")
+	buttonTxt.Position = UDim2.fromScale(0.5, 0.45)
+	buttonTxt.AnchorPoint = Vector2.new(0.5, 0.5)
+	buttonTxt.TextColor3 = FFGEnum.THEME.color.white
+	buttonTxt.BackgroundTransparency = 1
+	buttonTxt.TextScaled = true
+	buttonTxt.Text = "Purchase"
+	buttonTxt.Font = FFGEnum.THEME.font
+	buttonTxt.Size = buyButton.Size + UDim2.fromScale(0, 0.5)
+	buttonTxt.Parent = buyButton
+	-- //!SECTION
 
--- 	local buttonTxt = create("TextLabel")({
--- 		Position = UDim2.fromScale(0.5, 0.45),
--- 		AnchorPoint = Vector2.new(0.5, 0.5),
--- 		TextColor3 = FFGEnum.THEME.color.white,
--- 		BackgroundTransparency = 1,
--- 		TextScaled = true,
--- 		Text = buttonText,
--- 		Font = FFGEnum.THEME.font,
--- 		Size = buyButton.Size + UDim2.fromScale(0, 0.5),
--- 	})
--- 	buttonTxt.Parent = buyButton
--- 	-- //!SECTION
+	-- //!SECTION
 
--- 	-- //!SECTION
+	-- //SECTION - UI List Layouts
+	-- itemInfoContainer
+	local uiListLayout = Instance.new("UIListLayout")
+	uiListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	uiListLayout.FillDirection = Enum.FillDirection.Vertical
+	uiListLayout.VerticalFlex = Enum.UIFlexAlignment.SpaceEvenly
+	uiListLayout.Parent = itemInfoContainer
+	-- -- //!SECTION
 
--- 	-- //SECTION - UI List Layouts
--- 	-- itemInfoContainer
--- 	create("UIListLayout")({
--- 		HorizontalAlignment = Enum.HorizontalAlignment.Center,
--- 		FillDirection = Enum.FillDirection.Vertical,
--- 		VerticalFlex = Enum.UIFlexAlignment.SpaceEvenly,
--- 		Parent = itemInfoContainer,
--- 	})
+	return shopTooltipContainer
+end
 
--- 	-- -- //!SECTION
-
--- 	-- //SECTION - Effects
--- 	effect(function()
--- 		if isOwned() then
--- 			buttonColor(FFGEnum.THEME.button.disabledColor)
--- 			buttonText("Owned")
-
--- 			buyButton.Active = false
--- 			buyButton.Interactable = false
--- 			buttonTxt.TextColor3 = FFGEnum.THEME.intent.disabled
--- 		end
--- 	end)
--- 	-- //!SECTION
-
--- 	return shopTooltipContainer
--- end
-
--- return ShopTooltip
+return ShopTooltip

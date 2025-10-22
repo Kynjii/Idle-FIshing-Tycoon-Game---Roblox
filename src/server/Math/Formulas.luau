@@ -116,7 +116,7 @@ local FORMULAS = {
 	-- Entity baselines
 	BOAT = { BaseCost = 100, BaseStorage = 100, BaseFPS = 5 },
 	TENDER = { BaseCost = 100, BaseStorage = 60 },
-	STORAGE = { BaseCost = 25, BaseStorage = 200 },
+	STORAGE = { BaseCost = 50, BaseStorage = 200 },
 	BUILDING = { BaseCost = 1000 },
 
 	-- Tier (rarity) curve used elsewhere in your economy

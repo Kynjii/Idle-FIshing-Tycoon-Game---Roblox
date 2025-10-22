@@ -23,8 +23,10 @@ local function story(target)
 		ItemPrice = "1.1k",
 		ItemName = "hammer_01",
 		ItemId = "Hammer",
+		ItemDescription = "",
+		Parent = target,
+		ShopInstance = target,
 	})
-	item.Parent = target
 
 	return function()
 		item:Destroy()
