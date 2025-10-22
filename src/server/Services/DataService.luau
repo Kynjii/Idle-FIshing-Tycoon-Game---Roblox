@@ -2,8 +2,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local Economy = require(ServerScriptService.Server.Analytics.Economy)
 local TableUtil = require(ReplicatedStorage.Packages.TableUtil)
-local ShopHelpers = require(ReplicatedStorage.Shared.Inventory.ShopHelpers)
 local BuildingType = require(ReplicatedStorage.Shared.Types.Classes.BuildingType)
+local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
 local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
 local PlayerDataTemplate = require(ServerScriptService.Server.Modules.PlayerDataTemplate)
 local Replica = require(ServerScriptService.Server.ReplicaServer)
@@ -364,7 +364,7 @@ end
 -- //!SECTION
 
 -- //SECTION - HELPER
-function DataService.SaveHelper(player: Player, helper: ShopHelpers.Helper): boolean
+function DataService.SaveHelper(player: Player, helper: HelperType.HelperData): boolean
 	local profile = getProfile(player, stateTypes.Helper)
 	if not profile then return false end
 

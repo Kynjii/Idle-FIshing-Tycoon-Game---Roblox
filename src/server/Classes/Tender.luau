@@ -14,7 +14,7 @@ local ClassVisualizer = require(ServerScriptService.Server.Classes.Modules.Class
 local EventListeners = require(ServerScriptService.Server.Classes.Modules.EventListeners)
 local ProximityPrompt = require(ServerScriptService.Server.Classes.Modules.ProximityPrompt)
 local PurchaseBoard = require(ServerScriptService.Server.Classes.Modules.PurchaseBoard)
-local Tutorial = require(ServerScriptService.Server.Game.Tutorial)
+local Tutorial = require(ServerScriptService.Server.Game.Tutorial.Tutorial)
 local TenderType = require(ReplicatedStorage.Shared.Types.Classes.TenderType)
 local Buffs = require(ServerScriptService.Server.Math.Buffs)
 local FadeEffect = require(ServerScriptService.Server.Modules.Tweens.FadeEffect)
@@ -37,7 +37,7 @@ local DEFAULTS = {
 	Level = 1,
 	MaxLevel = 100,
 	BaseCost = Formulas.TENDER.BaseCost,
-	isPurchased = false,
+	IsPurchased = false,
 	BaseStorage = Formulas.TENDER.BaseStorage,
 	UpgradeStage = 1,
 	FishInStorage = 0,
@@ -148,8 +148,8 @@ end
 
 -- //SECTION - Core Tender Actions
 function Tender.Purchase(self: Tender)
-	self.isPurchased = true
-	if self.Model.PrimaryPart then self.Model.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.isPurchased, true) end
+	self.IsPurchased = true
+	if self.Model.PrimaryPart then self.Model.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.IsPurchased, true) end
 
 	self:UpdateBuffs()
 	self:UpdateVisualModel()
@@ -323,7 +323,7 @@ end
 -- //SECTION - UI Setup
 function Tender.Initialize(self: Tender)
 	-- Handle visibility based on purchase status
-	if not self.isPurchased then
+	if not self.IsPurchased then
 		self:Hide()
 		self:CannotCollide()
 	else
@@ -338,8 +338,8 @@ function Tender.Initialize(self: Tender)
 	if self.PurchaseBoard then self:SetupProximityPrompt(self.PurchaseBoard) end
 
 	-- Apply attributes for ChainManager
-	if self.isPurchased then
-		if self.Model.PrimaryPart then self.Model.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.isPurchased, self.isPurchased) end
+	if self.IsPurchased then
+		if self.Model.PrimaryPart then self.Model.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.IsPurchased, self.IsPurchased) end
 	end
 end
 
@@ -459,7 +459,7 @@ function Tender.Serialize(self: Tender): { [string]: any }
 		MaxLevel = self.MaxLevel,
 		BaseCost = self.BaseCost,
 		UpgradeCost = self.UpgradeCost,
-		isPurchased = self.isPurchased,
+		IsPurchased = self.IsPurchased,
 		BaseStorage = self.BaseStorage,
 		UpgradeStage = self.UpgradeStage,
 		CurrentMaxStorage = self.CurrentMaxStorage,
@@ -517,7 +517,7 @@ function Tender.UpdateVisualModel(self: Tender)
 			weld.Part1 = self.VisualRoot
 			part.Anchored = false
 
-			if self.isPurchased then FadeEffect.In(part) end
+			if self.IsPurchased then FadeEffect.In(part) end
 		end
 	end
 

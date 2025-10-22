@@ -57,9 +57,9 @@ function PB.CreatePB(pbModel: Model, class: Boat | Tender | PortStorage | Buildi
 		pbDetails.EntityLabel.Text = typedClass.Entity
 		pbDetails.EntityLabel.TextColor3 = FFGEnum.THEME.textColor[typedClass.Entity]
 
-		-- Handle State based on isPurchased
+		-- Handle State based on IsPurchased
 		local progressContainer: Frame = pbDetails.ProgressBar:FindFirstAncestor("ProgressContainer")
-		if not typedClass.isPurchased then
+		if not typedClass.IsPurchased then
 			pbDetails.LevelLabel.Visible = false
 			pbDetails.StageLabel.Visible = false
 			progressContainer.Visible = false
@@ -67,12 +67,12 @@ function PB.CreatePB(pbModel: Model, class: Boat | Tender | PortStorage | Buildi
 			progressContainer.Visible = true
 			pbDetails.LevelLabel.Visible = true
 			pbDetails.StageLabel.Visible = true
-			pbDetails.LevelLabel.Text = typedClass.isPurchased and `Level: {typedClass.Level}`
+			pbDetails.LevelLabel.Text = typedClass.IsPurchased and `Level: {typedClass.Level}`
 		end
 
 		-- Building Buff
 		if typedClass.Entity == FFGEnum.CLASS.ENTITY_NAME.Building then
-			if not typedClass.isPurchased then pbDetails.EntityLabel.Text = typedClass.BuildingBuff.Label end
+			if not typedClass.IsPurchased then pbDetails.EntityLabel.Text = typedClass.BuildingBuff.Label end
 		end
 
 		-- Progress Bar
@@ -114,9 +114,9 @@ function PB.UpdatePB(class: Boat | Tender | PortStorage | Building)
 	typedClass.PBDetails.EntityLabel.Text = typedClass.Entity
 	typedClass.PBDetails.EntityLabel.TextColor3 = FFGEnum.THEME.textColor[typedClass.Entity]
 
-	-- Handle State based on isPurchased
+	-- Handle State based on IsPurchased
 	local progressContainer: Frame = typedClass.PBDetails.ProgressBar:FindFirstAncestor("ProgressContainer")
-	if not typedClass.isPurchased then
+	if not typedClass.IsPurchased then
 		typedClass.PBDetails.LevelLabel.Visible = false
 		typedClass.PBDetails.StageLabel.Visible = false
 		progressContainer.Visible = false
@@ -124,7 +124,7 @@ function PB.UpdatePB(class: Boat | Tender | PortStorage | Building)
 		progressContainer.Visible = true
 		typedClass.PBDetails.LevelLabel.Visible = true
 		typedClass.PBDetails.StageLabel.Visible = true
-		typedClass.PBDetails.LevelLabel.Text = typedClass.isPurchased and "Level: " .. typedClass.Level
+		typedClass.PBDetails.LevelLabel.Text = typedClass.IsPurchased and "Level: " .. typedClass.Level
 	end
 
 	-- Progress Bar

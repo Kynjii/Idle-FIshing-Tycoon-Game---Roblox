@@ -61,7 +61,7 @@ local DEFAULTS = {
 	Level = 1,
 	MaxLevel = 100,
 	BaseCost = Formulas.BUILDING.BaseCost,
-	isPurchased = false,
+	IsPurchased = false,
 	UpgradeStage = 1,
 }
 -- //!SECTION
@@ -108,7 +108,7 @@ function Building.New(state: { [string]: any }?, player: Player, model: Model, r
 	self.CurrentVisualModel = nil
 
 	self.BuildingBuff = realmBuffs[BUILDING_BUFFS[self.BuildingName]]
-	if not self.BuildingBuff.CurrentValue then self.BuildingBuff.CurrentValue = self.isPurchased and Buffs.CalculateLevelBuffValue(self.UpgradeStage, self.Level, self.BuildingBuff) or nil end
+	if not self.BuildingBuff.CurrentValue then self.BuildingBuff.CurrentValue = self.IsPurchased and Buffs.CalculateLevelBuffValue(self.UpgradeStage, self.Level, self.BuildingBuff) or nil end
 
 	self.PurchaseBoard, self.PBDetails = self:SetupPurchaseBoard()
 
@@ -125,7 +125,7 @@ end
 
 -- //SECTION - Core Building Actions
 function Building.Purchase(self: Building): ()
-	self.isPurchased = true
+	self.IsPurchased = true
 	if self.BuildingBuff then self.BuildingBuff.CurrentValue = Buffs.CalculateLevelBuffValue(self.UpgradeStage, self.Level, self.BuildingBuff) end
 
 	self:UpdateVisualModel()
@@ -179,7 +179,7 @@ end
 -- //SECTION - UI Setup
 function Building.Initialize(self: Building)
 	-- Handle visibility based on purchase status
-	if not self.isPurchased then
+	if not self.IsPurchased then
 		self:Hide()
 		self:CannotCollide()
 	else
@@ -270,7 +270,7 @@ function Building.Serialize(self: Building): { [string]: any }
 		MaxLevel = self.MaxLevel,
 		BaseCost = self.BaseCost,
 		UpgradeCost = self.UpgradeCost,
-		isPurchased = self.isPurchased,
+		IsPurchased = self.IsPurchased,
 		UpgradeStage = self.UpgradeStage,
 		BuildingId = self.BuildingId,
 		BuildingName = self.BuildingName,
@@ -278,7 +278,7 @@ function Building.Serialize(self: Building): { [string]: any }
 end
 
 function Building.Save(self: Building): ()
-	if self.isPurchased then DataService.SaveBuffState(self.Player, self.BuildingBuff or nil) end
+	if self.IsPurchased then DataService.SaveBuffState(self.Player, self.BuildingBuff or nil) end
 
 	DataService.SaveBuildingState(self.Player, self:Serialize())
 end
@@ -323,7 +323,7 @@ function Building.UpdateVisualModel(self: Building): ()
 			weld.Part1 = self.VisualRoot
 			part.Anchored = false
 
-			if self.isPurchased then FadeEffect.In(part) end
+			if self.IsPurchased then FadeEffect.In(part) end
 		end
 	end
 

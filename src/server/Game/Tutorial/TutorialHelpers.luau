@@ -1,0 +1,91 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
+local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
+
+-- Used for introduction to the game
+
+local Catalog: { HelperType.HelperData } = {
+	{
+		Entity = FFGEnum.CLASS.ENTITY_NAME.Helper,
+		Id = "tutorial_helper_1",
+		RealmId = 1,
+		Name = FFGEnum.JOB_NAMES.Transporter,
+		CurrencyType = "Gold",
+		QualityId = 1,
+		Stats = {},
+		ItemImage = FFGEnum.JOB_ASSETS.Transport,
+		JobCategory = FFGEnum.JOB_CATEGORY.Transporting,
+		CurrentAssignment = FFGEnum.JOB_ASSIGNMENTS.Unassigned,
+		IsPurchased = false,
+	},
+
+	{
+		Entity = FFGEnum.CLASS.ENTITY_NAME.Helper,
+		Id = "tutorial_helper_2",
+		RealmId = 1,
+		Name = FFGEnum.JOB_NAMES.Transporter,
+		CurrencyType = "Gold",
+		QualityId = 1,
+		Stats = {},
+		ItemImage = FFGEnum.JOB_ASSETS.Transport,
+		JobCategory = FFGEnum.JOB_CATEGORY.Transporting,
+		CurrentAssignment = FFGEnum.JOB_ASSIGNMENTS.Unassigned,
+		IsPurchased = false,
+	},
+	{
+		Entity = FFGEnum.CLASS.ENTITY_NAME.Helper,
+		Id = "tutorial_helper_3",
+		RealmId = 1,
+		Name = FFGEnum.JOB_NAMES.Transporter,
+		CurrencyType = "Gold",
+		QualityId = 1,
+		Stats = {},
+		ItemImage = FFGEnum.JOB_ASSETS.Transport,
+		JobCategory = FFGEnum.JOB_CATEGORY.Transporting,
+		CurrentAssignment = FFGEnum.JOB_ASSIGNMENTS.Unassigned,
+		IsPurchased = false,
+	},
+	{
+		Entity = FFGEnum.CLASS.ENTITY_NAME.Helper,
+		Id = "tutorial_helper_4",
+		RealmId = 1,
+		Name = FFGEnum.JOB_NAMES.Transporter,
+		CurrencyType = "Gold",
+		QualityId = 1,
+		Stats = {},
+		ItemImage = FFGEnum.JOB_ASSETS.Transport,
+		JobCategory = FFGEnum.JOB_CATEGORY.Transporting,
+		CurrentAssignment = FFGEnum.JOB_ASSIGNMENTS.Unassigned,
+		IsPurchased = false,
+	},
+	{
+		Entity = FFGEnum.CLASS.ENTITY_NAME.Helper,
+		Id = "tutorial_helper_5",
+		RealmId = 1,
+		Name = FFGEnum.JOB_NAMES.Transporter,
+		CurrencyType = "Gold",
+		QualityId = 1,
+		Stats = {},
+		ItemImage = FFGEnum.JOB_ASSETS.Transport,
+		JobCategory = FFGEnum.JOB_CATEGORY.Transporting,
+		CurrentAssignment = FFGEnum.JOB_ASSIGNMENTS.Unassigned,
+		IsPurchased = false,
+	},
+	{
+		Entity = FFGEnum.CLASS.ENTITY_NAME.Helper,
+		Id = "tutorial_helper_6",
+		RealmId = 1,
+		Name = FFGEnum.JOB_NAMES.Transporter,
+		CurrencyType = "Gold",
+		QualityId = 1,
+		Stats = {},
+		ItemImage = FFGEnum.JOB_ASSETS.Transport,
+		JobCategory = FFGEnum.JOB_CATEGORY.Transporting,
+		CurrentAssignment = FFGEnum.JOB_ASSIGNMENTS.Unassigned,
+		IsPurchased = false,
+	},
+}
+
+table.freeze(Catalog)
+
+return Catalog

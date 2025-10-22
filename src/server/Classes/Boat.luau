@@ -8,7 +8,7 @@ local ClassVisualizer = require(ServerScriptService.Server.Classes.Modules.Class
 local EventListeners = require(ServerScriptService.Server.Classes.Modules.EventListeners)
 local ProximityPrompt = require(ServerScriptService.Server.Classes.Modules.ProximityPrompt)
 local PurchaseBoard = require(ServerScriptService.Server.Classes.Modules.PurchaseBoard)
-local Tutorial = require(ServerScriptService.Server.Game.Tutorial)
+local Tutorial = require(ServerScriptService.Server.Game.Tutorial.Tutorial)
 local BoatType = require(ReplicatedStorage.Shared.Types.Classes.BoatType)
 local Buffs = require(ServerScriptService.Server.Math.Buffs)
 local DataService = require(ServerScriptService.Server.Services.DataService)
@@ -37,7 +37,7 @@ local DEFAULTS = {
 	Level = 1,
 	MaxLevel = 100,
 	BaseCost = Formulas.BOAT.BaseCost,
-	isPurchased = false,
+	IsPurchased = false,
 	BaseStorage = Formulas.BOAT.BaseStorage,
 	UpgradeStage = 1,
 	FishInStorage = 0,
@@ -137,8 +137,8 @@ end
 
 -- //SECTION - Core Boat Actions
 function Boat.Purchase(self: Boat): ()
-	self.isPurchased = true
-	if self.Model.PrimaryPart then self.Model.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.isPurchased, true) end
+	self.IsPurchased = true
+	if self.Model.PrimaryPart then self.Model.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.IsPurchased, true) end
 
 	self:UpdateBuffs()
 	self:UpdateVisualModel()
@@ -268,7 +268,7 @@ end
 -- //SECTION - UI Setup
 function Boat.Initialize(self: Boat): ()
 	-- Handle visibility based on purchase status
-	if not self.isPurchased then
+	if not self.IsPurchased then
 		self:Hide()
 		self:CannotCollide()
 	else
@@ -282,7 +282,7 @@ function Boat.Initialize(self: Boat): ()
 	-- Setup UI components
 	if self.PurchaseBoard then self:SetupProximityPrompt(self.PurchaseBoard) end
 
-	if self.isPurchased then task.delay(1, function()
+	if self.IsPurchased then task.delay(1, function()
 		self:StartFishing()
 	end) end
 end
@@ -397,7 +397,7 @@ function Boat.Serialize(self: Boat): { [string]: any }
 		MaxLevel = self.MaxLevel,
 		BaseCost = self.BaseCost,
 		UpgradeCost = self.UpgradeCost,
-		isPurchased = self.isPurchased,
+		IsPurchased = self.IsPurchased,
 		BaseStorage = self.BaseStorage,
 		UpgradeStage = self.UpgradeStage,
 		CurrentMaxStorage = self.CurrentMaxStorage,
@@ -456,7 +456,7 @@ function Boat.UpdateVisualModel(self: Boat): ()
 			weld.Part1 = self.VisualRoot
 			part.Anchored = false
 
-			if self.isPurchased and part.Name ~= "Base" then FadeEffect.In(part) end
+			if self.IsPurchased and part.Name ~= "Base" then FadeEffect.In(part) end
 		end
 	end
 

@@ -1,7 +1,6 @@
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
-local Teams = game:GetService("Teams")
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)

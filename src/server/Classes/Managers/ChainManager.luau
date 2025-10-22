@@ -64,7 +64,7 @@ function ChainManager.New(realmData, tier: number, player: Player, teamId: numbe
 
 	self._cleaner = Trove.new()
 
-	if self.LaneTender.isPurchased and self.LaneBoat.isPurchased then self:StartTenderCycle() end
+	if self.LaneTender.IsPurchased and self.LaneBoat.IsPurchased then self:StartTenderCycle() end
 
 	return self
 end
@@ -111,8 +111,8 @@ function ChainManager.AttachAttListeners(self: ChainManagerInstance)
 	if self.TenderModel and self.TenderModel.PrimaryPart then
 		if self._cleaner then
 			self._cleaner:Add(self.TenderModel.PrimaryPart.AttributeChanged:Connect(function(attributeName)
-				-- isPurchased triggers the start of the cycle
-				if attributeName == FFGEnum.ATTRIBUTES.isPurchased and self.TenderModel.PrimaryPart:GetAttribute(attributeName) == true and self.LaneBoat.isPurchased then
+				-- IsPurchased triggers the start of the cycle
+				if attributeName == FFGEnum.ATTRIBUTES.IsPurchased and self.TenderModel.PrimaryPart:GetAttribute(attributeName) == true and self.LaneBoat.IsPurchased then
 					if self.LaneTender.FishInStorage > 0 and not self.LaneStorage:IsStorageFull() then
 						self.TenderModel.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.atPort, true)
 					else
@@ -151,8 +151,8 @@ function ChainManager.AttachAttListeners(self: ChainManagerInstance)
 	if self.BoatModel and self.BoatModel.PrimaryPart then
 		if self._cleaner then
 			self._cleaner:Add(self.BoatModel.PrimaryPart.AttributeChanged:Connect(function(attributeName)
-				-- isPurchased triggers the start of the cycle
-				if attributeName == FFGEnum.ATTRIBUTES.isPurchased and self.BoatModel.PrimaryPart:GetAttribute(attributeName) == true and self.LaneTender.isPurchased then
+				-- IsPurchased triggers the start of the cycle
+				if attributeName == FFGEnum.ATTRIBUTES.IsPurchased and self.BoatModel.PrimaryPart:GetAttribute(attributeName) == true and self.LaneTender.IsPurchased then
 					self:StartTenderCycle()
 					return
 				end
@@ -198,7 +198,7 @@ end
 function ChainManager:ResetTravellingAttributes()
 	local primary = self.TenderModel.PrimaryPart
 	for name, _ in pairs(primary:GetAttributes()) do
-		if name ~= FFGEnum.ATTRIBUTES.isPurchased then primary:SetAttribute(name, false) end
+		if name ~= FFGEnum.ATTRIBUTES.IsPurchased then primary:SetAttribute(name, false) end
 	end
 end
 
@@ -276,7 +276,7 @@ function ChainManager:StartUnloadingFish()
 
 	while remainingUnloadTime > 0 and tender.FishInStorage > 0 do
 		-- Check if we can unload
-		local canUnload = storage.isPurchased and not storage:IsStorageFull()
+		local canUnload = storage.IsPurchased and not storage:IsStorageFull()
 
 		if canUnload then
 			tender:DestroyTenderStoppedBillboard()

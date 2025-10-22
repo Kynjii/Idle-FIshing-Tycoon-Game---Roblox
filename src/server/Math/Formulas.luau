@@ -118,6 +118,7 @@ local FORMULAS = {
 	TENDER = { BaseCost = 100, BaseStorage = 60 },
 	STORAGE = { BaseCost = 50, BaseStorage = 200 },
 	BUILDING = { BaseCost = 1000 },
+	HELPER = { BaseCost = 100 },
 
 	-- Tier (rarity) curve used elsewhere in your economy
 	TIER_MULTIPLIER = {

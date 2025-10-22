@@ -1,13 +1,15 @@
+local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
-local Trove = require(ReplicatedStorage.Packages.Trove)
 local ClassCalculators = require(ServerScriptService.Server.Classes.Modules.ClassCalculators)
+local Trove = require(ReplicatedStorage.Packages.Trove)
 local ClassVisualizer = require(ServerScriptService.Server.Classes.Modules.ClassVisualizer)
 local EventListeners = require(ServerScriptService.Server.Classes.Modules.EventListeners)
 local HelperCalculators = require(ServerScriptService.Server.Classes.Modules.HelperCalculators)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local Formulas = require(ServerScriptService.Server.Math.Formulas)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
+local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
 
 -- //SECTION - Boat Data
 local NAME = {
@@ -25,7 +27,7 @@ local DEFAULTS = {
 	MaxLevel = 100,
 	UpgradeStage = 1,
 	StorageFull = false,
-	BaseWalkSpeed = Formulas.HELPER_BASE.Defaults.WalkSpeed,
+	BaseCost = Formulas.HELPER.BaseCost,
 }
 
 -- local ANIMATIONS = {
@@ -38,8 +40,52 @@ Helper.__index = Helper
 
 type Helper = typeof(setmetatable({}, Helper))
 
+-- //SECTION - Helpers for generating only stats for Shop
+local function chooseJob()
+	local jobs = {}
+
+	local index = 1
+	for k, v in pairs(FFGEnum.JOB_CATEGORY) do
+		jobs[index] = v
+		index += 1
+	end
+
+	return jobs[math.random(1, #jobs)]
+end
+
+local function grabName(jobCategory)
+	return NAME[jobCategory]
+end
+
+local function chooseQuality()
+	local function getRandomQuality()
+		local totalWeight = 0
+		for _, data in pairs(FFGEnum.QUALITIES) do
+			totalWeight += data.DropChance
+		end
+
+		local randomValue = math.random() * totalWeight
+		local cumulative = 0
+
+		for qualityId, data in pairs(FFGEnum.QUALITIES) do
+			cumulative += data.DropChance
+			if randomValue <= cumulative then return qualityId end
+		end
+
+		return nil, nil
+	end
+
+	local qualityId = getRandomQuality()
+	return qualityId
+end
+
+local function generateStats(jobCategory, level, qualityId)
+	return HelperCalculators.CalculateStats(jobCategory, level, qualityId)
+end
+-- //!SECTION
+
 -- //SECTION - Constructor
-function Helper.New(state: { [string]: any }?, player: Player, model: Model, teamId: number): Helper
+function Helper.New(state: HelperType.HelperData, player: Player, model: Model, teamId: number): Helper
 	local self = setmetatable({}, Helper)
 
 	-- Start with default stats as base
@@ -55,28 +101,76 @@ function Helper.New(state: { [string]: any }?, player: Player, model: Model, tea
 	end
 
 	-- Calculate derived properties
-	self.Entity = self.Entity or DEFAULTS.Entity
+	self.Entity = state.Entity or self.Entity or DEFAULTS.Entity
 	self.Player = player
-	self.Owner = self.Owner or player.UserId
+	self.RealmId = state.RealmId
+	self.Owner = state.Owner or self.Owner or player.UserId
 	self.Model = model:Clone()
+	self.Id = state.Id
 	self.TeamId = teamId
-	self.JobCategory = state and state.JobCategory or self:GenerateJobCategory()
+	self.JobCategory = state.JobCategory
+	self.ItemImage = state.ItemImage
 	self.Name = self:GetName()
 
 	-- Define quality first
-	self.QualityId = state and state.QualityId or self:DefineQuality()
+	self.QualityId = state.QualityId
 	self.Quality = FFGEnum.QUALITIES[self.QualityId]
 
 	-- Calculate default stats based on quality and job
-	self.Stats = state and state.Stats or self:CalculateStats()
+	self.Stats = state.Stats or generateStats(self.JobCategory, self.Level, self.QualityId)
+	self.BaseCost = state.BaseCost or ClassCalculators.CalculateBaseValue(DEFAULTS.BaseCost, self.QualityId, self.RealmId)
+	self.UpgradeCost = state.UpgradeCost or ClassCalculators.CalculateUpgradeCost(self.BaseCost, self.Level, self.QualityId, self.RealmId)
 
-	self.CurrentAssignment = state and state.CurrentAssignment or nil
+	self.CurrentAssignment = state.CurrentAssignment
 
 	self._cleaner = Trove.new()
 
 	self:AttachEventListeners()
 
 	return self
+end
+-- //!SECTION
+
+-- //SECTION - Static to generate data for shops
+function Helper.CreateStateData(player: Player, currencyType: string)
+	local state = {} :: HelperType.HelperData
+
+	-- Start with default stats as base
+	for key, value in pairs(DEFAULTS) do
+		state[key] = value
+	end
+
+	-- Calculate derived properties
+	state.Player = player
+	state.Owner = player.UserId
+	state.Id = HttpService:GenerateGUID(false)
+	state.JobCategory = chooseJob()
+	state.Name = grabName(state.JobCategory)
+	state.CurrencyType = currencyType
+
+	-- Define quality first
+	state.QualityId = chooseQuality()
+	state.Quality = FFGEnum.QUALITIES[state.QualityId]
+
+	-- Get correct image
+	state.ItemImage = FFGEnum.JOB_ASSETS[state.JobCategory]
+
+	-- Calculate default stats based on quality and job
+	state.Stats = generateStats(state.JobCategory, 1, state.QualityId)
+	state.BaseCost = ClassCalculators.CalculateBaseValue(DEFAULTS.BaseCost, state.QualityId, state.RealmId)
+	state.UpgradeCost = ClassCalculators.CalculateUpgradeCost(state.BaseCost, state.Level, state.QualityId, state.RealmId)
+
+	state.IsPurchased = false
+
+	state.CurrentAssignment = nil
+
+	return state
+end
+-- //!SECTION
+
+-- //SECTION - Assignments
+function Helper.GetAssignments()
+	return
 end
 -- //!SECTION
 
@@ -100,34 +194,15 @@ end
 
 -- //SECTION - Calculations
 function Helper.GenerateJobCategory(self: Helper): number
-	local jobs = FFGEnum.JOBS
-	return jobs[math.random(1, #jobs)]
+	return chooseJob()
 end
 
 function Helper.CalculateStats(self: Helper)
-	return HelperCalculators.CalculateStats(self.JobCategory, self.Level, self.QualityId)
+	return generateStats(self.JobCategory, self.Level, self.QualityId)
 end
 
 function Helper.DefineQuality(self: Helper): number?
-	local function getRandomQuality()
-		local totalWeight = 0
-		for _, data in pairs(FFGEnum.QUALITIES) do
-			totalWeight += data.DropChance
-		end
-
-		local randomValue = math.random() * totalWeight
-		local cumulative = 0
-
-		for qualityId, data in pairs(FFGEnum.QUALITIES) do
-			cumulative += data.DropChance
-			if randomValue <= cumulative then return qualityId end
-		end
-
-		return nil, nil
-	end
-
-	local qualityId = getRandomQuality()
-	return qualityId
+	return chooseQuality()
 end
 -- //!SECTION
 
@@ -199,22 +274,27 @@ end
 -- //!SECTION
 
 -- //SECTION - Loading and Saving
-function Helper.Serialize(self: Helper): { [string]: any }
+function Helper.Serialize(self: Helper): HelperType.HelperData
 	return {
 		Entity = self.Entity,
 		Id = self.Id,
-		Owner = self.Owner,
 		RealmId = self.RealmId,
-		Tier = self.Tier,
+		Owner = self.Owner,
 		Name = self.Name,
 		Level = self.Level,
-		QualityId = self.QualityId,
 		MaxLevel = self.MaxLevel,
+		CurrencyType = self.CurrencyType,
+		ItemImage = self.ItemImage,
+		JobCategory = self.JobCategory,
+		QualityId = self.QualityId,
 		Stats = self.Stats,
 		UpgradeStage = self.UpgradeStage,
 		ResourceInStorage = self.ResourceInStorage,
 		StorageFull = self.StorageFull,
 		CurrentAssignment = self.CurrentAssignment,
+		IsPurchased = self.IsPurchased,
+		BaseCost = self.BaseCost,
+		UpgradeCost = self.UpgradeCost,
 	}
 end
 

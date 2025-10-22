@@ -128,12 +128,12 @@ function updateName()
 end
 
 function updateLevel()
-	if not entityData.isPurchased then
+	if not entityData.IsPurchased then
 		details.Defaults.LevelLabel.Parent.Visible = false
 	else
 		details.Defaults.LevelLabel.Parent.Visible = true
 	end
-	details.Defaults.LevelLabel.Text = entityData.isPurchased and "Level: " .. entityData.Level or ""
+	details.Defaults.LevelLabel.Text = entityData.IsPurchased and "Level: " .. entityData.Level or ""
 	details.Defaults.LevelLabel.Visible = true
 end
 function writeDescription()
@@ -149,47 +149,47 @@ function updateStats()
 
 	-- Boat
 	if entityData.Entity == FFGEnum.CLASS.ENTITY_NAME.Boat then
-		details.Stats.CurrentFPSValue.Text = entityData.isPurchased and FormatNumber(entityData.CurrentFPS) or ""
-		details.Stats.NextFPSValue.Text = entityData.isPurchased and "+" .. FormatNumber(entityData.NextFPS - entityData.CurrentFPS) or ""
+		details.Stats.CurrentFPSValue.Text = entityData.IsPurchased and FormatNumber(entityData.CurrentFPS) or ""
+		details.Stats.NextFPSValue.Text = entityData.IsPurchased and "+" .. FormatNumber(entityData.NextFPS - entityData.CurrentFPS) or ""
 		details.Stats.NextFPSValue.TextColor3 = FFGEnum.THEME.color.green
 
 		local currentFPSParent = details.Stats.CurrentFPSValue:FindFirstAncestorWhichIsA("Frame")
-		currentFPSParent.Visible = entityData.isPurchased and true
+		currentFPSParent.Visible = entityData.IsPurchased and true
 
 		local nextFPSValueParent = details.Stats.NextFPSValue:FindFirstAncestorWhichIsA("Frame")
-		nextFPSValueParent.Visible = entityData.isPurchased and true
+		nextFPSValueParent.Visible = entityData.IsPurchased and true
 	end
 
 	-- Tender
 	if entityData.Entity == FFGEnum.CLASS.ENTITY_NAME.Tender then
-		details.Stats.CurrentTravelTimeValue.Text = entityData.isPurchased and FormatNumber(entityData.CurrentTravelTime) .. " secs" or ""
-		details.Stats.CurrentLoadTimeValue.Text = entityData.isPurchased and FormatNumber(entityData.LoadTime) .. " secs" or ""
+		details.Stats.CurrentTravelTimeValue.Text = entityData.IsPurchased and FormatNumber(entityData.CurrentTravelTime) .. " secs" or ""
+		details.Stats.CurrentLoadTimeValue.Text = entityData.IsPurchased and FormatNumber(entityData.LoadTime) .. " secs" or ""
 
 		-- //TODO - Add next times to Tender and reflect here
 		local currentTTParent = details.Stats.CurrentTravelTimeValue:FindFirstAncestorWhichIsA("Frame")
-		currentTTParent.Visible = entityData.isPurchased and true
+		currentTTParent.Visible = entityData.IsPurchased and true
 
 		local currentLTParent = details.Stats.CurrentLoadTimeValue:FindFirstAncestorWhichIsA("Frame")
-		currentLTParent.Visible = entityData.isPurchased and true
+		currentLTParent.Visible = entityData.IsPurchased and true
 	end
 
 	-- Non-Building
 	if entityData.Entity ~= FFGEnum.CLASS.ENTITY_NAME.Building then
 		-- STORAGE Stats
-		details.Stats.CurrentMaxStorageValue.Text = entityData.isPurchased and FormatNumber(entityData.CurrentMaxStorage) or ""
-		details.Stats.NextMaxStorageValue.Text = entityData.isPurchased and "+" .. FormatNumber(entityData.NextLvlMaxStorage - entityData.CurrentMaxStorage) or ""
+		details.Stats.CurrentMaxStorageValue.Text = entityData.IsPurchased and FormatNumber(entityData.CurrentMaxStorage) or ""
+		details.Stats.NextMaxStorageValue.Text = entityData.IsPurchased and "+" .. FormatNumber(entityData.NextLvlMaxStorage - entityData.CurrentMaxStorage) or ""
 		details.Stats.NextMaxStorageValue.TextColor3 = FFGEnum.THEME.color.green
 
 		local currentMaxStorageParent = details.Stats.CurrentMaxStorageValue:FindFirstAncestorWhichIsA("Frame")
-		currentMaxStorageParent.Visible = entityData.isPurchased and true
+		currentMaxStorageParent.Visible = entityData.IsPurchased and true
 
 		local nextMaxStorageParent = details.Stats.NextMaxStorageValue:FindFirstAncestorWhichIsA("Frame")
-		nextMaxStorageParent.Visible = entityData.isPurchased and true
+		nextMaxStorageParent.Visible = entityData.IsPurchased and true
 	end
 
 	-- Building
 	if entityData.Entity == FFGEnum.CLASS.ENTITY_NAME.Building then
-		if entityData.isPurchased and entityData.BuildingBuff then
+		if entityData.IsPurchased and entityData.BuildingBuff then
 			local isPlus = entityData.BuildingBuff.IsPlus
 			if isPlus then
 				details.Stats.CurrentBuffValue.Text = "+" .. (FormatNumber(entityData.BuildingBuff.CurrentValue * 100)) .. "%" .. " " .. entityData.BuildingBuff.Label
@@ -203,7 +203,7 @@ function updateStats()
 	end
 end
 function updateEntityInteractiveFrameLabel()
-	details.EntityInteractiveFrameLabel.Text = entityData.isPurchased and "Upgrade" or "Purchase"
+	details.EntityInteractiveFrameLabel.Text = entityData.IsPurchased and "Upgrade" or "Purchase"
 	details.EntityInteractiveFrameLabel.Visible = true
 end
 
@@ -213,7 +213,7 @@ function handleUpgradeClick()
 		Upgraded = Events.GetRemote(Events.RemoteNames.EntityUpgraded),
 	}
 
-	if not entityData.isPurchased then
+	if not entityData.IsPurchased then
 		events.Purchased:FireServer(entityData[FFGEnum.CLASS.PROPERTIES.Id])
 	else
 		events.Upgraded:FireServer(entityData[FFGEnum.CLASS.PROPERTIES.Id])
@@ -242,7 +242,7 @@ function updateButtonState()
 	details.upgradeButton.Visible = true
 
 	local currentGoldAmount = currentState.Currencies.Gold or 0
-	local cost = entityData.isPurchased and entityData.UpgradeCost or entityData.BaseCost
+	local cost = entityData.IsPurchased and entityData.UpgradeCost or entityData.BaseCost
 	local enable = cost <= currentGoldAmount
 
 	if enable then
@@ -259,7 +259,7 @@ function updateButtonState()
 		details.upgradeButton.Interactable = false
 	end
 
-	details.upgradeButton.TextLabel.Text = entityData.isPurchased and "Upgrade" or "Purchase"
+	details.upgradeButton.TextLabel.Text = entityData.IsPurchased and "Upgrade" or "Purchase"
 	details.upgradeCostLabel.Text = FormatNumber(cost)
 end
 

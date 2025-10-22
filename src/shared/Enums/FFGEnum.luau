@@ -48,7 +48,7 @@ FFGEnum.STAGES = {
 }
 
 FFGEnum.ATTRIBUTES = {
-	isPurchased = "isPurchased",
+	IsPurchased = "IsPurchased",
 	atPort = "atPort",
 	atBoat = "atBoat",
 	finishedLoading = "finishedLoading",
@@ -70,7 +70,7 @@ FFGEnum.CLASS = {
 		MaxLevel = "MaxLevel",
 		BaseCost = "BaseCost",
 		UpgradeCost = "UpgradeCost",
-		isPurchased = "isPurchased",
+		IsPurchased = "IsPurchased",
 		BaseStorage = "BaseStorage",
 		UpgradeStage = "UpgradeStage",
 		CurrentMaxStorage = "CurrentMaxStorage",
@@ -95,11 +95,40 @@ FFGEnum.CLASS = {
 	},
 }
 
-FFGEnum.JOBS = {
-	[1] = "Fishing",
-	[2] = "Woodcutting",
-	[3] = "Mining",
-	[4] = "Transport",
+FFGEnum.JOB_CATEGORY = {
+	Fishing = "Fishing",
+	Woodcutting = "Woodcutting",
+	Mining = "Mining",
+	Transporting = "Transporting",
+}
+
+FFGEnum.JOB_NAMES = {
+	Fisher = "Fisher",
+	Woodcutter = "Woodcutter",
+	Miner = "Miner",
+	Transporter = "Hauler",
+}
+
+FFGEnum.JOB_ASSIGNMENTS = {
+	Unassigned = 1,
+	Transporter = 2,
+	Fisher = 3,
+	Miner = 4,
+	Woodcutter = 5,
+}
+
+FFGEnum.JOB_STATE = {
+	[1] = "Idle",
+	[2] = "Gathering",
+	[3] = "Travelling",
+	[500] = "Stuck",
+}
+
+FFGEnum.JOB_ASSETS = {
+	Fishing = "rbxassetid://119061574257660",
+	Woodcutting = "rbxassetid://76234482123867",
+	Mining = "rbxassetid://111187697712320",
+	Transport = "rbxassetid://135331905621652",
 }
 
 FFGEnum.CURRENCY_TYPES = {

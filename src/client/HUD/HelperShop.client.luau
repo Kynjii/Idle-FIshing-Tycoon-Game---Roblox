@@ -4,8 +4,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TableUtil = require(ReplicatedStorage.Packages.TableUtil)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
-local ShopHelpers = require(ReplicatedStorage.Shared.Inventory.ShopHelpers)
 local Replica = require(ReplicatedStorage.Shared.ReplicaClient)
+local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
 local ShopGUI = require(ReplicatedStorage.Shared.UI.Components.Shop.ShopGUI)
 local ShopItem = require(ReplicatedStorage.Shared.UI.Components.Shop.ShopItem)
 local FormatNumber = require(ReplicatedStorage.Shared.Utils.FormatNumber)
@@ -19,7 +19,7 @@ local shopDetailsUI = helperShopUI:WaitForChild("DetailsContainer") :: Frame
 local main = shopDetailsUI:WaitForChild("Main") :: Frame
 local shopItemsContainer = main:WaitForChild("ShopItemsContainer") :: ScrollingFrame
 
-local itemCatalog = ShopHelpers
+local itemCatalog = {}
 local playerItems = {}
 local itemElements = {}
 
@@ -28,13 +28,13 @@ function handlePurchaseClick(itemId: string)
 	if shopItemPurchased then shopItemPurchased:FireServer(itemId) end
 end
 
-function createShopItemElement(helper: ShopHelpers.Helper)
+function createShopItemElement(helper: HelperType.HelperData)
 	return ShopItem({
 		ItemImage = helper.ItemImage,
 		ItemName = helper.Name,
 		ItemId = helper.Id,
 		ItemDescription = "Wee wooo",
-		ItemPrice = FormatNumber(helper.BaseCost),
+		ItemPrice = FormatNumber(helper.Stats and helper.Stats.BaseCost),
 		BackgroundColor3 = FFGEnum.THEME.shop.shopItem.bgColor,
 		BackgroundTransparency = 0,
 		Size = UDim2.fromScale(1, 1),
@@ -92,19 +92,9 @@ function updateUI()
 	for _, element: Frame in pairs(itemElements) do
 		local associatedItem = TableUtil.Find(playerItems, function(item)
 			return item.Id == element.Name
-		end)
+		end) :: Instance
 
-		if associatedItem then
-			local buyButton = element:FindFirstChild("BuyBtn", true) :: ImageButton
-			if buyButton then
-				buyButton.Active = false
-				buyButton.Image = "rbxassetid://87220614829273"
-				buyButton.HoverImage = ""
-				buyButton.PressedImage = ""
-				buyButton.Interactable = false
-			end
-			break
-		end
+		if associatedItem then associatedItem:Destroy() end
 	end
 end
 

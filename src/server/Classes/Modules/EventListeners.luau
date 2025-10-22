@@ -74,11 +74,11 @@ function EventListeners.Attach(class: Boat | Tender | PortStorage | Building)
 			if not canProceed then return end
 
 			-- See if the player can afford the state update (purchase / upgrade)
-			if not DataService.CanAfford(player, FFGEnum.CURRENCY_TYPES.Gold, not typedClass.isPurchased and typedClass.BaseCost or typedClass.UpgradeCost) then return end
+			if not DataService.CanAfford(player, FFGEnum.CURRENCY_TYPES.Gold, not typedClass.IsPurchased and typedClass.BaseCost or typedClass.UpgradeCost) then return end
 
-			DataService.Spend(player, FFGEnum.CURRENCY_TYPES.Gold, not typedClass.isPurchased and typedClass.BaseCost or typedClass.UpgradeCost)
+			DataService.Spend(player, FFGEnum.CURRENCY_TYPES.Gold, not typedClass.IsPurchased and typedClass.BaseCost or typedClass.UpgradeCost)
 
-			if typedClass.isPurchased then
+			if typedClass.IsPurchased then
 				typedClass:Upgrade()
 			else
 				typedClass:Purchase()

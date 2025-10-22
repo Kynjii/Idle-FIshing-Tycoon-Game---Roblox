@@ -7,7 +7,7 @@ local ClassVisualizer = require(ServerScriptService.Server.Classes.Modules.Class
 local EventListeners = require(ServerScriptService.Server.Classes.Modules.EventListeners)
 local ProximityPrompt = require(ServerScriptService.Server.Classes.Modules.ProximityPrompt)
 local PurchaseBoard = require(ServerScriptService.Server.Classes.Modules.PurchaseBoard)
-local Tutorial = require(ServerScriptService.Server.Game.Tutorial)
+local Tutorial = require(ServerScriptService.Server.Game.Tutorial.Tutorial)
 local PortStorageType = require(ReplicatedStorage.Shared.Types.Classes.PortStorageType)
 local Buffs = require(ServerScriptService.Server.Math.Buffs)
 local DataService = require(ServerScriptService.Server.Services.DataService)
@@ -33,7 +33,7 @@ local DEFAULTS = {
 	Level = 1,
 	MaxLevel = 100,
 	BaseCost = Formulas.STORAGE.BaseCost,
-	isPurchased = false,
+	IsPurchased = false,
 	BaseStorage = Formulas.STORAGE.BaseStorage,
 	UpgradeStage = 1,
 	FishInStorage = 0,
@@ -127,7 +127,7 @@ end
 
 -- //SECTION - Core Actions
 function PortStorage.Purchase(self: PortStorage): ()
-	self.isPurchased = true
+	self.IsPurchased = true
 
 	self.TakeFishPrompt = self:SetupFishRemovalPrompt()
 	self:UpdateBuffs()
@@ -233,7 +233,7 @@ end
 -- //SECTION - UI Setup
 function PortStorage.Initialize(self: PortStorage): ()
 	-- Handle visibility based on purchase status
-	if not self.isPurchased then
+	if not self.IsPurchased then
 		self:Hide()
 		self:CannotCollide()
 	else
@@ -245,7 +245,7 @@ function PortStorage.Initialize(self: PortStorage): ()
 
 	-- Setup UI components
 	if self.PurchaseBoard then self:SetupProximityPrompt(self.PurchaseBoard) end
-	if self.isPurchased then self.TakeFishPrompt = self:SetupFishRemovalPrompt() end
+	if self.IsPurchased then self.TakeFishPrompt = self:SetupFishRemovalPrompt() end
 	self:UpdateFishModel()
 end
 
@@ -413,7 +413,7 @@ function PortStorage.Serialize(self: PortStorage): { [string]: any }
 		MaxLevel = self.MaxLevel,
 		BaseCost = self.BaseCost,
 		UpgradeCost = self.UpgradeCost,
-		isPurchased = self.isPurchased,
+		IsPurchased = self.IsPurchased,
 		BaseStorage = self.BaseStorage,
 		CurrentMaxStorage = self.CurrentMaxStorage,
 		NextLvlMaxStorage = self.NextLvlMaxStorage,
@@ -468,7 +468,7 @@ function PortStorage.UpdateVisualModel(self: PortStorage)
 			weld.Part1 = self.VisualRoot
 			part.Anchored = false
 
-			if self.isPurchased then FadeEffect.In(part) end
+			if self.IsPurchased then FadeEffect.In(part) end
 		end
 	end
 
