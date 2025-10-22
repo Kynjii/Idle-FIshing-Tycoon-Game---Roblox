@@ -39,6 +39,9 @@ function HelperManager.New(playerHelperData: { HelperType.HelperData }, player: 
 
 	self._cleaner = Trove.new()
 
+	-- //TODO - if the player has the tutorial helper do not create statedata for it
+	-- if the player has all the tutorial helpers, set tutorial state in player data
+	-- if player has completed the tutorial and all helper stages, skip this part
 	local helpers = {}
 	local index = 1
 	for _, k in pairs(self.tutorialHelpersCatalog) do
