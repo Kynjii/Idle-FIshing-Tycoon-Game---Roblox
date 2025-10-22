@@ -16,6 +16,7 @@ Events.RemoteNames = {
 
 Events.BindableNames = {
 	ShowShopTooltip = "ShowShopTooltip",
+	CloseUIWindow = "CloseUIWindow",
 }
 
 local FOLDER_NAME = "Events"

@@ -5,10 +5,10 @@ local Events = require(ReplicatedStorage.Shared.Events.Events)
 local MainUIPanel = require(ReplicatedStorage.Shared.UI.Components.Frames.MainUIPanel)
 local Tooltip = require(ReplicatedStorage.Shared.UI.Components.Tooltips.Tooltip)
 
-local ShopGUI = {}
+local PlayerInventory = {}
 
-function ShopGUI.Create(props: {
-	ShopName: string,
+function PlayerInventory.Create(props: {
+	Name: string,
 	ScreenGuiName: string,
 })
 	local shopScreenGui = Instance.new("ScreenGui")
@@ -17,7 +17,7 @@ function ShopGUI.Create(props: {
 	shopScreenGui.ResetOnSpawn = false
 	shopScreenGui.Enabled = true
 
-	local mainPanel = MainUIPanel.Create({ Name = "Crew Shop" })
+	local mainPanel = MainUIPanel.Create({ Name = "Inventory" })
 	mainPanel.Parent = shopScreenGui
 
 	local shopItemsContainer = Instance.new("ScrollingFrame")
@@ -96,7 +96,7 @@ function ShopGUI.Create(props: {
 	return shopScreenGui
 end
 
-function ShopGUI.CloseShop(screenGui)
+function PlayerInventory.CloseShop(screenGui)
 	screenGui.Enabled = false
 	if Lighting then
 		local blur = Lighting:FindFirstChild("Blur")
@@ -104,4 +104,4 @@ function ShopGUI.CloseShop(screenGui)
 	end
 end
 
-return ShopGUI
+return PlayerInventory
