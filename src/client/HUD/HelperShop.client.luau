@@ -12,15 +12,22 @@ local FormatNumber = require(ReplicatedStorage.Shared.Utils.FormatNumber)
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
-local helperShopUI = ShopGUI.Create({ ShopName = "Crew Shop", ScreenGuiName = "HelperShop" })
-helperShopUI.Parent = playerGui
+local helperShopUI
+local shopDetailsUI
+local main
+local shopItemsContainer
+task.spawn(function()
+	helperShopUI = ShopGUI.Create({ ShopName = "Crew Shop", ScreenGuiName = "HelperShop" })
+	helperShopUI.Parent = playerGui
 
-local shopDetailsUI = helperShopUI:WaitForChild("DetailsContainer") :: Frame
-local main = shopDetailsUI:WaitForChild("Main") :: Frame
-local shopItemsContainer = main:WaitForChild("ShopItemsContainer") :: ScrollingFrame
+	shopDetailsUI = helperShopUI:WaitForChild("DetailsContainer", 10) :: Frame
+	shopDetailsUI.Visible = false
 
-local itemCatalog = {}
-local playerItems = {}
+	main = shopDetailsUI:WaitForChild("Main", 10) :: Frame
+	shopItemsContainer = main:WaitForChild("ShopItemsContainer", 10) :: ScrollingFrame
+end)
+
+local playerTutorialItems = {}
 local itemElements = {}
 
 function handlePurchaseClick(itemId: string)
@@ -48,24 +55,13 @@ function createShopItemElement(helper: HelperType.HelperData)
 	})
 end
 
-if shopItemsContainer then
-	for i, item in ipairs(itemCatalog) do
-		local itemElement = createShopItemElement(item)
-		itemElements[i] = itemElement
-	end
-end
-
--- Open/Close ShopDetails
--- Default close
-shopDetailsUI.Visible = false
-
 local _replica = nil
 local shopData: any = {}
 
-function watchPlayerItems()
+function watchplayerTutorialItems()
 	Replica.OnNew("PlayerState", function(replicaData)
-		_replica = replicaData:OnSet({ "Realms", replicaData.Data.CurrentRealm, "Helpers" }, function(newState)
-			playerItems = newState
+		_replica = replicaData:OnSet({ "TutorialHelpers" }, function(newState)
+			playerTutorialItems = newState
 			updateUI()
 		end)
 	end)
@@ -80,7 +76,7 @@ function handleClosingShopDetailsUI()
 		if distance >= 8 then
 			local tooltip = main:FindFirstChild("ShopTooltip", true)
 			if tooltip then tooltip:Destroy() end
-			ShopGUI.CloseShop(helperShopUI)
+			ShopGUI.CloseShop(shopDetailsUI)
 			break
 		end
 
@@ -90,7 +86,7 @@ end
 
 function updateUI()
 	for _, element: Frame in pairs(itemElements) do
-		local associatedItem = TableUtil.Find(playerItems, function(item)
+		local associatedItem = TableUtil.Find(playerTutorialItems, function(item)
 			return item.Id == element.Name
 		end) :: Instance
 
@@ -109,10 +105,9 @@ end
 local shopDetails = Events.GetRemote(Events.RemoteNames.OpenHelperShop)
 if shopDetails then shopDetails.OnClientEvent:Connect(function(data)
 	if data then
-		player.PlayerGui.HelperShop.Enabled = true
 		shopDetailsUI.Visible = true
 		shopData = data
-		watchPlayerItems()
+		watchplayerTutorialItems()
 		populateDetailsUI()
 		task.spawn(function()
 			handleClosingShopDetailsUI()
@@ -120,9 +115,16 @@ if shopDetails then shopDetails.OnClientEvent:Connect(function(data)
 	end
 end) end
 
-local playerItemStateEvent = Events.GetRemote(Events.RemoteNames.PrepareHelperShop)
-if playerItemStateEvent then playerItemStateEvent.OnClientEvent:Connect(function(data)
+local playerTutorialItemstateEvent = Events.GetRemote(Events.RemoteNames.PrepareHelperShop)
+if playerTutorialItemstateEvent then playerTutorialItemstateEvent.OnClientEvent:Connect(function(data)
 	if not data then return end
 
-	playerItems = data
+	playerTutorialItems = data
+
+	if shopItemsContainer then
+		for i, item in ipairs(playerTutorialItems) do
+			local itemElement = createShopItemElement(item)
+			itemElements[i] = itemElement
+		end
+	end
 end) end

@@ -17,6 +17,9 @@ local Catalog: { HelperType.HelperData } = {
 		JobCategory = FFGEnum.JOB_CATEGORY.Transporting,
 		CurrentAssignment = FFGEnum.JOB_ASSIGNMENTS.Unassigned,
 		IsPurchased = false,
+		IsTutorialHelper = true,
+		Level = 1,
+		ResourceInStorage = 0,
 	},
 
 	{
@@ -31,6 +34,9 @@ local Catalog: { HelperType.HelperData } = {
 		JobCategory = FFGEnum.JOB_CATEGORY.Transporting,
 		CurrentAssignment = FFGEnum.JOB_ASSIGNMENTS.Unassigned,
 		IsPurchased = false,
+		IsTutorialHelper = true,
+		Level = 1,
+		ResourceInStorage = 0,
 	},
 	{
 		Entity = FFGEnum.CLASS.ENTITY_NAME.Helper,
@@ -44,6 +50,9 @@ local Catalog: { HelperType.HelperData } = {
 		JobCategory = FFGEnum.JOB_CATEGORY.Transporting,
 		CurrentAssignment = FFGEnum.JOB_ASSIGNMENTS.Unassigned,
 		IsPurchased = false,
+		IsTutorialHelper = true,
+		Level = 1,
+		ResourceInStorage = 0,
 	},
 	{
 		Entity = FFGEnum.CLASS.ENTITY_NAME.Helper,
@@ -57,6 +66,9 @@ local Catalog: { HelperType.HelperData } = {
 		JobCategory = FFGEnum.JOB_CATEGORY.Transporting,
 		CurrentAssignment = FFGEnum.JOB_ASSIGNMENTS.Unassigned,
 		IsPurchased = false,
+		IsTutorialHelper = true,
+		Level = 1,
+		ResourceInStorage = 0,
 	},
 	{
 		Entity = FFGEnum.CLASS.ENTITY_NAME.Helper,
@@ -70,6 +82,9 @@ local Catalog: { HelperType.HelperData } = {
 		JobCategory = FFGEnum.JOB_CATEGORY.Transporting,
 		CurrentAssignment = FFGEnum.JOB_ASSIGNMENTS.Unassigned,
 		IsPurchased = false,
+		IsTutorialHelper = true,
+		Level = 1,
+		ResourceInStorage = 0,
 	},
 	{
 		Entity = FFGEnum.CLASS.ENTITY_NAME.Helper,
@@ -83,6 +98,9 @@ local Catalog: { HelperType.HelperData } = {
 		JobCategory = FFGEnum.JOB_CATEGORY.Transporting,
 		CurrentAssignment = FFGEnum.JOB_ASSIGNMENTS.Unassigned,
 		IsPurchased = false,
+		IsTutorialHelper = true,
+		Level = 1,
+		ResourceInStorage = 0,
 	},
 }
 

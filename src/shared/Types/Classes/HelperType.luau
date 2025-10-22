@@ -6,19 +6,22 @@ export type HelperData = {
 	RealmId: number,
 	Owner: number?,
 	Name: string, -- display
-	Level: number?,
+	Level: number,
 	CurrencyType: string,
 	ItemImage: string,
 	JobCategory: number,
 	QualityId: number,
 	Stats: { [string]: number }?,
 	UpgradeStage: number?,
-	ResourceInStorage: number?,
+	ResourceInStorage: number,
 	StorageFull: boolean?,
 	CurrentAssignment: number,
 	IsPurchased: boolean,
 	BaseCost: number?,
 	UpgradeCost: number?,
+	Model: Model?,
+	_cleaner: any?,
+	IsTutorialHelper: boolean?,
 }
 
 return HelperType

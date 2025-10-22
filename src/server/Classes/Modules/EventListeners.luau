@@ -4,6 +4,7 @@ local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local BoatType = require(ReplicatedStorage.Shared.Types.Classes.BoatType)
 local BuildingType = require(ReplicatedStorage.Shared.Types.Classes.BuildingType)
+local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
 local PortStorageType = require(ReplicatedStorage.Shared.Types.Classes.PortStorageType)
 local TenderType = require(ReplicatedStorage.Shared.Types.Classes.TenderType)
 local DataService = require(ServerScriptService.Server.Services.DataService)
@@ -43,6 +44,7 @@ function EventListeners.Attach(class: Boat | Tender | PortStorage | Building)
 				[1] = FFGEnum.CLASS.ENTITY_NAME.Boat,
 				[2] = FFGEnum.CLASS.ENTITY_NAME.Tender,
 				[3] = FFGEnum.CLASS.ENTITY_NAME.PortStorage,
+				[4] = FFGEnum.CLASS.ENTITY_NAME.Shop,
 			}
 
 			-- Check to see if the entity matches the correct stage
@@ -114,17 +116,14 @@ function EventListeners.Attach(class: Boat | Tender | PortStorage | Building)
 	else
 		-- Shop Item Purchased
 		local itemPurchased = Events.GetRemote(Events.RemoteNames.HelperPurchased)
-		if itemPurchased then
-			typedClass._cleaner:Add(itemPurchased.OnServerEvent:Connect(function(player: Player, itemId: string)
-				if typedClass.Player ~= player or typedClass.Owner ~= player.UserId then return end
+		if itemPurchased then typedClass._cleaner:Add(itemPurchased.OnServerEvent:Connect(function(player: Player, helper: HelperType.HelperData)
+			if typedClass.Player ~= player or typedClass.Owner ~= player.UserId then return end
 
-				local canProceed = checkTutorialState(player)
-				if not canProceed then return end
+			local canProceed = checkTutorialState(player)
+			if not canProceed then return end
 
-				print("handle buying the helper")
-				-- typedClass:PurchaseItem(itemId)
-			end))
-		end
+			typedClass:Purchasehelper(helper)
+		end)) end
 	end
 end
 

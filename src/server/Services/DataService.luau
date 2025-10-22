@@ -384,6 +384,18 @@ function DataService.SaveHelper(player: Player, helper: HelperType.HelperData): 
 
 	return true
 end
+
+function DataService.SaveTutorialHelper(player: Player, helper: HelperType.HelperData): boolean
+	local profile = getProfile(player, stateTypes.Helper)
+	if not profile then return false end
+
+	profile.Data.TutorialHelpers[helper.Id] = helper
+
+	local replica = DataService.Replicas[player]
+	if replica then replica:Set({ "TutorialHelpers" }, profile.Data.TutorialHelpers) end
+
+	return true
+end
 -- //!SECTION
 
 -- //SECTION - TUTORIAL
@@ -391,7 +403,7 @@ function DataService.SaveTutorialState(player: Player, completedStage: number): 
 	local profile = getProfile(player, stateTypes.SaveTutorialState)
 	if not profile then return end
 
-	if completedStage == 3 then profile.Data.CompletedTutorial = true end
+	if completedStage == 4 then profile.Data.CompletedTutorial = true end
 	if completedStage == 2 then profile.Data.TutorialStageComplete[1] = true end
 
 	profile.Data.TutorialStageComplete[completedStage] = true

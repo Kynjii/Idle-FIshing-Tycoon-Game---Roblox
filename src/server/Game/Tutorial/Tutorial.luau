@@ -9,6 +9,7 @@ local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local taggedBoats = CollectionService:GetTagged("Boat")
 local taggedTenders = CollectionService:GetTagged("Tender")
 local taggedStorage = CollectionService:GetTagged("Storage")
+local taggedHelperShops = CollectionService:GetTagged("HelperShop")
 -- //!SECTION
 
 local Tutorial = {}
@@ -49,6 +50,15 @@ local function FindStoragePB(teamId: number): Model?
 			local pb = taggedStorageUnit:FindFirstChild("Purchase_Board")
 			return pb
 		end
+	end
+
+	return nil
+end
+
+local function FindHelperShop(teamId: number): Model?
+	for _, taggedHelperShop in ipairs(taggedHelperShops) do
+		local taggedHelperShopTeamId = taggedHelperShop:GetAttribute(FFGEnum.ATTRIBUTES.TeamId)
+		if taggedHelperShopTeamId == teamId then return taggedHelperShop end
 	end
 
 	return nil
@@ -109,23 +119,26 @@ function Tutorial.Show(player: Player, teamId: number, stageProgress: number)
 	-- Remove existing attachments
 	Tutorial.PlayerTrove[player]:Clean()
 
-	local PBs = {
-		boatPB = FindBoatPB(teamId),
-		tenderPB = FindTenderPB(teamId),
-		portStoragePB = FindStoragePB(teamId),
+	local models = {
+		[1] = function()
+			return FindBoatPB(teamId)
+		end,
+		[2] = function()
+			return FindTenderPB(teamId)
+		end,
+		[3] = function()
+			return FindStoragePB(teamId)
+		end,
+		[4] = function()
+			return FindHelperShop(teamId)
+		end,
 	}
 
 	local stage = stageProgress
 
 	if stage then Tutorial.PlayerProgress[player] = stage end
 
-	local PBToUse = {
-		[1] = "boatPB",
-		[2] = "tenderPB",
-		[3] = "portStoragePB",
-	}
-
-	local purchaseBoard = PBs[PBToUse[stage]]
+	local purchaseBoard = models[stage]()
 	assignBeam(player, purchaseBoard)
 end
 
@@ -135,7 +148,7 @@ function Tutorial.Update(player: Player, teamId: number?)
 	if not Tutorial.PlayerProgress[player] then print("No player found in tutorial player progress") end
 
 	local currentStage = Tutorial.PlayerProgress[player]
-	local maxStage = 3
+	local maxStage = 4
 
 	if currentStage == maxStage then
 		Tutorial.PlayerTrove[player]:Destroy()

@@ -6,18 +6,26 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 local ClassVisualizer = require(ServerScriptService.Server.Classes.Modules.ClassVisualizer)
 local EventListeners = require(ServerScriptService.Server.Classes.Modules.EventListeners)
 local HelperCalculators = require(ServerScriptService.Server.Classes.Modules.HelperCalculators)
+local Tutorial = require(ServerScriptService.Server.Game.Tutorial.Tutorial)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local Formulas = require(ServerScriptService.Server.Math.Formulas)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
 
--- //SECTION - Boat Data
+-- //SECTION - Helper Data
 local NAME = {
 	Fishing = "Fisher", -- [Job]: Name
 	Woodcutting = "Woodcutter",
 	Mining = "Miner",
 	Transport = "Hauler",
 }
+
+local helperFolder = game.Workspace:WaitForChild("Helpers")
+local helperModel: Model
+if helperFolder then
+	helperModel = helperFolder:FindFirstChild("HelperTemplate")
+	if not helperModel then error("Unable to locate the helperModel") end
+end
 
 local DEFAULTS = {
 	Entity = FFGEnum.CLASS.ENTITY_NAME.Helper,
@@ -28,6 +36,7 @@ local DEFAULTS = {
 	UpgradeStage = 1,
 	StorageFull = false,
 	BaseCost = Formulas.HELPER.BaseCost,
+	IsPurchased = false,
 }
 
 -- local ANIMATIONS = {
@@ -38,7 +47,7 @@ local DEFAULTS = {
 local Helper = {}
 Helper.__index = Helper
 
-type Helper = typeof(setmetatable({}, Helper))
+type Helper = typeof(setmetatable({} :: HelperType.HelperData, Helper))
 
 -- //SECTION - Helpers for generating only stats for Shop
 local function chooseJob()
@@ -85,8 +94,8 @@ end
 -- //!SECTION
 
 -- //SECTION - Constructor
-function Helper.New(state: HelperType.HelperData, player: Player, model: Model, teamId: number): Helper
-	local self = setmetatable({}, Helper)
+function Helper.New(state: HelperType.HelperData, player: Player, teamId: number): Helper
+	local self = setmetatable({} :: HelperType.HelperData, Helper)
 
 	-- Start with default stats as base
 	for key, value in pairs(DEFAULTS) do
@@ -105,7 +114,7 @@ function Helper.New(state: HelperType.HelperData, player: Player, model: Model, 
 	self.Player = player
 	self.RealmId = state.RealmId
 	self.Owner = state.Owner or self.Owner or player.UserId
-	self.Model = model:Clone()
+	self.Model = state.IsPurchased and (helperModel and helperModel:Clone())
 	self.Id = state.Id
 	self.TeamId = teamId
 	self.JobCategory = state.JobCategory
@@ -162,7 +171,7 @@ function Helper.CreateStateData(player: Player, currencyType: string)
 
 	state.IsPurchased = false
 
-	state.CurrentAssignment = nil
+	state.CurrentAssignment = FFGEnum.JOB_ASSIGNMENTS.NotOwned
 
 	return state
 end
@@ -175,7 +184,17 @@ end
 -- //!SECTION
 
 -- //SECTION - Core Helper Actions
-function Helper.Upgrade(self: Helper): ()
+function Helper.Purchase(self: Helper & HelperType.HelperData): ()
+	self.IsPurchased = true
+	self.Model = self._cleaner and self._cleaner:Add(helperModel and helperModel:Clone())
+	self.CurrentAssignment = FFGEnum.JOB_ASSIGNMENTS.Unassigned
+
+	self:Save()
+
+	if self.Tier == 1 then Tutorial.Update(self.Player, self.TeamId) end
+end
+
+function Helper.Upgrade(self: Helper & HelperType.HelperData): ()
 	if not self:CanUpgrade() then return end
 
 	self.Level += 1
@@ -187,94 +206,94 @@ function Helper.Upgrade(self: Helper): ()
 	self:Save()
 end
 
-function Helper.IncreaseUpgradeStage(self: Helper, stage: number): ()
+function Helper.IncreaseUpgradeStage(self: Helper & HelperType.HelperData, stage: number): ()
 	self.UpgradeStage = stage
 end
 -- //!SECTION
 
 -- //SECTION - Calculations
-function Helper.GenerateJobCategory(self: Helper): number
+function Helper.GenerateJobCategory(self: Helper & HelperType.HelperData): number
 	return chooseJob()
 end
 
-function Helper.CalculateStats(self: Helper)
+function Helper.CalculateStats(self: Helper & HelperType.HelperData)
 	return generateStats(self.JobCategory, self.Level, self.QualityId)
 end
 
-function Helper.DefineQuality(self: Helper): number?
+function Helper.DefineQuality(self: Helper & HelperType.HelperData): number?
 	return chooseQuality()
 end
 -- //!SECTION
 
 -- //SECTION - Handling Resources
-function Helper.AddResource(self: Helper, amount: number): ()
-	local availableStorage = self.CurrentMaxStorage - self.ResourceInStorage
+function Helper.AddResource(self: Helper & HelperType.HelperData, amount: number): ()
+	local availableStorage = (self.Stats and self.Stats.Storage) - self.ResourceInStorage
 	local calcAmount = math.min(availableStorage, amount)
 
 	self.ResourceInStorage += calcAmount
 
-	if self.ResourceInStorage >= self.CurrentMaxStorage then
-		self.ResourceInStorage = self.CurrentMaxStorage
+	if self.ResourceInStorage >= self.Stats and self.Stats.Storage then
+		self.ResourceInStorage = self.Stats and self.Stats.Storage
 		self:UpdateStorageStatus(true)
 	end
 
 	self:Save()
 end
 
-function Helper.RemoveResource(self: Helper, amount: number): ()
+function Helper.RemoveResource(self: Helper & HelperType.HelperData, amount: number): ()
 	self.ResourceInStorage -= amount
 	self:UpdateStorageStatus(false)
 	self:Save()
 end
 
-function Helper.UpdateStorageStatus(self: Helper, status: boolean): ()
+function Helper.UpdateStorageStatus(self: Helper & HelperType.HelperData, status: boolean): ()
 	self.StorageFull = status
 end
 -- //!SECTION
 
 -- //SECTION - Setup
-function Helper.Initialize(self: Helper): ()
+function Helper.Initialize(self: Helper & HelperType.HelperData): ()
 	self:Show()
 	self:CanCollide()
 end
 -- //!SECTION
 
 -- //SECTION - Visibility and Collision
-function Helper.Show(self: Helper): ()
+function Helper.Show(self: Helper & HelperType.HelperData): ()
 	ClassVisualizer.Show(self.VisualRoot)
 end
 
-function Helper.Hide(self: Helper): ()
+function Helper.Hide(self: Helper & HelperType.HelperData): ()
 	ClassVisualizer.Hide(self.VisualRoot)
 end
 
-function Helper.CanCollide(self: Helper): ()
+function Helper.CanCollide(self: Helper & HelperType.HelperData): ()
 	ClassVisualizer.CanCollide(self.VisualRoot)
 end
 
-function Helper.CannotCollide(self: Helper): ()
+function Helper.CannotCollide(self: Helper & HelperType.HelperData): ()
 	ClassVisualizer.CannotCollide(self.VisualRoot)
 end
 -- //!SECTION
 
 -- //SECTION -  Helper Utilities
-function Helper.GetName(self: Helper): string
+function Helper.GetName(self: Helper & HelperType.HelperData): string
 	return NAME[self.JobCategory]
 end
 
-function Helper.CanUpgrade(self: Helper): boolean
+function Helper.CanUpgrade(self: Helper & HelperType.HelperData): boolean
 	return self.Level < self.MaxLevel
 end
 
-function Helper.IsStorageFull(self: Helper): boolean
-	local status = self.ResourceInStorage == self.CurrentMaxStorage
+function Helper.IsStorageFull(self: Helper & HelperType.HelperData): boolean
+	local status = self.ResourceInStorage == self.Stats and self.Stats.Storage
 	if self.StorageFull ~= status then self:UpdateStorageStatus(status) end
 	return status
 end
 -- //!SECTION
 
 -- //SECTION - Loading and Saving
-function Helper.Serialize(self: Helper): HelperType.HelperData
+function Helper.Serialize(self: Helper & HelperType.HelperData): HelperType.HelperData
 	return {
 		Entity = self.Entity,
 		Id = self.Id,
@@ -298,20 +317,24 @@ function Helper.Serialize(self: Helper): HelperType.HelperData
 	}
 end
 
-function Helper.Save(self: Helper): ()
-	DataService.SaveHelper(self.Player, self.Id, self:Serialize())
+function Helper.Save(self: Helper & HelperType.HelperData): ()
+	if self.IsTutorialHelper then
+		DataService.SaveTutorialHelper(self.Player, self:Serialize())
+	else
+		DataService.SaveHelper(self.Player, self:Serialize())
+	end
 end
 -- //!SECTION
 
 -- //SECTION - Event Listeners
-function Helper.AttachEventListeners(self: Helper)
+function Helper.AttachEventListeners(self: Helper & HelperType.HelperData)
 	-- //TODO -
 	-- EventListeners.Attach(self :: any)
 end
 -- //!SECTION
 
 -- //SECTION - Cleanup
-function Helper.Destroy(self: Helper)
+function Helper.Destroy(self: Helper & HelperType.HelperData)
 	self:Hide()
 	self:CannotCollide()
 

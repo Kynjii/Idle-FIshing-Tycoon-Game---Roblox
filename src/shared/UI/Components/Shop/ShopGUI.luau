@@ -1,7 +1,5 @@
 local Lighting = game:GetService("Lighting")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
-local Events = require(ReplicatedStorage.Shared.Events.Events)
 local MainUIPanel = require(ReplicatedStorage.Shared.UI.Components.Frames.MainUIPanel)
 local SingleGridLayout = require(ReplicatedStorage.Shared.UI.Components.GridLayouts.SingleGridLayout)
 local Tooltip = require(ReplicatedStorage.Shared.UI.Components.Tooltips.Tooltip)
@@ -29,8 +27,8 @@ function ShopGUI.Create(props: {
 	return shopScreenGui
 end
 
-function ShopGUI.CloseShop(screenGui)
-	screenGui.Enabled = false
+function ShopGUI.CloseShop(mainFrame)
+	mainFrame.Visible = false
 	if Lighting then
 		local blur = Lighting:FindFirstChild("Blur")
 		if blur then blur:Destroy() end

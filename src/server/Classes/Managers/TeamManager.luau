@@ -106,9 +106,11 @@ function TeamManager.AssignHelperManager(profile, player: Player, teamId: number
 	TeamManager.HelperManager[player.UserId] = TeamManager.HelperManager[player.UserId] or { OwnerId = player.UserId }
 	local currentRealm = profile.CurrentRealm or 1
 	local realmData = profile and profile.Realms[currentRealm]
-	local playerItemState = realmData.Helpers
+	local playerTutorialHelpers = profile.TutorialHelpers
+	local playerHelpers = realmData.Helpers
+	local shopState = realmData.Shops["HelperShop"]
 
-	local helperManager = HelperManager.New(playerItemState, player, teamId)
+	local helperManager = HelperManager.New({ HelpersOwned = playerHelpers, TutorialHelpers = playerTutorialHelpers }, shopState, player, teamId)
 	if not helperManager then return end
 
 	TeamManager.HelperManager[player.UserId] = helperManager

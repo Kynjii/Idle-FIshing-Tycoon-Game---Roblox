@@ -1,3 +1,4 @@
+local Lighting = game:GetService("Lighting")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterPlayer = game:GetService("StarterPlayer")
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
@@ -82,8 +83,11 @@ function MainUIPanel.Create(props: {
 
 	local baseSize = closeButton.Size
 	closeButton.Activated:Connect(function()
-		local parentScreenGUI = detailsContainer:FindFirstAncestorWhichIsA("ScreenGui")
-		if parentScreenGUI then parentScreenGUI.Enabled = false end
+		detailsContainer.Visible = false
+		if Lighting then
+			local blur = Lighting:FindFirstChild("Blur")
+			if blur then blur:Destroy() end
+		end
 	end)
 
 	closeButton.MouseEnter:Connect(function()

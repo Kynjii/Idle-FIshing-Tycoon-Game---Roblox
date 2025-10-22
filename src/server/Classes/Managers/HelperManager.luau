@@ -2,11 +2,9 @@ local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local Helper = require(ServerScriptService.Server.Classes.Helper)
-local TableUtil = require(ReplicatedStorage.Packages.TableUtil)
 local ClassVisualizer = require(ServerScriptService.Server.Classes.Modules.ClassVisualizer)
 local EventListeners = require(ServerScriptService.Server.Classes.Modules.EventListeners)
 local ProximityPrompt = require(ServerScriptService.Server.Classes.Modules.ProximityPrompt)
-local TutorialHelpers = require(ServerScriptService.Server.Game.Tutorial.TutorialHelpers)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
@@ -23,9 +21,7 @@ HelperManager.__index = HelperManager
 
 type HelperManager = typeof(setmetatable({}, HelperManager))
 
-local tutorialHelpersCatalog: { HelperType.HelperData } = TutorialHelpers
-
-function HelperManager.New(playerHelperData: { HelperType.HelperData }, player: Player, teamId: number): HelperManager
+function HelperManager.New(playerHelperData: { TutorialHelpers: { HelperType.HelperData }, HelpersOwned: { HelperType.HelperData } }, shopState: { [string]: any }, player: Player, teamId: number): HelperManager
 	local self = setmetatable({}, HelperManager)
 
 	self.Entity = FFGEnum.CLASS.ENTITY_NAME.Shop
@@ -34,22 +30,13 @@ function HelperManager.New(playerHelperData: { HelperType.HelperData }, player: 
 	self.TeamId = teamId
 	self.ShopModel = self:FindShopModel(teamId)
 	self.HelperModel = self:FindHelperModel(teamId)
-	self.tutorialHelpersCatalog = tutorialHelpersCatalog
-	self.PlayerHelperData = playerHelperData
+	self.TutorialState = playerHelperData.TutorialHelpers
+	self.HelpersOwned = playerHelperData.HelpersOwned
+	self.ShopState = shopState
 
 	self._cleaner = Trove.new()
 
-	-- //TODO - if the player has the tutorial helper do not create statedata for it
-	-- if the player has all the tutorial helpers, set tutorial state in player data
-	-- if player has completed the tutorial and all helper stages, skip this part
-	local helpers = {}
-	local index = 1
-	for _, k in pairs(self.tutorialHelpersCatalog) do
-		helpers[index] = Helper.CreateStateData(player, "Gold")
-		index += 1
-	end
-
-	print(helpers)
+	self:HandleTutorialState()
 
 	self:AttachEventListeners()
 
@@ -74,24 +61,38 @@ function HelperManager.FindHelperModel(self: HelperManager, teamId: number): Ins
 	return nil
 end
 
-function HelperManager.Purchasehelper(self: HelperManager, helperId: number): ()
-	local owned = self.PlayerHelperData[helperId]
-	if owned then return end
+function HelperManager.Purchasehelper(self: HelperManager, helper: HelperType.HelperData): ()
+	if not DataService.CanAfford(self.Player, helper.CurrencyType, helper.Stats and helper.Stats.BaseCost) then return end
 
-	local helper = TableUtil.Find(self.tutorialHelpersCatalog, function(helper)
-		return helper.id == helperId
-	end)
-	if not helper then
-		print("no helper found", self.tutorialHelpersCatalog, helperId)
-		return
+	local completedTutorial = DataService.CompletedTutorial(self.Player)
+	local helperClass = Helper.New(helper, self.Player, self.TeamId)
+	helperClass:Purchase()
+	helperClass:Save()
+
+	if completedTutorial then self.HelpersOwned[helper.Id] = helperClass end
+
+	DataService.Spend(self.Player, helperClass.CurrencyType, helperClass.Stats and helperClass.Stats.BaseCost)
+end
+
+-- //SECTION - Tutorial Handling
+function HelperManager.HandleTutorialState(self)
+	local isCompleted = DataService.CompletedTutorial(self.Player)
+	if isCompleted then return end
+
+	local numOfHelpersRemaining = 0
+	for _, tutorialHelper in pairs(self.TutorialState) do
+		if tutorialHelper.IsPurchased then return end
+		numOfHelpersRemaining += 1
+
+		if numOfHelpersRemaining == #self.TutorialState then
+			isCompleted = true
+			break
+		end
 	end
 
-	if not DataService.CanAfford(self.Player, helper.CurrencyType, helper.BaseCost) then return end
-
-	DataService.Spend(self.Player, helper.CurrencyType, helper.BaseCost)
-	self.PlayerHelperData[helperId] = helper
-	DataService.SaveHelper(self.Player, helper)
+	if isCompleted then DataService.SaveTutorialState(self.Player, 4) end
 end
+-- //!SECTION
 
 -- //SECTION - UI Setup
 function HelperManager.Initialize(self: HelperManager): ()
@@ -101,7 +102,9 @@ function HelperManager.Initialize(self: HelperManager): ()
 	-- Setup UI components
 	if self.ShopModel then self:SetupProximityPrompt(self.ShopModel) end
 
-	Events.FireEvent(Events.RemoteNames.PrepareHelperShop, self.Player, self.PlayerHelperData)
+	self.Player.CharacterAdded:Once(function()
+		Events.FireEvent(Events.RemoteNames.PrepareHelperShop, self.Player, self.TutorialState)
+	end)
 end
 
 function HelperManager.SetupProximityPrompt(self: HelperManager, model: Model): ()
@@ -145,6 +148,8 @@ function HelperManager.Destroy(self: HelperManager): ()
 		self._cleaner:Clean()
 		self._cleaner = nil
 	end
+
+	-- //TODO - Add save function to save current shop state (mainly to prevent players relogging to reroll the shop by checking the refresh status, helpers in stock etc.)
 
 	self.Player = nil :: any
 	self.ShopModel = nil :: any

@@ -115,6 +115,7 @@ FFGEnum.JOB_ASSIGNMENTS = {
 	Fisher = 3,
 	Miner = 4,
 	Woodcutter = 5,
+	NotOwned = 99,
 }
 
 FFGEnum.JOB_STATE = {
