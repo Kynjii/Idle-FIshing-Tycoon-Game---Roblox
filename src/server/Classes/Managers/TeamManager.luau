@@ -109,9 +109,9 @@ function TeamManager.AssignHelperShopManager(profile, player: Player, teamId: nu
 
 	local playerTutorialHelpers = profile.TutorialHelpers
 
-	local shopState = realmData.Shops["HelperShop"]
+	local shopState = realmData.Shops["HelperShop"] or nil
 
-	local HelperShopManager = HelperShopManager.New(playerTutorialHelpers, shopState, player, teamId)
+	local HelperShopManager = HelperShopManager.New(shopState, player, teamId, playerTutorialHelpers)
 	if not HelperShopManager then return end
 
 	TeamManager.HelperShopManager[player.UserId] = HelperShopManager

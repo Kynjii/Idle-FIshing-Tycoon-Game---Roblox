@@ -7,6 +7,7 @@ local MainUIPanel = {}
 
 function MainUIPanel.Create(props: {
 	Name: string,
+	Parent: Instance,
 })
 	local detailsContainer = Instance.new("Frame")
 	detailsContainer.Visible = true
@@ -15,6 +16,7 @@ function MainUIPanel.Create(props: {
 	detailsContainer.BackgroundTransparency = 1
 	detailsContainer.Position = UDim2.fromScale(0.5, 0.5)
 	detailsContainer.Size = UDim2.fromScale(1, 1)
+	detailsContainer.Parent = props.Parent
 
 	local main = Instance.new("Frame")
 	main.Name = "Main"
@@ -83,7 +85,8 @@ function MainUIPanel.Create(props: {
 
 	local baseSize = closeButton.Size
 	closeButton.Activated:Connect(function()
-		detailsContainer.Visible = false
+		local screenGUI = detailsContainer:FindFirstAncestorWhichIsA("ScreenGui")
+		if screenGUI then screenGUI.Enabled = false end
 		if Lighting then
 			local blur = Lighting:FindFirstChild("Blur")
 			if blur then blur:Destroy() end

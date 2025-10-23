@@ -141,7 +141,7 @@ end
 -- //!SECTION
 
 -- //SECTION - Static to generate data for shops
-function Helper.CreateStateData(player: Player, currencyType: string)
+function Helper.CreateStateData(player: Player, currencyType: string, existingState: HelperType.HelperData?)
 	local state: HelperType.HelperData = {}
 
 	-- Start with default stats as base
@@ -149,29 +149,36 @@ function Helper.CreateStateData(player: Player, currencyType: string)
 		state[key] = value
 	end
 
+	-- used for tutorial helpers that come with some pre-defined stats
+	if existingState then
+		for key, value in pairs(existingState) do
+			state[key] = value
+		end
+	end
+
 	-- Calculate derived properties
-	state.Player = player
-	state.Owner = player.UserId
-	state.Id = HttpService:GenerateGUID(false)
-	state.JobCategory = chooseJob()
-	state.Name = grabName(state.JobCategory)
-	state.CurrencyType = currencyType
+	state.Player = state.Player or player
+	state.Owner = state.Owner or player.UserId
+	state.Id = state.Id or HttpService:GenerateGUID(false)
+	state.JobCategory = state.JobCategory or chooseJob()
+	state.Name = state.Name or grabName(state.JobCategory)
+	state.CurrencyType = state.CurrencyType or currencyType
 
 	-- Define quality first
-	state.QualityId = chooseQuality()
+	state.QualityId = state.QualityId or chooseQuality()
 	state.Quality = FFGEnum.QUALITIES[state.QualityId]
 
 	-- Get correct image
-	state.ItemImage = FFGEnum.JOB_ASSETS[state.JobCategory]
+	state.ItemImage = state.ItemImage or FFGEnum.JOB_ASSETS[state.JobCategory]
 
 	-- Calculate default stats based on quality and job
-	state.Stats = generateStats(state.JobCategory, 1, state.QualityId)
-	state.BaseCost = ClassCalculators.CalculateBaseValue(DEFAULTS.BaseCost, state.QualityId, state.RealmId)
-	state.UpgradeCost = ClassCalculators.CalculateUpgradeCost(state.BaseCost, state.Level, state.QualityId, state.RealmId)
+	state.Stats = state.Stats or generateStats(state.JobCategory, 1, state.QualityId)
+	state.BaseCost = state.BaseCost or ClassCalculators.CalculateBaseValue(DEFAULTS.BaseCost, state.QualityId, state.RealmId)
+	state.UpgradeCost = state.UpgradeCost or ClassCalculators.CalculateUpgradeCost(state.BaseCost, state.Level, state.QualityId, state.RealmId)
 
-	state.IsPurchased = false
+	state.IsPurchased = state.IsPurchased or false
 
-	state.CurrentAssignment = FFGEnum.JOB_ASSIGNMENTS.NotOwned
+	state.CurrentAssignment = state.CurrentAssignment or FFGEnum.JOB_ASSIGNMENTS.NotOwned
 
 	return state
 end

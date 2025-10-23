@@ -1,7 +1,8 @@
+local ExperienceStateRecordingService = game:GetService("ExperienceStateRecordingService")
+local HttpService = game:GetService("HttpService")
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local TableUtil = require(ReplicatedStorage.Packages.TableUtil)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local Replica = require(ReplicatedStorage.Shared.ReplicaClient)
@@ -13,31 +14,30 @@ local FormatNumber = require(ReplicatedStorage.Shared.Utils.FormatNumber)
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
-local helperShopUI
-local shopDetailsUI
-local main
-local shopItemsContainer
+local helperShopUI: Instance
+local shopDetailsUI: Instance
+local main: Instance
+local shopItemsContainer: Instance
+local screenGui: ScreenGui
 
 task.spawn(function()
 	helperShopUI = ShopGUI.Create({ ShopName = "Crew Shop", ScreenGuiName = "HelperShop" })
 	helperShopUI.Parent = playerGui
 
 	shopDetailsUI = helperShopUI:WaitForChild("DetailsContainer", 10) :: Frame
-	shopDetailsUI.Visible = false
 
 	main = shopDetailsUI:WaitForChild("Main", 10) :: Frame
-	shopItemsContainer = main:WaitForChild("ShopItemsContainer", 10) :: ScrollingFrame
-end)
+	shopItemsContainer = main:WaitForChild("ItemContainer", 10) :: ScrollingFrame
 
-local playerTutorialItems = {}
-local itemElements = {}
+	screenGui = player.PlayerGui.HelperShop
+end)
 
 function handlePurchaseClick(itemId: string)
 	local shopItemPurchased = Events.GetRemote(Events.RemoteNames.ShopItemPurchased)
 	if shopItemPurchased then shopItemPurchased:FireServer(itemId) end
 end
 
-function createShopItemElement(helper: HelperType.HelperData)
+function createShopitemComponent(helper: HelperType.HelperData)
 	return ShopItem({
 		ItemImage = helper.ItemImage,
 		ItemName = helper.Name,
@@ -58,7 +58,8 @@ function createShopItemElement(helper: HelperType.HelperData)
 end
 
 local _replica = nil
-local shopData: {[string]: any} = {}
+local shopData: { [string]: any } = {}
+local itemComponents = {}
 
 function watchplayerTutorialItems()
 	Replica.OnNew("PlayerState", function(replicaData)
@@ -78,7 +79,7 @@ function handleClosingShopDetailsUI()
 		if distance >= 8 then
 			local tooltip = main:FindFirstChild("ShopTooltip", true)
 			if tooltip then tooltip:Destroy() end
-			ShopGUI.CloseShop(shopDetailsUI)
+			ShopGUI.CloseShop(screenGui)
 			break
 		end
 
@@ -87,12 +88,22 @@ function handleClosingShopDetailsUI()
 end
 
 function updateUI()
-	for _, element: Frame in pairs(itemElements) do
-		local associatedItem = TableUtil.Find(shopData, function(item)
-			return item.Id == element.Name
-		end) :: Instance
-
-		if associatedItem then associatedItem:Destroy() end
+	print(shopData.Inventory)
+	if shopItemsContainer then
+		for k, item in pairs(shopData.Inventory) do
+			if item.IsPurchased then
+				if itemComponents[item.Id] then
+					local itemComponent: Instance = itemComponents[item.Id].Component
+					itemComponents[item.Id] = nil
+					itemComponent:Destroy()
+					return
+				end
+			else
+				if itemComponents[item.Id] then return end
+				local itemComponent = createShopitemComponent(item)
+				itemComponents[item.Id] = { Component = itemComponent, Item = item }
+			end
+		end
 	end
 end
 
@@ -108,11 +119,11 @@ local shopDetails = Events.GetRemote(Events.RemoteNames.OpenHelperShop)
 if shopDetails then
 	shopDetails.OnClientEvent:Connect(function(data)
 		if data then
-			print(`Open Shop Data (used to see current items): {data}`)
-			shopDetailsUI.Visible = true
-			shopData = data
+			local decodedData = HttpService:JSONDecode(data)
+			shopData = decodedData
 			-- watchplayerTutorialItems()
 			populateDetailsUI()
+			screenGui.Enabled = true
 			task.spawn(function()
 				handleClosingShopDetailsUI()
 			end)
@@ -123,13 +134,8 @@ end
 local prepareShopEvent = Events.GetRemote(Events.RemoteNames.PrepareHelperShop)
 if prepareShopEvent then prepareShopEvent.OnClientEvent:Connect(function(data)
 	if not data then return end
-	print(`Prepare Shop (used for restocking): {data}`)
-	shopData = data
+	local decodedData = HttpService:JSONDecode(data)
+	shopData = { Inventory = decodedData }
 
-	if shopItemsContainer then
-		for i, item in ipairs(playerTutorialItems) do
-			local itemElement = createShopItemElement(item)
-			itemElements[i] = itemElement
-		end
-	end
+	updateUI()
 end) end

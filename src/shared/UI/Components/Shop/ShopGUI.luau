@@ -14,21 +14,19 @@ function ShopGUI.Create(props: {
 	shopScreenGui.Name = props.ScreenGuiName
 	shopScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	shopScreenGui.ResetOnSpawn = false
-	shopScreenGui.Enabled = true
+	shopScreenGui.Enabled = false
 
-	local mainPanel = MainUIPanel.Create({ Name = "Crew Shop" })
-	mainPanel.Parent = shopScreenGui
+	local mainPanel = MainUIPanel.Create({ Name = "Crew Shop", Parent = shopScreenGui })
 
-	local shopItemsContainer = SingleGridLayout.Create({ Name = "ShopItemContainer" })
-	shopItemsContainer.Parent = mainPanel
+	SingleGridLayout.Create({ Name = "ItemContainer", Parent = mainPanel.Main })
 
-	Tooltip.Initialize(mainPanel)
+	Tooltip.Initialize(mainPanel.Main)
 
 	return shopScreenGui
 end
 
 function ShopGUI.CloseShop(mainFrame)
-	mainFrame.Visible = false
+	mainFrame.Enabled = false
 	if Lighting then
 		local blur = Lighting:FindFirstChild("Blur")
 		if blur then blur:Destroy() end

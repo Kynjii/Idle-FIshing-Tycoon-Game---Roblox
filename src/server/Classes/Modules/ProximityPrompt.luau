@@ -1,4 +1,7 @@
+local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local TableUtil = require(ReplicatedStorage.Packages.TableUtil)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local BoatType = require(ReplicatedStorage.Shared.Types.Classes.BoatType)
@@ -33,7 +36,7 @@ function PP.CreatePP(proximityPrompt: ProximityPrompt, class: Boat | Tender | Po
 	proximityPrompt.MaxActivationDistance = typedClass.Entity ~= FFGEnum.CLASS.ENTITY_NAME.Shop and 5 or 15
 	proximityPrompt.MaxIndicatorDistance = proximityPrompt.MaxActivationDistance * 5
 	proximityPrompt.ObjectText = "Open"
-	proximityPrompt.ActionText = `{class.Entity} Details`
+	proximityPrompt.ActionText = `{class.Entity}`
 
 	if typedClass.Entity ~= FFGEnum.CLASS.ENTITY_NAME.Shop then
 		class._cleaner:Add(proximityPrompt.Triggered:Connect(function(player)
@@ -55,7 +58,7 @@ function PP.CreatePP(proximityPrompt: ProximityPrompt, class: Boat | Tender | Po
 				return
 			end
 
-			Events.FireEvent(Events.RemoteNames.OpenHelperShop, class.Player, typedClass.ShopState)
+			Events.FireEvent(Events.RemoteNames.OpenHelperShop, class.Player, HttpService:JSONEncode(typedClass:Serialize()))
 		end))
 	end
 

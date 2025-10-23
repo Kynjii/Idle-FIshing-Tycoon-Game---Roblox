@@ -2,6 +2,7 @@ local SingleGridLayout = {}
 
 function SingleGridLayout.Create(props: {
 	Name: string,
+	Parent: Instance,
 })
 	local scrollingFrame = Instance.new("ScrollingFrame")
 	scrollingFrame.Name = props.Name
@@ -15,6 +16,7 @@ function SingleGridLayout.Create(props: {
 	scrollingFrame.ScrollBarThickness = 0
 	scrollingFrame.ScrollingDirection = Enum.ScrollingDirection.Y
 	scrollingFrame.Size = UDim2.fromScale(1, 0.933988)
+	scrollingFrame.Parent = props.Parent
 
 	local uiGridLayout = Instance.new("UIGridLayout")
 	uiGridLayout.Name = "UIGridLayout"

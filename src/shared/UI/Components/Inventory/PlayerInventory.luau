@@ -16,13 +16,11 @@ function PlayerInventory.Create(props: {
 	shopScreenGui.Name = props.ScreenGuiName
 	shopScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	shopScreenGui.ResetOnSpawn = false
-	shopScreenGui.Enabled = true
+	shopScreenGui.Enabled = false
 
-	local mainPanel = MainUIPanel.Create({ Name = "Inventory" })
-	mainPanel.Parent = shopScreenGui
+	local mainPanel = MainUIPanel.Create({ Name = "Inventory", Parent = shopScreenGui })
 
-	local itemsContainer = SingleGridLayout.Create({ Name = "ItemContainer" })
-	itemsContainer.Parent = mainPanel
+	SingleGridLayout.Create({ Name = "ItemContainer", Parent = mainPanel })
 
 	Tooltip.Initialize(mainPanel)
 

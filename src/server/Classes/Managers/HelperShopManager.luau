@@ -13,6 +13,14 @@ local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
 
+local function dictCount(t)
+	local n = 0
+	for _ in pairs(t or {}) do
+		n += 1
+	end
+	return n
+end
+
 -- //SECTION - Tagged Entities within Workspace
 local taggedShops = CollectionService:GetTagged("HelperShop")
 -- //!SECTION
@@ -20,15 +28,17 @@ local taggedShops = CollectionService:GetTagged("HelperShop")
 local HelperShopManager = {}
 HelperShopManager.__index = HelperShopManager
 
-type HelperShopManager = typeof(setmetatable({} , HelperShopManager))
+type HelperShopManager = typeof(setmetatable({}, HelperShopManager))
 
 local REFRESH_INTERVAL: number = 60 * 15
 
 local INVENTORY_AMOUNT: number = 6
 
-type ShopState = {}
+type ShopState = {
+	Inventory: { [string]: HelperType.HelperData },
+}
 
-function HelperShopManager.New(TutorialHelpers: { HelperType.HelperData }, shopState: { [string]: any }, player: Player, teamId: number): HelperShopManager
+function HelperShopManager.New(shopState: ShopState, player: Player, teamId: number, TutorialHelpers: { HelperType.HelperData }?): HelperShopManager
 	local self = setmetatable({} :: HelperShopManager, HelperShopManager)
 
 	self.Entity = FFGEnum.CLASS.ENTITY_NAME.Shop
@@ -42,14 +52,14 @@ function HelperShopManager.New(TutorialHelpers: { HelperType.HelperData }, shopS
 	self.CurrentPeriod = math.floor(os.time() / REFRESH_INTERVAL)
 	self.PeriodEnd = (self.CurrentPeriod + 1) * REFRESH_INTERVAL
 	self.TimeRemaining = self.PeriodEnd - os.time()
-	self.ShopState = shopState
+	self.Inventory = shopState and shopState.Inventory or {}
+	self.CompletedTutorial = shopState and shopState.CompletedTutorial or self:HandleTutorialState()
+
+	if dictCount(self.Inventory) == 0 then self:RestockShop() end
 
 	self._cleaner = Trove.new()
 
-	self.RefreshInterval = nil
 	self:StartRefreshMonitor()
-
-	self.CompletedTutorial = shopState and shopState.CompletedTutorial or self:HandleTutorialState()
 
 	self:AttachEventListeners()
 
@@ -105,14 +115,25 @@ function HelperShopManager.StartRefreshMonitor(self: HelperShopManager)
 end
 
 function HelperShopManager.RestockShop(self: HelperShopManager)
-	self.ShopState = nil
+	print("restocking now")
+	self.Inventory = {}
 
-	for i = 1, INVENTORY_AMOUNT do 
-		local helper = Helper.CreateStateData(self.Player, "Gold")
-		self.ShopState[helper.Id] = helper
+	local preparedData = {}
+
+	if not self.CompletedTutorial then
+		for i, tutHelper in pairs(self.TutorialState) do
+			local helper = Helper.CreateStateData(self.Player, "Gold", tutHelper)
+			preparedData[helper.Id] = helper
+		end
+	else
+		for i = 1, INVENTORY_AMOUNT do
+			local helper = Helper.CreateStateData(self.Player, "Gold")
+			preparedData[helper.Id] = helper
+		end
 	end
 
-	Events.FireEvent(Events.RemoteNames.PrepareHelperShop, self.Player, self.ShopState)
+	self.Inventory = preparedData
+	Events.FireEvent(Events.RemoteNames.PrepareHelperShop, self.Player, HttpService:JSONEncode(preparedData))
 end
 
 -- //SECTION - Tutorial Handling
@@ -122,10 +143,10 @@ function HelperShopManager.HandleTutorialState(self): boolean
 
 	local numOfHelpersRemaining: number = 0
 	for _, tutorialHelper in pairs(self.TutorialState) do
-		if tutorialHelper.IsPurchased then continue end
+		if tutorialHelper.IsPurchased then return end
 		numOfHelpersRemaining += 1
 
-		if numOfHelpersRemaining == #self.TutorialState then
+		if numOfHelpersRemaining == 0 then
 			isCompleted = true
 			break
 		end
@@ -147,16 +168,6 @@ function HelperShopManager.Initialize(self: HelperShopManager): ()
 
 	-- Setup UI components
 	if self.ShopModel then self:SetupProximityPrompt(self.ShopModel) end
-
-	self.Player.CharacterAdded:Once(function()
-		if not self.CompletedTutorial then
-			print(`sending tutorialstate: {self.TutorialState}`)
-			Events.FireEvent(Events.RemoteNames.PrepareHelperShop, self.Player, self.TutorialState)
-		else
-			print(`sending shopstate: {self.ShopState}`)
-			Events.FireEvent(Events.RemoteNames.PrepareHelperShop, self.Player, self.ShopState)
-		end
-	end)
 end
 
 function HelperShopManager.SetupProximityPrompt(self: HelperShopManager, model: Model): ()
@@ -198,7 +209,7 @@ function HelperShopManager.Serialize(self: HelperShopManager): { [string]: any }
 		Id = self.Id,
 		Owner = self.Owner,
 		TutorialState = self.TutorialState,
-		ShopState = self.ShopState,
+		Inventory = self.Inventory,
 		CompletedTutorial = self.CompletedTutorial,
 	}
 end
