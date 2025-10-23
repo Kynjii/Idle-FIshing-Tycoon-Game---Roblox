@@ -15,6 +15,7 @@ function Tooltip.Create(props: {
 	ItemCost: string,
 	ItemName: string,
 	ItemDescription: string,
+	ItemStats: { [number]: { [string]: any } }?,
 	Parent: Instance?,
 })
 	-- //SECTION - Shop Tooltip Container
@@ -48,6 +49,7 @@ function Tooltip.Create(props: {
 
 	-- //SECTION - Frame Header
 	local frameHeader = Instance.new("ImageLabel")
+	frameHeader.Name = "BG"
 	frameHeader.Image = FFGEnum.THEME.shop.shopTooltip.frameTriangle
 	frameHeader.Size = UDim2.fromScale(0.9, 0.1)
 	frameHeader.AnchorPoint = FFGEnum.THEME.alignment.anchor.top
@@ -58,6 +60,7 @@ function Tooltip.Create(props: {
 
 	-- //SECTION -  Item Name
 	local itemLabel = Instance.new("TextLabel")
+	itemLabel.Name = "ItemName"
 	itemLabel.BackgroundTransparency = 1
 	itemLabel.Size = UDim2.fromScale(0.85, 0.80)
 	itemLabel.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
@@ -73,6 +76,7 @@ function Tooltip.Create(props: {
 
 	-- //SECTION Holds all the main elements
 	local mainContainer = Instance.new("Frame")
+	mainContainer.Name = "Main"
 	mainContainer.Size = UDim2.fromScale(0.9, 0.9)
 	mainContainer.Position = FFGEnum.THEME.alignment.position.center
 	mainContainer.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
@@ -82,6 +86,7 @@ function Tooltip.Create(props: {
 
 	-- //SECTION - Item Info Container
 	local itemInfoContainer = Instance.new("Frame")
+	itemInfoContainer.Name = "ItemInfoContainer"
 	itemInfoContainer.Size = UDim2.fromScale(1, 0.4)
 	itemInfoContainer.Position = UDim2.fromScale(0.5, 0.05)
 	itemInfoContainer.AnchorPoint = FFGEnum.THEME.alignment.anchor.top
@@ -90,8 +95,9 @@ function Tooltip.Create(props: {
 
 	-- //SECTION -  Item Image
 	local itemImageContainer = Instance.new("Frame")
+	itemImageContainer.Name = "ItemImageContainer"
 	itemImageContainer.BackgroundColor3 = FFGEnum.THEME.shop.shopItem.outline
-	itemImageContainer.Size = UDim2.fromScale(0.3, 0.3)
+	itemImageContainer.Size = UDim2.fromScale(0.5, 0.5)
 	itemImageContainer.Parent = itemInfoContainer
 
 	local imageLabel = Instance.new("ImageLabel")
@@ -127,7 +133,7 @@ function Tooltip.Create(props: {
 
 	-- //SECTION - Item Description
 	local descriptionLabel = Instance.new("TextLabel")
-	descriptionLabel.Text = props.ItemDescription
+	descriptionLabel.Text = props.ItemDescription or ""
 	descriptionLabel.TextColor3 = FFGEnum.THEME.color.teal_900
 	descriptionLabel.TextWrapped = true
 	descriptionLabel.TextScaled = true
@@ -135,6 +141,23 @@ function Tooltip.Create(props: {
 	descriptionLabel.BackgroundTransparency = 1
 	descriptionLabel.Size = UDim2.fromScale(0.9, 0.35)
 	descriptionLabel.Parent = itemInfoContainer
+	-- //!SECTION
+
+	-- //SECTION - Item Stats
+	if props.ItemStats then
+		for i, stat in ipairs(props.ItemStats) do
+			local statElement = Instance.new("TextLabel")
+			statElement.Name = `{stat.Label}_label`
+			statElement.Text = `{stat.Label}: {stat.Value}`
+			statElement.TextColor3 = FFGEnum.THEME.color.teal_900
+			statElement.TextWrapped = true
+			statElement.TextScaled = true
+			statElement.Font = FFGEnum.THEME.font
+			statElement.BackgroundTransparency = 1
+			statElement.Size = UDim2.fromScale(0.9, 0.35)
+			statElement.Parent = itemInfoContainer
+		end
+	end
 	-- //!SECTION
 
 	-- //SECTION - Buy Button
@@ -195,6 +218,7 @@ function Tooltip.Initialize(parentInstance: Instance)
 		ItemCost = "",
 		ItemDescription = "",
 		ItemName = "",
+		ItemStats = {},
 		Parent = parentInstance,
 		Size = UDim2.fromScale(0.3, 1),
 		Rounded = FFGEnum.THEME.button.cornerRadius,
@@ -208,6 +232,7 @@ function Tooltip.Initialize(parentInstance: Instance)
 		Name: string,
 		Id: string,
 		Description: string,
+		Stats: { [number]: string }?,
 	}
 
 	local bindableEvent = Events.GetBindableEvent(Events.BindableNames.ShowShopTooltip)
@@ -223,6 +248,7 @@ function Tooltip.Initialize(parentInstance: Instance)
 			ItemDescription = data.Description,
 			ItemName = data.Name,
 			ItemImage = data.Image,
+			ItemStats = data.Stats,
 			Size = UDim2.fromScale(0.3, 1),
 			Rounded = FFGEnum.THEME.button.cornerRadius,
 			Visible = true,

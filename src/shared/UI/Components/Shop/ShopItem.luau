@@ -15,10 +15,11 @@ local function ShopItem(
 		Visible: boolean?,
 		HoverEffect: boolean?,
 		ItemImage: string,
-		ItemPrice: string,
 		ItemName: string,
 		ItemId: string,
 		ItemDescription: string,
+		ItemPrice: string,
+		ItemStats: { [number]: { [string]: any } }?,
 		Parent: Instance,
 		ShopInstance: Instance,
 	}
@@ -134,10 +135,10 @@ local function ShopItem(
 				Name = props.ItemName,
 				Id = props.ItemId,
 				Description = props.ItemDescription,
+				Stats = props.ItemStats,
 			}
 
-			local fired = Events.FireBindableEvent(Events.BindableNames.ShowShopTooltip, itemData)
-			if not fired then print("did not fire") end
+			Events.FireBindableEvent(Events.BindableNames.ShowShopTooltip, itemData)
 		end
 	end)
 

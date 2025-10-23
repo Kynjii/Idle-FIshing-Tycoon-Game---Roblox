@@ -115,7 +115,6 @@ function HelperShopManager.StartRefreshMonitor(self: HelperShopManager)
 end
 
 function HelperShopManager.RestockShop(self: HelperShopManager)
-	print("restocking now")
 	self.Inventory = {}
 
 	local preparedData = {}

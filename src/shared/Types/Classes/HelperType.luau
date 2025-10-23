@@ -28,6 +28,7 @@ export type HelperData = {
 	_cleaner: any?,
 	IsTutorialHelper: boolean?,
 	Player: Player,
+	Description: string,
 }
 
 export type HelperInstance = {

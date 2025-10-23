@@ -13,11 +13,13 @@ local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
 
 -- //SECTION - Helper Data
-local NAME = {
-	Fishing = "Fisher", -- [Job]: Name
-	Woodcutting = "Woodcutter",
-	Mining = "Miner",
-	Transport = "Hauler",
+local NAME = FFGEnum.JOB_NAMES
+
+local DESCRIPTION = {
+	Fishing = "A crew member specialized in Fishing and transporting Fish.",
+	Woodcutting = "A crew member specialized in Woodcutting and transporting Wood.",
+	Mining = "A crew member specialized in Mining and transporting Ore.",
+	Transporting = "A crew member specialized in Transporting Fish from the Port to the Market.",
 }
 
 local helperFolder: Instance = game.Workspace:WaitForChild("Helpers")
@@ -120,6 +122,7 @@ function Helper.New(state: HelperType.HelperData, player: Player, teamId: number
 	self.JobCategory = state.JobCategory
 	self.ItemImage = state.ItemImage
 	self.Name = self:GetName()
+	self.Description = state.Description or DESCRIPTION[self.JobCategory]
 
 	-- Define quality first
 	self.QualityId = state.QualityId
@@ -163,6 +166,9 @@ function Helper.CreateStateData(player: Player, currencyType: string, existingSt
 	state.JobCategory = state.JobCategory or chooseJob()
 	state.Name = state.Name or grabName(state.JobCategory)
 	state.CurrencyType = state.CurrencyType or currencyType
+	state.Description = state.Description or DESCRIPTION[state.JobCategory]
+
+	print(state.Description, DESCRIPTION, DESCRIPTION[state.JobCategory], state.JobCategory)
 
 	-- Define quality first
 	state.QualityId = state.QualityId or chooseQuality()
@@ -173,6 +179,7 @@ function Helper.CreateStateData(player: Player, currencyType: string, existingSt
 
 	-- Calculate default stats based on quality and job
 	state.Stats = state.Stats or generateStats(state.JobCategory, 1, state.QualityId)
+	print(state.Stats)
 	state.BaseCost = state.BaseCost or ClassCalculators.CalculateBaseValue(DEFAULTS.BaseCost, state.QualityId, state.RealmId)
 	state.UpgradeCost = state.UpgradeCost or ClassCalculators.CalculateUpgradeCost(state.BaseCost, state.Level, state.QualityId, state.RealmId)
 
@@ -321,6 +328,7 @@ function Helper.Serialize(self: Helper): { [string]: any }
 		IsPurchased = self.IsPurchased,
 		BaseCost = self.BaseCost,
 		UpgradeCost = self.UpgradeCost,
+		Description = self.Description,
 	}
 end
 

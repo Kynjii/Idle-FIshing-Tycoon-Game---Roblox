@@ -103,10 +103,10 @@ FFGEnum.JOB_CATEGORY = {
 }
 
 FFGEnum.JOB_NAMES = {
-	Fisher = "Fisher",
-	Woodcutter = "Woodcutter",
-	Miner = "Miner",
-	Transporter = "Hauler",
+	Fishing = "Fisher",
+	Woodcutting = "Woodcutter",
+	Mining = "Miner",
+	Transporting = "Transporter",
 }
 
 FFGEnum.JOB_ASSIGNMENTS = {
@@ -129,7 +129,7 @@ FFGEnum.JOB_ASSETS = {
 	Fishing = "rbxassetid://119061574257660",
 	Woodcutting = "rbxassetid://76234482123867",
 	Mining = "rbxassetid://111187697712320",
-	Transport = "rbxassetid://135331905621652",
+	Transporting = "rbxassetid://135331905621652",
 }
 
 FFGEnum.CURRENCY_TYPES = {

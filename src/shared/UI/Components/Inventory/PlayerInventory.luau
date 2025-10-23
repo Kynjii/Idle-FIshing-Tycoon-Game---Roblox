@@ -20,9 +20,9 @@ function PlayerInventory.Create(props: {
 
 	local mainPanel = MainUIPanel.Create({ Name = "Inventory", Parent = shopScreenGui })
 
-	SingleGridLayout.Create({ Name = "ItemContainer", Parent = mainPanel })
+	SingleGridLayout.Create({ Name = "ItemContainer", Parent = mainPanel.Main })
 
-	Tooltip.Initialize(mainPanel)
+	Tooltip.Initialize(mainPanel.Main)
 
 	return shopScreenGui
 end
