@@ -58,7 +58,8 @@ function PP.CreatePP(proximityPrompt: ProximityPrompt, class: Boat | Tender | Po
 				return
 			end
 
-			Events.FireEvent(Events.RemoteNames.OpenHelperShop, class.Player, HttpService:JSONEncode(typedClass:Serialize()))
+			local shopInventory = typedClass.Inventory or {}
+			Events.FireEvent(Events.RemoteNames.OpenHelperShop, class.Player, HttpService:JSONEncode(shopInventory))
 		end))
 	end
 

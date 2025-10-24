@@ -84,7 +84,7 @@ end
 
 function updateUI()
 	if shopItemsContainer then
-		for k, item in pairs(shopData.Inventory) do
+		for k, item in pairs(shopData) do
 			if item.IsPurchased then
 				if itemComponents[item.Id] then
 					local itemComponent: Instance = itemComponents[item.Id].Component
@@ -127,8 +127,7 @@ local prepareShopEvent = Events.GetRemote(Events.RemoteNames.PrepareHelperShop)
 if prepareShopEvent then prepareShopEvent.OnClientEvent:Connect(function(data)
 	if not data then return end
 	local decodedData = HttpService:JSONDecode(data)
-	shopData = { Inventory = decodedData }
-
+	shopData = decodedData
 	updateUI()
 end) end
 

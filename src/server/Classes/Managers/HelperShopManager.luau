@@ -124,10 +124,7 @@ function HelperShopManager.StartRefreshMonitor(self: HelperShopManager)
 		self:SetTimeRemaining()
 		self:UpdateRefreshBillboard()
 
-		if self.TimeRemaining <= 0 then
-			if not self.CompletedTutorial then return end
-			self:RestockShop()
-		end
+		if self.TimeRemaining <= 1 then self:RestockShop() end
 	end, 1))
 end
 
@@ -161,6 +158,7 @@ function HelperShopManager.CreateRefreshBillboard(self: HelperShopManager)
 	countdownTimer.TextColor3 = FFGEnum.THEME.color.white
 	countdownTimer.TextScaled = true
 	countdownTimer.BackgroundTransparency = 1
+
 	local timerText = SecToMins.GetString(self.TimeRemaining)
 	countdownTimer.Text = timerText or ""
 	countdownTimer.Parent = billboard

@@ -19,7 +19,6 @@ local inventoryItemsContainer: Instance
 local screenGui: ScreenGui
 
 local hudInventoryButton = playerGui:WaitForChild("Inventory"):FindFirstChild("InventoryButton", true) :: ImageButton
-print(hudInventoryButton)
 
 task.spawn(function()
 	inventoryUI = PlayerInventory.Create({ Name = "Inventory", ScreenGuiName = "PlayerInventory" })

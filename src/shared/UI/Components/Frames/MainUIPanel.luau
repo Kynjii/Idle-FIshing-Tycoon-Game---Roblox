@@ -91,6 +91,9 @@ function MainUIPanel.Create(props: {
 			local blur = Lighting:FindFirstChild("Blur")
 			if blur then blur:Destroy() end
 		end
+
+		local tooltip = detailsContainer:FindFirstChild("ShopTooltip", true)
+		if tooltip then tooltip:Destroy() end
 	end)
 
 	closeButton.MouseEnter:Connect(function()

@@ -31,6 +31,9 @@ function ShopGUI.CloseShop(mainFrame)
 		local blur = Lighting:FindFirstChild("Blur")
 		if blur then blur:Destroy() end
 	end
+
+	local tooltip = mainFrame:FindFirstChild("ShopTooltip", true)
+	if tooltip then tooltip:Destroy() end
 end
 
 return ShopGUI
