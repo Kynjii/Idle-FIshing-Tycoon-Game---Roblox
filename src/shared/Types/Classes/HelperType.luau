@@ -26,7 +26,6 @@ export type HelperData = {
 	UpgradeCost: number?,
 	Model: Model?,
 	_cleaner: any?,
-	IsTutorialHelper: boolean?,
 	Player: Player,
 	Description: string,
 }
@@ -52,7 +51,6 @@ export type HelperInstance = {
 	UpgradeCost: number?,
 	Model: Model?,
 	_cleaner: any?,
-	IsTutorialHelper: boolean?,
 }
 
 export type HelperModule = {
