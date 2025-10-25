@@ -1,4 +1,3 @@
-local HttpService = game:GetService("HttpService")
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -85,6 +84,15 @@ end
 
 local getInventoryFn = Events.GetRemoteFn(Events.RemoteFunctionNames.GetInventory)
 if hudInventoryButton and getInventoryFn then hudInventoryButton.Activated:Connect(function()
+	if screenGui.Enabled then
+		screenGui.Enabled = false
+		if Lighting then
+			local blur = Lighting:FindFirstChild("Blur")
+			if blur then blur:Destroy() end
+		end
+		return
+	end
+
 	local data = getInventoryFn:InvokeServer()
 	if data then
 		playerInventory = data
