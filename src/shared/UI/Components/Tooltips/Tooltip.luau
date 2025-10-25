@@ -387,8 +387,6 @@ function Tooltip.Initialize()
 			Parent = data.Parent,
 		})
 	end) end
-
-	print(Tooltip.Existing)
 	-- //!SECTION
 end
 
