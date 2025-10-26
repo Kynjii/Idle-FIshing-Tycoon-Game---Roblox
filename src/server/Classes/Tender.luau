@@ -367,7 +367,7 @@ end
 function Tender.ShowFishPopUp(self: Tender, amount: number)
 	if not self.Model then return end
 
-	local billboard = self.Model:FindFirstChild("BoatPopupTemplate", true) :: BillboardGui
+	local billboard: BillboardGui = game.Workspace:FindFirstChild("BillBoards"):FindFirstChild("FishPopupTemplate")
 	if billboard and self.Model.PrimaryPart then
 		local billboardFolder = self.Model.PrimaryPart:FindFirstChild("Billboard")
 		if billboardFolder then
@@ -375,7 +375,7 @@ function Tender.ShowFishPopUp(self: Tender, amount: number)
 			clone.Parent = billboardFolder
 			clone.Adornee = self.Model.PrimaryPart
 			clone.Name = "Popup_Clone"
-			PopUp.Animate(clone, amount, clone.Boat)
+			PopUp.Animate(clone, amount, clone.Fish)
 		end
 	end
 end
