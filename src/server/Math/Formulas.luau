@@ -114,9 +114,9 @@ local FORMULAS = {
 	end,
 
 	-- Entity baselines
-	BOAT = { BaseCost = 100, BaseStorage = 100, BaseFPS = 5 },
-	TENDER = { BaseCost = 100, BaseStorage = 95 },
-	STORAGE = { BaseCost = 200, BaseStorage = 190 },
+	BOAT = { BaseCost = 100, BaseStorage = 50, BaseFPS = 5 },
+	TENDER = { BaseCost = 100, BaseStorage = 45 },
+	STORAGE = { BaseCost = 200, BaseStorage = 45 },
 	BUILDING = { BaseCost = 1500 },
 	HELPER = { BaseCost = 1000 },
 
@@ -153,11 +153,11 @@ FORMULAS.TIME_MIN_FRACTION = 0.05 -- never below 5% of base
 -- Quality (rarity) multiplier after Level & Stage
 FORMULAS.QUALITY_MULT = {
 	[1] = 1.00, -- Common
-	[2] = 1.15, -- Uncommon
-	[3] = 1.35, -- Rare
-	[4] = 1.60, -- Epic
-	[5] = 1.90, -- Legendary
-	[6] = 2.30, -- Mythic
+	[2] = 1.32, -- Uncommon
+	[3] = 1.74, -- Rare
+	[4] = 2.30, -- Epic
+	[5] = 3.03, -- Legendary
+	[6] = 4.00, -- Mythic
 }
 
 -- Base stats (defaults exist for all; per-jobCategory are exclusive)
@@ -167,10 +167,10 @@ FORMULAS.HELPER_BASE = {
 		Storage = 50, -- “up”
 	},
 	PerJobCategory = {
-		Fishing = { CatchRate = 5, Luck = 0, CastTime = 6 }, -- CastTime “timeDown”
-		Woodcutting = { ChopRate = 5, Sturdiness = 0, SwingTime = 5 },
-		Mining = { OreYield = 4, Prospecting = 0, SwingTime = 6 },
-		Transport = { Throughput = 8, RouteSkill = 0, TravelTime = 12 },
+		Fishing = { CatchRate = 5, Luck = 0.02, CastTime = 6 }, -- CastTime “timeDown”
+		Woodcutting = { WoodYield = 5, CritChance = 0.02, SwingRate = 6 },
+		Mining = { OreYield = 5, CritChance = 0.02, SwingRate = 6 },
+		Transporting = { FishStorage = 50, FishValue = 12, LoadTime = 15 },
 	},
 }
 
@@ -178,13 +178,13 @@ FORMULAS.HELPER_BASE = {
 FORMULAS.HELPER_PER_LEVEL_ADD = {
 	Defaults = {
 		WalkSpeed = 0.35,
-		Storage = 3.00,
+		Storage = 30,
 	},
 	PerJobCategory = {
-		Fishing = { CatchRate = 0.30, Luck = 0.15, CastTime = 0.00 },
-		Woodcutting = { ChopRate = 0.30, Sturdiness = 0.15, SwingTime = 0.00 },
-		Mining = { OreYield = 0.28, Prospecting = 0.15, SwingTime = 0.00 },
-		Transport = { Throughput = 0.40, RouteSkill = 0.15, TravelTime = 0.00 },
+		Fishing = { CatchRate = 0.30, Luck = 0.15, CastTime = 0.01 },
+		Woodcutting = { WoodYield = 0.30, CritChance = 0.15, SwingRate = 0.01 },
+		Mining = { OreYield = 0.30, CritChance = 0.15, SwingRate = 0.01 },
+		Transporting = { FishStorage = 0.50, FishValue = 0.15, LoadTime = 0.01 },
 	},
 }
 
@@ -198,16 +198,15 @@ FORMULAS.HELPER_STAT_TYPES = {
 	Luck = "up",
 	CastTime = "timeDown",
 	-- Woodcutting
-	ChopRate = "up",
-	Sturdiness = "up",
-	SwingTime = "timeDown",
+	WoodYield = "up",
+	CritChance = "up",
+	SwingRate = "timeDown",
 	-- Mining
 	OreYield = "up",
-	Prospecting = "up", -- SwingTime already defined
 	-- Transport
-	Throughput = "up",
-	RouteSkill = "up",
-	TravelTime = "timeDown",
+	FishStorage = "up",
+	FishValue = "up",
+	LoadTime = "timeDown",
 }
 
 -- =========================
@@ -241,9 +240,9 @@ FORMULAS.PERK_VALUE_RANGES = {
 	SwiftHands = { min = 0.06, max = 0.12 }, -- -% time stats
 
 	SeasonedAngler = { min = 0.10, max = 0.18 }, -- +% CatchRate (+flat Luck side bonus)
-	TrueGrit = { min = 0.10, max = 0.18 }, -- +% ChopRate (+flat Sturdiness)
+	TrueGrit = { min = 0.10, max = 0.18 }, -- +% WoodYield (+flat Sturdiness)
 	StoneSense = { min = 0.10, max = 0.18 }, -- +% OreYield (+flat Prospecting)
-	RoadCraft = { min = 0.10, max = 0.18 }, -- +% Throughput (+flat RouteSkill)
+	FishMonger = { min = 0.10, max = 0.18 }, -- +% FishValue (+flat RouteSkill)
 }
 
 -- Small flat “side bonuses” paired with some perks
@@ -251,7 +250,7 @@ FORMULAS.PERK_FLAT_SIDE_BONUS = {
 	SeasonedAngler = 3, -- +Luck
 	TrueGrit = 3, -- +Sturdiness
 	StoneSense = 3, -- +Prospecting
-	RoadCraft = 3, -- +RouteSkill
+	FishMonger = 3, -- +RouteSkill
 }
 
 -- Optional weighted selection for perks (higher = more likely). Omit for uniform.
@@ -262,7 +261,7 @@ FORMULAS.PERK_SELECTION_WEIGHTS = {
 	-- SeasonedAngler = 1.2,
 	-- TrueGrit = 1.2,
 	-- StoneSense = 1.2,
-	-- RoadCraft = 1.2,
+	-- FishMonger = 1.2,
 }
 
 return FORMULAS

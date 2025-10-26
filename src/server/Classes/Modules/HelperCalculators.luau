@@ -7,6 +7,11 @@ local HelperCalculator = {}
 
 export type StatsTable = { [string]: number }
 
+local function addDeviance(value, range)
+	local randomFactor = 1 + (math.random() - 0.5) * 2 * range
+	return value * randomFactor
+end
+
 local function clampLevel(level: number): number
 	level = tonumber(level) or 1
 	return math.clamp(level, 1, Formulas.MAX_LEVEL or 100)
@@ -78,7 +83,7 @@ local PERKS_DEF: { PerkDef } = {
 			-- value is a fraction: 0.10 => 10% faster (lower time)
 			local factor = math.max(0.05, 1 - value) -- never reduce more than 95% in one go
 			if stats.CastTime then stats.CastTime = math.max(1, math.floor(stats.CastTime * factor + 0.5)) end
-			if stats.SwingTime then stats.SwingTime = math.max(1, math.floor(stats.SwingTime * factor + 0.5)) end
+			if stats.SwingRate then stats.SwingRate = math.max(1, math.floor(stats.SwingRate * factor + 0.5)) end
 			if stats.TravelTime then stats.TravelTime = math.max(1, math.floor(stats.TravelTime * factor + 0.5)) end
 		end,
 	},
@@ -323,10 +328,10 @@ function HelperCalculator.CalculateStats(jobCategory: string, level: number, qua
 	local typeMap = Formulas.HELPER_STAT_TYPES
 
 	local defaults = (baseDefs and baseDefs.Defaults) or {}
-	local catBase = (baseDefs and baseDefs.PerjobCategory and baseDefs.PerjobCategory[jobCategory]) or {}
+	local helperBase = (baseDefs and baseDefs.PerJobCategory and baseDefs.PerJobCategory[jobCategory]) or {}
 
 	local defaultsAdd = (addDefs and addDefs.Defaults) or {}
-	local catAdd = (addDefs and addDefs.PerjobCategory and addDefs.PerjobCategory[jobCategory]) or {}
+	local helperAdd = (addDefs and addDefs.PerJobCategory and addDefs.PerJobCategory[jobCategory]) or {}
 
 	local stats: StatsTable = {}
 
@@ -338,6 +343,7 @@ function HelperCalculator.CalculateStats(jobCategory: string, level: number, qua
 
 		if statType == "up" then
 			local v = leveled * stageMult * qualityMult
+			v = addDeviance(v, 0.02)
 			stats[key] = math.floor(v + 0.5)
 		else -- "timeDown"
 			local stageReduction = getStageTimeReductionFraction(stgIndex)
@@ -349,13 +355,14 @@ function HelperCalculator.CalculateStats(jobCategory: string, level: number, qua
 	end
 
 	-- jobCategory-only
-	for key, baseValue in pairs(catBase) do
-		local perLevel = (catAdd and catAdd[key]) or 0
+	for key, baseValue in pairs(helperBase) do
+		local perLevel = (helperAdd and helperAdd[key]) or 0
 		local statType = typeMap[key] or "up"
 		local leveled = baseValue + perLevel * (lvl - 1)
 
 		if statType == "up" then
 			local v = leveled * stageMult * qualityMult
+			v = addDeviance(v, 0.02)
 			stats[key] = math.floor(v + 0.5)
 		else -- "timeDown"
 			local stageReduction = getStageTimeReductionFraction(stgIndex)
@@ -364,6 +371,12 @@ function HelperCalculator.CalculateStats(jobCategory: string, level: number, qua
 			local reduced = math.max(leveled * minFrac, leveled * combined)
 			stats[key] = math.floor(reduced + 0.5)
 		end
+	end
+
+	-- Merge FishStorage into Storage for Transporting jobs
+	if jobCategory == "Transporting" then
+		stats.Storage = math.floor((stats.Storage or 0) + (stats.FishStorage or 0) + 0.5)
+		stats.FishStorage = nil
 	end
 
 	-- No perks here; second return is the “applied” list for compatibility with old callers.

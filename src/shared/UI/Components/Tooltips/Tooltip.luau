@@ -248,12 +248,27 @@ function Tooltip.Create(props: {
 	statsContainerUIPadding.PaddingTop = UDim.new(0.05, 0)
 	statsContainerUIPadding.Parent = statsContainer
 
+	local statOrder = {
+		Storage = 1,
+		WalkSpeed = 2,
+		CatchRate = 3,
+		CritChance = 3,
+		Luck = 4,
+		SwingRate = 4,
+		WoodYield = 5,
+		OreYield = 5,
+		FishValue = 5,
+		LoadTime = 6,
+		CastTime = 6,
+	}
+
 	if props.ItemStats then
 		for i, stat in ipairs(props.ItemStats) do
 			local statFrameContainer = Instance.new("Frame")
 			statFrameContainer.Name = `{stat.Label}Container`
 			statFrameContainer.BackgroundTransparency = 1
 			statFrameContainer.Size = UDim2.fromScale(1, 0.2)
+			statFrameContainer.LayoutOrder = statOrder[stat.Label] or 0
 			statFrameContainer.Parent = statsContainer
 
 			local statFrameContainerUIList = Instance.new("UIListLayout")
