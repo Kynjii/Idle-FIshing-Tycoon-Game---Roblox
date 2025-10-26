@@ -220,16 +220,14 @@ end
 
 -- //SECTION - Handling Fish
 function Boat.StartFishing(self: Boat): ()
-	if self._cleaner then
-		self._cleaner:Add(SetInterval(function()
-			if not self:IsStorageFull() then
-				self:AddFish(self.CurrentFPS)
-				self:UpdatePurchaseBoardUI()
-			else
-				self:UpdateStorageStatus(true)
-			end
-		end, 1))
-	end
+	if self._cleaner then self._cleaner:Add(SetInterval(function()
+		if not self:IsStorageFull() then
+			self:AddFish(self.CurrentFPS)
+			self:UpdatePurchaseBoardUI()
+		else
+			self:UpdateStorageStatus(true)
+		end
+	end, 1)) end
 end
 
 function Boat.AddFish(self: Boat, amount: number): ()
@@ -308,7 +306,7 @@ function Boat.SetupProximityPrompt(self: Boat, purchaseBoard: Model): ()
 end
 
 function Boat.ShowFishPopUp(self: Boat, amount: number): ()
-	local billboard: BillboardGui? = self.Model:FindFirstChild("FishPopupTemplate", true)
+	local billboard: BillboardGui = game.Workspace:FindFirstChild("BillBoards"):FindFirstChild("FishPopupTemplate")
 	if not billboard then return end
 
 	local primaryPart: BasePart? = self.Model.PrimaryPart
@@ -419,7 +417,7 @@ function Boat.GetVisualModels(self: Boat): { [number]: Model }
 	local modelsFolder = DeepWait(game.Workspace, "Boats", "VisualStages")
 	local models = modelsFolder:GetChildren()
 
-	local sortedModels: {Model} = {}
+	local sortedModels: { Model } = {}
 	for k, v in pairs(models) do
 		sortedModels[tonumber(v.Name)] = v
 	end

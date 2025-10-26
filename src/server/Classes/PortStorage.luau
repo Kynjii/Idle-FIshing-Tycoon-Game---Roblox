@@ -15,6 +15,7 @@ local Formulas = require(ServerScriptService.Server.Math.Formulas)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local DeepWait = require(ReplicatedStorage.Shared.Utils.DeepWait)
 local FadeEffect = require(ServerScriptService.Server.Modules.Tweens.FadeEffect)
+local PopUp = require(ServerScriptService.Server.Modules.Tweens.PopUp)
 local ResizeFromEdge = require(ServerScriptService.Server.Modules.Tweens.ResizeFromEdge)
 
 -- //SECTION - Types
@@ -160,7 +161,12 @@ function PortStorage.IncreaseUpgradeStage(self: PortStorage, stage: number): ()
 end
 
 function PortStorage.AddFish(self: PortStorage, amount: number): ()
-	self.FishInStorage += amount
+	local availableStorage: number = self.CurrentMaxStorage - self.FishInStorage
+	local calcAmount: number = math.min(availableStorage, amount)
+
+	self.FishInStorage += calcAmount
+
+	self:ShowFishPopUp(calcAmount)
 	if self.FishInStorage >= self.CurrentMaxStorage then
 		self.FishInStorage = self.CurrentMaxStorage
 		self:UpdateStorageStatus(true)
@@ -192,6 +198,26 @@ function PortStorage.UpdateFishModel(self: PortStorage): ()
 	local ratio = (max > 0) and math.clamp(current / max, 0, 1) or 0
 
 	ResizeFromEdge.ResizeByRatio(part, ratio, maxHeight, { from = "bottom", cleaner = self._cleaner, minHeight = minHeight })
+end
+
+function PortStorage.ShowFishPopUp(self: PortStorage, amount: number): ()
+	local billboard: BillboardGui = game.Workspace:FindFirstChild("BillBoards"):FindFirstChild("FishPopupTemplate")
+	if not billboard then return end
+
+	local primaryPart: BasePart = self.VisualRoot
+	if not primaryPart then return end
+
+	local clone: BillboardGui = billboard:Clone()
+	local container: Instance = primaryPart:FindFirstChild("Billboard")
+	if container then
+		clone.Parent = container
+	else
+		clone.Parent = primaryPart
+	end
+
+	clone.Adornee = primaryPart
+	clone.Name = "Popup_Clone"
+	PopUp.Animate(clone, amount, clone.Fish)
 end
 -- //!SECTION
 
