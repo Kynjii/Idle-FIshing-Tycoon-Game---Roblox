@@ -8,9 +8,14 @@ local Tooltip = {}
 Tooltip.Existing = {}
 
 -- Helper for handling Purchase/Upgrade via tooltip
-local function handleButtonClick(itemId: string): ()
-	local purchaseEvent = Events.GetRemote(Events.RemoteNames.HelperPurchased)
-	if purchaseEvent then purchaseEvent:FireServer(itemId) end
+local function handleButtonClick(itemId: string, isPurchased: boolean): ()
+	if isPurchased then
+		local openJobManagementPanel = Events.GetRemote(Events.RemoteNames.OpenJobManagementPanel)
+		if openJobManagementPanel then openJobManagementPanel:FireServer(itemId) end
+	else
+		local purchaseEvent = Events.GetRemote(Events.RemoteNames.HelperPurchased)
+		if purchaseEvent then purchaseEvent:FireServer(itemId) end
+	end
 end
 
 function Tooltip.ClearExisting(userId: number): ()
@@ -33,6 +38,7 @@ function Tooltip.Create(props: {
 	ItemDescription: string,
 	ItemStats: { [number]: { [string]: any } }?,
 	ItemId: string,
+	IsPurchased: boolean?,
 	Parent: Instance?,
 })
 	-- //SECTION - Tooltip Container
@@ -333,7 +339,7 @@ function Tooltip.Create(props: {
 
 	local baseSize = buyButton.Size
 	buyButton.Activated:Connect(function()
-		handleButtonClick(props.ItemId)
+		handleButtonClick(props.ItemId, props.IsPurchased or false)
 	end)
 	buyButton.MouseEnter:Connect(function()
 		AnimateButtonHover.Enter(buyButton, baseSize)
@@ -348,7 +354,7 @@ function Tooltip.Create(props: {
 	buttonTxt.TextColor3 = FFGEnum.THEME.color.white
 	buttonTxt.BackgroundTransparency = 1
 	buttonTxt.TextScaled = true
-	buttonTxt.Text = "Purchase"
+	buttonTxt.Text = props.IsPurchased and "Manage" or "Purchase"
 	buttonTxt.Font = FFGEnum.THEME.font
 	buttonTxt.Size = UDim2.fromScale(0.9, 0.9)
 	buttonTxt.Parent = buyButton
@@ -378,9 +384,10 @@ function Tooltip.Initialize()
 		Description: string,
 		Stats: { [number]: string }?,
 		Owner: number,
+		IsPurchased: boolean?,
 	}
 
-	local openTooltipEvent = Events.GetBindableEvent(Events.BindableNames.ShowShopTooltip)
+	local openTooltipEvent = Events.GetBindableEvent(Events.BindableNames.ShowTooltip)
 	if openTooltipEvent then openTooltipEvent.Event:Connect(function(data: itemData)
 		if not data then
 			error("Not data was passed when attempting to open tooltip", data)
@@ -397,6 +404,7 @@ function Tooltip.Initialize()
 			ItemStats = data.ItemStats,
 			ItemQualityId = data.ItemQualityId,
 			ItemId = data.ItemId,
+			IsPurchased = data.IsPurchased or false,
 			Size = UDim2.fromScale(0.3, 1),
 			Rounded = FFGEnum.THEME.button.cornerRadius,
 			Visible = true,

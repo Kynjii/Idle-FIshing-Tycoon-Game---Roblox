@@ -13,6 +13,7 @@ Events.RemoteNames = {
 	HelperPurchased = "HelperPurchased",
 	PrepareHelperShop = "PrepareHelperShop",
 	UpdateUI = "UpdateUI",
+	OpenJobManagementPanel = "OpenJobManagementPanel",
 }
 
 Events.RemoteFunctionNames = {
@@ -20,7 +21,7 @@ Events.RemoteFunctionNames = {
 }
 
 Events.BindableNames = {
-	ShowShopTooltip = "ShowShopTooltip",
+	ShowTooltip = "ShowTooltip",
 	CloseUIWindow = "CloseUIWindow",
 }
 

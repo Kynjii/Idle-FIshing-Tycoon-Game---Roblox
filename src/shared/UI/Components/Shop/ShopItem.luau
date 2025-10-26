@@ -24,6 +24,7 @@ local function ShopItem(
 		Parent: Instance,
 		ShopInstance: Instance,
 		Owner: number,
+		IsPurchased: boolean?,
 	}
 )
 	local shopItemContainer = Instance.new("CanvasGroup")
@@ -156,8 +157,8 @@ local function ShopItem(
 		strokeThickness = FFGEnum.THEME.shop.shopItem.outlineThickness
 		containerStroke.Thickness = strokeThickness
 
-		-- Shop Tooltips
-		local bindableEvent = Events.GetBindableEvent(Events.BindableNames.ShowShopTooltip)
+		-- Tooltips
+		local bindableEvent = Events.GetBindableEvent(Events.BindableNames.ShowTooltip)
 		if bindableEvent then
 			local itemData = {
 				ItemImage = props.ItemImage,
@@ -171,7 +172,7 @@ local function ShopItem(
 				Parent = props.ShopInstance,
 			}
 
-			Events.FireBindableEvent(Events.BindableNames.ShowShopTooltip, itemData)
+			Events.FireBindableEvent(Events.BindableNames.ShowTooltip, itemData)
 		end
 	end)
 

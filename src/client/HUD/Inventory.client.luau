@@ -64,6 +64,7 @@ function createitemComponent(helper: HelperType.HelperData)
 		Parent = inventoryItemsContainer,
 		ShopInstance = main,
 		Owner = helper.Owner,
+		IsPurchased = helper.IsPurchased or false,
 	})
 end
 
