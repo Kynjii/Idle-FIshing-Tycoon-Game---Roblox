@@ -5,7 +5,7 @@ local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 
 local Tooltip = {}
-Tooltip.Existing = nil
+Tooltip.Existing = {}
 
 -- Helper for handling Purchase/Upgrade via tooltip
 local function handleButtonClick(itemId: string): ()
@@ -13,11 +13,11 @@ local function handleButtonClick(itemId: string): ()
 	if purchaseEvent then purchaseEvent:FireServer(itemId) end
 end
 
-function Tooltip.ClearExisting(): ()
-	if Tooltip.Existing then
-		local existing = Tooltip.Existing
+function Tooltip.ClearExisting(userId: number): ()
+	if Tooltip.Existing[userId] then
+		local existing = Tooltip.Existing[userId]
 		existing:Destroy()
-		Tooltip.Existing = nil
+		Tooltip.Existing[userId] = nil
 	end
 end
 
@@ -362,6 +362,7 @@ function Tooltip.Initialize()
 		Id: string,
 		Description: string,
 		Stats: { [number]: string }?,
+		Owner: number,
 	}
 
 	local openTooltipEvent = Events.GetBindableEvent(Events.BindableNames.ShowShopTooltip)
@@ -371,9 +372,9 @@ function Tooltip.Initialize()
 			return
 		end
 
-		Tooltip.ClearExisting()
+		Tooltip.ClearExisting(data.Owner)
 
-		Tooltip.Existing = Tooltip.Create({
+		Tooltip.Existing[data.Owner] = Tooltip.Create({
 			ItemBaseCost = data.ItemBaseCost,
 			ItemDescription = data.ItemDescription,
 			ItemName = data.ItemName,

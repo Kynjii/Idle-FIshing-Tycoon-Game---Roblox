@@ -23,6 +23,7 @@ local function ShopItem(
 		ItemQualityId: number,
 		Parent: Instance,
 		ShopInstance: Instance,
+		Owner: number,
 	}
 )
 	local shopItemContainer = Instance.new("CanvasGroup")
@@ -166,6 +167,7 @@ local function ShopItem(
 				ItemDescription = props.ItemDescription,
 				ItemStats = props.ItemStats,
 				ItemQualityId = props.ItemQualityId,
+				Owner = props.Owner,
 				Parent = props.ShopInstance,
 			}
 

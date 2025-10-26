@@ -33,7 +33,7 @@ task.spawn(function()
 end)
 
 function clearExistingTooltip()
-	Tooltip.ClearExisting()
+	Tooltip.ClearExisting(player.UserId)
 end
 
 function createitemComponent(helper: HelperType.HelperData)
@@ -63,6 +63,7 @@ function createitemComponent(helper: HelperType.HelperData)
 		SliceCenter = Rect.new(32, 83, 32, 83),
 		Parent = inventoryItemsContainer,
 		ShopInstance = main,
+		Owner = helper.Owner,
 	})
 end
 

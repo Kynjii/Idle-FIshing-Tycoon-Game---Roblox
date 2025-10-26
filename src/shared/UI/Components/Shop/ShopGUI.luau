@@ -33,8 +33,6 @@ function ShopGUI.CloseShop(mainFrame)
 			if instance.Name == "Blur" then instance:Destroy() end
 		end
 	end
-
-	Tooltip.ClearExisting()
 end
 
 return ShopGUI
