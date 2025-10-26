@@ -35,27 +35,27 @@ function Tooltip.Create(props: {
 	ItemId: string,
 	Parent: Instance?,
 })
-	-- //SECTION - Shop Tooltip Container
-	local shopTooltipContainer = Instance.new("Frame")
-	shopTooltipContainer.Name = "ShopTooltip"
-	shopTooltipContainer.Parent = props.Parent or nil
-	shopTooltipContainer.Size = props.Size
-	shopTooltipContainer.BackgroundColor3 = props.BackgroundColor3 or FFGEnum.THEME.color.panel
-	shopTooltipContainer.AnchorPoint = FFGEnum.THEME.alignment.anchor.left
-	shopTooltipContainer.Position = UDim2.fromScale(1.05, 0.5)
-	shopTooltipContainer.Visible = props.Visible or false
+	-- //SECTION - Tooltip Container
+	local tooltipContainer = Instance.new("Frame")
+	tooltipContainer.Name = "Tooltip"
+	tooltipContainer.Parent = props.Parent or nil
+	tooltipContainer.Size = props.Size
+	tooltipContainer.BackgroundColor3 = props.BackgroundColor3 or FFGEnum.THEME.color.panel
+	tooltipContainer.AnchorPoint = FFGEnum.THEME.alignment.anchor.left
+	tooltipContainer.Position = UDim2.fromScale(1.05, 0.5)
+	tooltipContainer.Visible = props.Visible or false
 
-	-- //SECTION - Shop Tooltip Outline
+	-- //SECTION - Tooltip Outline
 	local containerStroke = Instance.new("UIStroke")
 	containerStroke.Color = FFGEnum.THEME.shop.shopTooltip.border or Color3.new(0, 0, 0)
 	containerStroke.StrokeSizingMode = Enum.StrokeSizingMode.FixedSize
 	containerStroke.Thickness = FFGEnum.THEME.shop.shopTooltip.outlineThickness
-	containerStroke.Parent = shopTooltipContainer
+	containerStroke.Parent = tooltipContainer
 	-- //!SECTION
 
-	-- //SECTION -  Shop Tooltip Corner
+	-- //SECTION -  Tooltip Corner
 	local corner = Instance.new("UICorner")
-	corner.Parent = shopTooltipContainer
+	corner.Parent = tooltipContainer
 
 	if props.Rounded then
 		corner.CornerRadius = props.Rounded
@@ -73,7 +73,7 @@ function Tooltip.Create(props: {
 	frameHeader.Position = FFGEnum.THEME.alignment.position.frameHeader
 	frameHeader.ResampleMode = Enum.ResamplerMode.Default
 	frameHeader.BackgroundTransparency = 1
-	frameHeader.Parent = shopTooltipContainer
+	frameHeader.Parent = tooltipContainer
 
 	local headerCorner = Instance.new("UICorner")
 	headerCorner.Name = "UICorner"
@@ -107,7 +107,7 @@ function Tooltip.Create(props: {
 	mainContainer.Position = FFGEnum.THEME.alignment.position.center
 	mainContainer.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 	mainContainer.BackgroundTransparency = 1
-	mainContainer.Parent = shopTooltipContainer
+	mainContainer.Parent = tooltipContainer
 
 	local uIPadding = Instance.new("UIPadding")
 	uIPadding.Name = "MainContainerPadding"
@@ -365,7 +365,7 @@ function Tooltip.Create(props: {
 	uiListLayout.Parent = itemInfoContainer
 	-- -- //!SECTION
 
-	return shopTooltipContainer
+	return tooltipContainer
 end
 
 function Tooltip.Initialize()
@@ -383,7 +383,7 @@ function Tooltip.Initialize()
 	local openTooltipEvent = Events.GetBindableEvent(Events.BindableNames.ShowShopTooltip)
 	if openTooltipEvent then openTooltipEvent.Event:Connect(function(data: itemData)
 		if not data then
-			error("Not data was passed when attempting to open shop tooltip", data)
+			error("Not data was passed when attempting to open tooltip", data)
 			return
 		end
 
