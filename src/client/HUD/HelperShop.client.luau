@@ -22,7 +22,7 @@ task.spawn(function()
 	screenGui.Parent = playerGui
 
 	main = screenGui:FindFirstChild("Main", true) :: Frame
-	if main then shopItemsContainer = main:WaitForChild("ItemContainer", 10) :: ScrollingFrame end
+	if main then shopItemsContainer = main:FindFirstChild("ItemContainer", true) :: ScrollingFrame end
 end)
 
 function clearExistingTooltip()
@@ -47,7 +47,6 @@ function createShopitemComponent(helper: HelperType.HelperData)
 		ItemStats = preparedStatData,
 		ItemQualityId = helper.QualityId,
 		BackgroundColor3 = FFGEnum.QUALITIES[helper.QualityId].Color,
-		BackgroundTransparency = 0.4,
 		Size = UDim2.fromScale(1, 1),
 		Rounded = FFGEnum.THEME.button.cornerRadius,
 		HoverEffect = true,

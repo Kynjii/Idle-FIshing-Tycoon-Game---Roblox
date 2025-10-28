@@ -12,8 +12,8 @@ function ShopGUI.Create(props: {
 })
 	local screenGui = MainUIPanel.Create({ screenGuiName = props.screenGuiName, panelName = props.shopName })
 
-	local main = screenGui:FindFirstChild("Main", true)
-	if main then SingleGridLayout.Create({ Name = "ItemContainer", Parent = main }) end
+	local innerWindow = screenGui:FindFirstChild("InnerWindow", true)
+	if innerWindow then SingleGridLayout.Create({ Name = "ItemContainer", Parent = innerWindow }) end
 
 	Tooltip.Initialize()
 

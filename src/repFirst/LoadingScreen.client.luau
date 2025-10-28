@@ -32,6 +32,7 @@ textFrameUIList.FillDirection = Enum.FillDirection.Horizontal
 textFrameUIList.HorizontalAlignment = Enum.HorizontalAlignment.Center
 textFrameUIList.VerticalAlignment = Enum.VerticalAlignment.Bottom
 textFrameUIList.ItemLineAlignment = Enum.ItemLineAlignment.Center
+textFrameUIList.Padding = UDim.new(0.01)
 textFrameUIList.Parent = textFrame
 
 local textLabel = Instance.new("TextLabel")

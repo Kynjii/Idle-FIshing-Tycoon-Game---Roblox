@@ -293,7 +293,7 @@ function Tooltip.Create(props: {
 			statElementLabel.TextWrapped = true
 			statElementLabel.TextScaled = true
 			statElementLabel.LayoutOrder = 1
-			statElementLabel.Font = FFGEnum.THEME.normalFont
+			statElementLabel.Font = FFGEnum.THEME.bigFont
 			statElementLabel.BackgroundTransparency = 1
 			statElementLabel.Size = UDim2.fromScale(0.5, 1)
 			statElementLabel.Parent = statFrameContainer
@@ -306,7 +306,7 @@ function Tooltip.Create(props: {
 			statElementValue.TextWrapped = true
 			statElementValue.TextScaled = true
 			statElementValue.LayoutOrder = 2
-			statElementValue.Font = FFGEnum.THEME.normalFont
+			statElementValue.Font = FFGEnum.THEME.bigFont
 			statElementValue.BackgroundTransparency = 1
 			statElementValue.Size = UDim2.fromScale(0.5, 1)
 			statElementValue.Parent = statFrameContainer
@@ -405,7 +405,7 @@ function Tooltip.Initialize()
 			ItemQualityId = data.ItemQualityId,
 			ItemId = data.ItemId,
 			IsPurchased = data.IsPurchased or false,
-			Size = UDim2.fromScale(0.3, 1),
+			Size = UDim2.fromScale(0.3, 0.9),
 			Rounded = FFGEnum.THEME.button.cornerRadius,
 			Visible = true,
 			Parent = data.Parent,

@@ -161,7 +161,7 @@ function HelperShopManager.CreateRefreshBillboard(self: HelperShopManager)
 
 	local countdownTimer = Instance.new("TextLabel")
 	countdownTimer.Size = UDim2.fromScale(1, 1)
-	countdownTimer.Font = FFGEnum.THEME.font
+	countdownTimer.Font = FFGEnum.THEME.bigFont
 	countdownTimer.TextColor3 = FFGEnum.THEME.color.white
 	countdownTimer.TextScaled = true
 	countdownTimer.BackgroundTransparency = 1

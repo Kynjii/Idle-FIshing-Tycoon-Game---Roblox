@@ -157,6 +157,9 @@ FFGEnum.UI = {
 	Buttons = {
 		--
 	},
+	Items = {
+		BackgroundQualityId = { [1] = "rbxassetid://94138515421739", [2] = "rbxassetid://78206843085783", [3] = "rbxassetid://125653281446487", [4] = "rbxassetid://113686615974215", [5] = "rbxassetid://130543839885527", [6] = "rbxassetid://104966714958616" },
+	},
 }
 
 FFGEnum.BUFFS = {

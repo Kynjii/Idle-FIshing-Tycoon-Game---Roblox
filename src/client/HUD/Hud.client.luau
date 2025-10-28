@@ -16,8 +16,9 @@ local currencyLabels = {}
 
 local function animate(currencyLabel: TextLabel)
 	if currencyLabel then
+		local baseSize = currencyLabel.Size
 		local tweenGoal = {
-			Size = currencyLabel.Size + UDim2.fromScale(0.1, 0.1),
+			Size = baseSize + UDim2.fromScale(0.1, 0.1),
 		}
 
 		local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Linear)
@@ -26,7 +27,7 @@ local function animate(currencyLabel: TextLabel)
 		tween:Play()
 
 		tween.Completed:Connect(function()
-			currencyLabel.Size = UDim2.fromScale(0.628, 0.702)
+			currencyLabel.Size = baseSize
 			tween:Destroy()
 		end)
 	end
@@ -44,11 +45,11 @@ local function setCurrency(name: string, v: number)
 		currencyLabel.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 		currencyLabel.Position = UDim2.fromScale(0.539, 0.526)
 		currencyLabel.Size = UDim2.fromScale(0.9, 1.053)
-		currencyLabel.Font = FFGEnum.THEME.font
+		currencyLabel.Font = FFGEnum.THEME.bigFont
 		currencyLabel.TextScaled = true
 		currencyLabel.Visible = true
-		currencyLabels[name] = currencyLabel
 		currencyLabel.Parent = currencyTemplate.Parent
+		currencyLabels[name] = currencyLabel
 	end
 
 	animate(currencyLabel)

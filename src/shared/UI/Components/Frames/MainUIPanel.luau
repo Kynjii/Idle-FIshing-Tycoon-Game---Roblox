@@ -33,7 +33,7 @@ function MainUIPanel.Create(props: {
 	panelContainer.Name = "PanelContainer"
 	panelContainer.AnchorPoint = Vector2.new(0.5, 0.5)
 	panelContainer.BackgroundTransparency = 1
-	panelContainer.Position = UDim2.fromScale(0.5, 0.5)
+	panelContainer.Position = UDim2.fromScale(0.4, 0.5)
 	panelContainer.Size = UDim2.fromScale(0.619, 0.7)
 	panelContainer.ZIndex = 0
 	panelContainer.Parent = screenGui
@@ -83,19 +83,27 @@ function MainUIPanel.Create(props: {
 	main.Size = UDim2.fromScale(1, 1)
 	main.Parent = panelContainer
 
+	local mainPadding = Instance.new("UIPadding")
+	mainPadding.PaddingTop = UDim.new(0.01)
+	mainPadding.Parent = main
+
 	local panelNameContainer = Instance.new("Frame")
 	panelNameContainer.Name = "PanelNameContainer"
 	panelNameContainer.AnchorPoint = Vector2.new(0.5, 0.5)
 	panelNameContainer.BackgroundTransparency = 1
-	panelNameContainer.Position = UDim2.fromScale(0.500531, 0.0642202)
+	panelNameContainer.Position = UDim2.fromScale(0.500531, 0.1)
 	panelNameContainer.Size = UDim2.fromScale(1, 0.0868755)
 	panelNameContainer.Parent = main
+
+	local panelNameContainerPadding = Instance.new("UIPadding")
+	panelNameContainerPadding.PaddingLeft = UDim.new(0.03)
+	panelNameContainerPadding.Parent = panelNameContainer
 
 	local textLabel = Instance.new("TextLabel")
 	textLabel.Name = "TextLabel"
 	textLabel.AnchorPoint = Vector2.new(0.5, 0.5)
 	textLabel.BackgroundTransparency = 1
-	textLabel.Font = FFGEnum.THEME.font
+	textLabel.Font = FFGEnum.THEME.bigFont
 	textLabel.Position = UDim2.fromScale(0.5, 0.5)
 	textLabel.Size = UDim2.fromScale(1, 1)
 	textLabel.Text = props.panelName
@@ -169,7 +177,7 @@ function MainUIPanel.Create(props: {
 	closeButtonX.Name = "TextLabel"
 	closeButtonX.AnchorPoint = Vector2.new(0.5, 0.5)
 	closeButtonX.BackgroundTransparency = 1
-	closeButtonX.Font = FFGEnum.THEME.font
+	closeButtonX.Font = FFGEnum.THEME.bigFont
 	closeButtonX.Position = UDim2.fromScale(0.5, 0.5)
 	closeButtonX.Size = UDim2.fromScale(0.480769, 0.634615)
 	closeButtonX.Text = "X"
