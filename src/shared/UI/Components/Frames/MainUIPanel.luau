@@ -38,6 +38,11 @@ function MainUIPanel.Create(props: {
 	panelContainer.ZIndex = 0
 	panelContainer.Parent = screenGui
 
+	local panelContainerAspect = Instance.new("UIAspectRatioConstraint")
+	panelContainerAspect.AspectRatio = 1.5
+	panelContainerAspect.AspectType = Enum.AspectType.ScaleWithParentSize
+	panelContainerAspect.Parent = panelContainer
+
 	local panelBG = Instance.new("ImageLabel")
 	panelBG.Name = "PanelBG"
 	panelBG.AnchorPoint = Vector2.new(0.5, 0.5)

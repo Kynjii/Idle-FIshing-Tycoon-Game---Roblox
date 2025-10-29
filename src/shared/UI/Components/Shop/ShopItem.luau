@@ -1,4 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
+
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 
@@ -36,6 +38,11 @@ local function ShopItem(
 	shopItemContainer.Visible = props.Visible or true
 	shopItemContainer.ClipsDescendants = true
 	shopItemContainer.Parent = props.Parent or nil
+
+	local shopItemContainerAspect = Instance.new("UIAspectRatioConstraint")
+	shopItemContainerAspect.AspectRatio = 1
+	shopItemContainerAspect.AspectType = Enum.AspectType.ScaleWithParentSize
+	shopItemContainerAspect.Parent = shopItemContainer
 
 	local itemQualityBG = Instance.new("ImageLabel")
 	itemQualityBG.Name = "ItemBG"
@@ -84,7 +91,7 @@ local function ShopItem(
 	local itemName = Instance.new("TextLabel")
 	itemName.Font = FFGEnum.THEME.bigFont
 	itemName.TextScaled = true
-	itemName.Size = UDim2.fromScale(1, 0.15)
+	itemName.Size = UDim2.fromScale(1, 0.2)
 	itemName.BackgroundTransparency = 1
 	itemName.TextColor3 = FFGEnum.THEME.color.white
 	itemName.LayoutOrder = 1
@@ -94,27 +101,26 @@ local function ShopItem(
 
 	-- //SECTION -  Item Image
 	local item = Instance.new("ImageLabel")
+	item.Name = "ItemImage"
 	item.Image = props.ItemImage
 	item.LayoutOrder = 2
 	item.BackgroundTransparency = 1
-	item.Size = UDim2.fromScale(0.8, 0.75)
+	item.Size = UDim2.fromScale(0.6, 0.6)
 	item.ZIndex = 2
 	item.Parent = mainContainer
-
-	local itemAspect = Instance.new("UIAspectRatioConstraint")
-	itemAspect.AspectRatio = 1.16
-	itemAspect.AspectType = Enum.AspectType.ScaleWithParentSize
-	itemAspect.Parent = item
 	-- //!SECTION
 
 	-- //SECTION -  Item Price
 	local priceContainer = Instance.new("Frame")
+	priceContainer.Name = "PriceContainer"
+	priceContainer.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 	priceContainer.Size = UDim2.fromScale(1, 0.2)
 	priceContainer.LayoutOrder = 3
 	priceContainer.BackgroundTransparency = 1
 	priceContainer.Parent = mainContainer
 
 	local priceContainerGradient = Instance.new("ImageLabel")
+	priceContainerGradient.Name = "Gradient"
 	priceContainerGradient.Image = "rbxassetid://74369602913754"
 	priceContainerGradient.Size = UDim2.fromScale(0.99, 1)
 	priceContainerGradient.AnchorPoint = FFGEnum.THEME.alignment.anchor.center

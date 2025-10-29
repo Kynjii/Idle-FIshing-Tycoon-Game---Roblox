@@ -4,6 +4,7 @@ local BuildingsManager = require(script.Parent.BuildingsManager)
 local ChainManager = require(script.Parent.ChainManager)
 local HelperShopManager = require(script.Parent.HelperShopManager)
 local InventoryManager = require(script.Parent.InventoryManager)
+local JobManager = require(script.Parent.JobManager)
 local BuildingsManagerType = require(ReplicatedStorage.Shared.Types.Managers.BuildingsManagerType)
 local ChainManagerType = require(ReplicatedStorage.Shared.Types.Managers.ChainManagerType)
 
@@ -58,6 +59,7 @@ TeamManager.ChainManagers = {}
 TeamManager.BuildingsManager = {}
 TeamManager.HelperShopManager = {}
 TeamManager.InventoryManager = {}
+TeamManager.JobManager = {}
 
 function TeamManager.CreateTeams(): ()
 	for i, team in ipairs(TeamManager.Teams) do
@@ -111,11 +113,11 @@ function TeamManager.AssignHelperShopManager(profile, player: Player, teamId: nu
 
 	local shopState = realmData.Shops["HelperShop"] or nil
 
-	local HelperShopManager = HelperShopManager.New(shopState, player, teamId)
-	if not HelperShopManager then return end
+	local helperShopManager = HelperShopManager.New(shopState, player, teamId)
+	if not helperShopManager then return end
 
-	TeamManager.HelperShopManager[player.UserId] = HelperShopManager
-	HelperShopManager:Initialize()
+	TeamManager.HelperShopManager[player.UserId] = helperShopManager
+	helperShopManager:Initialize()
 end
 
 function TeamManager.AssignInventoryManager(profile, player: Player, teamId: number): ()
@@ -125,10 +127,23 @@ function TeamManager.AssignInventoryManager(profile, player: Player, teamId: num
 
 	local playerInventoryState = realmData.Helpers or {}
 
-	local InventoryManager = InventoryManager.New(playerInventoryState, player, teamId)
-	if not InventoryManager then return end
+	local inventoryManager = InventoryManager.New(playerInventoryState, player, teamId)
+	if not inventoryManager then return end
 
-	TeamManager.InventoryManager[player.UserId] = InventoryManager
+	TeamManager.InventoryManager[player.UserId] = inventoryManager
+end
+
+function TeamManager.AssignJobManager(profile, player: Player, teamId: number): ()
+	TeamManager.JobManager[player.UserId] = TeamManager.JobManager[player.UserId] or { OwnerId = player.UserId }
+	local currentRealm = profile.CurrentRealm or 1
+	local realmData = profile and profile.Realms[currentRealm]
+
+	local playerHelperState = realmData.Helpers or {}
+
+	local jobManager = JobManager.New(playerHelperState, player, teamId)
+	if not jobManager then return end
+
+	TeamManager.JobManager[player.UserId] = jobManager
 end
 
 function TeamManager.AssignTeam(player: Player): number?
@@ -152,6 +167,7 @@ function TeamManager.AssignManagers(profile, player: Player, teamId: number): ()
 	TeamManager.AssignChainManagers(profile.Data, player, teamId)
 	TeamManager.AssignHelperShopManager(profile.Data, player, teamId)
 	TeamManager.AssignInventoryManager(profile.Data, player, teamId)
+	TeamManager.AssignJobManager(profile, player, teamId)
 end
 
 local managerTypes = {
@@ -159,6 +175,7 @@ local managerTypes = {
 	Building = "Building",
 	Shop = "Shop",
 	Inventory = "Inventory",
+	Job = "Job",
 }
 
 local function listClean(list, userId, managerType): ()
@@ -181,6 +198,8 @@ local function listClean(list, userId, managerType): ()
 		TeamManager.HelperShopManager[userId] = nil
 	elseif managerType == managerTypes.Inventory then
 		TeamManager.InventoryManager[userId] = nil
+	elseif managerType == managerTypes.Job then
+		TeamManager.JobManager[userId] = nil
 	end
 end
 
@@ -189,11 +208,13 @@ function TeamManager.CleanupPlayer(userId: number): ()
 	local buildingList = TeamManager.BuildingsManager[userId]
 	local helperShopList = TeamManager.HelperShopManager[userId]
 	local inventoryList = TeamManager.InventoryManager[userId]
+	local jobList = TeamManager.JobManager[userId]
 
 	if chainList then listClean(chainList, userId, managerTypes.Chain) end
 	if buildingList then listClean(buildingList, userId, managerTypes.Building) end
 	if helperShopList then listClean(helperShopList, userId, managerTypes.Shop) end
 	if inventoryList then listClean(inventoryList, userId, managerTypes.Inventory) end
+	if jobList then listClean(jobList, userId, managerTypes.Job) end
 end
 
 export type TeamManager = typeof(TeamManager)

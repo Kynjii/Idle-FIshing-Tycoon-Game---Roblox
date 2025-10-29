@@ -57,6 +57,7 @@ FFGEnum.ATTRIBUTES = {
 	TeamId = "TeamId",
 	BuildingId = "BuildingId",
 	BuildingName = "BuildingName",
+	JobId = "JobId",
 }
 
 FFGEnum.CLASS = {
@@ -107,15 +108,6 @@ FFGEnum.JOB_NAMES = {
 	Woodcutting = "Woodcutter",
 	Mining = "Miner",
 	Transporting = "Transporter",
-}
-
-FFGEnum.JOB_ASSIGNMENTS = {
-	Unassigned = 1,
-	Transporter = 2,
-	Fisher = 3,
-	Miner = 4,
-	Woodcutter = 5,
-	NotOwned = 99,
 }
 
 FFGEnum.JOB_STATE = {

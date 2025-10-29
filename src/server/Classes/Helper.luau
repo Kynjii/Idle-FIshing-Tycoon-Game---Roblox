@@ -8,6 +8,7 @@ local EventListeners = require(ServerScriptService.Server.Classes.Modules.EventL
 local HelperCalculators = require(ServerScriptService.Server.Classes.Modules.HelperCalculators)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local Formulas = require(ServerScriptService.Server.Math.Formulas)
+local Jobs = require(ServerScriptService.Server.Modules.Jobs.Jobs)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
 
@@ -38,6 +39,7 @@ local DEFAULTS = {
 	StorageFull = false,
 	BaseCost = Formulas.HELPER.BaseCost,
 	IsPurchased = false,
+	ResourceInStorage = 0,
 }
 
 -- local ANIMATIONS = {
@@ -172,15 +174,31 @@ function Helper.CreateStateData(player: Player, currencyType: string)
 
 	state.IsPurchased = state.IsPurchased or false
 
-	state.CurrentAssignment = state.CurrentAssignment or FFGEnum.JOB_ASSIGNMENTS.NotOwned
+	state.CurrentAssignment = state.CurrentAssignment or ""
 
 	return state
 end
 -- //!SECTION
 
 -- //SECTION - Assignments
-function Helper.GetAssignments()
+function Helper.GetAssignments(self: Helper)
 	return
+end
+
+function Helper.CanAssignJob(self: Helper, jobId: string): boolean
+	local jobInfo = Jobs.Data[jobId]
+	if not jobInfo then return false end
+
+	return jobInfo.Category == self.JobCategory
+end
+
+function Helper.AssignJob(self: Helper, jobId: string)
+	if not self:CanAssignJob(jobId) then return false end
+	self.ResourceInStorage = 0
+	self.CurrentAssignment = jobId
+
+	self:Save()
+	return true
 end
 -- //!SECTION
 
@@ -188,7 +206,6 @@ end
 function Helper.Purchase(self: Helper): ()
 	self.IsPurchased = true
 	self.Model = self._cleaner and self._cleaner:Add(helperModel and helperModel:Clone())
-	self.CurrentAssignment = FFGEnum.JOB_ASSIGNMENTS.Unassigned
 
 	self:Save()
 end
