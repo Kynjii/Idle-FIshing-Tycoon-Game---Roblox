@@ -22,7 +22,7 @@ local DESCRIPTION = {
 	Transporting = "A crew member specialized in Transporting Fish from the Port to the Market.",
 }
 
-local helperFolder: Instance = game.Workspace:WaitForChild("Helpers")
+local helperFolder: Instance = game.Workspace:WaitForChild("Helpers", true)
 local helperModel: Model
 if helperFolder then
 	helperModel = helperFolder:FindFirstChild("HelperTemplate")
@@ -117,7 +117,7 @@ function Helper.New(state: HelperType.HelperData, player: Player, teamId: number
 	self.Player = player
 	self.RealmId = state.RealmId
 	self.Owner = state.Owner or self.Owner or player.UserId
-	self.Model = state.IsPurchased and (helperModel and helperModel:Clone())
+	self.Model = nil
 	self.Id = state.Id
 	self.TeamId = teamId
 	self.JobCategory = state.JobCategory
@@ -192,8 +192,25 @@ function Helper.CanAssignJob(self: Helper, jobId: string): boolean
 	return jobInfo.Category == self.JobCategory
 end
 
+function Helper.CreateModel(self: Helper)
+	if self.Model then self.Model:Destroy() end
+	local clonedModel = helperModel and helperModel:Clone()
+	clonedModel.Name = `{self.Player}'s {self.Name} | Level {self.Level}`
+	clonedModel.Parent = helperModel.Parent
+	self.Model = self._cleaner and self._cleaner:Add(clonedModel)
+
+	if clonedModel then
+		local modelChildren = clonedModel:GetChildren()
+		for _, part: Instance in pairs(modelChildren) do
+			if part:IsA("MeshPart") or part:IsA("Part") and part.Name ~= "HumanoidRootPart" then part.Transparency = 0 end
+		end
+	end
+end
+
 function Helper.AssignJob(self: Helper, jobId: string)
 	if not self:CanAssignJob(jobId) then return false end
+	self:CreateModel()
+
 	self.ResourceInStorage = 0
 	self.CurrentAssignment = jobId
 
@@ -205,7 +222,6 @@ end
 -- //SECTION - Core Helper Actions
 function Helper.Purchase(self: Helper): ()
 	self.IsPurchased = true
-	self.Model = self._cleaner and self._cleaner:Add(helperModel and helperModel:Clone())
 
 	self:Save()
 end

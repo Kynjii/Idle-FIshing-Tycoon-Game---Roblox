@@ -11,8 +11,8 @@ Tooltip.Existing = {}
 -- Helper for handling Purchase/Upgrade via tooltip
 local function handleButtonClick(itemId: string, isPurchased: boolean): ()
 	if isPurchased then
-		local openJobManagementPanel = Events.GetRemote(Events.RemoteNames.OpenJobManagementPanel)
-		if openJobManagementPanel then openJobManagementPanel:FireServer(itemId) end
+		local assignJobEvent = Events.GetRemoteFn(Events.RemoteFunctionNames.AssignJob)
+		if assignJobEvent then assignJobEvent:InvokeServer(itemId, "job_id_1") end -- //TODO
 	else
 		local purchaseEvent = Events.GetRemote(Events.RemoteNames.HelperPurchased)
 		if purchaseEvent then purchaseEvent:FireServer(itemId) end
@@ -40,6 +40,7 @@ function Tooltip.Create(props: {
 	ItemStats: { [number]: { [string]: any } }?,
 	ItemId: string,
 	IsPurchased: boolean?,
+	Owner: number?,
 	Parent: Instance?,
 })
 	-- //SECTION - Tooltip Container
@@ -47,7 +48,7 @@ function Tooltip.Create(props: {
 	tooltipContainer.Name = "Tooltip"
 	tooltipContainer.Parent = props.Parent or nil
 	tooltipContainer.Size = props.Size
-	tooltipContainer.BackgroundColor3 = props.BackgroundColor3 or FFGEnum.THEME.color.panel
+	tooltipContainer.BackgroundColor3 = props.BackgroundColor3 or FFGEnum.QUALITIES[props.ItemQualityId].Color
 	tooltipContainer.AnchorPoint = FFGEnum.THEME.alignment.anchor.left
 	tooltipContainer.Position = UDim2.fromScale(1.05, 0.5)
 	tooltipContainer.Visible = props.Visible or false
@@ -325,7 +326,7 @@ function Tooltip.Create(props: {
 
 	local buyButton = Button.Create({
 		color = "Green",
-		text = "Buy",
+		text = props.IsPurchased and "Assign" or "Buy",
 		size = UDim2.fromScale(1, 1),
 	})
 	buyButton.Parent = imageButtonContainer

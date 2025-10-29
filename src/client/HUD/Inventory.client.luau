@@ -23,7 +23,7 @@ task.spawn(function()
 	screenGui.Parent = playerGui
 
 	main = screenGui:FindFirstChild("Main", true) :: Frame
-	if main then inventoryItemsContainer = main:WaitForChild("ItemContainer", 10) :: ScrollingFrame end
+	if main then inventoryItemsContainer = main:FindFirstChild("ItemContainer", true) :: ScrollingFrame end
 end)
 
 function clearExistingTooltip()
@@ -67,11 +67,16 @@ local itemComponents = {}
 function updateUI()
 	clearExistingTooltip()
 
+	for _, component: Instance in pairs(itemComponents) do
+		component:Destroy()
+	end
+
+	itemComponents = {}
+
 	if inventoryItemsContainer then
 		for k, item in pairs(playerInventory) do
-			if itemComponents[item.Id] then return end
 			local itemComponent = createitemComponent(item)
-			itemComponents[item.Id] = { Component = itemComponent, Item = item }
+			itemComponents[item.Id] = itemComponent
 		end
 	end
 end

@@ -167,7 +167,7 @@ function TeamManager.AssignManagers(profile, player: Player, teamId: number): ()
 	TeamManager.AssignChainManagers(profile.Data, player, teamId)
 	TeamManager.AssignHelperShopManager(profile.Data, player, teamId)
 	TeamManager.AssignInventoryManager(profile.Data, player, teamId)
-	TeamManager.AssignJobManager(profile, player, teamId)
+	TeamManager.AssignJobManager(profile.Data, player, teamId)
 end
 
 local managerTypes = {

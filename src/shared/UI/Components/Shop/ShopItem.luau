@@ -195,6 +195,7 @@ local function ShopItem(
 				ItemDescription = props.ItemDescription,
 				ItemStats = props.ItemStats,
 				ItemQualityId = props.ItemQualityId,
+				IsPurchased = props.IsPurchased,
 				Owner = props.Owner,
 				Parent = props.ShopInstance,
 			}

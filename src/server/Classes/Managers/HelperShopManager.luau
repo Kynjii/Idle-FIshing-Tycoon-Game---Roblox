@@ -102,6 +102,7 @@ function HelperShopManager.Purchasehelper(self: HelperShopManager, helperId: str
 
 	local helperClass = Helper.New(helperInShop, self.Player, self.TeamId)
 	helperClass:Purchase()
+	helperClass:Destroy()
 
 	DataService.Spend(self.Player, helperClass.CurrencyType, helperClass.BaseCost)
 

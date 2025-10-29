@@ -5,6 +5,15 @@ local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 
 local taggedJobLocations = CollectionService:GetTagged("JobLocation")
 
+function getJobLocation(jobId: string): CFrame?
+	for _, taggedJobLocation: Part in ipairs(taggedJobLocations) do
+		local taggedJobLocationTeamId = taggedJobLocation:GetAttribute(FFGEnum.ATTRIBUTES.JobId)
+		if taggedJobLocationTeamId == jobId then return taggedJobLocation.Position end
+	end
+
+	return nil
+end
+
 local Jobs = {}
 Jobs.Data = {
 	["job_id_1"] = {
@@ -44,14 +53,5 @@ Jobs.Data = {
 		Location = getJobLocation("job_id_6"),
 	},
 }
-
-function getJobLocation(jobId: string): CFrame?
-	for _, taggedJobLocation: Part in ipairs(taggedJobLocations) do
-		local taggedJobLocationTeamId = taggedJobLocation:GetAttribute(FFGEnum.ATTRIBUTES.JobId)
-		if taggedJobLocationTeamId == jobId then return taggedJobLocation.CFrame end
-	end
-
-	return nil
-end
 
 return Jobs
