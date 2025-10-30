@@ -191,8 +191,13 @@ function ChainManager.AttachAttListeners(self: ChainManagerInstance)
 	if self.LaneStorage then
 		local getStorageFish = Events.GetBindableEvent(Events.BindableNames.GetStorageFish)
 		if getStorageFish then getStorageFish.Event:Connect(function(request: GetStorageFishData)
-			if request.Player ~= self.Player or self.Owner ~= request.Player.UserId then return end
+			print(request, self.Player, self.TeamId, self.Tier)
+			print(request.Player ~= self.Player)
+			if request.Player ~= self.Player then return end
+
+			print(self.TeamId ~= request.TeamId)
 			if self.TeamId ~= request.TeamId then return end
+			print(self.Tier ~= request.JobId)
 			if self.Tier ~= request.JobId then return end
 
 			local helperStorage = request.AvailableStorage

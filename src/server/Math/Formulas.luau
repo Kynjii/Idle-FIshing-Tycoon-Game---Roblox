@@ -102,9 +102,9 @@ local FORMULAS = {
 	end,
 
 	-- Entity baselines
-	BOAT = { BaseCost = 100, BaseStorage = 50, BaseFPS = 5 },
-	TENDER = { BaseCost = 100, BaseStorage = 45 },
-	STORAGE = { BaseCost = 200, BaseStorage = 45 },
+	BOAT = { BaseCost = 100, BaseStorage = 100, BaseFPS = 5 },
+	TENDER = { BaseCost = 100, BaseStorage = 200 },
+	STORAGE = { BaseCost = 200, BaseStorage = 200 },
 	BUILDING = { BaseCost = 1500 },
 	HELPER = { BaseCost = 1000 },
 
