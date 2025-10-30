@@ -208,7 +208,6 @@ function JobManager.AttachEventListeners(self: JobManager): ()
 		if helper.CurrentAssignment ~= jobId then return end
 
 		local amount = data.Amount
-		print(amount)
 		if amount then helper:AddResource(amount) end
 		Pathfinding.GoUnloadSpot(jobId, helper.Id, helper.Model, self.Player)
 	end) end

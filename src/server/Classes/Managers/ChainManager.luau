@@ -191,13 +191,8 @@ function ChainManager.AttachAttListeners(self: ChainManagerInstance)
 	if self.LaneStorage then
 		local getStorageFish = Events.GetBindableEvent(Events.BindableNames.GetStorageFish)
 		if getStorageFish then getStorageFish.Event:Connect(function(request: GetStorageFishData)
-			print(request, self.Player, self.TeamId, self.Tier)
-			print(request.Player ~= self.Player)
 			if request.Player ~= self.Player then return end
-
-			print(self.TeamId ~= request.TeamId)
 			if self.TeamId ~= request.TeamId then return end
-			print(self.Tier ~= request.JobId)
 			if self.Tier ~= request.JobId then return end
 
 			local helperStorage = request.AvailableStorage
@@ -205,7 +200,6 @@ function ChainManager.AttachAttListeners(self: ChainManagerInstance)
 			local availableFishInStorage = storage.FishInStorage
 
 			local amount = math.min(helperStorage, availableFishInStorage)
-			print(helperStorage, storage, availableFishInStorage, amount)
 			storage:RemoveFish(amount)
 
 			local data: SendStorageFishData = {
