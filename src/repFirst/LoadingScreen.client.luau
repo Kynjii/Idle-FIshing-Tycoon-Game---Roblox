@@ -25,7 +25,6 @@ textFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 textFrame.Position = UDim2.fromScale(0.55, 0.8)
 textFrame.Transparency = 1
 textFrame.ZIndex = 10
-textFrame.Parent = screenGui
 
 local textFrameUIList = Instance.new("UIListLayout")
 textFrameUIList.FillDirection = Enum.FillDirection.Horizontal
@@ -65,6 +64,8 @@ textLabel2.TextScaled = true
 textLabel2.TextXAlignment = Enum.TextXAlignment.Left
 textLabel2.TextYAlignment = Enum.TextYAlignment.Top
 textLabel2.Parent = textFrame
+
+textFrame.Parent = screenGui
 
 local loadingText = {
 	[1] = ".",

@@ -1,10 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
-local TableUtil = require(ReplicatedStorage.Packages.TableUtil)
 local Helper = require(ServerScriptService.Server.Classes.Helper)
 local Pathfinding = require(ServerScriptService.Server.Classes.Modules.Pathfinding)
-local SetInterval = require(ServerScriptService.Server.Modules.SetInterval)
+local ProgressBar = require(ServerScriptService.Server.Modules.Tweens.ProgressBar)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
@@ -80,6 +79,14 @@ end
 function JobManager.BeginGathering(self: JobManager, helper: HelperType.HelperData)
 	if not helper then return end
 
+	local helperProgressBillboard: BillboardGui? = helper.Model and helper.Model:FindFirstChild("HelperProgress")
+	local progressBarFrame
+	if helperProgressBillboard then
+		progressBarFrame = helperProgressBillboard:FindFirstChild("ProgressBar", true)
+		helperProgressBillboard.Enabled = true
+		ProgressBar.Show(helperProgressBillboard)
+	end
+
 	local waitTime: number = helper.Stats and helper.Stats.LoadTime
 	if waitTime then
 		local timePassed = 0
@@ -91,16 +98,19 @@ function JobManager.BeginGathering(self: JobManager, helper: HelperType.HelperDa
 					finished = true
 				else
 					timePassed += 1
-					print("gathering")
-					-- updated progress
+
+					if progressBarFrame then ProgressBar.Update(progressBarFrame, timePassed, waitTime) end
+
 					task.wait(1)
 				end
 			end
 
 			if finished then
+				ProgressBar.Hide(helperProgressBillboard)
 				print("gathering complete!")
 				-- Continue to next phase of job or fire completion event
 			else
+				ProgressBar.Hide(helperProgressBillboard)
 				print("gathering cancelled")
 			end
 		end)

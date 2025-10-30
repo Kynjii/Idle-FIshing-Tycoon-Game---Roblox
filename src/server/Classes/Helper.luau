@@ -1,10 +1,12 @@
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
+
 local ClassCalculators = require(ServerScriptService.Server.Classes.Modules.ClassCalculators)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local ClassVisualizer = require(ServerScriptService.Server.Classes.Modules.ClassVisualizer)
 local HelperCalculators = require(ServerScriptService.Server.Classes.Modules.HelperCalculators)
+local CollisionGroups = require(ServerScriptService.Server.Game.CollisionGroups.CollisionGroups)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local Formulas = require(ServerScriptService.Server.Math.Formulas)
 local Jobs = require(ServerScriptService.Server.Modules.Jobs.Jobs)
@@ -41,10 +43,6 @@ local DEFAULTS = {
 	IsPurchased = false,
 	ResourceInStorage = 0,
 }
-
--- local ANIMATIONS = {
--- 	WaterBob = "WaterBob",
--- }
 -- //!SECTION
 
 local Helper = {}
@@ -246,6 +244,8 @@ function Helper.CreateModel(self: Helper)
 				end
 			end
 		end
+
+		CollisionGroups.SetNpcCollisionGroup(clonedModel)
 	end
 
 	local startPos: Vector3 = Jobs.Data[self.CurrentAssignment].Location
