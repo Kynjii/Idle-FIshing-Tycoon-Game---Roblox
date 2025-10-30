@@ -174,6 +174,8 @@ function PathFinding.GoGatherSpot(jobId: number, helperId: string, npcModel: Mod
 		-- Fire event when all destinations reached
 		local helperAtGatheringLocationEvent = Events.GetBindableEvent(Events.BindableNames.HelperAtGatheringLoc)
 		if helperAtGatheringLocationEvent and completedAllDestinations then Events.FireBindableEvent(Events.BindableNames.HelperAtGatheringLoc, { Id = helperId, JobId = jobId }) end
+
+		task.wait(0.2)
 	end)
 end
 
@@ -337,6 +339,8 @@ function PathFinding.GoUnloadSpot(jobId: number, helperId: string, npcModel: Mod
 		-- Fire event when all destinations reached
 		local helperAtUnloadingLocEvent = Events.GetBindableEvent(Events.BindableNames.HelperAtUnloadingLoc)
 		if helperAtUnloadingLocEvent and completedAllDestinations then Events.FireBindableEvent(Events.BindableNames.HelperAtUnloadingLoc, { Id = helperId, JobId = jobId }) end
+
+		task.wait(0.2)
 	end)
 end
 
