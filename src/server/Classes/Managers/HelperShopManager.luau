@@ -63,7 +63,6 @@ function HelperShopManager.New(shopState: ShopState, player: Player, teamId: num
 	self:StartRefreshMonitor()
 
 	self:AttachEventListeners()
-
 	return self
 end
 

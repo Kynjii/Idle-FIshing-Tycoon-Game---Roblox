@@ -108,6 +108,21 @@ function ChainManager.Initialize(self: ChainManagerInstance)
 	self:AttachAttListeners()
 end
 
+type SendStorageFishData = {
+	Player: Player,
+	HelperId: string,
+	JobId: number,
+	Amount: number,
+}
+
+type GetStorageFishData = {
+	Player: Player,
+	JobId: number,
+	TeamId: number,
+	AvailableStorage: number,
+	HelperId: string,
+}
+
 function ChainManager.AttachAttListeners(self: ChainManagerInstance)
 	if self.TenderModel and self.TenderModel.PrimaryPart then
 		if self._cleaner then
@@ -174,16 +189,28 @@ function ChainManager.AttachAttListeners(self: ChainManagerInstance)
 	end
 
 	if self.LaneStorage then
-		local helperGatherBindableFn: BindableFunction? = Events.GetBindableFn(Events.BindableFunctionNames.GatherResource.Fish)
-		if helperGatherBindableFn then helperGatherBindableFn.OnInvoke = function(availableStorage)
-			local helperStorage = availableStorage
+		local getStorageFish = Events.GetBindableEvent(Events.BindableNames.GetStorageFish)
+		if getStorageFish then getStorageFish.Event:Connect(function(request: GetStorageFishData)
+			if request.Player ~= self.Player or self.Owner ~= request.Player.UserId then return end
+			if self.TeamId ~= request.TeamId then return end
+			if self.Tier ~= request.JobId then return end
+
+			local helperStorage = request.AvailableStorage
 			local storage = self.LaneStorage
 			local availableFishInStorage = storage.FishInStorage
 
 			local amount = math.min(helperStorage, availableFishInStorage)
+			print(helperStorage, storage, availableFishInStorage, amount)
 			storage:RemoveFish(amount)
-			return amount
-		end end
+
+			local data: SendStorageFishData = {
+				Amount = amount,
+				HelperId = request.HelperId,
+				JobId = request.JobId,
+				Player = request.Player,
+			}
+			Events.FireBindableEvent(Events.BindableNames.SendStorageFish, data)
+		end) end
 	end
 end
 

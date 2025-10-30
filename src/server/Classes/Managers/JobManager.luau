@@ -88,24 +88,25 @@ function JobManager.BeginAction(self: JobManager, actionType: string, helper: He
 				if timePassed >= waitTime then
 					finished = true
 				else
-					timePassed += 1
-
+					timePassed += 0.5
 					if progressBarFrame then ProgressBar.Update(progressBarFrame, timePassed, waitTime) end
-
-					task.wait(1)
+					task.wait(0.5)
 				end
 			end
 
 			if finished then
 				ProgressBar.Hide(helperProgressBillboard)
 				if isGatherAction then
-					local getResource = Events.GetBindableFn(Events.BindableFunctionNames.GatherResource[helper.ResourceType])
-					print(getResource)
-					if getResource then
-						local resourceAmount: number = getResource:Invoke(helper.Stats.Storage)
-						if resourceAmount then helper:AddResource(resourceAmount) end
-						Pathfinding.GoUnloadSpot(jobId, helper.Id, helper.Model, self.Player)
-					end
+					local availableStorage = helper.Stats.Storage
+
+					local data: GetStorageFishData = {
+						Player = self.Player,
+						JobId = jobId,
+						TeamId = self.TeamId,
+						AvailableStorage = availableStorage,
+						HelperId = helper.Id,
+					}
+					Events.FireBindableEvent(Events.BindableNames.GetStorageFish, data)
 				else
 					local amount = helper.ResourceInStorage
 					DataService.Spend(self.Player, FFGEnum.CURRENCY_TYPES.Gold, amount)
@@ -146,6 +147,21 @@ function JobManager.BeginGathering(self: JobManager, helper: HelperType.HelperDa
 	self:BeginAction(actionType, helper, jobId)
 end
 
+type SendStorageFishData = {
+	Player: Player,
+	HelperId: string,
+	JobId: number,
+	Amount: number,
+}
+
+type GetStorageFishData = {
+	Player: Player,
+	JobId: number,
+	TeamId: number,
+	AvailableStorage: number,
+	HelperId: string,
+}
+
 -- //SECTION - Event Listeners
 function JobManager.AttachEventListeners(self: JobManager): ()
 	-- Remote events for assigning helper to a job
@@ -176,6 +192,25 @@ function JobManager.AttachEventListeners(self: JobManager): ()
 		if not helper then return end
 
 		self:StartJob(helper, jobId)
+	end) end
+
+	-- //TODO - Perhaps change the name, it's confusing. This is the chainmanager sending fish to me
+	local sendStorageFish = Events.GetBindableEvent(Events.BindableNames.SendStorageFish)
+	if sendStorageFish then sendStorageFish.Event:Connect(function(data: SendStorageFishData)
+		local player = data.Player
+		if player ~= self.Player then return end
+
+		local helperId = data.HelperId
+		local helper = self.Helpers[helperId]
+		if not helper then return end
+
+		local jobId = data.JobId
+		if helper.CurrentAssignment ~= jobId then return end
+
+		local amount = data.Amount
+		print(amount)
+		if amount then helper:AddResource(amount) end
+		Pathfinding.GoUnloadSpot(jobId, helper.Id, helper.Model, self.Player)
 	end) end
 end
 -- //!SECTION

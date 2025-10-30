@@ -32,10 +32,17 @@ Events.BindableFunctionNames = {
 }
 
 Events.BindableNames = {
+	-- UI
 	ShowTooltip = "ShowTooltip",
 	CloseUIWindow = "CloseUIWindow",
+
+	-- Helper Pathfinding
 	HelperAtGatheringLoc = "HelperAtGatheringLoc",
 	HelperAtUnloadingLoc = "HelperAtUnloadingLoc",
+
+	-- Transporter (Helper) cycle
+	GetStorageFish = "RequestStorageFish",
+	SendStorageFish = "SendStorageFish",
 }
 
 local FOLDER_NAME = "RME"
@@ -90,6 +97,21 @@ function Events.InitOnServer()
 			local ev = Instance.new("BindableEvent")
 			ev.Name = bindableName
 			ev.Parent = bindableFolder
+		end
+	end
+
+	local bindableFnFolder = ReplicatedStorage:FindFirstChild(FOLDER_NAME_BINDABLE_FUNCS)
+	if not bindableFnFolder then
+		bindableFnFolder = Instance.new("Folder")
+		bindableFnFolder.Name = FOLDER_NAME_BINDABLE_FUNCS
+		bindableFnFolder.Parent = ReplicatedStorage
+	end
+
+	for _, bindableFnName in pairs(Events.BindableFunctionNames.GatherResource) do
+		if not bindableFnFolder:FindFirstChild(bindableFnName) then
+			local ev = Instance.new("BindableFunction")
+			ev.Name = bindableFnName
+			ev.Parent = bindableFnFolder
 		end
 	end
 end
