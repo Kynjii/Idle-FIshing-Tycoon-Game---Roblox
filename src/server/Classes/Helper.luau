@@ -36,7 +36,7 @@ local DEFAULTS = {
 	RealmId = 1,
 	Name = "Unnamed Helper",
 	Level = 1,
-	MaxLevel = 100,
+	MaxLevel = Formulas.MAX_LEVEL,
 	UpgradeStage = 1,
 	StorageFull = false,
 	BaseCost = Formulas.HELPER.BaseCost,
@@ -330,6 +330,12 @@ end
 function Helper.RemoveResource(self: Helper, amount: number): ()
 	self.ResourceInStorage -= amount
 	self:UpdateStorageStatus(false)
+	self:Save()
+end
+
+function Helper.ClearStorage(self: Helper): ()
+	self.ResourceInStorage = 0
+	self:UpdateStorageStatus(true)
 	self:Save()
 end
 

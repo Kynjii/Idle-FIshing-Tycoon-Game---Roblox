@@ -39,6 +39,7 @@ export type HelperData = {
 	Player: Player,
 	Description: string,
 	ResourceType: string,
+	ClearStorage: () -> (),
 }
 
 export type HelperInstance = {
@@ -62,6 +63,7 @@ export type HelperInstance = {
 	UpgradeCost: number?,
 	Model: Model?,
 	_cleaner: any?,
+	ClearStorage: () -> (),
 }
 
 export type HelperModule = {

@@ -1,26 +1,27 @@
 -- //SECTION - Progression knobs
-local MAX_LEVEL = 100
+local MAX_LEVEL = 500
 
--- Level thresholds when "promoted" to the next stage (1-indexed stage)
-local PROMO_LEVEL = { 1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
+local PROMO_LEVEL = { 1, 5, 10, 20, 35, 55, 80, 110, 145, 185, 230, 280, 335, 395, 460, 500 }
 
--- Early stages: earnings > costs ; Later stages: costs > earnings
--- Per-stage geometric rates used to build cumulative level multipliers.
-local EARN_RATE = { 1.25, 1.16, 1.12, 1.10, 1.08, 1.08, 1.07, 1.06, 1.05, 1.05 } -- FPS / Storage, etc.
-local COST_RATE = { 1.14, 1.16, 1.18, 1.19, 1.20, 1.21, 1.22, 1.23, 1.24, 1.25 } -- Upgrade Cost
+local EARN_RATE = { 1.30, 1.25, 1.20, 1.18, 1.15, 1.12, 1.10, 1.08, 1.06, 1.05, 1.04, 1.04, 1.03, 1.03, 1.02, 1.02 }
+local COST_RATE = { 1.18, 1.20, 1.22, 1.23, 1.24, 1.25, 1.26, 1.27, 1.28, 1.29, 1.30, 1.31, 1.32, 1.33, 1.34, 1.35 }
 
--- One-time bonus when ENTERING a stage (by stage index AFTER the bump).
--- Example: going 1 -> 2 at level 10 applies +7% immediately.
 local EARN_BONUS = {
-	[2] = 0.07,
-	[3] = 0.07,
-	[4] = 0.08,
-	[5] = 0.08,
-	[6] = 0.10,
-	[7] = 0.10,
-	[8] = 0.12,
-	[9] = 0.12,
-	[10] = 0.15,
+	[2] = 0.05,
+	[3] = 0.05,
+	[4] = 0.06,
+	[5] = 0.06,
+	[6] = 0.07,
+	[7] = 0.07,
+	[8] = 0.08,
+	[9] = 0.08,
+	[10] = 0.09,
+	[11] = 0.09,
+	[12] = 0.10,
+	[13] = 0.10,
+	[14] = 0.11,
+	[15] = 0.11,
+	[16] = 0.12,
 }
 -- //!SECTION
 
@@ -127,40 +128,51 @@ local FORMULAS = {
 FORMULAS.PER_LEVEL_STORAGE_ADD = 30.0 -- +30 storage / level
 FORMULAS.PER_LEVEL_FPS_ADD = 10 -- +10 FPS   / level
 
--- =========================
--- Time-stat tuning (Stage → % faster)
--- =========================
-
-FORMULAS.STAGE_TIME_REDUCTION_COEFF = 0.20 -- each +1.0 of (stageMult-1) ≈ 20% faster
-FORMULAS.MAX_STAGE_TIME_REDUCTION = 0.50 -- cap 50% faster from Stage
-FORMULAS.TIME_MIN_FRACTION = 0.05 -- never below 5% of base
+-- Add percentage-based per-level growth for compound excitement
+FORMULAS.PER_LEVEL_MULT = 1.02 -- 2% compound growth per level
 
 -- =========================
--- Helper system knobs
+-- Time-stat tuning (Stage → % faster) - IMPROVED
 -- =========================
 
--- Quality (rarity) multiplier after Level & Stage
+FORMULAS.STAGE_TIME_REDUCTION_COEFF = 0.30 -- 30% per stage (was 20%)
+FORMULAS.MAX_STAGE_TIME_REDUCTION = 0.80 -- cap 80% faster (was 50%)
+FORMULAS.TIME_MIN_FRACTION = 0.02 -- never below 2% of base (was 5%)
+
+-- Add breakthrough levels for major time reductions
+FORMULAS.TIME_BREAKTHROUGH_LEVELS = {
+	[25] = 0.15, -- -15% at level 25
+	[50] = 0.25, -- -25% at level 50
+	[100] = 0.40, -- -40% at level 100
+	[200] = 0.55, -- -55% at level 200
+	[350] = 0.70, -- -70% at level 350
+}
+
+-- =========================
+-- Helper system knobs - IMPROVED
+-- =========================
+
 FORMULAS.QUALITY_MULT = {
 	[1] = 1.00, -- Common
-	[2] = 1.32, -- Uncommon
-	[3] = 1.74, -- Rare
-	[4] = 2.30, -- Epic
-	[5] = 3.03, -- Legendary
-	[6] = 4.00, -- Mythic
+	[2] = 1.20, -- Uncommon
+	[3] = 1.45, -- Rare
+	[4] = 1.75, -- Epic
+	[5] = 2.10, -- Legendary
+	[6] = 2.50, -- Mythic
 }
 
 -- Base stats (defaults exist for all; per-jobCategory are exclusive)
 FORMULAS.HELPER_BASE = {
 	Defaults = {
-		WalkSpeed = 5, -- “up”
-		Storage = 50, -- “up”
+		WalkSpeed = 5, -- "up"
+		Storage = 50, -- "up"
 		LoadTime = 15, -- "timeDown"
 	},
 	PerJobCategory = {
-		Fishing = { CatchRate = 5, Luck = 0.02, CastTime = 6 }, -- CastTime “timeDown”
+		Fishing = { CatchRate = 5, Luck = 0.02, CastTime = 6 }, -- CastTime "timeDown"
 		Woodcutting = { WoodYield = 5, CritChance = 0.02, SwingRate = 6 },
 		Mining = { OreYield = 5, CritChance = 0.02, SwingRate = 6 },
-		Transporting = { FishStorage = 50, FishValue = 12, LoadTime = 10 },
+		Transporting = { Storage = 100, FishValue = 12, LoadTime = 10 },
 	},
 }
 
@@ -175,7 +187,7 @@ FORMULAS.HELPER_PER_LEVEL_ADD = {
 		Fishing = { CatchRate = 0.30, Luck = 1, CastTime = 0.01 },
 		Woodcutting = { WoodYield = 0.30, CritChance = 1, SwingRate = 0.01 },
 		Mining = { OreYield = 0.30, CritChance = 1, SwingRate = 0.01 },
-		Transporting = { FishStorage = 0.50, FishValue = 1, LoadTime = 0.03 },
+		Transporting = { Storage = 0.50, FishValue = 1, LoadTime = 0.03 },
 	},
 }
 
@@ -201,16 +213,16 @@ FORMULAS.HELPER_STAT_TYPES = {
 }
 
 -- =========================
--- Perks: slots, value ranges, selection weights
+-- Perks: slots, value ranges, selection weights - IMPROVED
 -- =========================
 
--- How many perk slots a Helper gets by quality
+-- Everyone gets perks now for more interesting gameplay
 FORMULAS.QUALITY_PERK_COUNT = {
-	[1] = 0, -- Common
-	[2] = 0, -- Uncommon
-	[3] = 1, -- Rare
+	[1] = 1, -- Common
+	[2] = 1, -- Uncommon
+	[3] = 2, -- Rare
 	[4] = 2, -- Epic
-	[5] = 2, -- Legendary
+	[5] = 3, -- Legendary
 	[6] = 3, -- Mythic
 }
 
@@ -224,7 +236,7 @@ FORMULAS.QUALITY_PERK_VALUE_MULT = {
 	[6] = 1.12,
 }
 
--- Perk value ranges (fractions unless noted). Keys must match your HelperCalculator’s PERKS_DEF.
+-- Perk value ranges (fractions unless noted). Keys must match HelperCalculator's PERKS_DEF.
 FORMULAS.PERK_VALUE_RANGES = {
 	Fleet = { min = 0.06, max = 0.12 }, -- +% WalkSpeed
 	Organizer = { min = 0.08, max = 0.15 }, -- +% Storage
@@ -236,7 +248,7 @@ FORMULAS.PERK_VALUE_RANGES = {
 	FishMonger = { min = 0.10, max = 0.18 }, -- +% FishValue (+flat RouteSkill)
 }
 
--- Small flat “side bonuses” paired with some perks
+-- Small flat "side bonuses" paired with some perks
 FORMULAS.PERK_FLAT_SIDE_BONUS = {
 	SeasonedAngler = 3, -- +Luck
 	TrueGrit = 3, -- +Sturdiness
@@ -244,7 +256,7 @@ FORMULAS.PERK_FLAT_SIDE_BONUS = {
 	FishMonger = 3, -- +RouteSkill
 }
 
--- Optional weighted selection for perks (higher = more likely). Omit for uniform.
+-- Optional weighted selection for perks (higher = more likely).
 FORMULAS.PERK_SELECTION_WEIGHTS = {
 	-- Fleet = 1.0,
 	-- Organizer = 1.0,
@@ -253,6 +265,26 @@ FORMULAS.PERK_SELECTION_WEIGHTS = {
 	-- TrueGrit = 1.2,
 	-- StoneSense = 1.2,
 	-- FishMonger = 1.2,
+}
+
+-- =========================
+-- Resource Scaling Improvements (#6)
+-- =========================
+
+-- Milestone bonuses to break up progression walls
+FORMULAS.MILESTONE_BONUSES = {
+	-- Level milestones
+	[10] = { type = "cost_reduction", value = 0.10 }, -- -10% costs
+	[25] = { type = "earn_boost", value = 0.25 }, -- +25% earnings
+	[50] = { type = "helper_slots", value = 1 }, -- +1 helper slot
+	[75] = { type = "cost_reduction", value = 0.15 }, -- -15% costs
+	[100] = { type = "earn_boost", value = 0.50 }, -- +50% earnings
+	[150] = { type = "helper_slots", value = 2 }, -- +2 helper slots
+	[200] = { type = "cost_reduction", value = 0.20 }, -- -20% costs
+	[250] = { type = "earn_boost", value = 0.75 }, -- +75% earnings
+	[300] = { type = "helper_slots", value = 2 }, -- +2 helper slots
+	[400] = { type = "cost_reduction", value = 0.25 }, -- -25% costs
+	[500] = { type = "earn_boost", value = 1.00 }, -- +100% earnings
 }
 
 return FORMULAS

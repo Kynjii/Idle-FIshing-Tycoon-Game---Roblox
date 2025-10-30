@@ -139,8 +139,18 @@ function HelperShopManager.RestockShop(self: HelperShopManager)
 	local preparedData = {}
 
 	for i = 1, INVENTORY_AMOUNT do
-		local helper = Helper.CreateStateData(self.Player, "Gold")
-		preparedData[helper.Id] = helper
+		-- //TODO - TEMP until other job categories are in the game
+		local isTransporter = false
+		while not isTransporter do
+			local helper = Helper.CreateStateData(self.Player, "Gold")
+
+			if helper.JobCategory == FFGEnum.JOB_CATEGORY.Transporting then
+				preparedData[helper.Id] = helper
+				isTransporter = true
+			end
+
+			task.wait()
+		end
 	end
 
 	self.Inventory = preparedData

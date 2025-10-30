@@ -84,7 +84,7 @@ function JobManager.BeginAction(self: JobManager, actionType: string, helper: He
 		local finished = false
 
 		local actionTask = task.spawn(function()
-			while not finished and helper and self.Player do
+			while not finished do
 				if timePassed >= waitTime then
 					finished = true
 				else
@@ -110,7 +110,7 @@ function JobManager.BeginAction(self: JobManager, actionType: string, helper: He
 				else
 					local amount = helper.ResourceInStorage
 					DataService.Earn(self.Player, FFGEnum.CURRENCY_TYPES.Gold, amount)
-					helper:RemoveResource(helper.ResourceInStorage)
+					helper:ClearStorage()
 					self:StartJob(helper, jobId)
 				end
 			else

@@ -45,6 +45,11 @@ FFGEnum.STAGES = {
 	[9] = { Color = Color3.fromHex("#C9A242"), Label = "Stage IX" },
 	[10] = { Color = Color3.fromHex("#B98C1F"), Label = "Stage X" },
 	[11] = { Color = Color3.fromHex("#A67812"), Label = "Stage XI" },
+	[12] = { Color = Color3.fromHex("#936505"), Label = "Stage XII" },
+	[13] = { Color = Color3.fromHex("#805300"), Label = "Stage XIII" },
+	[14] = { Color = Color3.fromHex("#6D4200"), Label = "Stage XIV" },
+	[15] = { Color = Color3.fromHex("#5A3200"), Label = "Stage XV" },
+	[16] = { Color = Color3.fromHex("#472200"), Label = "Stage XVI" },
 }
 
 FFGEnum.ATTRIBUTES = {
