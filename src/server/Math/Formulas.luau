@@ -152,14 +152,15 @@ FORMULAS.QUALITY_MULT = {
 -- Base stats (defaults exist for all; per-jobCategory are exclusive)
 FORMULAS.HELPER_BASE = {
 	Defaults = {
-		WalkSpeed = 10, -- “up”
+		WalkSpeed = 5, -- “up”
 		Storage = 50, -- “up”
+		LoadTime = 15, -- "timeDown"
 	},
 	PerJobCategory = {
 		Fishing = { CatchRate = 5, Luck = 0.02, CastTime = 6 }, -- CastTime “timeDown”
 		Woodcutting = { WoodYield = 5, CritChance = 0.02, SwingRate = 6 },
 		Mining = { OreYield = 5, CritChance = 0.02, SwingRate = 6 },
-		Transporting = { FishStorage = 50, FishValue = 12, LoadTime = 15 },
+		Transporting = { FishStorage = 50, FishValue = 12, LoadTime = 10 },
 	},
 }
 
@@ -168,12 +169,13 @@ FORMULAS.HELPER_PER_LEVEL_ADD = {
 	Defaults = {
 		WalkSpeed = 0.35,
 		Storage = 30,
+		LoadTime = 0.01,
 	},
 	PerJobCategory = {
-		Fishing = { CatchRate = 0.30, Luck = 0.15, CastTime = 0.01 },
-		Woodcutting = { WoodYield = 0.30, CritChance = 0.15, SwingRate = 0.01 },
-		Mining = { OreYield = 0.30, CritChance = 0.15, SwingRate = 0.01 },
-		Transporting = { FishStorage = 0.50, FishValue = 0.15, LoadTime = 0.01 },
+		Fishing = { CatchRate = 0.30, Luck = 1, CastTime = 0.01 },
+		Woodcutting = { WoodYield = 0.30, CritChance = 1, SwingRate = 0.01 },
+		Mining = { OreYield = 0.30, CritChance = 1, SwingRate = 0.01 },
+		Transporting = { FishStorage = 0.50, FishValue = 1, LoadTime = 0.03 },
 	},
 }
 

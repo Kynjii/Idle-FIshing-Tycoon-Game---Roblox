@@ -15,20 +15,17 @@ type JobManager = typeof(setmetatable({}, JobManager))
 
 function JobManager.New(helperState, player: Player, teamId: number): JobManager
 	local self = setmetatable({} :: JobManager, JobManager)
-	print(helperState)
 	self.Player = player
 	self.Owner = self.Owner or player.UserId
 	self.TeamId = teamId
 
-	print(player, self.Player)
 	self.Helpers = {}
 
 	self._cleaner = Trove.new()
 
 	self:CreateHelpers(helperState)
-	self:AssignJobs(player)
-
 	self:AttachEventListeners()
+	self:AssignJobs(player)
 
 	return self
 end
@@ -38,8 +35,6 @@ function JobManager.CreateHelpers(self: JobManager, helperState)
 		local helperClass = Helper.New(helper, self.Player, self.TeamId)
 		self.Helpers[helperClass.Id] = helperClass
 	end
-
-	print(self.Helpers)
 end
 
 function JobManager.AssignJobs(self: JobManager, player: Player)
@@ -64,14 +59,10 @@ function JobManager.AssignHelper(self: JobManager, helperId: number, jobId: numb
 		helper = newHelperClass
 	end
 
-	if helper and helper.AssignJob then
-		local assigned = helper:AssignJob(jobId, true)
-		if assigned then self:StartJob(helper, jobId) end
-	end
+	if helper and helper.AssignJob then helper:AssignJob(jobId, true) end
 end
 
 function JobManager.StartJob(self: JobManager, helper: HelperType.HelperInstance, jobId: number)
-	print(helper.Model)
 	if not helper or not helper.Model then return end
 
 	if helper.ResourceInStorage > 0 then
@@ -99,10 +90,13 @@ function JobManager.AttachEventListeners(self: JobManager): ()
 	end) end
 
 	local helperAtUnloadingLoc = Events.GetBindableEvent(Events.BindableNames.HelperAtUnloadingLoc)
-	if helperAtUnloadingLoc then helperAtUnloadingLoc.Event:Connect(function(helperId, helperJobId)
+	if helperAtUnloadingLoc then helperAtUnloadingLoc.Event:Connect(function(data)
+		local helperId = data.Id
+		local jobId = data.JobId
 		local helper = self.Helpers[helperId]
-		print(helper)
-		self:StartJob(helper, helperJobId)
+		if not helper then return end
+
+		self:StartJob(helper, jobId)
 	end) end
 
 	local helperStuck = Events.GetBindableEvent(Events.BindableNames.HelperStuck)

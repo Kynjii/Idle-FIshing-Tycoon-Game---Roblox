@@ -204,13 +204,52 @@ function Helper.CreateModel(self: Helper)
 				if part.Name ~= "HumanoidRootPart" then part.Transparency = 0 end
 				part.Anchored = false
 			end
+
+			if part.Name == "Humanoid" then
+				local humanoid: Humanoid = part
+				humanoid.WalkSpeed = self.Stats and self.Stats.WalkSpeed
+			end
+
+			if part.Name == "HelperName" then
+				local namePlate: TextLabel = part:FindFirstChild("Name")
+				local playerNameLabel: TextLabel = part:FindFirstChild("PlayerName")
+				if namePlate and playerNameLabel then
+					local function colorToRgbString(c)
+						if typeof(c) == "Color3" then
+							local r = math.floor(c.R * 255 + 0.5)
+							local g = math.floor(c.G * 255 + 0.5)
+							local b = math.floor(c.B * 255 + 0.5)
+							return string.format("%d,%d,%d", r, g, b)
+						elseif typeof(c) == "string" then
+							return c
+						elseif typeof(c) == "table" then
+							return table.concat(c, ",")
+						else
+							return "255,255,255"
+						end
+					end
+
+					local playerName = (typeof(self.Player) == "Instance" and self.Player.Name) or tostring(self.Player)
+					local helperName = tostring(self.Name)
+					local qualityColor = colorToRgbString(FFGEnum.QUALITIES[self.QualityId].Color)
+					local stageColor = colorToRgbString(FFGEnum.STAGES[self.UpgradeStage].Color)
+					local stageLabel = tostring(FFGEnum.STAGES[self.UpgradeStage].Label)
+
+					playerNameLabel.RichText = true
+					playerNameLabel.Font = FFGEnum.THEME.normalFont
+					playerNameLabel.Text = playerName
+
+					namePlate.RichText = true
+					namePlate.Text = string.format("<font color='rgb(%s)'>%s</font> | <font color='rgb(%s)'>%s</font>", qualityColor, helperName, stageColor, stageLabel)
+				end
+			end
 		end
 	end
 
 	local startPos: Vector3 = Jobs.Data[self.CurrentAssignment].Location
 	if startPos then
 		self.Model:MoveTo(startPos)
-		Events.FireBindableEvent(Events.BindableNames.HelperAtUnloadingLoc, self.Player, self.Id, self.CurrentAssignment)
+		Events.FireBindableEvent(Events.BindableNames.HelperAtUnloadingLoc, { Id = self.Id, JobId = self.CurrentAssignment })
 	end
 end
 
