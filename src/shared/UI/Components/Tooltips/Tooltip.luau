@@ -4,6 +4,7 @@ local AnimateButtonHover = require(StarterPlayer.StarterPlayerScripts.Client.HUD
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local Button = require(ReplicatedStorage.Shared.UI.Components.Buttons.Button)
+local UIConfig = require(ReplicatedStorage.Shared.UI.UIConfig)
 
 local Tooltip = {}
 Tooltip.Existing = {}
@@ -52,6 +53,7 @@ function Tooltip.Create(props: {
 	tooltipContainer.AnchorPoint = FFGEnum.THEME.alignment.anchor.left
 	tooltipContainer.Position = UDim2.fromScale(1.05, 0.5)
 	tooltipContainer.Visible = props.Visible or false
+	UIConfig.applyAspect(tooltipContainer, 3 / 4)
 
 	-- //SECTION - Tooltip Outline
 	local containerStroke = Instance.new("UIStroke")
@@ -104,6 +106,7 @@ function Tooltip.Create(props: {
 		itemLabel.TextColor3 = FFGEnum.THEME.color.white
 	end
 	itemLabel.TextScaled = true
+	UIConfig.applyTextConstraints(itemLabel, "h1")
 	itemLabel.Parent = frameHeader
 	-- //!SECTION
 	-- //!SECTION
@@ -154,10 +157,7 @@ function Tooltip.Create(props: {
 	itemImageContainer.BackgroundColor3 = FFGEnum.THEME.shop.shopItem.bgColor
 	itemImageContainer.Size = UDim2.fromScale(0.5, 0.5)
 	itemImageContainer.Parent = itemInfoContainer
-
-	local uIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
-	uIAspectRatioConstraint.Name = "UIAspectRatioConstraint"
-	uIAspectRatioConstraint.Parent = itemImageContainer
+	UIConfig.applyAspect(itemImageContainer)
 
 	local imageLabel = Instance.new("ImageLabel")
 	imageLabel.Image = props.ItemImage
@@ -190,6 +190,7 @@ function Tooltip.Create(props: {
 	priceLabel.BackgroundTransparency = 1
 	priceLabel.Size = UDim2.fromScale(0.9, 0.15)
 	priceLabel.Parent = itemInfoContainer
+	UIConfig.applyTextConstraints(priceLabel, "h2")
 	-- //!SECTION
 
 	-- //SECTION - Item Description
@@ -204,6 +205,7 @@ function Tooltip.Create(props: {
 	descriptionLabel.BackgroundTransparency = 1
 	descriptionLabel.Size = UDim2.fromScale(0.9, 0.35)
 	descriptionLabel.Parent = itemInfoContainer
+	UIConfig.applyTextConstraints(descriptionLabel, "body")
 	-- //!SECTION
 
 	-- //SECTION - Item Stats
@@ -299,6 +301,7 @@ function Tooltip.Create(props: {
 			statElementLabel.BackgroundTransparency = 1
 			statElementLabel.Size = UDim2.fromScale(0.5, 1)
 			statElementLabel.Parent = statFrameContainer
+			UIConfig.applyTextConstraints(statElementLabel, "body")
 
 			local statElementValue = Instance.new("TextLabel")
 			statElementValue.Name = `{stat.Label}_Value`
@@ -312,6 +315,7 @@ function Tooltip.Create(props: {
 			statElementValue.BackgroundTransparency = 1
 			statElementValue.Size = UDim2.fromScale(0.5, 1)
 			statElementValue.Parent = statFrameContainer
+			UIConfig.applyTextConstraints(statElementValue, "body")
 		end
 	end
 	-- //!SECTION
@@ -353,6 +357,12 @@ function Tooltip.Create(props: {
 	uiListLayout.VerticalFlex = Enum.UIFlexAlignment.SpaceEvenly
 	uiListLayout.Parent = itemInfoContainer
 	-- -- //!SECTION
+
+	UIConfig.observeViewport(function()
+		UIConfig.applyTextConstraints(itemLabel, "h1")
+		UIConfig.applyTextConstraints(priceLabel, "h2")
+		UIConfig.applyTextConstraints(descriptionLabel, "body")
+	end)
 
 	return tooltipContainer
 end

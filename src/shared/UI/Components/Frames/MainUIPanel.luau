@@ -4,7 +4,9 @@ local StarterPlayer = game:GetService("StarterPlayer")
 
 local PanelTab = require(script.Parent.PanelTab)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
+local UIConfig = require(ReplicatedStorage.Shared.UI.UIConfig)
 local AnimateButtonHover = require(StarterPlayer.StarterPlayerScripts.Client.HUD.Utils.AnimateButtonHover)
+
 local MainUIPanel = {}
 
 type TabsData = {
@@ -37,11 +39,7 @@ function MainUIPanel.Create(props: {
 	panelContainer.Size = UDim2.fromScale(0.619, 0.7)
 	panelContainer.ZIndex = 0
 	panelContainer.Parent = screenGui
-
-	local panelContainerAspect = Instance.new("UIAspectRatioConstraint")
-	panelContainerAspect.AspectRatio = 1.5
-	panelContainerAspect.AspectType = Enum.AspectType.ScaleWithParentSize
-	panelContainerAspect.Parent = panelContainer
+	UIConfig.applyAspect(panelContainer, 16 / 9)
 
 	local panelBG = Instance.new("ImageLabel")
 	panelBG.Name = "PanelBG"
@@ -64,8 +62,8 @@ function MainUIPanel.Create(props: {
 	tabContainer.Parent = panelContainer
 
 	local uIListLayout = Instance.new("UIListLayout")
+	UIConfig.setGap(uIListLayout, "S")
 	uIListLayout.Name = "UIListLayout"
-	uIListLayout.Padding = UDim.new(0.01, 0)
 	uIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	uIListLayout.Parent = tabContainer
 
@@ -89,7 +87,7 @@ function MainUIPanel.Create(props: {
 	main.Parent = panelContainer
 
 	local mainPadding = Instance.new("UIPadding")
-	mainPadding.PaddingTop = UDim.new(0.01)
+	UIConfig.setPadding(mainPadding, "S")
 	mainPadding.Parent = main
 
 	local panelNameContainer = Instance.new("Frame")
@@ -101,7 +99,7 @@ function MainUIPanel.Create(props: {
 	panelNameContainer.Parent = main
 
 	local panelNameContainerPadding = Instance.new("UIPadding")
-	panelNameContainerPadding.PaddingLeft = UDim.new(0.03)
+	UIConfig.setPadding(panelNameContainerPadding, "S")
 	panelNameContainerPadding.Parent = panelNameContainer
 
 	local textLabel = Instance.new("TextLabel")
@@ -115,6 +113,7 @@ function MainUIPanel.Create(props: {
 	textLabel.TextColor3 = Color3.new(1, 1, 1)
 	textLabel.TextScaled = true
 	textLabel.TextXAlignment = Enum.TextXAlignment.Left
+	UIConfig.applyTextConstraints(textLabel, "h1")
 
 	local uIStroke = Instance.new("UIStroke")
 	uIStroke.Name = "UIStroke"
@@ -132,6 +131,7 @@ function MainUIPanel.Create(props: {
 	innerWindow.Position = UDim2.fromScale(0.500531, 0.568048)
 	innerWindow.Size = UDim2.fromScale(1, 0.863903)
 	innerWindow.ZIndex = 10
+	UIConfig.applyPanelStyle(innerWindow)
 	innerWindow.Parent = main
 
 	local container = Instance.new("Frame")
@@ -202,6 +202,11 @@ function MainUIPanel.Create(props: {
 	uIAspectRatioConstraint1.Parent = closeButton
 
 	closeButton.Parent = main
+
+	UIConfig.observeViewport(function()
+		UIConfig.applyTextConstraints(textLabel, "h1")
+		UIConfig.applyPanelStyle(innerWindow)
+	end)
 
 	return screenGui
 end

@@ -3,6 +3,7 @@ local UserInputService = game:GetService("UserInputService")
 
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
+local UIConfig = require(ReplicatedStorage.Shared.UI.UIConfig)
 
 local function ShopItem(
 	props: {
@@ -96,6 +97,7 @@ local function ShopItem(
 	itemName.TextColor3 = FFGEnum.THEME.color.white
 	itemName.LayoutOrder = 1
 	itemName.Text = props.ItemName
+	UIConfig.applyTextConstraints(itemName, "title")
 	itemName.Parent = mainContainer
 	-- //!SECTION
 
@@ -107,6 +109,7 @@ local function ShopItem(
 	item.BackgroundTransparency = 1
 	item.Size = UDim2.fromScale(0.6, 0.6)
 	item.ZIndex = 2
+	UIConfig.applyAspect(item)
 	item.Parent = mainContainer
 	-- //!SECTION
 
@@ -161,6 +164,7 @@ local function ShopItem(
 	ItemBaseCostTxt.Text = props.ItemBaseCost
 	ItemBaseCostTxt.Font = FFGEnum.THEME.bigFont
 	ItemBaseCostTxt.Size = UDim2.fromScale(0.5, 0.9)
+	UIConfig.applyTextConstraints(ItemBaseCostTxt, "body")
 	ItemBaseCostTxt.Parent = priceContainerInner
 
 	local priceContainerList = Instance.new("UIListLayout")
@@ -206,6 +210,11 @@ local function ShopItem(
 
 	shopItemContainer.MouseLeave:Connect(function()
 		hoverImage.Visible = false
+	end)
+
+	UIConfig.observeViewport(function()
+		UIConfig.applyTextConstraints(itemName, "title")
+		UIConfig.applyTextConstraints(ItemBaseCostTxt, "body")
 	end)
 
 	return shopItemContainer
