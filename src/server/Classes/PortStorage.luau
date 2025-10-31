@@ -436,6 +436,7 @@ function PortStorage.Serialize(self: PortStorage): { [string]: any }
 		Tier = self.Tier,
 		UpgradeStage = self.UpgradeStage,
 		Level = self.Level,
+		BaseCost = self.BaseCost,
 		UpgradeCost = self.UpgradeCost,
 		IsPurchased = self.IsPurchased,
 		BaseStorage = self.BaseStorage,
