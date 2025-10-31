@@ -395,9 +395,6 @@ function Boat.Serialize(self: Boat): { [string]: any }
 		UpgradeStage = self.UpgradeStage,
 		FishInStorage = self.FishInStorage,
 		StorageFull = self.StorageFull,
-		BaseFPS = self.BaseFPS,
-		CurrentFPS = self.CurrentFPS,
-		NextFPS = self.NextFPS,
 	}
 end
 

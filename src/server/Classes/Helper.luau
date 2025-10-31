@@ -409,7 +409,6 @@ function Helper.Serialize(self: Helper): { [string]: any }
 		Name = self.Name,
 		Level = self.Level,
 		CurrencyType = self.CurrencyType,
-		ItemImage = self.ItemImage,
 		JobCategory = self.JobCategory,
 		QualityId = self.QualityId,
 		Stats = self.Stats,

@@ -460,8 +460,6 @@ function Tender.Serialize(self: Tender): { [string]: any }
 		UpgradeStage = self.UpgradeStage,
 		FishInStorage = self.FishInStorage,
 		StorageFull = self.StorageFull,
-		CurrentTravelTime = self.CurrentTravelTime,
-		LoadTime = self.LoadTime,
 	}
 end
 
