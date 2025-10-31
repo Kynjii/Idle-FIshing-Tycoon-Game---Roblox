@@ -12,7 +12,8 @@ Tooltip.Existing = {}
 -- Helper for handling Purchase/Upgrade via tooltip
 local function handleButtonClick(itemId: string, isPurchased: boolean): ()
 	if isPurchased then
-		-- //TODO - Upgrade
+		local assignJobEvent = Events.GetRemote(Events.RemoteNames.AssignJob)
+		if assignJobEvent then assignJobEvent:FireServer(itemId, 1) end -- //TODO
 	else
 		local purchaseEvent = Events.GetRemote(Events.RemoteNames.HelperPurchased)
 		if purchaseEvent then purchaseEvent:FireServer(itemId) end
@@ -343,8 +344,8 @@ function Tooltip.Create(props: {
 	buyButtonContainer.Parent = buttonContainer
 
 	local buyButton = Button.Create({
-		color = "Green",
-		text = props.IsPurchased and "Upgrade" or "Purchase",
+		color = props.IsPurchased and "Purple" or "Green",
+		text = props.IsPurchased and "Assign" or "Purchase",
 		size = UDim2.fromScale(1, 1),
 	})
 	buyButton.Parent = buyButtonContainer
@@ -359,6 +360,36 @@ function Tooltip.Create(props: {
 	buyButton.MouseLeave:Connect(function()
 		AnimateButtonHover.Leave(buyButton, baseSize)
 	end)
+
+	-- If purchased, add an upgrade option
+	if props.IsPurchased then
+		buttonGrid.CellSize = UDim2.fromScale(0.485, 1)
+
+		local upgradeButtonContainer = Instance.new("Frame")
+		upgradeButtonContainer.Name = "UpgradeButtonContainer"
+		upgradeButtonContainer.BackgroundTransparency = 1
+		upgradeButtonContainer.LayoutOrder = 4
+		upgradeButtonContainer.Size = UDim2.fromScale(1, 1)
+		upgradeButtonContainer.Parent = buttonContainer
+
+		local upgradeButton = Button.Create({
+			color = "Green",
+			text = "Upgrade",
+			size = UDim2.fromScale(1, 1),
+		})
+		upgradeButton.Parent = upgradeButtonContainer
+
+		upgradeButton.Activated:Connect(function()
+			-- handleButtonClick(props.ItemId, props.IsPurchased or false)
+		end)
+		local upgradeBaseSize = upgradeButton.Size
+		upgradeButton.MouseEnter:Connect(function()
+			AnimateButtonHover.Enter(upgradeButton, upgradeBaseSize)
+		end)
+		upgradeButton.MouseLeave:Connect(function()
+			AnimateButtonHover.Leave(upgradeButton, upgradeBaseSize)
+		end)
+	end
 	-- //!SECTION
 
 	-- //!SECTION

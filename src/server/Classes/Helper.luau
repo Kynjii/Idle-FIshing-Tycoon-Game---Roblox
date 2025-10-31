@@ -138,8 +138,6 @@ function Helper.New(state: HelperType.HelperData, player: Player, teamId: number
 
 	self._cleaner = Trove.new()
 
-	self:AttachEventListeners()
-
 	return self
 end
 -- //!SECTION
@@ -387,18 +385,6 @@ function Helper.IsStorageFull(self: Helper): boolean
 end
 -- //!SECTION
 
--- //SECTION - Event Listeners
-function Helper.AttachEventListeners(self: Helper)
-	local helperUpgraded = Events.GetRemote(Events.RemoteNames.HelperUpgraded)
-	if helperUpgraded then self._cleaner:Add(helperUpgraded.OnServerEvent:Connect(function(player: Player, helperId: string)
-		if self.Player ~= player or self.Owner ~= player.UserId then return end
-		if helperId ~= self.Id then return end
-
-		self:Upgrade()
-	end)) end
-end
--- //!SECTION
-
 -- //SECTION - Loading and Saving
 function Helper.Serialize(self: Helper): { [string]: any }
 	return {
@@ -408,6 +394,7 @@ function Helper.Serialize(self: Helper): { [string]: any }
 		Owner = self.Owner,
 		Name = self.Name,
 		Level = self.Level,
+		MaxLevel = self.MaxLevel,
 		CurrencyType = self.CurrencyType,
 		ItemImage = self.ItemImage,
 		JobCategory = self.JobCategory,

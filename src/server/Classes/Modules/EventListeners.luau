@@ -16,7 +16,6 @@ type Boat = BoatType.BoatInstance
 type Tender = TenderType.TenderInstance
 type PortStorage = PortStorageType.StorageInstance
 type Building = BuildingType.BuildingInstance
-type Helper = HelperType.HelperInstance
 -- //!SECTION
 
 function EventListeners.Attach(class: Boat | Tender | PortStorage | Building)
@@ -30,7 +29,8 @@ function EventListeners.Attach(class: Boat | Tender | PortStorage | Building)
 	elseif class.Entity == FFGEnum.CLASS.ENTITY_NAME.Building then
 		typedClass = class :: Building
 	elseif class.Entity == FFGEnum.CLASS.ENTITY_NAME.Shop then
-		typedClass = class :: Helper
+		-- //TODO - add type
+		typedClass = class
 	else
 		error("Invalid entity passed to CreatePB")
 	end
@@ -114,7 +114,7 @@ function EventListeners.Attach(class: Boat | Tender | PortStorage | Building)
 		end)) end
 		-- //!SECTION
 	else
-		-- Helper Purchased
+		-- Shop Item Purchased
 		local itemPurchased = Events.GetRemote(Events.RemoteNames.HelperPurchased)
 		if itemPurchased then typedClass._cleaner:Add(itemPurchased.OnServerEvent:Connect(function(player: Player, helperId: string)
 			if typedClass.Player ~= player or typedClass.Owner ~= player.UserId then return end
