@@ -46,7 +46,6 @@ function Button.Create(props: {
 		buttonText.Position = FFGEnum.THEME.alignment.position.center
 		buttonText.Parent = button
 		UIConfig.applyTextConstraints(buttonText, "h2")
-		buttonText.TextScaled = true
 	end
 
 	return button

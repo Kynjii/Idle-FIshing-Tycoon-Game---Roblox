@@ -46,7 +46,7 @@ function populateDetailsUI()
 	updateCrewMngPanelUI()
 end
 
-local getCrewManagementState = Events.GetRemoteFn(Events.RemoteFunctionNames.GetCrewManagementState)
+local getCrewManagementState = Events.GetRemoteFn(Events.RemoteFunctionNames.GetPlayerInventory)
 if crewManagementButton and getCrewManagementState then crewManagementButton.Activated:Connect(function()
 	if screenGui.Enabled then
 		screenGui.Enabled = false
@@ -57,17 +57,6 @@ if crewManagementButton and getCrewManagementState then crewManagementButton.Act
 		return
 	end
 
-	local data = getCrewManagementState:InvokeServer()
-	if data then
-		crewState = data
-
-		populateDetailsUI()
-		screenGui.Enabled = true
-	end
-end) end
-
-local openCrewManagementPanel = Events.GetRemote(Events.RemoteNames.OpenCrewManagementPanel)
-if openCrewManagementPanel and getCrewManagementState then openCrewManagementPanel.OnClientEvent:Connect(function()
 	local data = getCrewManagementState:InvokeServer()
 	if data then
 		crewState = data

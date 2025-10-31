@@ -35,7 +35,7 @@ function MainUIPanel.Create(props: {
 	panelContainer.Name = "PanelContainer"
 	panelContainer.AnchorPoint = Vector2.new(0.5, 0.5)
 	panelContainer.BackgroundTransparency = 1
-	panelContainer.Position = UDim2.fromScale(0.4, 0.5)
+	panelContainer.Position = UDim2.fromScale(0.45, 0.5)
 	panelContainer.Size = UDim2.fromScale(0.619, 0.7)
 	panelContainer.ZIndex = 0
 	panelContainer.Parent = screenGui
@@ -57,7 +57,7 @@ function MainUIPanel.Create(props: {
 	tabContainer.Name = "TabContainer"
 	tabContainer.AnchorPoint = Vector2.new(0.5, 0.5)
 	tabContainer.BackgroundTransparency = 1
-	tabContainer.Position = UDim2.fromScale(-0.035, 0.520888)
+	tabContainer.Position = UDim2.fromScale(-0.035, 0.55)
 	tabContainer.Size = UDim2.fromScale(0.071, 0.778777)
 	tabContainer.Parent = panelContainer
 
@@ -113,7 +113,6 @@ function MainUIPanel.Create(props: {
 	textLabel.TextColor3 = Color3.new(1, 1, 1)
 	textLabel.TextXAlignment = Enum.TextXAlignment.Left
 	UIConfig.applyTextConstraints(textLabel, "h1")
-	textLabel.TextScaled = true
 
 	local uIStroke = Instance.new("UIStroke")
 	uIStroke.Name = "UIStroke"
@@ -145,7 +144,7 @@ function MainUIPanel.Create(props: {
 	closeButton.Name = "CloseButton"
 	closeButton.AnchorPoint = Vector2.new(0.5, 0.5)
 	closeButton.BackgroundColor3 = FFGEnum.THEME.color.orange_900
-	closeButton.Position = UDim2.fromScale(1.00485, -0.00189609)
+	closeButton.Position = UDim2.fromScale(1, 0)
 	closeButton.Size = UDim2.fromScale(0.06, 0.09)
 
 	local baseSize = closeButton.Size

@@ -97,7 +97,6 @@ local function ShopItem(
 	itemName.LayoutOrder = 1
 	itemName.Text = props.ItemName
 	UIConfig.applyTextConstraints(itemName, "body")
-	itemName.TextScaled = true
 	itemName.Parent = mainContainer
 	-- //!SECTION
 
@@ -164,7 +163,6 @@ local function ShopItem(
 	ItemBaseCostTxt.Font = FFGEnum.THEME.bigFont
 	ItemBaseCostTxt.Size = UDim2.fromScale(0.5, 0.9)
 	UIConfig.applyTextConstraints(ItemBaseCostTxt, "body")
-	ItemBaseCostTxt.TextScaled = true
 	ItemBaseCostTxt.Parent = priceContainerInner
 
 	local priceContainerList = Instance.new("UIListLayout")

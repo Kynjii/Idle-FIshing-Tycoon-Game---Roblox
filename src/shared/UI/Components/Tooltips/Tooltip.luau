@@ -94,7 +94,6 @@ function Tooltip.Create(props: {
 		itemLabel.TextColor3 = FFGEnum.THEME.color.white
 	end
 	UIConfig.applyTextConstraints(itemLabel, "h1")
-	itemLabel.TextScaled = true
 	itemLabel.Parent = frameHeader
 	-- //!SECTION
 	-- //!SECTION
@@ -198,7 +197,6 @@ function Tooltip.Create(props: {
 	priceLabel.BackgroundTransparency = 1
 	priceLabel.Parent = priceContainer
 	UIConfig.applyTextConstraints(priceLabel, "h2")
-	priceLabel.TextScaled = true
 	-- //!SECTION
 
 	-- //SECTION - Item Description
@@ -213,7 +211,6 @@ function Tooltip.Create(props: {
 	descriptionLabel.Size = UDim2.fromScale(1, 0.7)
 	descriptionLabel.Parent = addInfoContainer
 	UIConfig.applyTextConstraints(descriptionLabel, "caption")
-	descriptionLabel.TextScaled = true
 	-- //!SECTION
 
 	-- //SECTION - Item Stats
@@ -307,7 +304,6 @@ function Tooltip.Create(props: {
 			statElementLabel.Size = UDim2.fromScale(0.5, 1)
 			statElementLabel.Parent = statFrameContainer
 			UIConfig.applyTextConstraints(statElementLabel, "body")
-			statElementLabel.TextScaled = true
 
 			local statElementValue = Instance.new("TextLabel")
 			statElementValue.Name = `{stat.Label}_Value`
@@ -321,7 +317,6 @@ function Tooltip.Create(props: {
 			statElementValue.Size = UDim2.fromScale(0.5, 1)
 			statElementValue.Parent = statFrameContainer
 			UIConfig.applyTextConstraints(statElementValue, "body")
-			statElementValue.TextScaled = true
 		end
 	end
 	-- //!SECTION
