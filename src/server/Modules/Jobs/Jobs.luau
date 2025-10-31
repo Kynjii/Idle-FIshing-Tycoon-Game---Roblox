@@ -40,6 +40,7 @@ Jobs.Data = {
 		Ref = "FL_1",
 		Location = getJobLocation(1),
 		Route = getJobRoute(1),
+		MaxSlots = 3,
 	},
 	[2] = {
 		Id = 2,
@@ -47,6 +48,7 @@ Jobs.Data = {
 		Ref = "FL_2",
 		Location = getJobLocation(2),
 		Route = getJobRoute(2),
+		MaxSlots = 3,
 	},
 	[3] = {
 		Id = 3,
@@ -54,6 +56,7 @@ Jobs.Data = {
 		Ref = "FL_3",
 		Location = getJobLocation(3),
 		Route = getJobRoute(3),
+		MaxSlots = 3,
 	},
 	[4] = {
 		Id = 4,
@@ -61,6 +64,7 @@ Jobs.Data = {
 		Ref = "FL_4",
 		Location = getJobLocation(4),
 		Route = getJobRoute(4),
+		MaxSlots = 3,
 	},
 	[5] = {
 		Id = 5,
@@ -68,6 +72,7 @@ Jobs.Data = {
 		Ref = "FL_5",
 		Location = getJobLocation(5),
 		Route = getJobRoute(5),
+		MaxSlots = 3,
 	},
 	[6] = {
 		Id = 6,
@@ -75,7 +80,17 @@ Jobs.Data = {
 		Ref = "FL_6",
 		Location = getJobLocation(6),
 		Route = getJobRoute(6),
+		MaxSlots = 3,
 	},
 }
+
+function Jobs.GetMaxSlots(): { [number]: number }
+	local data = {}
+	for i, job in ipairs(Jobs.Data) do
+		data[i] = job.MaxSlots
+	end
+
+	return data
+end
 
 return Jobs
