@@ -418,7 +418,6 @@ function Helper.Serialize(self: Helper): { [string]: any }
 		StorageFull = self.StorageFull,
 		CurrentAssignment = self.CurrentAssignment,
 		IsPurchased = self.IsPurchased,
-		BaseCost = self.BaseCost,
 		UpgradeCost = self.UpgradeCost,
 		Description = self.Description,
 	}

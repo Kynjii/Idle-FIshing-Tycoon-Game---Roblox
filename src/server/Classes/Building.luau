@@ -267,7 +267,6 @@ function Building.Serialize(self: Building): { [string]: any }
 		Tier = self.Tier,
 		Name = self.Name,
 		Level = self.Level,
-		BaseCost = self.BaseCost,
 		UpgradeCost = self.UpgradeCost,
 		IsPurchased = self.IsPurchased,
 		UpgradeStage = self.UpgradeStage,
