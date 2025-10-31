@@ -391,6 +391,7 @@ function Boat.Serialize(self: Boat): { [string]: any }
 		Tier = self.Tier,
 		Name = self.Name,
 		Level = self.Level,
+		UpgradeCost = self.UpgradeCost,
 		IsPurchased = self.IsPurchased,
 		BaseStorage = self.BaseStorage,
 		UpgradeStage = self.UpgradeStage,
