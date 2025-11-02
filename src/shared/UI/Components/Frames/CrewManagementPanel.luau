@@ -7,10 +7,11 @@ function CrewManagementPanel.Create(props: {
 		MaxSlots: number,
 		LockedSlots: number,
 		AssignedHelpers: {
-			[number]: { Name: string, Level: number, QualityId: number }?,
+			[number]: { Name: string, Level: number, QualityId: number },
 		},
 	},
 	JobId: number,
+	Player: Player,
 })
 	local crewManagementContainer = Instance.new("Frame")
 	crewManagementContainer.Name = "CrewManagementContainer"

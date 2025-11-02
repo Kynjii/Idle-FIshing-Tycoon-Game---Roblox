@@ -1,8 +1,8 @@
 --!strict
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local CrewManagementPanel =
-	require(ReplicatedStorage.Shared.UI.Components.Frames.CrewManagementPanel)
+local CrewManagementPanel = require(ReplicatedStorage.Shared.UI.Components.Frames.CrewManagementPanel)
 
 local function story(target)
 	local panel = CrewManagementPanel.Create({
@@ -18,8 +18,14 @@ local function story(target)
 				},
 			},
 		},
+		Player = Players.LocalPlayer,
 	})
-	panel.Parent = target
+	local frame = Instance.new("Frame")
+	frame.Size = UDim2.new(0, 1920, 0, 1080)
+	frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	frame.Parent = target
+
+	panel.Parent = frame
 
 	return function()
 		panel:Destroy()

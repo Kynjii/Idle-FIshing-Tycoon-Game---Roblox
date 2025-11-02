@@ -151,10 +151,14 @@ FFGEnum.UI = {
 		Inventory = "rbxassetid://103276014090684",
 		CrewManagement = "rbxassetid://118792170900331",
 		Gold = "rbxassetid://113802680310061",
+		PadLock = "rbxassetid://78382217391272",
+		Minus = "rbxassetid://84352522067310",
+		Purchase = "rbxassetid://107460233002169",
 	},
 	Frames = {
 		MainUIPanel = "rbxassetid://95574095879865",
 		InnerPanel = "rbxassetid://132276661423012",
+		ListItem = "rbxassetid://94314557664644",
 	},
 	Tabs = {
 		RightTab = "rbxassetid://132317085020730",
@@ -170,7 +174,14 @@ FFGEnum.UI = {
 	},
 	Items = {
 		Hovered = "rbxassetid://119714101000238",
-		BackgroundQualityId = { [1] = "rbxassetid://94138515421739", [2] = "rbxassetid://78206843085783", [3] = "rbxassetid://125653281446487", [4] = "rbxassetid://113686615974215", [5] = "rbxassetid://130543839885527", [6] = "rbxassetid://104966714958616" },
+		BackgroundQualityId = {
+			[1] = "rbxassetid://94138515421739",
+			[2] = "rbxassetid://78206843085783",
+			[3] = "rbxassetid://125653281446487",
+			[4] = "rbxassetid://113686615974215",
+			[5] = "rbxassetid://130543839885527",
+			[6] = "rbxassetid://104966714958616",
+		},
 	},
 }
 

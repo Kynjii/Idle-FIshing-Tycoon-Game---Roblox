@@ -20,18 +20,10 @@ local buttonImages = {
 }
 
 function Button.Create(props: {
-	color: "Green"
-		| "Blue"
-		| "BlueGray"
-		| "Gray"
-		| "Orange"
-		| "Purple"
-		| "Red"
-		| "SkyBlue"
-		| "White"
-		| "Yellow",
+	color: "Green" | "Blue" | "BlueGray" | "Gray" | "Orange" | "Purple" | "Red" | "SkyBlue" | "White" | "Yellow",
 	text: string?,
 	size: UDim2?,
+	currencyType: "None" | "Gold",
 })
 	local button = Instance.new("ImageButton")
 	button.Image = buttonImages.squareColor[props.color] or ""
@@ -44,17 +36,35 @@ function Button.Create(props: {
 	button.BackgroundTransparency = 1
 	button.Size = props.size or UDim2.fromScale(1, 1)
 
+	local buttonText: TextLabel?
 	if props.text then
-		local buttonText = Instance.new("TextLabel")
+		buttonText = Instance.new("TextLabel")
 		buttonText.Font = FFGEnum.THEME.bigFont
 		buttonText.Text = props.text
+		buttonText.LayoutOrder = 2
 		buttonText.TextColor3 = FFGEnum.THEME.color.white
 		buttonText.BackgroundTransparency = 1
-		buttonText.Size = UDim2.fromScale(1, 1)
+		buttonText.Size = UDim2.fromScale(0.5, 1)
 		buttonText.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
-		buttonText.Position = FFGEnum.THEME.alignment.position.center
+		buttonText.Position = FFGEnum.THEME.alignment.position.textCenter
 		buttonText.Parent = button
-		UIConfig.ApplyTextConstraints(buttonText, "h2")
+		UIConfig.ApplyTextConstraints(buttonText, "body")
+	end
+
+	if props.currencyType == "Gold" then
+		local currencyIcon = Instance.new("ImageLabel")
+		currencyIcon.Image = FFGEnum.UI.Icons.Gold
+		currencyIcon.LayoutOrder = 1
+		currencyIcon.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
+		currencyIcon.Position = FFGEnum.THEME.alignment.position.center
+		currencyIcon.BackgroundTransparency = 1
+		currencyIcon.Size = UDim2.fromScale(0.3, 0.3)
+		UIConfig.ApplyAspect(currencyIcon)
+		currencyIcon.Parent = button
+
+		if buttonText then buttonText.Size = UDim2.fromScale(0.3, 1) end
+
+		UIConfig.ApplyList(button, Enum.FillDirection.Horizontal, { HAlign = Enum.HorizontalAlignment.Center, VAlign = Enum.VerticalAlignment.Center })
 	end
 
 	return button

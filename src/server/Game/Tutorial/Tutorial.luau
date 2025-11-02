@@ -88,7 +88,7 @@ local function assignBeam(player: Player, purchaseBoard: Model)
 		})
 		beam.LightEmission = 1 -- use additive blending
 		beam.LightInfluence = 0 -- beam not influenced by light
-		beam.Texture = "rbxassetid://98438318309998"
+		beam.Texture = "rbxassetid://94540391947020"
 		beam.TextureMode = Enum.TextureMode.Wrap -- wrap so length can be set by TextureLength
 		beam.TextureLength = 2 -- repeating texture is 1 stud long
 		beam.TextureSpeed = 1.5 -- slow texture speed

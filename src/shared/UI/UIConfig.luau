@@ -1,3 +1,4 @@
+--!strict
 local RunService = game:GetService("RunService")
 local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
@@ -9,9 +10,7 @@ local camera = workspace.CurrentCamera
 local playerGui: PlayerGui? = nil
 
 pcall(function()
-	if RunService:IsRunning() and Players.LocalPlayer then
-		playerGui = Players.LocalPlayer:FindFirstChildOfClass("PlayerGui")
-	end
+	if RunService:IsRunning() and Players.LocalPlayer then playerGui = Players.LocalPlayer:FindFirstChildOfClass("PlayerGui") end
 end)
 
 -- Detect if we're in a plugin / UILabs context
@@ -94,10 +93,7 @@ function UIConfig.ComputeFontSize(token: TextToken): (number, number, number)
 end
 
 -- Attach/refresh UITextSizeConstraint; set TextScaled and LineHeight
-function UIConfig.ApplyTextConstraints(
-	textObj: TextLabel | TextButton,
-	token: "title" | "h1" | "h2" | "body" | "caption"
-)
+function UIConfig.ApplyTextConstraints(textObj: TextLabel | TextButton, token: "title" | "h1" | "h2" | "body" | "caption")
 	local okToken = (UIConfig.Text :: any)[token] and token or "body"
 
 	local target, minV, maxV = UIConfig.ComputeFontSize(okToken)
@@ -118,8 +114,10 @@ function UIConfig.ApplyTextConstraints(
 		constraint.Parent = textObj
 	end
 
-	constraint.MaxTextSize = maxV
-	constraint.MinTextSize = minV
+	if constraint then
+		constraint.MaxTextSize = maxV
+		constraint.MinTextSize = minV
+	end
 
 	textObj.TextScaled = true
 	textObj.TextSize = target
@@ -185,9 +183,8 @@ end
 -- //!SECTION
 
 -- //SECTION - Aspect Constraints
-function UIConfig.ApplyAspect(frame: Frame, ratio: number?, axis: Enum.DominantAxis?)
-	local aspect = frame:FindFirstChildOfClass("UIAspectRatioConstraint")
-		or Instance.new("UIAspectRatioConstraint")
+function UIConfig.ApplyAspect(frame: Frame | ImageLabel | ImageButton, ratio: number?, axis: Enum.DominantAxis?)
+	local aspect = frame:FindFirstChildOfClass("UIAspectRatioConstraint") or Instance.new("UIAspectRatioConstraint")
 	aspect.AspectRatio = ratio or 1 -- default: square
 	aspect.DominantAxis = axis or Enum.DominantAxis.Width
 	aspect.AspectType = Enum.AspectType.ScaleWithParentSize
@@ -196,7 +193,7 @@ end
 
 -- //SECTION - Apply List
 function UIConfig.ApplyList(
-	frame: Frame,
+	frame: Instance,
 	axis: Enum.FillDirection?,
 	options: {
 		HAlign: Enum.HorizontalAlignment?,
@@ -241,14 +238,12 @@ function UIConfig.ObserveViewport(onUpdate: () -> ())
 	)
 
 	-- Camera viewport change
-	if camera then
-		table.insert(
-			connections,
-			camera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
-				onUpdate()
-			end)
-		)
-	end
+	if camera then table.insert(
+		connections,
+		camera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
+			onUpdate()
+		end)
+	) end
 
 	-- Some UIs are recreated under PlayerGui; watch top-level ScreenGuis if needed
 	local pg = UIConfig.GetPlayerGui()

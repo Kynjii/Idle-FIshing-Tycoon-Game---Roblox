@@ -1,3 +1,4 @@
+-- !strict
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -14,12 +15,16 @@ local crewManagementButton = crewManagementButtonScreenGui:FindFirstChild("OpenB
 local screenGui: ScreenGui
 
 task.spawn(function()
-	screenGui = MainUIPanel.Create({ screenGuiName = "CrewManagementPanel", panelName = "Crew Management", panelTabs = {
-		hasTabs = true,
-		tabs = {
-			{ Name = "TransportingTab", Index = 1, Icon = FFGEnum.UI.Icons.Transporting },
+	screenGui = MainUIPanel.Create({
+		screenGuiName = "CrewManagementPanel",
+		panelName = "Crew Management",
+		panelTabs = {
+			hasTabs = true,
+			tabs = {
+				{ Name = "TransportingTab", Index = 1, Icon = FFGEnum.UI.Icons.Transporting },
+			},
 		},
-	} })
+	})
 	screenGui.Parent = playerGui
 end)
 
@@ -44,21 +49,23 @@ function populateDetailsUI()
 end
 
 local getCrewManagementState = Events.GetRemoteFn(Events.RemoteFunctionNames.GetPlayerInventory)
-if crewManagementButton and getCrewManagementState then crewManagementButton.Activated:Connect(function()
-	if screenGui.Enabled then
-		screenGui.Enabled = false
-		if Lighting then
-			local blur = Lighting:FindFirstChild("BlurEffect")
-			if blur then blur:Destroy() end
+if crewManagementButton and getCrewManagementState then
+	crewManagementButton.Activated:Connect(function()
+		if screenGui.Enabled then
+			screenGui.Enabled = false
+			if Lighting then
+				local blur = Lighting:FindFirstChild("BlurEffect")
+				if blur then blur:Destroy() end
+			end
+			return
 		end
-		return
-	end
 
-	local data = getCrewManagementState:InvokeServer()
-	if data then
-		crewState = data
+		local data = getCrewManagementState:InvokeServer()
+		if data then
+			crewState = data
 
-		populateDetailsUI()
-		screenGui.Enabled = true
-	end
-end) end
+			populateDetailsUI()
+			screenGui.Enabled = true
+		end
+	end)
+end
