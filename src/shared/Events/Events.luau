@@ -17,11 +17,13 @@ Events.RemoteNames = {
 	AssignJob = "AssignJob",
 	HelperUpgraded = "HelperUpgraded",
 	HelperData = "HelperData",
+	PlayerReady = "PlayerReady",
 }
 
 Events.RemoteFunctionNames = {
 	GetPlayerInventory = "GetPlayerInventory",
 	GetCrewManagementState = "GetCrewManagementState",
+	GetJobData = "GetJobData",
 }
 
 Events.BindableFunctionNames = {

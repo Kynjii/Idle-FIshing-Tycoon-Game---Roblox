@@ -1,14 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerScriptService = game:GetService("ServerScriptService")
 
 local TableUtil = require(ReplicatedStorage.Packages.TableUtil)
-local Jobs = require(ServerScriptService.Server.Modules.Jobs.Jobs)
 local AvailableJobListItem = require(ReplicatedStorage.Shared.UI.Components.Jobs.AvailableJobListItem)
+local UIConfig = require(ReplicatedStorage.Shared.UI.UIConfig)
 local CrewManagementPanel = {}
 
-function CrewManagementPanel.Create(props: {
-	Player: Player,
-})
+function CrewManagementPanel.Create(player: Player, jobsData)
 	local crewManagementContainer = Instance.new("Frame")
 	crewManagementContainer.Name = "CrewManagementContainer"
 	crewManagementContainer.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -35,6 +32,10 @@ function CrewManagementPanel.Create(props: {
 	availableJobs.ScrollingDirection = Enum.ScrollingDirection.Y
 	availableJobs.Size = UDim2.fromScale(0.45, 1)
 
+	local scrollingFramePadding = Instance.new("UIPadding")
+	scrollingFramePadding.PaddingTop = UDim.new(0.05)
+	scrollingFramePadding.Parent = availableJobs
+
 	local uIGridLayout = Instance.new("UIGridLayout")
 	uIGridLayout.Name = "UIGridLayout"
 	uIGridLayout.CellSize = UDim2.fromScale(0.9, 0.3)
@@ -46,11 +47,11 @@ function CrewManagementPanel.Create(props: {
 	availableJobs.Parent = crewManagementContainer
 
 	-- Handle Available Jobs
-	for id, job in ipairs(Jobs.Data) do
+	for id, job in ipairs(jobsData) do
 		local jobData = job
 
 		local preparedData = TableUtil.Copy(jobData)
-		preparedData.Player = props.Player
+		preparedData.Player = player
 		local availableJob = AvailableJobListItem.Create(preparedData)
 		availableJob.LayoutOrder = id
 		availableJob.Parent = availableJobs

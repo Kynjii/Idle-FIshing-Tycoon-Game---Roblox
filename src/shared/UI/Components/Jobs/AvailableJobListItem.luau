@@ -1,13 +1,10 @@
 --!strict
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerScriptService = game:GetService("ServerScriptService")
-local StarterPlayer = game:GetService("StarterPlayer")
 
-local Jobs = require(ServerScriptService.Server.Modules.Jobs.Jobs)
-local AnimateButtonHover = require(StarterPlayer.StarterPlayerScripts.Client.HUD.Utils.AnimateButtonHover)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
+local AnimateButtonHover = require(ReplicatedStorage.Shared.UI.AnimateButtonHover)
 local Button = require(ReplicatedStorage.Shared.UI.Components.Buttons.Button)
 local UIConfig = require(ReplicatedStorage.Shared.UI.UIConfig)
 local AvailableJobListItem = {}
@@ -66,7 +63,7 @@ function AvailableJobListItem.Create(props: {
 	textLabel.Font = FFGEnum.THEME.bigFont
 	textLabel.Position = UDim2.fromScale(0.5, 0.5)
 	textLabel.Size = UDim2.fromScale(0.49, 0.2)
-	textLabel.Text = Jobs.Data[props.Id].Label or ""
+	textLabel.Text = props.Label or ""
 	textLabel.TextColor3 = Color3.new(1, 1, 1)
 	textLabel.TextSize = 14
 	UIConfig.ApplyTextConstraints(textLabel, "body")
@@ -226,6 +223,7 @@ function AvailableJobListItem.Create(props: {
 
 	assignButton.Activated:Connect(function()
 		-- //TODO - Replace with proper selection of helper, currently this just assigns the first one it finds
+		if #props.Slots.AssignedHelpers == 3 then return end
 		local getPlayerInventory = Events.GetRemoteFn(Events.RemoteFunctionNames.GetPlayerInventory)
 
 		if getPlayerInventory then

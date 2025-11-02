@@ -5,6 +5,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
+local CrewManagementPanel = require(ReplicatedStorage.Shared.UI.Components.Frames.CrewManagementPanel)
 local MainUIPanel = require(ReplicatedStorage.Shared.UI.Components.Frames.MainUIPanel)
 local Tooltip = require(ReplicatedStorage.Shared.UI.Components.Tooltips.Tooltip)
 
@@ -13,6 +14,8 @@ local playerGui = player:WaitForChild("PlayerGui")
 local crewManagementButtonScreenGui = playerGui:WaitForChild("CrewManagementButton")
 local crewManagementButton = crewManagementButtonScreenGui:FindFirstChild("OpenButton", true) :: ImageButton
 local screenGui: ScreenGui
+
+local getJobDataEvent = Events.GetRemoteFn(Events.RemoteFunctionNames.GetJobData)
 
 task.spawn(function()
 	screenGui = MainUIPanel.Create({
@@ -26,6 +29,15 @@ task.spawn(function()
 		},
 	})
 	screenGui.Parent = playerGui
+
+	local innerWindow = screenGui:FindFirstChild("InnerWindow", true)
+	if innerWindow then
+		if getJobDataEvent then
+			local jobsData = getJobDataEvent:InvokeServer()
+			local crewManagementPanel = CrewManagementPanel.Create(player, jobsData)
+			crewManagementPanel.Parent = innerWindow
+		end
+	end
 end)
 
 function clearExistingTooltip()

@@ -1,5 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Teams = game:GetService("Teams")
+
+local Events = require(ReplicatedStorage.Shared.Events.Events)
 local BuildingsManager = require(script.Parent.BuildingsManager)
 local ChainManager = require(script.Parent.ChainManager)
 local HelperShopManager = require(script.Parent.HelperShopManager)
@@ -155,6 +157,7 @@ function TeamManager.AssignTeam(player: Player): number?
 			player.Neutral = false
 
 			player:LoadCharacter()
+			Events.FireEvent(Events.RemoteNames.PlayerReady, player)
 			return i
 		end
 	end

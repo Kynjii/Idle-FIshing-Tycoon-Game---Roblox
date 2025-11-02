@@ -65,6 +65,8 @@ function JobManager.NumOfSlotsAvailable(self: JobManager, jobId: number): number
 end
 
 function JobManager.AssignSlot(self: JobManager, jobId: number): ()
+	if not jobId then return end
+	print(jobId, self.JobState)
 	local jobState: JobState = self.JobState[jobId]
 	jobState -= 1
 end
@@ -195,57 +197,70 @@ type GetStorageFishData = {
 function JobManager.AttachEventListeners(self: JobManager): ()
 	-- Remote events for assigning helper to a job
 	local assignJobEvent = Events.GetRemote(Events.RemoteNames.AssignJob)
-	if assignJobEvent then assignJobEvent.OnServerEvent:Connect(function(player: Player, helperId: string, jobId: number)
-		if self.Player ~= player or self.Owner ~= player.UserId then return end
-		if not helperId or not jobId then return end
+	if assignJobEvent then
+		assignJobEvent.OnServerEvent:Connect(function(player: Player, helperId: string, jobId: number)
+			if self.Player ~= player or self.Owner ~= player.UserId then return end
+			if not helperId or not jobId then return end
 
-		self:AssignHelper(helperId, jobId)
-	end) end
+			self:AssignHelper(helperId, jobId)
+		end)
+	end
 
 	-- Remote Events for handling job cycle
 	local helperAtGatheringLoc = Events.GetBindableEvent(Events.BindableNames.HelperAtGatheringLoc)
-	if helperAtGatheringLoc then helperAtGatheringLoc.Event:Connect(function(data)
-		local helperId: string = data.Id
-		local jobId: number = data.JobId
-		local player: Player = data.Player
+	if helperAtGatheringLoc then
+		helperAtGatheringLoc.Event:Connect(function(data)
+			local helperId: string = data.Id
+			local jobId: number = data.JobId
+			local player: Player = data.Player
 
-		if self.Player ~= player or self.Owner ~= player.UserId then return end
-		local helper = self.Helpers[helperId]
-		if not helper then return end
+			if self.Player ~= player or self.Owner ~= player.UserId then return end
+			local helper = self.Helpers[helperId]
+			if not helper then return end
 
-		self:BeginGathering(helper, jobId)
-	end) end
+			self:BeginGathering(helper, jobId)
+		end)
+	end
 
 	local helperAtUnloadingLoc = Events.GetBindableEvent(Events.BindableNames.HelperAtUnloadingLoc)
-	if helperAtUnloadingLoc then helperAtUnloadingLoc.Event:Connect(function(data)
-		local helperId: string = data.Id
-		local jobId: number = data.JobId
-		local player: Player = data.Player
+	if helperAtUnloadingLoc then
+		helperAtUnloadingLoc.Event:Connect(function(data)
+			local helperId: string = data.Id
+			local jobId: number = data.JobId
+			local player: Player = data.Player
 
-		if self.Player ~= player or self.Owner ~= player.UserId then return end
-		local helper = self.Helpers[helperId]
-		if not helper then return end
+			if self.Player ~= player or self.Owner ~= player.UserId then return end
+			local helper = self.Helpers[helperId]
+			if not helper then return end
 
-		self:StartJob(helper, jobId)
-	end) end
+			self:StartJob(helper, jobId)
+		end)
+	end
 
 	-- //TODO - Perhaps change the name, it's confusing. This is the chainmanager sending fish to me
 	local sendStorageFish = Events.GetBindableEvent(Events.BindableNames.SendStorageFish)
-	if sendStorageFish then sendStorageFish.Event:Connect(function(data: SendStorageFishData)
-		local helperId: string = data.HelperId
-		local jobId: number = data.JobId
-		local player: Player = data.Player
+	if sendStorageFish then
+		sendStorageFish.Event:Connect(function(data: SendStorageFishData)
+			local helperId: string = data.HelperId
+			local jobId: number = data.JobId
+			local player: Player = data.Player
 
-		if self.Player ~= player or self.Owner ~= player.UserId then return end
-		local helper = self.Helpers[helperId]
-		if not helper then return end
+			if self.Player ~= player or self.Owner ~= player.UserId then return end
+			local helper = self.Helpers[helperId]
+			if not helper then return end
 
-		if helper.CurrentAssignment ~= jobId then return end
+			if helper.CurrentAssignment ~= jobId then return end
 
-		local amount = data.Amount
-		if amount then helper:AddResource(amount) end
-		Pathfinding.GoUnloadSpot(jobId, helper.Id, helper.Model, self.Player)
-	end) end
+			local amount = data.Amount
+			if amount then helper:AddResource(amount) end
+			Pathfinding.GoUnloadSpot(jobId, helper.Id, helper.Model, self.Player)
+		end)
+	end
+
+	local jobDataEvent = Events.GetRemoteFn(Events.RemoteFunctionNames.GetJobData)
+	if jobDataEvent then jobDataEvent.OnServerInvoke = function(player: Player)
+		return Jobs.Data
+	end end
 end
 -- //!SECTION
 

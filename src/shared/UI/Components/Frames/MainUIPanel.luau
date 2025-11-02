@@ -1,12 +1,10 @@
 local Lighting = game:GetService("Lighting")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local StarterPlayer = game:GetService("StarterPlayer")
 
 local PanelTab = require(script.Parent.PanelTab)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
+local AnimateButtonHover = require(ReplicatedStorage.Shared.UI.AnimateButtonHover)
 local UIConfig = require(ReplicatedStorage.Shared.UI.UIConfig)
-local AnimateButtonHover =
-	require(StarterPlayer.StarterPlayerScripts.Client.HUD.Utils.AnimateButtonHover)
 
 local MainUIPanel = {}
 

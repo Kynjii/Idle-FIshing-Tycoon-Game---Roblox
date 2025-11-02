@@ -1,8 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local StarterPlayer = game:GetService("StarterPlayer")
 
-local AnimateButtonHover = require(StarterPlayer.StarterPlayerScripts.Client.HUD.Utils.AnimateButtonHover)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
+local AnimateButtonHover = require(ReplicatedStorage.Shared.UI.AnimateButtonHover)
 local UIConfig = require(ReplicatedStorage.Shared.UI.UIConfig)
 local Button = {}
 
@@ -68,7 +67,7 @@ function Button.Create(props: {
 		UIConfig.ApplyList(button, Enum.FillDirection.Horizontal, { HAlign = Enum.HorizontalAlignment.Center, VAlign = Enum.VerticalAlignment.Center })
 	end
 
-	local baseSize = props.Size
+	local baseSize = button.Size
 	button.MouseEnter:Connect(function()
 		AnimateButtonHover.Enter(button, baseSize)
 	end)

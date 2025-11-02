@@ -1,8 +1,6 @@
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local StarterPlayer = game:GetService("StarterPlayer")
-local AnimateButtonHover = require(StarterPlayer.StarterPlayerScripts.Client.HUD.Utils.AnimateButtonHover)
 local BoatType = require(ReplicatedStorage.Shared.Types.Classes.BoatType)
 local BuildingType = require(ReplicatedStorage.Shared.Types.Classes.BuildingType)
 local PortStorageType = require(ReplicatedStorage.Shared.Types.Classes.PortStorageType)
@@ -12,6 +10,7 @@ local Events = require(ReplicatedStorage.Shared.Events.Events)
 local DeepWait = require(ReplicatedStorage.Shared.Utils.DeepWait)
 local FormatNumber = require(ReplicatedStorage.Shared.Utils.FormatNumber)
 local Replica = require(ReplicatedStorage.Shared.ReplicaClient)
+local AnimateButtonHover = require(ReplicatedStorage.Shared.UI.AnimateButtonHover)
 
 type Boat = BoatType.BoatInstance
 type Tender = TenderType.TenderInstance
@@ -312,16 +311,18 @@ function populateDetailsUI()
 end
 
 local entityDetails = Events.GetRemote(Events.RemoteNames.OpenEntityDetails)
-if entityDetails then entityDetails.OnClientEvent:Connect(function(data)
-	clearExistingData()
+if entityDetails then
+	entityDetails.OnClientEvent:Connect(function(data)
+		clearExistingData()
 
-	if data then
-		player.PlayerGui.EntityDetails.Enabled = true
-		entityDetailsUI.Visible = true
-		detailsAreOpen = true
-		entityData = data
-		watchEntity()
-		populateDetailsUI()
-		handleClosingEntityDetailsUI()
-	end
-end) end
+		if data then
+			player.PlayerGui.EntityDetails.Enabled = true
+			entityDetailsUI.Visible = true
+			detailsAreOpen = true
+			entityData = data
+			watchEntity()
+			populateDetailsUI()
+			handleClosingEntityDetailsUI()
+		end
+	end)
+end

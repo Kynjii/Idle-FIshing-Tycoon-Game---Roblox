@@ -1,7 +1,4 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local StarterPlayer = game:GetService("StarterPlayer")
-local AnimateButtonHover =
-	require(StarterPlayer.StarterPlayerScripts.Client.HUD.Utils.AnimateButtonHover)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local Button = require(ReplicatedStorage.Shared.UI.Components.Buttons.Button)
@@ -345,21 +342,15 @@ function Tooltip.Create(props: {
 	buyButtonContainer.Parent = buttonContainer
 
 	local buyButton = Button.Create({
-		color = "Green",
-		text = props.IsPurchased and "Upgrade" or "Purchase",
-		size = UDim2.fromScale(1, 1),
+		Color = "Green",
+		Text = props.IsPurchased and "Upgrade" or "Purchase",
+		Size = UDim2.fromScale(1, 1),
+		CurrencyType = "Gold",
 	})
 	buyButton.Parent = buyButtonContainer
 
 	buyButton.Activated:Connect(function()
 		handleButtonClick(props.ItemId, props.IsPurchased or false)
-	end)
-	local baseSize = buyButton.Size
-	buyButton.MouseEnter:Connect(function()
-		AnimateButtonHover.Enter(buyButton, baseSize)
-	end)
-	buyButton.MouseLeave:Connect(function()
-		AnimateButtonHover.Leave(buyButton, baseSize)
 	end)
 	-- //!SECTION
 
