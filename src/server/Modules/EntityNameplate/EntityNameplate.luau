@@ -11,17 +11,38 @@ function EntityNameplate.Create(props: {
 	UpgradeStage: number,
 	Adornee: Instance?,
 })
-	local helperName = Instance.new("BillboardGui")
-	helperName.Name = "HelperNameplate"
-	helperName.AlwaysOnTop = true
-	if props.Adornee then helperName.Adornee = props.Adornee end
-	helperName.Enabled = false
-	helperName.LightInfluence = 1
-	helperName.MaxDistance = 100
-	helperName.ResetOnSpawn = false
-	helperName.Size = UDim2.fromOffset(150, 35)
-	helperName.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	UIConfig.ApplyList(helperName, Enum.FillDirection.Vertical, { HAlign = Enum.HorizontalAlignment.Center })
+	local entityName = Instance.new("BillboardGui")
+	entityName.Name = "EntityNameplate"
+	entityName.AlwaysOnTop = true
+	if props.Adornee then entityName.Adornee = props.Adornee end
+	entityName.Enabled = false
+	entityName.LightInfluence = 1
+	entityName.MaxDistance = 50
+	entityName.ResetOnSpawn = false
+	entityName.Size = UDim2.fromOffset(150, 50)
+	entityName.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+	local frameContainer = Instance.new("Frame")
+	frameContainer.BackgroundTransparency = 1
+	frameContainer.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
+	frameContainer.Position = FFGEnum.THEME.alignment.position.center
+	frameContainer.Size = UDim2.fromScale(1, 1)
+	frameContainer.Parent = entityName
+
+	local nameplateBg = Instance.new("ImageLabel")
+	nameplateBg.Name = "NameplateBG"
+	nameplateBg.ScaleType = Enum.ScaleType.Slice
+	nameplateBg.SliceCenter = Rect.new(35, 35, 35, 35)
+	nameplateBg.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
+	nameplateBg.Position = FFGEnum.THEME.alignment.position.center
+	nameplateBg.ZIndex = 0
+	nameplateBg.BackgroundTransparency = 1
+	nameplateBg.Size = UDim2.fromScale(1, 1)
+	nameplateBg.ImageTransparency = 0.7
+	nameplateBg.Image = FFGEnum.UI.Frames.NameplateBackground
+	nameplateBg.Parent = entityName
+
+	UIConfig.ApplyList(frameContainer, Enum.FillDirection.Vertical, { HAlign = Enum.HorizontalAlignment.Center, VAlign = Enum.VerticalAlignment.Center })
 
 	local name = Instance.new("TextLabel")
 	name.Name = "Name"
@@ -30,12 +51,12 @@ function EntityNameplate.Create(props: {
 	name.Font = FFGEnum.THEME.bigFont
 	name.LayoutOrder = 2
 	name.Position = UDim2.fromScale(0.5, 0.5)
-	name.Size = UDim2.fromScale(1, 0.5)
+	name.Size = UDim2.fromScale(1, 0.3)
 	name.Text = props.Name or ""
 	name.TextColor3 = Color3.new(1, 1, 1)
 	name.TextStrokeTransparency = 0.7
 	UIConfig.ApplyTextConstraints(name, "h1")
-	name.Parent = helperName
+	name.Parent = frameContainer
 
 	local quality = Instance.new("TextLabel")
 	quality.Name = "Quality"
@@ -44,12 +65,12 @@ function EntityNameplate.Create(props: {
 	quality.Font = FFGEnum.THEME.bigFont
 	quality.LayoutOrder = 1
 	quality.Position = UDim2.fromScale(0.5, 0.5)
-	quality.Size = UDim2.fromScale(1, 0.3)
+	quality.Size = UDim2.fromScale(1, 0.2)
 	quality.Text = FFGEnum.QUALITIES[props.QualityId].Label or ""
 	quality.TextColor3 = FFGEnum.QUALITIES[props.QualityId].Color or Color3.new(1, 1, 1)
 	quality.TextStrokeTransparency = 0.7
 	UIConfig.ApplyTextConstraints(quality, "body")
-	quality.Parent = helperName
+	quality.Parent = frameContainer
 
 	local infoContainer = Instance.new("Frame")
 	infoContainer.Name = "InfoContainer"
@@ -91,7 +112,7 @@ function EntityNameplate.Create(props: {
 	UIConfig.ApplyTextConstraints(stage, "caption")
 	stage.Parent = infoContainer
 
-	infoContainer.Parent = helperName
+	infoContainer.Parent = frameContainer
 
 	UIConfig.ObserveViewport(function()
 		UIConfig.ApplyTextConstraints(name, "h1")
@@ -100,7 +121,7 @@ function EntityNameplate.Create(props: {
 		UIConfig.ApplyTextConstraints(stage, "caption")
 	end)
 
-	return helperName
+	return entityName
 end
 
 return EntityNameplate

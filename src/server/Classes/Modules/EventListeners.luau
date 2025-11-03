@@ -4,7 +4,6 @@ local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local BoatType = require(ReplicatedStorage.Shared.Types.Classes.BoatType)
 local BuildingType = require(ReplicatedStorage.Shared.Types.Classes.BuildingType)
-local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
 local PortStorageType = require(ReplicatedStorage.Shared.Types.Classes.PortStorageType)
 local TenderType = require(ReplicatedStorage.Shared.Types.Classes.TenderType)
 local DataService = require(ServerScriptService.Server.Services.DataService)
@@ -73,7 +72,6 @@ function EventListeners.Attach(class: Boat | Tender | PortStorage | Building)
 	if typedClass.Entity ~= FFGEnum.CLASS.ENTITY_NAME.Shop then
 		local function handleStateUpdate(player)
 			local canProceed = checkTutorialState(player)
-			print("canProceed", canProceed)
 			if not canProceed then return end
 
 			-- See if the player can afford the state update (purchase / upgrade)

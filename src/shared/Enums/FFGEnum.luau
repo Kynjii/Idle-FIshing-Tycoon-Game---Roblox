@@ -159,6 +159,7 @@ FFGEnum.UI = {
 		MainUIPanel = "rbxassetid://95574095879865",
 		InnerPanel = "rbxassetid://132276661423012",
 		ListItem = "rbxassetid://94314557664644",
+		NameplateBackground = "rbxassetid://86748504086845",
 	},
 	Tabs = {
 		RightTab = "rbxassetid://132317085020730",

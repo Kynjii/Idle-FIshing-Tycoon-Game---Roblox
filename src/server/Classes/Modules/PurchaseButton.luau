@@ -37,6 +37,7 @@ function PB.CreatePB(pbModel: Model, class: Boat | Tender | PortStorage | Buildi
 
 	local purchaseButton = pbModel
 	local billboardRoot = purchaseButton:FindFirstChild("BillboardRoot") :: Part
+	local button: Part = purchaseButton:FindFirstChild("Button")
 
 	local pbDetails = EntityNameplate.Create({
 		Name = typedClass.Name,
@@ -55,11 +56,11 @@ function PB.CreatePB(pbModel: Model, class: Boat | Tender | PortStorage | Buildi
 	priceBillboard.Enabled = true
 	priceBillboard.MaxDistance = 100
 	priceBillboard.ResetOnSpawn = false
-	priceBillboard.Adornee = pbDetails
-	priceBillboard.ExtentsOffsetWorldSpace = Vector3.new(-100, 0, 0)
+	priceBillboard.Adornee = button
+	priceBillboard.ExtentsOffsetWorldSpace = Vector3.new(70, 0, 0)
 	priceBillboard.Size = UDim2.fromOffset(150, 35)
 	priceBillboard.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	priceBillboard.Parent = billboardRoot
+	priceBillboard.Parent = button
 
 	local priceLabel = Instance.new("TextLabel")
 	priceLabel.Name = "Price"
@@ -68,19 +69,18 @@ function PB.CreatePB(pbModel: Model, class: Boat | Tender | PortStorage | Buildi
 	priceLabel.Font = FFGEnum.THEME.bigFont
 	priceLabel.LayoutOrder = 2
 	priceLabel.Position = UDim2.fromScale(0.5, 0.5)
-	priceLabel.Size = UDim2.fromScale(1, 1)
+	priceLabel.Size = UDim2.fromScale(0.5, 0.5)
 	local cost = not typedClass.IsPurchased and typedClass.BaseCost or typedClass.UpgradeCost
 	priceLabel.Text = FormatNumber(cost) or ""
 	priceLabel.TextColor3 = FFGEnum.THEME.color.textGold
 	priceLabel.TextStrokeTransparency = 0.7
-	UIConfig.ApplyTextConstraints(priceLabel, "h1")
+	UIConfig.ApplyTextConstraints(priceLabel, "caption")
 	priceLabel.Parent = priceBillboard
 
 	local levelLabel = pbDetails:FindFirstChild("Level", true)
 	local stageLabel = pbDetails:FindFirstChild("Stage", true)
 	local qualityLabel = pbDetails:FindFirstChild("Quality", true)
 
-	local button: Part = purchaseButton:FindFirstChild("Button")
 	if button then
 		if not DataService.CanAfford(class.Player, "Gold", not typedClass.IsPurchased and typedClass.BaseCost or typedClass.UpgradeCost) then button.Color = FFGEnum.THEME.color.red end
 	end
@@ -159,8 +159,11 @@ function PB.UpdatePB(class: Boat | Tender | PortStorage | Building)
 
 	local purchaseButton = class.PurchaseButton
 	local billboardRoot = purchaseButton:FindFirstChild("BillboardRoot") :: Part
-	local nameplate = billboardRoot:FindFirstChild("HelperNameplate")
+	local nameplate = billboardRoot:FindFirstChild("EntityNameplate")
+	local button: Part = purchaseButton:FindFirstChild("Button")
+	local priceBillboard = button:FindFirstChild("PriceBillboard")
 	if nameplate then nameplate:Destroy() end
+	if priceBillboard then priceBillboard:Destroy() end
 
 	PB.CreatePB(typedClass.PurchaseButton, typedClass)
 

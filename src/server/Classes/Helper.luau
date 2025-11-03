@@ -216,7 +216,8 @@ function Helper.CreateModel(self: Helper)
 			end
 		end
 
-		local nameplate = EntityNameplate.Create({ Adornee = clonedModel, Level = self.Level, Name = self.Name, QualityId = self.QualityId, UpgradeStage = self.UpgradeStage })
+		local nameplate: BillboardGui = EntityNameplate.Create({ Adornee = clonedModel, Level = self.Level, Name = self.Name, QualityId = self.QualityId, UpgradeStage = self.UpgradeStage })
+		nameplate.ExtentsOffsetWorldSpace = Vector3.new(0, 2, 0)
 		nameplate.Enabled = true
 		nameplate.Parent = clonedModel
 
