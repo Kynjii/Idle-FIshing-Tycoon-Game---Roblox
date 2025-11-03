@@ -221,6 +221,26 @@ function PortStorage.ShowFishPopUp(self: PortStorage, amount: number): ()
 	clone.Name = "Popup_Clone"
 	PopUp.Animate(clone, amount, clone.Fish)
 end
+
+function PortStorage.ShowGoldPopUp(self: PortStorage, amount: number): ()
+	local billboard: BillboardGui = game.Workspace:FindFirstChild("BillBoards"):FindFirstChild("GoldPopupTemplate")
+	if not billboard then return end
+
+	local primaryPart: BasePart? = self.VisualRoot
+	if not primaryPart then return end
+
+	local clone: BillboardGui = billboard:Clone()
+	local container: Instance? = primaryPart:FindFirstChild("Billboard")
+	if container then
+		clone.Parent = container
+	else
+		clone.Parent = primaryPart
+	end
+
+	clone.Adornee = primaryPart
+	clone.Name = "Gold_Popup_Clone"
+	PopUp.Animate(clone, amount, clone.Gold)
+end
 -- //!SECTION
 
 -- //SECTION - Calculations
@@ -304,8 +324,8 @@ function PortStorage.SetupFishRemovalPrompt(self: PortStorage)
 
 	proximityPrompt.HoldDuration = 0.5
 	proximityPrompt.ObjectText = ""
-	proximityPrompt.ActionText = "Take Fish"
-	proximityPrompt.UIOffset = Vector2.new(-100, 0)
+	proximityPrompt.ActionText = "Sell Fish"
+	proximityPrompt.UIOffset = Vector2.new(-50, 0)
 
 	-- Handle not showing the prompt if the user is not the owner
 	if self._cleaner then
@@ -326,6 +346,7 @@ function PortStorage.SetupFishRemovalPrompt(self: PortStorage)
 
 			-- Spend the currency
 			DataService.Earn(player, FFGEnum.CURRENCY_TYPES.Gold, amount * 2)
+			self:ShowGoldPopUp(amount * 2)
 
 			-- Save State
 			self:Save()

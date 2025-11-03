@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local EntityNameplate = require(ServerScriptService.Server.Modules.EntityNameplate.EntityNameplate)
+local PriceBillboard = require(ServerScriptService.Server.Modules.EntityNameplate.PriceBillboard)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local BoatType = require(ReplicatedStorage.Shared.Types.Classes.BoatType)
 local PortStorageType = require(ReplicatedStorage.Shared.Types.Classes.PortStorageType)
@@ -11,7 +12,6 @@ local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local BuildingType = require(ReplicatedStorage.Shared.Types.Classes.BuildingType)
 local ProgressBar = require(ReplicatedStorage.Shared.UI.Components.ProgressBar)
-local UIConfig = require(ReplicatedStorage.Shared.UI.UIConfig)
 local FormatNumber = require(ReplicatedStorage.Shared.Utils.FormatNumber)
 
 type Boat = BoatType.BoatInstance
@@ -45,37 +45,18 @@ function PB.CreatePB(pbModel: Model, class: Boat | Tender | PortStorage | Buildi
 		UpgradeStage = typedClass.UpgradeStage,
 		Adornee = billboardRoot,
 		Level = typedClass.Level,
+		JobCategory = typedClass.JobCategory or typedClass.Entity or "None",
+		MaxStorage = class.Entity ~= FFGEnum.CLASS.ENTITY_NAME.Building and typedClass.CurrentMaxStorage or nil,
 	})
 	pbDetails.Enabled = true
 	pbDetails.Parent = billboardRoot
 
-	-- //TODO - Move into helper func and add gold icon
-	local priceBillboard = Instance.new("BillboardGui")
-	priceBillboard.Name = "PriceBillboard"
-	priceBillboard.AlwaysOnTop = true
-	priceBillboard.Enabled = true
-	priceBillboard.MaxDistance = FFGEnum.THEME.Nameplate.MaxDistance
-	priceBillboard.ResetOnSpawn = false
-	priceBillboard.Adornee = button
-	priceBillboard.ExtentsOffsetWorldSpace = Vector3.new(70, 0, 0)
-	priceBillboard.Size = UDim2.fromScale(2, 4)
-	priceBillboard.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	priceBillboard.Parent = button
-
-	local priceLabel = Instance.new("TextLabel")
-	priceLabel.Name = "Price"
-	priceLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-	priceLabel.BackgroundTransparency = 1
-	priceLabel.Font = FFGEnum.THEME.bigFont
-	priceLabel.LayoutOrder = 2
-	priceLabel.Position = UDim2.fromScale(0.5, 0.5)
-	priceLabel.Size = UDim2.fromScale(0.5, 0.5)
-	local cost = not typedClass.IsPurchased and typedClass.BaseCost or typedClass.UpgradeCost
-	priceLabel.Text = FormatNumber(cost) or ""
-	priceLabel.TextColor3 = FFGEnum.THEME.color.textGold
-	priceLabel.TextStrokeTransparency = 0.7
-	UIConfig.ApplyTextConstraints(priceLabel, "caption")
-	priceLabel.Parent = priceBillboard
+	PriceBillboard.Create({
+		IsPurchased = class.IsPurchased,
+		BaseCost = class.BaseCost,
+		UpgradeCost = class.UpgradeCost,
+		Parent = button,
+	})
 
 	local levelLabel = pbDetails:FindFirstChild("Level", true)
 	local stageLabel = pbDetails:FindFirstChild("Stage", true)
@@ -93,10 +74,14 @@ function PB.CreatePB(pbModel: Model, class: Boat | Tender | PortStorage | Buildi
 	if not hasProgressBar then PB.CreateProgressBar(purchaseButton, typedClass) end
 
 	-- Handle State based on IsPurchased
+	local infoContainer = billboardRoot:FindFirstChild("InfoContainer", true)
+	local uiList: UIListLayout = infoContainer:FindFirstChildWhichIsA("UIListLayout")
 	if not typedClass.IsPurchased then
+		uiList.HorizontalFlex = Enum.UIFlexAlignment.None
 		levelLabel.Visible = false
 		stageLabel.Visible = false
 	else
+		uiList.HorizontalFlex = Enum.UIFlexAlignment.SpaceBetween
 		levelLabel.Visible = true
 		stageLabel.Visible = true
 	end
@@ -219,7 +204,7 @@ function PB.CreateLogic(class)
 
 				handleUpgrade(class)
 				task.spawn(function()
-					task.wait(3)
+					task.wait(1)
 					class.ButtonDebounce = false
 				end)
 			end

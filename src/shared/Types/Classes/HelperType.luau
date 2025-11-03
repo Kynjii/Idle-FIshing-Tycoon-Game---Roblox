@@ -68,6 +68,7 @@ export type HelperInstance = {
 	ClearStorage: () -> (),
 	Upgrade: () -> (),
 	Purchasehelper: (number) -> (),
+	ShowGoldPopUp: (self: HelperInstance) -> (),
 }
 
 export type HelperModule = {

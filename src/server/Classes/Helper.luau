@@ -11,6 +11,7 @@ local DataService = require(ServerScriptService.Server.Services.DataService)
 local Formulas = require(ServerScriptService.Server.Math.Formulas)
 local EntityNameplate = require(ServerScriptService.Server.Modules.EntityNameplate.EntityNameplate)
 local Jobs = require(ServerScriptService.Server.Modules.Jobs.Jobs)
+local PopUp = require(ServerScriptService.Server.Modules.Tweens.PopUp)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
@@ -216,7 +217,15 @@ function Helper.CreateModel(self: Helper)
 			end
 		end
 
-		local nameplate: BillboardGui = EntityNameplate.Create({ Adornee = clonedModel, Level = self.Level, Name = self.Name, QualityId = self.QualityId, UpgradeStage = self.UpgradeStage })
+		local nameplate: BillboardGui = EntityNameplate.Create({
+			Adornee = clonedModel,
+			Level = self.Level,
+			Name = self.Name,
+			QualityId = self.QualityId,
+			UpgradeStage = self.UpgradeStage,
+			JobCategory = self.JobCategory,
+			MaxStorage = self.Stats.Storage,
+		})
 		nameplate.ExtentsOffsetWorldSpace = Vector3.new(0, 2, 0)
 		nameplate.Enabled = true
 		nameplate.Parent = clonedModel
@@ -313,6 +322,26 @@ end
 
 function Helper.UpdateStorageStatus(self: Helper, status: boolean): ()
 	self.StorageFull = status
+end
+
+function Helper.ShowGoldPopUp(self: Helper, amount: number): ()
+	local billboard: BillboardGui = game.Workspace:FindFirstChild("BillBoards"):FindFirstChild("GoldPopupTemplate")
+	if not billboard then return end
+
+	local primaryPart: BasePart? = self.Model.PrimaryPart
+	if not primaryPart then return end
+
+	local clone: BillboardGui = billboard:Clone()
+	local container: Instance? = primaryPart:FindFirstChild("Billboard")
+	if container then
+		clone.Parent = container
+	else
+		clone.Parent = primaryPart
+	end
+
+	clone.Adornee = primaryPart
+	clone.Name = "Gold_Popup_Clone"
+	PopUp.Animate(clone, amount, clone.Gold)
 end
 -- //!SECTION
 

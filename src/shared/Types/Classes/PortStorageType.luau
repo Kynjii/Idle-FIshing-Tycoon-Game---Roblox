@@ -54,6 +54,7 @@ export type StorageInstance = {
 	-- Essential Methods (called by other modules)
 	Initialize: (self: StorageInstance) -> (),
 	Destroy: (self: StorageInstance) -> (),
+	ShowGoldPopUp: (self: StorageInstance) -> (),
 
 	-- Allow any other properties/methods for internal use
 	[string]: any,

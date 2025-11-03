@@ -171,6 +171,16 @@ function UIConfig.SetPadding(pad: UIPadding, token: "XS" | "S" | "M" | "L" | "XL
 	pad.PaddingRight = UDim.new(s, 0)
 end
 
+function UIConfig.AddPadding(instance: Instance, token: "XS" | "S" | "M" | "L" | "XL")
+	local s = (UIConfig.Padding :: any)[token]
+	local pad = Instance.new("UIPadding")
+	pad.PaddingTop = UDim.new(s, 0)
+	pad.PaddingBottom = UDim.new(s, 0)
+	pad.PaddingLeft = UDim.new(s, 0)
+	pad.PaddingRight = UDim.new(s, 0)
+	pad.Parent = instance
+end
+
 function UIConfig.SetGap(layout: UIListLayout | UIGridLayout, token: "XS" | "S" | "M" | "L" | "XL")
 	local s = (UIConfig.Padding :: any)[token]
 	if layout:IsA("UIGridLayout") then

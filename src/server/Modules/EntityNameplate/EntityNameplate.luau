@@ -9,6 +9,8 @@ function EntityNameplate.Create(props: {
 	QualityId: number,
 	Level: number,
 	UpgradeStage: number,
+	JobCategory: "Fishing" | "Woodcutting" | "Mining" | "Transporting" | "None",
+	MaxStorage: number?,
 	Adornee: Instance?,
 })
 	local entityName = Instance.new("BillboardGui")
@@ -23,11 +25,13 @@ function EntityNameplate.Create(props: {
 	entityName.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 	local frameContainer = Instance.new("Frame")
+	frameContainer.Name = "Main"
 	frameContainer.BackgroundTransparency = 1
 	frameContainer.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 	frameContainer.Position = FFGEnum.THEME.alignment.position.center
 	frameContainer.Size = UDim2.fromScale(1, 1)
 	frameContainer.Parent = entityName
+	UIConfig.ApplyList(frameContainer, Enum.FillDirection.Vertical, { HAlign = Enum.HorizontalAlignment.Center, VAlign = Enum.VerticalAlignment.Center })
 
 	local nameplateBg = Instance.new("ImageLabel")
 	nameplateBg.Name = "NameplateBG"
@@ -42,11 +46,9 @@ function EntityNameplate.Create(props: {
 	nameplateBg.Image = FFGEnum.UI.Frames.NameplateBackground
 	nameplateBg.Parent = entityName
 
-	UIConfig.ApplyList(frameContainer, Enum.FillDirection.Vertical, { HAlign = Enum.HorizontalAlignment.Center, VAlign = Enum.VerticalAlignment.Center })
-
 	local name = Instance.new("TextLabel")
 	name.Name = "Name"
-	name.AnchorPoint = Vector2.new(0.5, 0.5)
+	name.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 	name.BackgroundTransparency = 1
 	name.Font = FFGEnum.THEME.bigFont
 	name.LayoutOrder = 2
@@ -56,11 +58,12 @@ function EntityNameplate.Create(props: {
 	name.TextColor3 = Color3.new(1, 1, 1)
 	name.TextStrokeTransparency = 0.7
 	UIConfig.ApplyTextConstraints(name, "h1")
+	UIConfig.AddPadding(name, "M")
 	name.Parent = frameContainer
 
 	local quality = Instance.new("TextLabel")
 	quality.Name = "Quality"
-	quality.AnchorPoint = Vector2.new(0.5, 0.5)
+	quality.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 	quality.BackgroundTransparency = 1
 	quality.Font = FFGEnum.THEME.bigFont
 	quality.LayoutOrder = 1
@@ -70,11 +73,12 @@ function EntityNameplate.Create(props: {
 	quality.TextColor3 = FFGEnum.QUALITIES[props.QualityId].Color or Color3.new(1, 1, 1)
 	quality.TextStrokeTransparency = 0.7
 	UIConfig.ApplyTextConstraints(quality, "body")
+	UIConfig.AddPadding(quality, "M")
 	quality.Parent = frameContainer
 
 	local infoContainer = Instance.new("Frame")
 	infoContainer.Name = "InfoContainer"
-	infoContainer.AnchorPoint = Vector2.new(0.5, 0.5)
+	infoContainer.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 	infoContainer.BackgroundTransparency = 1
 	infoContainer.LayoutOrder = 3
 	infoContainer.Position = UDim2.fromScale(0.5, 0.5)
@@ -83,30 +87,74 @@ function EntityNameplate.Create(props: {
 
 	local level = Instance.new("TextLabel")
 	level.Name = "Level"
-	level.AnchorPoint = Vector2.new(0.5, 0.5)
+	level.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 	level.BackgroundTransparency = 1
 	level.Font = FFGEnum.THEME.bigFont
 	level.LayoutOrder = 1
-	level.Size = UDim2.fromScale(0.5, 1)
+	level.Size = UDim2.fromScale(0.33, 1)
 	level.Text = `Level {props.Level}`
 	level.TextColor3 = Color3.fromRGB(0, 255, 0)
 	level.TextStrokeTransparency = 0.7
 	level.TextXAlignment = Enum.TextXAlignment.Left
 	UIConfig.ApplyTextConstraints(level, "caption")
+	UIConfig.AddPadding(level, "M")
 	level.Parent = infoContainer
+
+	local jobInfoContainer = Instance.new("Frame")
+	jobInfoContainer.Name = "JobInfoContainer"
+	jobInfoContainer.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
+	jobInfoContainer.BackgroundTransparency = 1
+	jobInfoContainer.LayoutOrder = 2
+	jobInfoContainer.Size = UDim2.fromScale(0.33, 1)
+	jobInfoContainer.Parent = infoContainer
+	UIConfig.ApplyList(jobInfoContainer, Enum.FillDirection.Horizontal, { HAlign = Enum.HorizontalAlignment.Center, VAlign = Enum.VerticalAlignment.Center })
+
+	local jobIconImage = {
+		Fishing = FFGEnum.UI.Icons.Inventory,
+		Woodcutting = FFGEnum.UI.Icons.Inventory,
+		Mining = FFGEnum.UI.Icons.Inventory,
+		Transporting = FFGEnum.UI.Icons.Inventory,
+		None = FFGEnum.UI.Icons.Inventory,
+	}
+
+	if props.JobCategory ~= "Building" then
+		local jobInfoIcon = Instance.new("ImageLabel")
+		jobInfoIcon.Name = "JobInfoIcon"
+		jobInfoIcon.Size = UDim2.fromScale(0.5, 1)
+		jobInfoIcon.Image = jobIconImage[props.JobCategory] or jobIconImage.None
+		jobInfoIcon.BackgroundTransparency = 1
+		jobInfoIcon.Parent = jobInfoContainer
+		UIConfig.ApplyAspect(jobInfoIcon)
+
+		local jobInfoText = Instance.new("TextLabel")
+		jobInfoText.Name = "JobInfoText"
+		jobInfoText.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
+		jobInfoText.BackgroundTransparency = 1
+		jobInfoText.Font = FFGEnum.THEME.bigFont
+		jobInfoText.LayoutOrder = 1
+		jobInfoText.Size = UDim2.fromScale(0.5, 1)
+		jobInfoText.Text = props.MaxStorage or ""
+		jobInfoText.TextColor3 = FFGEnum.THEME.color.blue
+		jobInfoText.TextStrokeTransparency = 0.7
+		jobInfoText.TextXAlignment = Enum.TextXAlignment.Left
+		jobInfoText.Parent = jobInfoContainer
+		UIConfig.ApplyTextConstraints(jobInfoText, "caption")
+		UIConfig.AddPadding(jobInfoText, "M")
+	end
 
 	local stage = Instance.new("TextLabel")
 	stage.Name = "Stage"
-	stage.AnchorPoint = Vector2.new(0.5, 0.5)
+	stage.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 	stage.BackgroundTransparency = 1
 	stage.Font = FFGEnum.THEME.bigFont
-	stage.LayoutOrder = 2
-	stage.Size = UDim2.fromScale(0.5, 1)
+	stage.LayoutOrder = 3
+	stage.Size = UDim2.fromScale(0.33, 1)
 	stage.Text = FFGEnum.STAGES[props.UpgradeStage].Label
 	stage.TextColor3 = FFGEnum.STAGES[props.UpgradeStage].Color or Color3.new(1, 1, 1)
 	stage.TextStrokeTransparency = 0.7
 	stage.TextXAlignment = Enum.TextXAlignment.Right
 	UIConfig.ApplyTextConstraints(stage, "caption")
+	UIConfig.AddPadding(stage, "M")
 	stage.Parent = infoContainer
 
 	infoContainer.Parent = frameContainer

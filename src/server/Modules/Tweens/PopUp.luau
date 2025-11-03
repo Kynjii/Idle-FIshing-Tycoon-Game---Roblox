@@ -11,13 +11,14 @@ local DEFAULTS = {
 
 function PopUp.Animate(billboard: BillboardGui, textValue: number, imageLabel: ImageLabel)
 	if billboard and textValue then
+		local isGold = billboard.Name == "Gold_Popup_Clone"
 		local image = imageLabel
 		local text = billboard:WaitForChild("TextLabel") :: TextLabel
 
 		billboard.StudsOffsetWorldSpace = Vector3.new(0, 0, 10)
 		text.Font = FFGEnum.THEME.bigFont
 		text.Text = "+" .. FormatNumber(textValue)
-		text.TextColor3 = Color3.fromRGB(0, 255, 0)
+		text.TextColor3 = isGold and FFGEnum.THEME.color.textGold or Color3.fromRGB(0, 255, 0)
 
 		PopUp.AnimateBillboard(billboard)
 		if image then PopUp.AnimateImageLabel(image) end
