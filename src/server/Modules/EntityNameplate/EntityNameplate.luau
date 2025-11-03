@@ -87,7 +87,6 @@ function EntityNameplate.Create(props: {
 	level.BackgroundTransparency = 1
 	level.Font = FFGEnum.THEME.bigFont
 	level.LayoutOrder = 1
-	level.Position = UDim2.fromScale(0.5, 0.5)
 	level.Size = UDim2.fromScale(0.5, 1)
 	level.Text = `Level {props.Level}`
 	level.TextColor3 = Color3.fromRGB(0, 255, 0)
@@ -102,9 +101,7 @@ function EntityNameplate.Create(props: {
 	stage.BackgroundTransparency = 1
 	stage.Font = FFGEnum.THEME.bigFont
 	stage.LayoutOrder = 2
-	stage.Position = UDim2.fromScale(0.5, 1)
-	stage.RichText = true
-	stage.Size = UDim2.fromScale(0.5, 0.5)
+	stage.Size = UDim2.fromScale(0.5, 1)
 	stage.Text = FFGEnum.STAGES[props.UpgradeStage].Label
 	stage.TextColor3 = FFGEnum.STAGES[props.UpgradeStage].Color or Color3.new(1, 1, 1)
 	stage.TextStrokeTransparency = 0.7
