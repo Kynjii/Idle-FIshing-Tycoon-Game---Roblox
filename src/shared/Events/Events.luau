@@ -7,7 +7,6 @@ Events.RemoteNames = {
 	WarningMsg = "WarningMsg",
 	OpenEntityDetails = "OpenEntityDetails",
 	EntityPurchased = "EntityPurchased",
-	EntityUpgraded = "EntityUpgraded",
 	GameReset = "GameReset",
 	OpenHelperShop = "OpenHelperShop",
 	HelperPurchased = "HelperPurchased",
@@ -50,7 +49,6 @@ Events.BindableNames = {
 
 	-- Entity Purchase/Upgrade
 	PurchaseEntity = "PurchaseEntity",
-	UpgradeEntity = "UpgradeEntity",
 }
 
 local FOLDER_NAME = "RME"

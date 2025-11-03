@@ -115,28 +115,6 @@ function EventListeners.Attach(class: Boat | Tender | PortStorage | Building)
 				handleStateUpdate(data.Player)
 			end))
 		end
-
-		-- Upgraded Event (from Client)
-		local upgradedEvent = Events.GetRemote(Events.RemoteNames.EntityUpgraded)
-		if upgradedEvent then
-			typedClass._cleaner:Add(upgradedEvent.OnServerEvent:Connect(function(player: Player, entityId: string)
-				if typedClass.Player ~= player or typedClass.Owner ~= player.UserId then return end
-				if typedClass.Id ~= entityId then return end
-
-				handleStateUpdate(player)
-			end))
-		end
-
-		-- Upgraded Event (from server)
-		local upgradedBindableEvent = Events.GetBindableEvent(Events.BindableNames.UpgradeEntity)
-		if upgradedBindableEvent then
-			typedClass._cleaner:Add(upgradedBindableEvent.Event:Connect(function(player: Player, entityId: string)
-				if typedClass.Player ~= player or typedClass.Owner ~= player.UserId then return end
-				if typedClass.Id ~= entityId then return end
-
-				handleStateUpdate(player)
-			end))
-		end
 		-- //!SECTION
 	else
 		-- Shop Item Purchased

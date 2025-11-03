@@ -190,20 +190,11 @@ function PB.CreateLogic(class)
 	class.ButtonDebounce = false
 
 	local function handleUpgrade(class)
-		local events = {
-			Purchased = Events.GetBindableEvent(Events.BindableNames.PurchaseEntity),
-			Upgraded = Events.GetBindableEvent(Events.BindableNames.UpgradeEntity),
-		}
-
 		local data = {
 			Id = class.Id,
 			Player = class.Player,
 		}
-		if not class.IsPurchased then
-			if events.Purchased then Events.FireBindableEvent(Events.BindableNames.PurchaseEntity, data) end
-		else
-			if events.Upgraded then Events.FireBindableEvent(Events.BindableNames.UpgradeEntity, data) end
-		end
+		Events.FireBindableEvent(Events.BindableNames.PurchaseEntity, data)
 	end
 
 	class._cleaner:Add(buttonBase.Touched:Connect(function(hit)

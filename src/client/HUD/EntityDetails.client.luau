@@ -209,16 +209,8 @@ function updateEntityInteractiveFrameLabel()
 end
 
 function handleUpgradeClick()
-	local events = {
-		Purchased = Events.GetRemote(Events.RemoteNames.EntityPurchased),
-		Upgraded = Events.GetRemote(Events.RemoteNames.EntityUpgraded),
-	}
-
-	if not entityData.IsPurchased then
-		events.Purchased:FireServer(entityData[FFGEnum.CLASS.PROPERTIES.Id])
-	else
-		events.Upgraded:FireServer(entityData[FFGEnum.CLASS.PROPERTIES.Id])
-	end
+	local purchasedEvent = Events.GetRemote(Events.RemoteNames.EntityPurchased)
+	purchasedEvent:FireServer(entityData.Id)
 end
 
 -- Buttons
