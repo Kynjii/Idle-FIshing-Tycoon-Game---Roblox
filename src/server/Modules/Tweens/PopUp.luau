@@ -16,9 +16,9 @@ function PopUp.Animate(billboard: BillboardGui, textValue: number, imageLabel: I
 		local text = billboard:WaitForChild("TextLabel") :: TextLabel
 
 		local billboardParent = billboard.Parent
-		local offsetValue = 10 * #billboardParent:GetChildren()
+		local offsetValue = 1.1 * #billboardParent:GetChildren()
 
-		billboard.StudsOffsetWorldSpace = Vector3.new(0, 0, offsetValue)
+		billboard.StudsOffsetWorldSpace = Vector3.new(0, offsetValue - 8, 10)
 		text.Font = FFGEnum.THEME.bigFont
 		text.Text = "+" .. FormatNumber(textValue)
 		text.TextColor3 = isGold and FFGEnum.THEME.color.textGold or Color3.fromRGB(0, 255, 0)

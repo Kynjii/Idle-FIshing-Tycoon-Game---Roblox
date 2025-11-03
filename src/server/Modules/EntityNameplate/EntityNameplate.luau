@@ -11,6 +11,7 @@ function EntityNameplate.Create(props: {
 	UpgradeStage: number,
 	JobCategory: "Fishing" | "Woodcutting" | "Mining" | "Transporting" | "None",
 	MaxStorage: number?,
+	FPS: number?,
 	Adornee: Instance?,
 })
 	local entityName = Instance.new("BillboardGui")
@@ -114,6 +115,7 @@ function EntityNameplate.Create(props: {
 		Woodcutting = FFGEnum.UI.Icons.Inventory,
 		Mining = FFGEnum.UI.Icons.Inventory,
 		Transporting = FFGEnum.UI.Icons.Inventory,
+		Boat = FFGEnum.UI.Icons.Fishing,
 		None = FFGEnum.UI.Icons.Inventory,
 	}
 
@@ -133,7 +135,7 @@ function EntityNameplate.Create(props: {
 		jobInfoText.Font = FFGEnum.THEME.bigFont
 		jobInfoText.LayoutOrder = 1
 		jobInfoText.Size = UDim2.fromScale(0.5, 1)
-		jobInfoText.Text = props.MaxStorage or ""
+		jobInfoText.Text = props.JobCategory == FFGEnum.CLASS.ENTITY_NAME.Boat and `{props.FPS}/s` or props.MaxStorage or ""
 		jobInfoText.TextColor3 = FFGEnum.THEME.color.blue
 		jobInfoText.TextStrokeTransparency = 0.7
 		jobInfoText.TextXAlignment = Enum.TextXAlignment.Left

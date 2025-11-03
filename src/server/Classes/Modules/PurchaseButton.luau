@@ -47,6 +47,7 @@ function PB.CreatePB(pbModel: Model, class: Boat | Tender | PortStorage | Buildi
 		Level = typedClass.Level,
 		JobCategory = typedClass.JobCategory or typedClass.Entity or "None",
 		MaxStorage = class.Entity ~= FFGEnum.CLASS.ENTITY_NAME.Building and typedClass.CurrentMaxStorage or nil,
+		FPS = class.Entity == FFGEnum.CLASS.ENTITY_NAME.Boat and typedClass.CurrentFPS or nil,
 	})
 	pbDetails.Enabled = true
 	pbDetails.Parent = billboardRoot
