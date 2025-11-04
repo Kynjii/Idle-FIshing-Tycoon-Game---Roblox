@@ -31,7 +31,8 @@ function Tooltip.Create(props: {
 	Visible: boolean?,
 	ItemImage: string,
 	ItemQualityId: number,
-	ItemBaseCost: string,
+	ItemBaseCost: number,
+	ItemUpgradeCost: number,
 	ItemName: string,
 	ItemDescription: string,
 	ItemStats: { [number]: { [string]: any } }?,
@@ -163,30 +164,12 @@ function Tooltip.Create(props: {
 	priceContainer.Position = FFGEnum.THEME.alignment.position.center
 	priceContainer.BackgroundTransparency = 1
 	priceContainer.Parent = addInfoContainer
-
-	local priceContainerList = Instance.new("UIListLayout")
-	priceContainerList.Name = "UIListLayout"
-	priceContainerList.FillDirection = Enum.FillDirection.Horizontal
-	priceContainerList.HorizontalAlignment = Enum.HorizontalAlignment.Center
-	priceContainerList.SortOrder = Enum.SortOrder.LayoutOrder
-	priceContainerList.VerticalAlignment = Enum.VerticalAlignment.Center
-	UIConfig.SetGap(priceContainerList, "S")
-	priceContainerList.Parent = priceContainer
-
-	local icon = Instance.new("ImageLabel")
-	icon.Name = "Icon"
-	icon.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
-	icon.BackgroundTransparency = 1
-	icon.Image = FFGEnum.UI.Icons.Gold
-	icon.LayoutOrder = 1
-	icon.Size = UDim2.fromScale(0.15, 0.15)
-	UIConfig.ApplyAspect(icon)
-	icon.Parent = priceContainer
+	UIConfig.ApplyList(priceContainer, Enum.FillDirection.Horizontal, { HAlign = Enum.HorizontalAlignment.Center, VAlign = Enum.VerticalAlignment.Center })
 
 	local priceLabel = Instance.new("TextLabel")
-	priceLabel.Name = "ItemBaseCost"
+	priceLabel.Name = "ItemCost"
 	priceLabel.LayoutOrder = 2
-	priceLabel.Text = props.ItemBaseCost
+	priceLabel.Text = props.IsPurchased and "Upgrade" or "Purchase"
 	priceLabel.AutomaticSize = Enum.AutomaticSize.X
 	priceLabel.Font = FFGEnum.THEME.bigFont
 	priceLabel.TextColor3 = FFGEnum.THEME.color.textGold
@@ -341,9 +324,10 @@ function Tooltip.Create(props: {
 	buyButtonContainer.Size = UDim2.fromScale(1, 1)
 	buyButtonContainer.Parent = buttonContainer
 
+	local cost = props.IsPurchased and props.ItemUpgradeCost or props.ItemBaseCost
 	local buyButton = Button.Create({
 		Color = "Green",
-		Text = props.IsPurchased and "Upgrade" or "Purchase",
+		Text = cost,
 		Size = UDim2.fromScale(1, 1),
 		CurrencyType = "Gold",
 	})
@@ -399,6 +383,7 @@ function Tooltip.Initialize()
 
 			Tooltip.Existing[data.Owner] = Tooltip.Create({
 				ItemBaseCost = data.ItemBaseCost,
+				ItemUpgradeCost = data.ItemUpgradeCost,
 				ItemDescription = data.ItemDescription,
 				ItemName = data.ItemName,
 				ItemImage = data.ItemImage,

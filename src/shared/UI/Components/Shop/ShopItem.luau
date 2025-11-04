@@ -22,6 +22,7 @@ local function ShopItem(
 		ItemBaseCost: string,
 		ItemStats: { [number]: { [string]: any } }?,
 		ItemQualityId: number,
+		ItemUpgradeCost: number,
 		Parent: Instance,
 		ShopInstance: Instance,
 		Owner: number,
@@ -192,6 +193,7 @@ local function ShopItem(
 			local itemData = {
 				ItemImage = props.ItemImage,
 				ItemBaseCost = props.ItemBaseCost,
+				ItemUpgradeCost = props.UpgradeCost,
 				ItemName = props.ItemName,
 				ItemId = props.ItemId,
 				ItemDescription = props.ItemDescription,
