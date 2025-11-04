@@ -6,6 +6,7 @@ local Events = require(ReplicatedStorage.Shared.Events.Events)
 local BuildingType = require(ReplicatedStorage.Shared.Types.Classes.BuildingType)
 local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
 local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
+local Jobs = require(ServerScriptService.Server.Modules.Jobs.Jobs)
 local PlayerDataTemplate = require(ServerScriptService.Server.Modules.PlayerDataTemplate)
 local Replica = require(ServerScriptService.Server.ReplicaServer)
 local PlayerStateToken = Replica.Token("PlayerState")
@@ -31,6 +32,8 @@ local stateTypes = {
 	ResetData = "Reset",
 	HelperShop = "save Helper Shop",
 	getPlayerInventory = "get Player Inventory",
+	SaveJobState = "save Job State",
+	GetJobState = "get Job State",
 }
 
 local function getProfile(player: Player, stateType: string): any | boolean
@@ -463,6 +466,43 @@ function DataService.CurrentTutorialStage(player: Player): number?
 	end
 
 	return currentStage
+end
+-- //!SECTION
+
+-- //SECTION - JOBS
+function DataService.SaveJobState(player: Player, jobState: Jobs.JobState)
+	local profile = getProfile(player, stateTypes.SaveJobState)
+	if not profile then return false end
+
+	local hasRealms = getRealms(profile)
+	if not hasRealms then return false end
+
+	local currentRealm = getRealmData(profile)
+	if not currentRealm then return false end
+
+	-- Initialize Jobs array if it doesn't exist
+	if not profile.Data.Realms[currentRealm].Jobs then profile.Data.Realms[currentRealm].Jobs = Jobs.Data end
+
+	profile.Data.Realms[currentRealm].Jobs[jobState.Id] = jobState
+
+	Events.FireEvent(Events.RemoteNames.UpdateJobManagementUI, player)
+
+	return true
+end
+
+function DataService.GetJobState(player: Player, jobId: number): Jobs.JobState
+	local profile = getProfile(player, stateTypes.GetJobState)
+	if not profile then return false end
+
+	local hasRealms = getRealms(profile)
+	if not hasRealms then return false end
+
+	local currentRealm = getRealmData(profile)
+	if not currentRealm then return false end
+
+	if not profile.Data.Realms[currentRealm].Jobs then return false end
+
+	return profile.Data.Realms[currentRealm].Jobs[jobId]
 end
 -- //!SECTION
 

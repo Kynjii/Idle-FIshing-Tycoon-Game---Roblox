@@ -2,7 +2,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local TableUtil = require(ReplicatedStorage.Packages.TableUtil)
 local AvailableJobListItem = require(ReplicatedStorage.Shared.UI.Components.Jobs.AvailableJobListItem)
-local UIConfig = require(ReplicatedStorage.Shared.UI.UIConfig)
 local CrewManagementPanel = {}
 
 function CrewManagementPanel.Create(player: Player, jobsData)

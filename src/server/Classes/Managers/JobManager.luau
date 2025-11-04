@@ -9,31 +9,28 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
+local JobManagerType = require(ReplicatedStorage.Shared.Types.Managers.JobManagerType)
 local ProgressBar = require(ReplicatedStorage.Shared.UI.Components.ProgressBar)
 
 local JobManager = {}
 JobManager.__index = JobManager
 
-export type JobManager = typeof(setmetatable({}, JobManager))
-export type JobState = {
-	[number]: number,
-}
+type JobManager = typeof(setmetatable({} :: JobManagerType.JobManagerInstance, JobManager))
 
-function JobManager.New(helperState, player: Player, teamId: number): JobManager
+function JobManager.New(helperState: { [string]: HelperType.HelperInstance }, jobState: { [number]: Jobs.JobState }, player: Player, teamId: number): JobManager
 	local self = setmetatable({} :: JobManager, JobManager)
 	self.Player = player
 	self.Owner = self.Owner or player.UserId
 	self.TeamId = teamId
 
 	self.Helpers = {}
-	self.JobState = {} :: JobState
-	self:GenerateJobState()
+	self.JobState = jobState
 
 	self._cleaner = Trove.new()
 
 	self:CreateHelpers(helperState)
 	self:AttachEventListeners()
-	self:AssignJobs(player)
+	self:AssignJobs()
 
 	return self
 end
@@ -45,32 +42,46 @@ function JobManager.CreateHelpers(self: JobManager, helperState)
 	end
 end
 
-function JobManager.AssignJobs(self: JobManager, player: Player): ()
+function JobManager.AssignJobs(self: JobManager): ()
 	for _, helper in pairs(self.Helpers) do
-		if helper.CurrentAssignment > 0 then self:AssignHelper(helper.Id, helper.CurrentAssignment, player) end
-	end
-end
-
-function JobManager.GenerateJobState(self: JobManager): ()
-	local jobSlots = Jobs.GetMaxSlots()
-
-	for i, slotNum in ipairs(jobSlots) do
-		self.JobState[i] = slotNum
+		if helper.CurrentAssignment > 0 then self:AssignHelper(helper.Id, helper.CurrentAssignment) end
 	end
 end
 
 function JobManager.NumOfSlotsAvailable(self: JobManager, jobId: number): number
-	local jobState: JobState = self.JobState[jobId]
-	return typeof(jobState) == "number" and jobState or -1
+	local job: Jobs.JobState = self.JobState[jobId]
+	if job then
+		local assignedHelpers = job.Slots.AssignedHelpers
+		local maxSlots = job.Slots.MaxSlots
+		local lockedSlots = job.Slots.LockedSlots
+
+		local unlockedSlots = maxSlots - lockedSlots
+
+		local availableSlots = unlockedSlots - #assignedHelpers
+
+		return math.max(0, availableSlots)
+	end
+
+	return -1
 end
 
-function JobManager.AssignSlot(self: JobManager, jobId: number): ()
-	if not jobId then return end
-	local jobState: JobState = self.JobState[jobId]
-	jobState -= 1
+function JobManager.UpdateJobState(self: JobManager, jobId: number, helper: HelperType.HelperInstance)
+	local job: Jobs.JobState = self.JobState[jobId]
+	if job then
+		local assignedHelpersTable = job.Slots.AssignedHelpers
+
+		local preparedData = {
+			Name = helper:GetName(),
+			Level = helper.Level,
+			QualityId = helper.QualityId,
+		}
+		assignedHelpersTable[#assignedHelpersTable + 1] = preparedData
+		print(job)
+		DataService.SaveJobState(self.Player, job)
+	end
 end
 
-function JobManager.AssignHelper(self: JobManager, helperId: number, jobId: number, player: Player?): ()
+function JobManager.AssignHelper(self: JobManager, helperId: number, jobId: number): ()
 	if not helperId or not jobId then return end
 	if self:NumOfSlotsAvailable(jobId) == 0 then
 		print("No JobSlots available for JobId: ", jobId)
@@ -83,7 +94,7 @@ function JobManager.AssignHelper(self: JobManager, helperId: number, jobId: numb
 	local helper = self.Helpers and self.Helpers[helperId] or nil
 	local isNewAssignment = true
 	if not helper then
-		local inventory = DataService.GetPlayerInventory(self.Player or player)
+		local inventory = DataService.GetPlayerInventory(self.Player)
 		if not inventory then return end
 
 		local savedHelperState = inventory[helperId]
@@ -96,8 +107,8 @@ function JobManager.AssignHelper(self: JobManager, helperId: number, jobId: numb
 
 	if helper.CurrentAssignment > 0 then isNewAssignment = false end
 
-	self:AssignSlot(jobId)
 	helper:AssignJob(jobId, isNewAssignment)
+	self:UpdateJobState(jobId, helper)
 end
 
 function JobManager.BeginAction(self: JobManager, actionType: string, helper: HelperType.HelperInstance, jobId: number)

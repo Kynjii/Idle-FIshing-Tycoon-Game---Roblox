@@ -141,8 +141,9 @@ function TeamManager.AssignJobManager(profile, player: Player, teamId: number): 
 	local realmData = profile and profile.Realms[currentRealm]
 
 	local playerHelperState = realmData.Helpers or {}
+	local playerJobState = realmData.Jobs or {}
 
-	local jobManager = JobManager.New(playerHelperState, player, teamId)
+	local jobManager = JobManager.New(playerHelperState, playerJobState, player, teamId)
 	if not jobManager then return end
 
 	TeamManager.JobManager[player.UserId] = jobManager

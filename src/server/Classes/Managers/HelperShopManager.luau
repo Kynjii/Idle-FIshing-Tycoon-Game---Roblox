@@ -104,6 +104,8 @@ function HelperShopManager.Purchasehelper(self: HelperShopManager, helperId: str
 
 	DataService.Spend(self.Player, helperClass.CurrencyType, helperClass.BaseCost)
 
+	Events.FireEvent(Events.RemoteNames.UpdateHelperShopUI, self.Player, helperId)
+
 	self:Save()
 end
 

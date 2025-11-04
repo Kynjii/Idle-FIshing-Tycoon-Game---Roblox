@@ -1,4 +1,4 @@
--- !strict
+--!strict
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -17,6 +17,26 @@ local screenGui: ScreenGui
 
 local getJobDataEvent = Events.GetRemoteFn(Events.RemoteFunctionNames.GetJobData)
 
+function clearExistingTooltip()
+	Tooltip.ClearExisting(player.UserId)
+end
+
+function updateCrewMngPanelUI()
+	clearExistingTooltip()
+
+	local innerWindow = screenGui:FindFirstChild("InnerWindow", true)
+	local crewManagementContainer = innerWindow and innerWindow:FindFirstChild("CrewManagementContainer", true)
+	if crewManagementContainer then crewManagementContainer:Destroy() end
+
+	if innerWindow then
+		if getJobDataEvent then
+			local jobsData = getJobDataEvent:InvokeServer()
+			local crewManagementPanel = CrewManagementPanel.Create(player, jobsData)
+			crewManagementPanel.Parent = innerWindow
+		end
+	end
+end
+
 task.spawn(function()
 	screenGui = MainUIPanel.Create({
 		screenGuiName = "CrewManagementPanel",
@@ -30,27 +50,10 @@ task.spawn(function()
 	})
 	screenGui.Parent = playerGui
 
-	local innerWindow = screenGui:FindFirstChild("InnerWindow", true)
-	if innerWindow then
-		if getJobDataEvent then
-			local jobsData = getJobDataEvent:InvokeServer()
-			local crewManagementPanel = CrewManagementPanel.Create(player, jobsData)
-			crewManagementPanel.Parent = innerWindow
-		end
-	end
+	updateCrewMngPanelUI()
 end)
 
-function clearExistingTooltip()
-	Tooltip.ClearExisting(player.UserId)
-end
-
 local crewState: { [string]: any } = {}
-
-function updateCrewMngPanelUI()
-	clearExistingTooltip()
-
-	-- //TODO -
-end
 
 function populateDetailsUI()
 	if not crewState then return end
@@ -81,3 +84,8 @@ if crewManagementButton and getCrewManagementState then
 		end
 	end)
 end
+
+local updateUIEvent = Events.GetRemote(Events.RemoteNames.UpdateJobManagementUI)
+if updateUIEvent then updateUIEvent.OnClientEvent:Connect(function()
+	updateCrewMngPanelUI()
+end) end

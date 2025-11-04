@@ -233,7 +233,7 @@ function Helper.CreateModel(self: Helper)
 		CollisionGroups.SetNpcCollisionGroup(clonedModel)
 	end
 
-	local startPos: Vector3 = Jobs.Data[self.CurrentAssignment].Location
+	local startPos: Vector3 = Jobs.GetJobLocation(self.CurrentAssignment)
 	if startPos then
 		self.Model:MoveTo(startPos)
 		Events.FireBindableEvent(Events.BindableNames.HelperAtUnloadingLoc, { Id = self.Id, JobId = self.CurrentAssignment, Player = self.Player })

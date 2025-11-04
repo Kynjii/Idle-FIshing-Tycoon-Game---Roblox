@@ -1,3 +1,6 @@
+local ServerScriptService = game:GetService("ServerScriptService")
+
+local Jobs = require(ServerScriptService.Server.Modules.Jobs.Jobs)
 local realmBuffs = {
 	-- FISH
 	Fish_Percent = { Name = "Fish_Percent", Label = "Fish Value", BaseValue = 0.05, Type = "Production", Scope = "Helper", IsPlus = true },
@@ -44,6 +47,7 @@ return {
 			Buffs = realmBuffs,
 			Helpers = {},
 			Shops = {},
+			Jobs = Jobs.Data,
 		},
 		[2] = {
 			Lanes = 6,
@@ -55,6 +59,7 @@ return {
 			Buffs = realmBuffs,
 			Helpers = {},
 			Shops = {},
+			Jobs = Jobs.Data,
 		},
 		[3] = {
 			Lanes = 6,
@@ -66,6 +71,7 @@ return {
 			Buffs = realmBuffs,
 			Helpers = {},
 			Shops = {},
+			Jobs = Jobs.Data,
 		},
 		[4] = {
 			Lanes = 6,
@@ -77,6 +83,7 @@ return {
 			Buffs = realmBuffs,
 			Helpers = {},
 			Shops = {},
+			Jobs = Jobs.Data,
 		},
 	},
 	Currencies = {

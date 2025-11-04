@@ -10,7 +10,7 @@ local Jobs = require(ServerScriptService.Server.Modules.Jobs.Jobs)
 local PathFinding = {}
 
 function PathFinding.GetRoute(jobId: number)
-	return Jobs.Data[jobId].Route
+	return Jobs.GetJobRoute(jobId)
 end
 
 local function pathfindToDestinations(npc, helperId, destinations, completionEvent, jobId, player)
