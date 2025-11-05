@@ -1,10 +1,34 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
+local Events = require(ReplicatedStorage.Shared.Events.Events)
+local BoatType = require(ReplicatedStorage.Shared.Types.Classes.BoatType)
+local BuildingType = require(ReplicatedStorage.Shared.Types.Classes.BuildingType)
+local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
+local PortStorageType = require(ReplicatedStorage.Shared.Types.Classes.PortStorageType)
+local TenderType = require(ReplicatedStorage.Shared.Types.Classes.TenderType)
 local UIConfig = require(ReplicatedStorage.Shared.UI.UIConfig)
-local EntityNameplate = {}
 
-function EntityNameplate.Create(props: {
+-- //SECTION - TYPES
+type Boat = BoatType.BoatInstance
+type Tender = TenderType.TenderInstance
+type PortStorage = PortStorageType.StorageInstance
+type Building = BuildingType.BuildingInstance
+type Helper = HelperType.HelperInstance
+-- //!SECTION
+
+local EntityNameplate = {}
+EntityNameplate.JobIconImage = {
+	Fishing = FFGEnum.UI.Icons.Inventory,
+	Woodcutting = FFGEnum.UI.Icons.Inventory,
+	Mining = FFGEnum.UI.Icons.Inventory,
+	Transporting = FFGEnum.UI.Icons.Inventory,
+	Boat = FFGEnum.UI.Icons.Fishing,
+	None = FFGEnum.UI.Icons.Inventory,
+}
+
+export type Props = {
+	Id: string,
 	Name: string,
 	QualityId: number,
 	Level: number,
@@ -13,7 +37,9 @@ function EntityNameplate.Create(props: {
 	MaxStorage: number?,
 	FPS: number?,
 	Adornee: Instance?,
-})
+}
+
+function EntityNameplate.Create(props: Props)
 	local entityName = Instance.new("BillboardGui")
 	entityName.Name = "EntityNameplate"
 	entityName.AlwaysOnTop = true
@@ -110,20 +136,11 @@ function EntityNameplate.Create(props: {
 	jobInfoContainer.Parent = infoContainer
 	UIConfig.ApplyList(jobInfoContainer, Enum.FillDirection.Horizontal, { HAlign = Enum.HorizontalAlignment.Center, VAlign = Enum.VerticalAlignment.Center })
 
-	local jobIconImage = {
-		Fishing = FFGEnum.UI.Icons.Inventory,
-		Woodcutting = FFGEnum.UI.Icons.Inventory,
-		Mining = FFGEnum.UI.Icons.Inventory,
-		Transporting = FFGEnum.UI.Icons.Inventory,
-		Boat = FFGEnum.UI.Icons.Fishing,
-		None = FFGEnum.UI.Icons.Inventory,
-	}
-
 	if props.JobCategory ~= "Building" then
 		local jobInfoIcon = Instance.new("ImageLabel")
 		jobInfoIcon.Name = "JobInfoIcon"
 		jobInfoIcon.Size = UDim2.fromScale(0.5, 1)
-		jobInfoIcon.Image = jobIconImage[props.JobCategory] or jobIconImage.None
+		jobInfoIcon.Image = EntityNameplate.JobIconImage[props.JobCategory] or EntityNameplate.JobIconImage.None
 		jobInfoIcon.BackgroundTransparency = 1
 		jobInfoIcon.Parent = jobInfoContainer
 		UIConfig.ApplyAspect(jobInfoIcon)
@@ -168,7 +185,67 @@ function EntityNameplate.Create(props: {
 		UIConfig.ApplyTextConstraints(stage, "caption")
 	end)
 
+	-- Event for handling Helper upgrades
+	-- local freshHelperData = Events.GetRemote(Events.RemoteNames.HelperData)
+	-- if freshHelperData then
+	-- 	freshHelperData.OnClientEvent:Connect(function(helperData: HelperType.HelperData)
+	-- 		if not props.JobCategory or props.JobCategory == "None" then return end
+	-- 		if props.Id ~= helperData.Id then return end
+
+	-- 		EntityNameplate.Update(entityName, helperData)
+	-- 	end)
+	-- end
+
+	-- -- Event for handling non-helper upgrades/purchases
+	-- local updateEvent = Events.GetRemote(Events.RemoteNames.EntityPurchased)
+	-- if updateEvent then
+	-- 	updateEvent.OnClientEvent:Connect(function(player: Player, entityData: Boat | Tender | PortStorage | Building)
+	-- 		if props.JobCategory and props.JobCategory ~= "None" then return end
+	-- 		if props.Id ~= entityData.Id then return end
+
+	-- 		EntityNameplate.Update(entityName, entityData)
+	-- 	end)
+	-- end
+
 	return entityName
+end
+
+function EntityNameplate.Update(entityBillboard: BillboardGui, class: Boat | Tender | PortStorage | Building | Helper)
+	local typedClass
+	if class.Entity == FFGEnum.CLASS.ENTITY_NAME.Boat then
+		typedClass = class :: Boat
+	elseif class.Entity == FFGEnum.CLASS.ENTITY_NAME.Tender then
+		typedClass = class :: Tender
+	elseif class.Entity == FFGEnum.CLASS.ENTITY_NAME.PortStorage then
+		typedClass = class :: PortStorage
+	elseif class.Entity == FFGEnum.CLASS.ENTITY_NAME.Building then
+		typedClass = class :: Building
+	elseif class.Entity == FFGEnum.CLASS.ENTITY_NAME.Helper then
+		typedClass = class :: Helper
+	else
+		error("Invalid entity passed to update EntityNameplate")
+	end
+
+	local levelLabel: TextLabel = entityBillboard:FindFirstChild("Level", true)
+	local stageLabel: TextLabel = entityBillboard:FindFirstChild("Stage", true)
+	local qualityLabel: TextLabel = entityBillboard:FindFirstChild("Quality", true)
+	local jobInfoIcon: ImageLabel = entityBillboard:FindFirstChild("JobInfoIcon", true)
+	local jobInfoText: TextLabel = entityBillboard:FindFirstChild("JobInfoText", true)
+
+	if levelLabel then levelLabel.Text = `Level {typedClass.Level}` end
+
+	if stageLabel then
+		stageLabel.Text = FFGEnum.STAGES[typedClass.UpgradeStage].Label
+		stageLabel.TextColor3 = FFGEnum.STAGES[typedClass.UpgradeStage].Color or Color3.new(1, 1, 1)
+	end
+
+	if typedClass.Entity ~= FFGEnum.CLASS.ENTITY_NAME.Building then
+		if qualityLabel then qualityLabel.Text = FFGEnum.QUALITIES[typedClass.QualityId].Label or "" end
+	end
+
+	if jobInfoIcon then jobInfoIcon.Image = EntityNameplate.JobIconImage[typedClass.JobCategory] or EntityNameplate.JobIconImage.None end
+
+	if jobInfoText then jobInfoText.Text = typedClass.JobCategory == FFGEnum.CLASS.ENTITY_NAME.Boat and `{typedClass.FPS}/s` or typedClass.MaxStorage or "" end
 end
 
 return EntityNameplate

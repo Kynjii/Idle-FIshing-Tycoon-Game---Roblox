@@ -90,7 +90,7 @@ function EventListeners.Attach(class: Boat | Tender | PortStorage | Building)
 			end
 
 			-- Update UIs
-			typedClass:UpdatepurchaseButtonUI()
+			Events.FireBindableEvent(Events.BindableNames.PurchaseEntity, typedClass)
 			typedClass:Save()
 		end
 

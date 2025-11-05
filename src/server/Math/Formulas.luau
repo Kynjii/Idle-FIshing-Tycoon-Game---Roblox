@@ -103,7 +103,7 @@ local FORMULAS = {
 	end,
 
 	-- Entity baselines
-	BOAT = { BaseCost = 100, BaseStorage = 100, BaseFPS = 5 },
+	BOAT = { BaseCost = 100, BaseStorage = 100, BaseFPS = 1 },
 	TENDER = { BaseCost = 100, BaseStorage = 200 },
 	STORAGE = { BaseCost = 200, BaseStorage = 200 },
 	BUILDING = { BaseCost = 1500 },
@@ -127,7 +127,7 @@ local FORMULAS = {
 -- =========================
 
 FORMULAS.PER_LEVEL_STORAGE_ADD = 30.0 -- +30 storage / level
-FORMULAS.PER_LEVEL_FPS_ADD = 10 -- +10 FPS   / level
+FORMULAS.PER_LEVEL_FPS_ADD = 5 -- +10 FPS   / level
 
 -- Add percentage-based per-level growth for compound excitement
 FORMULAS.PER_LEVEL_MULT = 1.02 -- 2% compound growth per level
@@ -180,7 +180,7 @@ FORMULAS.HELPER_BASE = {
 -- Per-level additive growth (small, before Stage/Quality)
 FORMULAS.HELPER_PER_LEVEL_ADD = {
 	Defaults = {
-		WalkSpeed = 0.35,
+		WalkSpeed = 0.05,
 		Storage = 30,
 		LoadTime = 0.01,
 	},

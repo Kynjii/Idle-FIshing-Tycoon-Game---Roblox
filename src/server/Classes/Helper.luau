@@ -15,6 +15,7 @@ local PopUp = require(ServerScriptService.Server.Modules.Tweens.PopUp)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
+local ProgressBar = require(ReplicatedStorage.Shared.UI.Components.ProgressBar)
 
 -- //SECTION - Helper Data
 local NAME = FFGEnum.JOB_NAMES
@@ -225,10 +226,17 @@ function Helper.CreateModel(self: Helper)
 			UpgradeStage = self.UpgradeStage,
 			JobCategory = self.JobCategory,
 			MaxStorage = self.Stats.Storage,
+			Id = self.Id,
 		})
 		nameplate.ExtentsOffsetWorldSpace = Vector3.new(0, 2, 0)
 		nameplate.Enabled = true
 		nameplate.Parent = clonedModel
+
+		local hasProgressBar = nameplate:FindFirstChild("ProgressContainer")
+		if not hasProgressBar then
+			local progressContainer = ProgressBar.Create({ Color = "WhiteShiny", HasText = true, Adornee = nameplate })
+			progressContainer.Parent = nameplate
+		end
 
 		CollisionGroups.SetNpcCollisionGroup(clonedModel)
 	end

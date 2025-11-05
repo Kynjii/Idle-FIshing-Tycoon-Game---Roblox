@@ -61,6 +61,7 @@ textLabel2.Font = Enum.Font.Bangers
 textLabel2.TextColor3 = Color3.fromHex("#ffffff")
 textLabel2.Text = ""
 textLabel2.TextScaled = true
+textLabel2.FontFace.Weight = Enum.FontWeight.Light
 textLabel2.TextXAlignment = Enum.TextXAlignment.Left
 textLabel2.TextYAlignment = Enum.TextYAlignment.Bottom
 textLabel2.Parent = textFrame

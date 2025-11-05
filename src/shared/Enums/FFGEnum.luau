@@ -188,6 +188,7 @@ FFGEnum.UI = {
 		},
 	},
 	ProgressBar = {
+		BackgroundWhiteTrape = "rbxassetid://105220536274181",
 		BackgroundWhite = "rbxassetid://98734232131657",
 		BackgroundColor = Color3.fromRGB(6, 38, 65),
 		InnerBar = {
@@ -197,6 +198,8 @@ FFGEnum.UI = {
 			Blue = "rbxassetid://73484172674727",
 			White = "rbxassetid://117380399857172",
 			WhiteShiny = "rbxassetid://121538561027385",
+			RedTrape = "rbxassetid://114012524575698",
+			BlueTrape = "rbxassetid://77539319651665",
 		},
 	},
 }

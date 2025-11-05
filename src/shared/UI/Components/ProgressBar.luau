@@ -7,7 +7,7 @@ local UIConfig = require(ReplicatedStorage.Shared.UI.UIConfig)
 local ProgressBar = {}
 
 function ProgressBar.Create(props: {
-	Color: "White" | "WhiteShiny" | "Blue" | "Yellow" | "Green" | "GreenShiny",
+	Color: "White" | "WhiteShiny" | "Blue" | "Yellow" | "Green" | "GreenShiny" | "RedTrape" | "BlueTrape" | "WhiteTrape",
 	HasText: boolean?,
 	HasBillboard: boolean?,
 	Adornee: Instance?,
@@ -19,64 +19,70 @@ function ProgressBar.Create(props: {
 		billBoard.AlwaysOnTop = true
 		if props.Adornee then billBoard.Adornee = props.Adornee end
 		billBoard.Enabled = false
+		billBoard.ExtentsOffsetWorldSpace = Vector3.new(-40, 0, 0)
 		billBoard.LightInfluence = 1
 		billBoard.MaxDistance = FFGEnum.THEME.Nameplate.MaxDistance
 		billBoard.ResetOnSpawn = false
-		billBoard.Size = UDim2.fromScale(10, 2.5)
+		billBoard.Size = UDim2.fromScale(10, 1)
 		billBoard.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-		UIConfig.ApplyList(billBoard, Enum.FillDirection.Vertical, { HAlign = Enum.HorizontalAlignment.Center })
 	end
 
 	local progressContainer = Instance.new("Frame")
 	progressContainer.Name = "ProgressContainer"
-	progressContainer.AnchorPoint = Vector2.new(0.5, 0.5)
+	progressContainer.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
+	progressContainer.Position = FFGEnum.THEME.alignment.position.center
 	progressContainer.BackgroundTransparency = 1
 	progressContainer.LayoutOrder = 3
-	progressContainer.Size = UDim2.fromScale(1, 0.33)
+	progressContainer.Size = UDim2.fromScale(1, 1)
 
 	local progressBG = Instance.new("ImageLabel")
 	progressBG.Name = "ProgressBG"
-	progressBG.AnchorPoint = Vector2.new(0.5, 0.5)
+	progressBG.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 	progressBG.BackgroundTransparency = 1
 	progressBG.ClipsDescendants = true
-	progressBG.Image = FFGEnum.UI.ProgressBar.InnerBar.White
+	progressBG.Image = FFGEnum.UI.ProgressBar.BackgroundWhiteTrape
 	progressBG.ImageColor3 = FFGEnum.UI.ProgressBar.BackgroundColor
-	progressBG.Position = UDim2.fromScale(0.5, 0.5)
+	progressBG.Position = FFGEnum.THEME.alignment.position.center
 	progressBG.ScaleType = Enum.ScaleType.Slice
-	progressBG.Size = UDim2.fromScale(0.9, 0.8)
-	progressBG.SliceCenter = Rect.new(20, 37, 21, 37)
+	progressBG.Size = UDim2.fromScale(1, 1)
+	progressBG.SliceCenter = Rect.new(308, 9, 0, 33)
 
 	local progressBar = Instance.new("ImageLabel")
 	progressBar.Name = "ProgressBar"
 	progressBar.AnchorPoint = Vector2.new(0, 0.5)
 	progressBar.BackgroundTransparency = 1
-	progressBar.Image = FFGEnum.UI.ProgressBar.InnerBar[props.Color] or FFGEnum.UI.ProgressBar.InnerBar.GreenShiny
+	progressBar.Image = FFGEnum.UI.ProgressBar.InnerBar[props.Color] or FFGEnum.UI.ProgressBar.BackgroundWhiteTrape
+	if props.Color == "WhiteTrape" then progressBar.ImageColor3 = FFGEnum.THEME.color.green end
 	progressBar.Position = UDim2.fromScale(0, 0.5)
 	progressBar.ScaleType = Enum.ScaleType.Slice
-	progressBar.Size = UDim2.fromScale(0, 1)
-	progressBar.SliceCenter = Rect.new(20, 37, 21, 37)
+	progressBar.Size = UDim2.fromScale(0.8, 1)
+	progressBar.SliceCenter = Rect.new(308, 9, 0, 33)
 	progressBar.ZIndex = 2
 	progressBar.Parent = progressBG
 
 	if props.HasText then
 		local progressBarText = Instance.new("TextLabel")
 		progressBarText.Name = "ProgressBarText"
-		progressBarText.AnchorPoint = Vector2.new(0.5, 0.5)
+		progressBarText.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 		progressBarText.BackgroundTransparency = 1
 		progressBarText.Font = FFGEnum.THEME.bigFont
 		progressBarText.Position = UDim2.fromScale(0.5, 0.5)
 		progressBarText.Size = UDim2.fromScale(1, 0.8)
 		progressBarText.Text = "0 / 100"
-		progressBarText.TextColor3 = Color3.new()
-		progressBarText.TextScaled = true
+		progressBarText.TextColor3 = FFGEnum.THEME.color.white
 		progressBarText.ZIndex = 5
-		UIConfig.ApplyTextConstraints(progressBarText, "body")
+		UIConfig.ApplyTextConstraints(progressBarText, "h1")
 		progressBarText.Parent = progressBG
+
+		UIConfig.ObserveViewport(function()
+			UIConfig.ApplyTextConstraints(progressBarText, "h1")
+		end)
 	end
 
 	progressBG.Parent = progressContainer
 
 	local container = props.HasBillboard and billBoard or progressContainer
+	if props.HasBillboard then progressContainer.Parent = container end
 	return container
 end
 

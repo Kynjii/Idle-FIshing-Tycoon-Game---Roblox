@@ -17,33 +17,20 @@ function LootNotification.Create(props: Props)
 	lootNotificationContainer.Position = FFGEnum.THEME.alignment.position.bottom
 	lootNotificationContainer.Transparency = 0
 	lootNotificationContainer.Visible = true
-	lootNotificationContainer.Size = UDim2.fromScale(1, 0.2)
+	lootNotificationContainer.Size = UDim2.fromScale(1, 0.4)
 
 	local bG = Instance.new("ImageLabel")
 	bG.Name = "BG"
 	bG.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 	bG.BackgroundTransparency = 1
-	bG.Image = FFGEnum.UI.Frames.LootNotificationBackground
+	bG.Image = FFGEnum.UI.ProgressBar.InnerBar.BlueTrape
 	bG.Position = FFGEnum.THEME.alignment.position.center
 	bG.Rotation = 180
+	bG.ImageColor3 = FFGEnum.THEME.button.pressedColor
 	bG.ScaleType = Enum.ScaleType.Slice
 	bG.Size = UDim2.fromScale(1, 1)
-	bG.SliceCenter = Rect.new(447, 20, 451, 22)
+	bG.SliceCenter = Rect.new(0, 9, 308, 33)
 	bG.Parent = lootNotificationContainer
-
-	local uICorner = Instance.new("UICorner")
-	uICorner.Name = "UICorner"
-	uICorner.CornerRadius = UDim.new(0.2, 0)
-	uICorner.Parent = lootNotificationContainer
-
-	local uIStroke = Instance.new("UIStroke")
-	uIStroke.Name = "UIStroke"
-	uIStroke.Color = Color3.fromRGB(25, 118, 210)
-	uIStroke.BorderStrokePosition = Enum.BorderStrokePosition.Center
-	uIStroke.LineJoinMode = Enum.LineJoinMode.Round
-	uIStroke.StrokeSizingMode = Enum.StrokeSizingMode.ScaledSize
-	uIStroke.Thickness = 0.05
-	uIStroke.Parent = lootNotificationContainer
 
 	local lootContainer = Instance.new("Frame")
 	lootContainer.Name = "LootContainer"

@@ -5,6 +5,7 @@ local TableUtil = require(ReplicatedStorage.Packages.TableUtil)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local BuildingType = require(ReplicatedStorage.Shared.Types.Classes.BuildingType)
 local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
+local FormatNumber = require(ReplicatedStorage.Shared.Utils.FormatNumber)
 local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
 local Jobs = require(ServerScriptService.Server.Modules.Jobs.Jobs)
 local PlayerDataTemplate = require(ServerScriptService.Server.Modules.PlayerDataTemplate)
@@ -186,7 +187,7 @@ function DataService.Earn(player: Player, currencyType: "Gold", amount: number)
 	if replica then replica:Set({ "Currencies", currencyType }, newValue) end
 
 	Events.FireBindableEvent(Events.BindableNames.UpdateState, player)
-	Events.FireEvent(Events.RemoteNames.LootNotification, player, { ItemType = currencyType, Text = amount })
+	Events.FireEvent(Events.RemoteNames.LootNotification, player, { ItemType = currencyType, Text = FormatNumber(amount) })
 end
 
 function DataService.CanAfford(player: Player, currencyType: "Gold", amount: number)

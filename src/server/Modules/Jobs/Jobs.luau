@@ -111,12 +111,11 @@ function Jobs.GetJobRoute(jobId: number): { [number]: Vector3 }
 	local route = {}
 	for _, taggedJobLocation: Part in ipairs(taggedJobLocations) do
 		local taggedJobLocationJobId = taggedJobLocation:GetAttribute(FFGEnum.ATTRIBUTES.JobId)
-		if taggedJobLocationJobId ~= jobId then return end
+		if taggedJobLocationJobId ~= jobId then continue end
 
 		local pathStep = taggedJobLocation:GetAttribute(FFGEnum.ATTRIBUTES.PathStep)
 		route[pathStep] = taggedJobLocation.Position
 	end
-
 	return route
 end
 
