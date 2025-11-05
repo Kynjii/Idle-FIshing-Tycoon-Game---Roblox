@@ -121,10 +121,8 @@ function PB.CreateProgressBar(parent: Part, class)
 	end
 
 	if class.Entity ~= FFGEnum.CLASS.ENTITY_NAME.Building then
-		if class.Entity ~= FFGEnum.CLASS.ENTITY_NAME.Helper then
-			if progressBarText then progressBarText.Text = `{FormatNumber(class.FishInStorage)} / {FormatNumber(class.CurrentMaxStorage)}` end
-			if progressBarFrame then ProgressBar.Update(progressBarFrame, class.FishInStorage, class.CurrentMaxStorage) end
-		end
+		if progressBarText then progressBarText.Text = `{FormatNumber(class.FishInStorage)} / {FormatNumber(class.CurrentMaxStorage)}` end
+		if progressBarFrame then ProgressBar.Update(progressBarFrame, class.FishInStorage, class.CurrentMaxStorage) end
 	else
 		if progressContainer then
 			if progressTypeIsFrame then
