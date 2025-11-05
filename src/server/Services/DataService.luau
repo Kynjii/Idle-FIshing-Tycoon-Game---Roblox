@@ -154,7 +154,7 @@ local function calculateBuffedAmount(player, amount)
 	return buffedAmount
 end
 
-function DataService.Earn(player: Player, currencyType: string, amount: number)
+function DataService.Earn(player: Player, currencyType: "Gold", amount: number)
 	local profile = DataService.Profiles[player]
 	if not profile then
 		FFGHelpers.PrintLog("No profile found when attempting to earn: ", currencyType)
@@ -169,13 +169,10 @@ function DataService.Earn(player: Player, currencyType: string, amount: number)
 		return
 	end
 
-	print(amount)
 	local current = tonumber(profile.Data.Currencies[currencyType]) or 0
-	print(current)
 	local buffedDiff = calculateBuffedAmount(player, amount)
 
 	local newValue = current + buffedDiff
-	print(newValue, current, buffedDiff)
 	profile.Data.Currencies[currencyType] = newValue
 
 	Economy.Log(player, Economy.FlowType.CurrencyAdd, currencyType, amount, newValue, Economy.TransactionType.Gameplay)
@@ -189,15 +186,16 @@ function DataService.Earn(player: Player, currencyType: string, amount: number)
 	if replica then replica:Set({ "Currencies", currencyType }, newValue) end
 
 	Events.FireBindableEvent(Events.BindableNames.UpdateState, player)
+	Events.FireEvent(Events.RemoteNames.LootNotification, player, { ItemType = currencyType, Text = amount })
 end
 
-function DataService.CanAfford(player: Player, currencyType: string, amount: number)
+function DataService.CanAfford(player: Player, currencyType: "Gold", amount: number)
 	local profile = DataService.Profiles[player]
 	if not profile then return end
 	return (tonumber(profile.Data.Currencies[currencyType]) or 0) >= amount
 end
 
-function DataService.Spend(player: Player, currencyType: string, amount: number)
+function DataService.Spend(player: Player, currencyType: "Gold", amount: number)
 	local profile = DataService.Profiles[player]
 	if not profile then return end
 	if typeof(amount) ~= "number" or amount <= 0 then return end
@@ -473,7 +471,7 @@ end
 -- //!SECTION
 
 -- //SECTION - JOBS
-function DataService.SaveJobState(player: Player, jobState: Jobs.JobState)
+function DataService.SaveJobState(player: Player, jobState: Jobs.JobState, skipEvent: boolean)
 	local profile = getProfile(player, stateTypes.SaveJobState)
 	if not profile then return false end
 
@@ -488,7 +486,7 @@ function DataService.SaveJobState(player: Player, jobState: Jobs.JobState)
 
 	profile.Data.Realms[currentRealm].Jobs[jobState.Id] = jobState
 
-	Events.FireEvent(Events.RemoteNames.UpdateJobManagementUI, player)
+	if not skipEvent then Events.FireEvent(Events.RemoteNames.UpdateJobManagementUI, player) end
 
 	return true
 end

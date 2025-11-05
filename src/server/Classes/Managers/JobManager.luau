@@ -1,7 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
-local TableUtil = require(ReplicatedStorage.Packages.TableUtil)
 local Helper = require(ServerScriptService.Server.Classes.Helper)
 local ClassCalculators = require(ServerScriptService.Server.Classes.Modules.ClassCalculators)
 local Pathfinding = require(ServerScriptService.Server.Classes.Modules.Pathfinding)
@@ -69,7 +68,9 @@ function JobManager.CalculateSlotUnlockCost(self: JobManager)
 	for _, job in ipairs(self.JobState) do
 		local jobSlots = job.Slots
 		jobSlots.UnlockCost = ClassCalculators.CalculateBaseValue(Formulas.JOBSLOT.BaseCost, job.Tier, self.RealmId)
-		DataService.SaveJobState(self.Player, job)
+
+		local skipEvent = true
+		DataService.SaveJobState(self.Player, job, skipEvent)
 	end
 end
 
@@ -140,7 +141,7 @@ function JobManager.PurchaseJobSlot(self: JobManager, jobId: number)
 		if not amount then return end
 
 		if lockedSlots == 0 then
-			error("All locked slots are already unlocked", job)
+			print("All locked slots are already unlocked", job)
 			return
 		end
 

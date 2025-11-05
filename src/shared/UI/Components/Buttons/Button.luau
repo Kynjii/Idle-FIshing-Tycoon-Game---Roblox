@@ -44,11 +44,11 @@ function Button.Create(props: {
 		buttonText.LayoutOrder = 2
 		buttonText.TextColor3 = FFGEnum.THEME.color.white
 		buttonText.BackgroundTransparency = 1
-		buttonText.Size = UDim2.fromScale(0.5, 1)
+		buttonText.Size = UDim2.fromScale(0.7, 1)
 		buttonText.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 		buttonText.Position = FFGEnum.THEME.alignment.position.textCenter
 		buttonText.Parent = button
-		UIConfig.ApplyTextConstraints(buttonText, "body")
+		UIConfig.ApplyTextConstraints(buttonText, "caption")
 	end
 
 	if props.CurrencyType == "Gold" then

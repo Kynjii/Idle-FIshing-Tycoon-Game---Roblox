@@ -58,11 +58,11 @@ UIConfig.Padding = { XS = 0.001, S = 0.03, M = 0.05, L = 0.08, XL = 0.1 } -- sca
 
 UIConfig.Text = {
 	-- min, max per band + relative scale to body
-	title = { S = { 28, 36 }, M = { 32, 44 }, L = { 36, 52 }, scale = 1.9 },
-	h1 = { S = { 24, 30 }, M = { 28, 36 }, L = { 32, 42 }, scale = 1.6 },
-	h2 = { S = { 20, 26 }, M = { 22, 30 }, L = { 24, 34 }, scale = 1.4 },
-	body = { S = { 14, 18 }, M = { 16, 20 }, L = { 18, 22 }, scale = 1.0 },
-	caption = { S = { 12, 14 }, M = { 12, 16 }, L = { 12, 16 }, scale = 0.85 },
+	title = { S = { 20, 28 }, M = { 24, 36 }, L = { 28, 44 }, scale = 1.9 },
+	h1 = { S = { 16, 22 }, M = { 20, 28 }, L = { 24, 34 }, scale = 1.6 },
+	h2 = { S = { 12, 18 }, M = { 14, 22 }, L = { 16, 26 }, scale = 1.4 },
+	body = { S = { 10, 14 }, M = { 12, 16 }, L = { 14, 18 }, scale = 1.0 },
+	caption = { S = { 8, 10 }, M = { 8, 12 }, L = { 8, 12 }, scale = 0.85 },
 	LineHeight = 1.2,
 }
 
@@ -193,11 +193,11 @@ end
 -- //!SECTION
 
 -- //SECTION - Aspect Constraints
-function UIConfig.ApplyAspect(frame: Frame | ImageLabel | ImageButton, ratio: number?, axis: Enum.DominantAxis?)
+function UIConfig.ApplyAspect(frame: Frame | ImageLabel | ImageButton, ratio: number?, axis: Enum.DominantAxis?, aspectType: Enum.AspectType?)
 	local aspect = frame:FindFirstChildOfClass("UIAspectRatioConstraint") or Instance.new("UIAspectRatioConstraint")
 	aspect.AspectRatio = ratio or 1 -- default: square
 	aspect.DominantAxis = axis or Enum.DominantAxis.Width
-	aspect.AspectType = Enum.AspectType.ScaleWithParentSize
+	aspect.AspectType = aspectType or Enum.AspectType.ScaleWithParentSize
 	aspect.Parent = frame
 end
 
@@ -210,6 +210,7 @@ function UIConfig.ApplyList(
 		VAlign: Enum.VerticalAlignment?,
 		HFlex: Enum.UIFlexAlignment?,
 		VFlex: Enum.UIFlexAlignment?,
+		Padding: "XS" | "S" | "M" | "L" | "XL"?,
 	}?
 ): UIListLayout
 	local list = Instance.new("UIListLayout")
@@ -218,6 +219,10 @@ function UIConfig.ApplyList(
 	if options and options.VAlign then list.VerticalAlignment = options.VAlign end
 	if options and options.HFlex then list.HorizontalFlex = options.HFlex end
 	if options and options.VFlex then list.VerticalFlex = options.VFlex end
+	if options and options.Padding then
+		local s = (UIConfig.Padding :: any)[options.Padding]
+		list.Padding = UDim.new(s, 0)
+	end
 	list.SortOrder = Enum.SortOrder.LayoutOrder
 	list.Parent = frame
 

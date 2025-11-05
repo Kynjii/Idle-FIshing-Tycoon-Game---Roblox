@@ -19,6 +19,7 @@ Events.RemoteNames = {
 	PlayerReady = "PlayerReady",
 	UpdateJobManagementUI = "UpdateJobManagementUI",
 	PurchaseJobSlot = "PurchaseJobSlot",
+	LootNotification = "LootNotification",
 }
 
 Events.RemoteFunctionNames = {

@@ -19,6 +19,7 @@ function AvailableJobListItem.Create(props: {
 		AssignedHelpers: {
 			[number]: { Id: string, Name: string, Level: number, QualityId: number },
 		},
+		UnlockCost: number?,
 	},
 	Player: Player,
 })
@@ -189,10 +190,10 @@ function AvailableJobListItem.Create(props: {
 			if isTaken then
 				buttonText = "-"
 			else
-				buttonText = "+"
+				buttonText = `{props.Slots.UnlockCost or "Buy"}`
 			end
 
-			local actionButton = Button.Create({ Color = buttonColor, CurrencyType = buttonCurrency, Text = buttonText, Size = UDim2.fromScale(0.2, 1) })
+			local actionButton = Button.Create({ Color = buttonColor, CurrencyType = buttonCurrency, Text = buttonText, Size = UDim2.fromScale(0.4, 1) })
 			actionButton.Position = UDim2.fromScale(0.9, 0.5)
 			actionButton.Name = isLocked and "UnassignButon" or isLocked and "PuchaseButton" or ""
 

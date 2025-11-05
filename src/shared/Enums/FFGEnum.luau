@@ -160,6 +160,7 @@ FFGEnum.UI = {
 		InnerPanel = "rbxassetid://132276661423012",
 		ListItem = "rbxassetid://94314557664644",
 		NameplateBackground = "rbxassetid://86748504086845",
+		LootNotificationBackground = "rbxassetid://84064232013782",
 	},
 	Tabs = {
 		RightTab = "rbxassetid://132317085020730",

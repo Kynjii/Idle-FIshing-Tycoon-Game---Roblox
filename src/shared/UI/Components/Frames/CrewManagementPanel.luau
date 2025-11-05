@@ -4,6 +4,7 @@ local TableUtil = require(ReplicatedStorage.Packages.TableUtil)
 local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
 local AvailableHelperListItem = require(ReplicatedStorage.Shared.UI.Components.Jobs.AvailableHelperListItem)
 local AvailableJobListItem = require(ReplicatedStorage.Shared.UI.Components.Jobs.AvailableJobListItem)
+local UIConfig = require(ReplicatedStorage.Shared.UI.UIConfig)
 local CrewManagementPanel = {}
 
 function CrewManagementPanel.Create(player: Player, jobsData, crewData, jobCategory: "Fishing" | "Woodcutting" | "Mining" | "Transporting")
@@ -13,14 +14,7 @@ function CrewManagementPanel.Create(player: Player, jobsData, crewData, jobCateg
 	crewManagementContainer.BackgroundTransparency = 1
 	crewManagementContainer.Position = UDim2.fromScale(0.5, 0.5)
 	crewManagementContainer.Size = UDim2.fromScale(1, 1)
-
-	local uIListLayout = Instance.new("UIListLayout")
-	uIListLayout.Name = "UIListLayout"
-	uIListLayout.FillDirection = Enum.FillDirection.Horizontal
-	uIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-	uIListLayout.HorizontalFlex = Enum.UIFlexAlignment.SpaceBetween
-	uIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	uIListLayout.Parent = crewManagementContainer
+	UIConfig.ApplyList(crewManagementContainer, Enum.FillDirection.Horizontal, { HAlign = Enum.HorizontalAlignment.Center, HFlex = Enum.UIFlexAlignment.SpaceBetween })
 
 	local availableJobs = Instance.new("ScrollingFrame")
 	availableJobs.Name = "AvailableJobs"
@@ -34,12 +28,12 @@ function CrewManagementPanel.Create(player: Player, jobsData, crewData, jobCateg
 	availableJobs.Size = UDim2.fromScale(0.45, 1)
 
 	local scrollingFramePadding = Instance.new("UIPadding")
-	scrollingFramePadding.PaddingTop = UDim.new(0.05)
+	UIConfig.SetPadding(scrollingFramePadding, "M")
 	scrollingFramePadding.Parent = availableJobs
 
 	local uIGridLayout = Instance.new("UIGridLayout")
 	uIGridLayout.Name = "UIGridLayout"
-	uIGridLayout.CellSize = UDim2.fromScale(0.9, 0.3)
+	uIGridLayout.CellSize = UDim2.fromScale(0.95, 0.3)
 	uIGridLayout.FillDirectionMaxCells = 50
 	uIGridLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 	uIGridLayout.SortOrder = Enum.SortOrder.LayoutOrder
@@ -68,19 +62,17 @@ function CrewManagementPanel.Create(player: Player, jobsData, crewData, jobCateg
 	availableCrew.ScrollingDirection = Enum.ScrollingDirection.Y
 	availableCrew.Size = UDim2.fromScale(0.45, 1)
 
-	local uIGridLayout7 = Instance.new("UIGridLayout")
-	uIGridLayout7.Name = "UIGridLayout"
-	uIGridLayout7.CellSize = UDim2.fromScale(0.95, 0.3)
-	uIGridLayout7.FillDirection = Enum.FillDirection.Vertical
-	uIGridLayout7.FillDirectionMaxCells = 50
-	uIGridLayout7.HorizontalAlignment = Enum.HorizontalAlignment.Center
-	uIGridLayout7.SortOrder = Enum.SortOrder.LayoutOrder
-	uIGridLayout7.Parent = availableCrew
+	local availableCrewUIGridLayout = Instance.new("UIGridLayout")
+	availableCrewUIGridLayout.Name = "UIGridLayout"
+	availableCrewUIGridLayout.CellSize = UDim2.fromScale(0.95, 0.3)
+	availableCrewUIGridLayout.FillDirectionMaxCells = 50
+	availableCrewUIGridLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	availableCrewUIGridLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	availableCrewUIGridLayout.Parent = availableCrew
 
-	local uIPadding7 = Instance.new("UIPadding")
-	uIPadding7.Name = "UIPadding"
-	uIPadding7.PaddingTop = UDim.new(0.03, 0)
-	uIPadding7.Parent = availableCrew
+	local availableCrewUIUIPadding = Instance.new("UIPadding")
+	UIConfig.SetPadding(availableCrewUIUIPadding, "M")
+	availableCrewUIUIPadding.Parent = availableCrew
 
 	-- Handle available helpers
 	local index = 1

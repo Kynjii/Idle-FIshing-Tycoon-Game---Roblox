@@ -33,7 +33,7 @@ function updateCrewMngPanelUI()
 	clearExistingTooltip()
 
 	local innerWindow = screenGui:FindFirstChild("InnerWindow", true)
-	local crewManagementContainer = innerWindow and innerWindow:FindFirstChild("CrewManagementContainer", true)
+	local crewManagementContainer = innerWindow and innerWindow:WaitForChild("CrewManagementContainer", 5)
 	if crewManagementContainer then crewManagementContainer:Destroy() end
 
 	if innerWindow then

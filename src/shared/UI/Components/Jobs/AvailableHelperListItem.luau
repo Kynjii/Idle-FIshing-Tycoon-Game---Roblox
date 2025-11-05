@@ -11,17 +11,17 @@ function AvailableHelperListItem.Create(helper: HelperType.HelperData)
 	local availableHelperTemplate = Instance.new("Frame")
 	availableHelperTemplate.AutomaticSize = Enum.AutomaticSize.Y
 	availableHelperTemplate.Name = "availableHelperTemplate"
-	availableHelperTemplate.AnchorPoint = Vector2.new(0.5, 0.5)
+	availableHelperTemplate.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 	availableHelperTemplate.BackgroundTransparency = 1
-	availableHelperTemplate.Position = UDim2.fromScale(0.5, 0.5)
+	availableHelperTemplate.Position = FFGEnum.THEME.alignment.position.center
 	availableHelperTemplate.Size = UDim2.fromScale(1, 1)
 
 	local bG = Instance.new("ImageLabel")
 	bG.Name = "BG"
-	bG.AnchorPoint = Vector2.new(0.5, 0.5)
+	bG.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 	bG.BackgroundTransparency = 1
-	bG.Image = "rbxassetid://82464405703579"
-	bG.Position = UDim2.fromScale(0.5, 0.5)
+	bG.Image = FFGEnum.UI.Items.BackgroundQualityId[helper.QualityId]
+	bG.Position = FFGEnum.THEME.alignment.position.center
 	bG.ScaleType = Enum.ScaleType.Slice
 	bG.Size = UDim2.fromScale(1, 1)
 	bG.SliceCenter = Rect.new(45, 45, 45, 45)
@@ -30,9 +30,9 @@ function AvailableHelperListItem.Create(helper: HelperType.HelperData)
 	local container = Instance.new("Frame")
 	container.Name = "Container"
 	container.AutomaticSize = Enum.AutomaticSize.Y
-	container.AnchorPoint = Vector2.new(0.5, 0.5)
+	container.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 	container.BackgroundTransparency = 1
-	container.Position = UDim2.fromScale(0.5, 0.5)
+	container.Position = FFGEnum.THEME.alignment.position.center
 	container.Size = UDim2.fromScale(1, 1)
 	UIConfig.ApplyList(container, Enum.FillDirection.Vertical)
 
@@ -43,16 +43,15 @@ function AvailableHelperListItem.Create(helper: HelperType.HelperData)
 	local textLabel = Instance.new("TextLabel")
 	textLabel.Name = "HelperName"
 	textLabel.LayoutOrder = 1
-	textLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+	textLabel.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 	textLabel.BackgroundTransparency = 1
 	textLabel.TextXAlignment = Enum.TextXAlignment.Left
 	textLabel.Font = FFGEnum.THEME.bigFont
-	textLabel.Position = UDim2.fromScale(0.5, 0.5)
-	textLabel.Size = UDim2.fromScale(0.49, 0.2)
+	textLabel.Position = FFGEnum.THEME.alignment.position.center
+	textLabel.Size = UDim2.fromScale(1, 0.2)
 	textLabel.Text = helper.Name or ""
 	textLabel.TextColor3 = Color3.new(1, 1, 1)
-	textLabel.TextSize = 14
-	UIConfig.ApplyTextConstraints(textLabel, "body")
+	UIConfig.ApplyTextConstraints(textLabel, "title")
 	textLabel.Parent = container
 
 	local mainContainer = Instance.new("Frame")
