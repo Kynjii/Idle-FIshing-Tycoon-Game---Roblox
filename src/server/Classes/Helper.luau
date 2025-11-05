@@ -234,7 +234,10 @@ function Helper.CreateModel(self: Helper)
 
 		local hasProgressBar = nameplate:FindFirstChild("ProgressContainer")
 		if not hasProgressBar then
-			local progressContainer = ProgressBar.Create({ Color = "WhiteShiny", HasText = true, Adornee = nameplate })
+			local progressContainer: Frame = ProgressBar.Create({ Color = "WhiteShiny", HasText = true, Adornee = nameplate })
+			progressContainer.Position = UDim2.fromScale(0.5, 1.1)
+			progressContainer.AnchorPoint = Vector2.new(0.5, 1)
+			progressContainer.Size = UDim2.fromScale(1, 0.2)
 			progressContainer.Parent = nameplate
 		end
 
