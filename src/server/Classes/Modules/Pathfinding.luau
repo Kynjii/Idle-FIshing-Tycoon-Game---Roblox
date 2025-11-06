@@ -32,6 +32,7 @@ local function pathfindToDestinations(npc, helperId, destinations, completionEve
 	end
 
 	local path = createPathToDestination()
+	if not path then error("No path found", path, npc, helperId, jobId, player) end
 	local IsStudio = RunService:IsStudio()
 	if IsStudio then path.Visualize = true end
 	local goalNum = 1

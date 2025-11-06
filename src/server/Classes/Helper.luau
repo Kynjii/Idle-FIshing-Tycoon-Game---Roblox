@@ -235,7 +235,10 @@ function Helper.CreateModel(self: Helper)
 		local hasProgressBar = nameplate:FindFirstChild("ProgressContainer")
 		if not hasProgressBar then
 			local progressContainer = ProgressBar.Create({ Color = "WhiteShiny", HasText = true, Adornee = nameplate })
+			progressContainer.Size = UDim2.fromScale(1, 0.2)
+			progressContainer.Position = UDim2.fromScale(0.5, 1)
 			progressContainer.Parent = nameplate
+			progressContainer.Visible = false
 		end
 
 		CollisionGroups.SetNpcCollisionGroup(clonedModel)
