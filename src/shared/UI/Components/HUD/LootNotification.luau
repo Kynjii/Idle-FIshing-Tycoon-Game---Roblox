@@ -15,7 +15,7 @@ function LootNotification.Create(props: Props)
 	lootNotificationContainer.Name = "LootNotificationContainer"
 	lootNotificationContainer.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 	lootNotificationContainer.Position = FFGEnum.THEME.alignment.position.bottom
-	lootNotificationContainer.Transparency = 0
+	lootNotificationContainer.Transparency = 1
 	lootNotificationContainer.Visible = true
 	lootNotificationContainer.Size = UDim2.fromScale(1, 0.4)
 
