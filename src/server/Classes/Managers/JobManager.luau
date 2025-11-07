@@ -278,7 +278,7 @@ function JobManager.StartJob(self: JobManager, helper: HelperType.HelperInstance
 	if helper.ResourceInStorage > 0 then
 		self:BeginUnloading(helper, jobId)
 	else
-		Pathfinding.GoGatherSpot(jobId, helper.Id, helper.Model, self.Player)
+		Pathfinding.GoGatherSpot(jobId, helper.Id, helper.Model, self.Player, self.TeamId)
 	end
 end
 
@@ -387,7 +387,7 @@ function JobManager.AttachEventListeners(self: JobManager): ()
 
 			local amount = data.Amount
 			if amount then helper:AddResource(amount) end
-			Pathfinding.GoUnloadSpot(jobId, helper.Id, helper.Model, self.Player)
+			Pathfinding.GoUnloadSpot(jobId, helper.Id, helper.Model, self.Player, self.TeamId)
 		end))
 	end
 

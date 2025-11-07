@@ -93,11 +93,13 @@ Jobs.Data = {
 	},
 }
 
-function Jobs.GetJobLocation(jobId: number): Vector3
+function Jobs.GetJobLocation(jobId: number, teamId: number): Vector3
 	local position = nil
 	for _, taggedJobLocation: Part in ipairs(taggedJobLocations) do
 		local taggedJobLocationJobId = taggedJobLocation:GetAttribute(FFGEnum.ATTRIBUTES.JobId)
+		local taggedJobLocationTeamId = taggedJobLocation:GetAttribute(FFGEnum.ATTRIBUTES.TeamId)
 		if taggedJobLocationJobId ~= jobId then continue end
+		if taggedJobLocationTeamId ~= teamId then continue end
 
 		local isUnloadLoc = taggedJobLocation:GetAttribute(FFGEnum.ATTRIBUTES.UnloadLoc)
 		if not isUnloadLoc then continue end
@@ -107,11 +109,13 @@ function Jobs.GetJobLocation(jobId: number): Vector3
 	return position
 end
 
-function Jobs.GetJobRoute(jobId: number): { [number]: Vector3 }
+function Jobs.GetJobRoute(jobId: number, teamId: number): { [number]: Vector3 }
 	local route = {}
 	for _, taggedJobLocation: Part in ipairs(taggedJobLocations) do
 		local taggedJobLocationJobId = taggedJobLocation:GetAttribute(FFGEnum.ATTRIBUTES.JobId)
+		local taggedJobLocationTeamId = taggedJobLocation:GetAttribute(FFGEnum.ATTRIBUTES.TeamId)
 		if taggedJobLocationJobId ~= jobId then continue end
+		if taggedJobLocationTeamId ~= teamId then continue end
 
 		local pathStep = taggedJobLocation:GetAttribute(FFGEnum.ATTRIBUTES.PathStep)
 		route[pathStep] = taggedJobLocation.Position

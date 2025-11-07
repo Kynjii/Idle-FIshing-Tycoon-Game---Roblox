@@ -9,11 +9,11 @@ local Jobs = require(ServerScriptService.Server.Modules.Jobs.Jobs)
 
 local PathFinding = {}
 
-function PathFinding.GetRoute(jobId: number)
-	return Jobs.GetJobRoute(jobId)
+function PathFinding.GetRoute(jobId: number, teamId: number)
+	return Jobs.GetJobRoute(jobId, teamId)
 end
 
-local function pathfindToDestinations(npc, helperId, destinations, completionEvent, jobId, player)
+local function pathfindToDestinations(npc, helperId, destinations, completionEvent, jobId, player, teamId)
 	local function createPathToDestination()
 		local agentParameters = {
 			AgentCanJump = true,
@@ -32,7 +32,7 @@ local function pathfindToDestinations(npc, helperId, destinations, completionEve
 	end
 
 	local path = createPathToDestination()
-	if not path then error("No path found", path, npc, helperId, jobId, player) end
+	if not path then error("No path found", path, npc, helperId, jobId, player, teamId) end
 	local IsStudio = RunService:IsStudio()
 	if IsStudio then path.Visualize = true end
 	local goalNum = 1
@@ -60,7 +60,7 @@ local function pathfindToDestinations(npc, helperId, destinations, completionEve
 	end)
 end
 
-function PathFinding.GoGatherSpot(jobId: number, helperId: string, npcModel: Model, player: Player)
+function PathFinding.GoGatherSpot(jobId: number, helperId: string, npcModel: Model, player: Player, teamId: number)
 	local npc = npcModel
 
 	if not npc.PrimaryPart then
@@ -68,7 +68,7 @@ function PathFinding.GoGatherSpot(jobId: number, helperId: string, npcModel: Mod
 		return
 	end
 
-	local route = PathFinding.GetRoute(jobId)
+	local route = PathFinding.GetRoute(jobId, teamId)
 	local reversed = TableUtil.Reverse(route)
 
 	if not reversed or #reversed == 0 then
@@ -84,10 +84,10 @@ function PathFinding.GoGatherSpot(jobId: number, helperId: string, npcModel: Mod
 		return
 	end
 
-	pathfindToDestinations(npc, helperId, reversed, Events.BindableNames.HelperAtGatheringLoc, jobId, player)
+	pathfindToDestinations(npc, helperId, reversed, Events.BindableNames.HelperAtGatheringLoc, jobId, player, teamId)
 end
 
-function PathFinding.GoUnloadSpot(jobId: number, helperId: string, npcModel: Model, player: Player)
+function PathFinding.GoUnloadSpot(jobId: number, helperId: string, npcModel: Model, player: Player, teamId: number)
 	local npc = npcModel
 
 	if not npc.PrimaryPart then
@@ -95,7 +95,7 @@ function PathFinding.GoUnloadSpot(jobId: number, helperId: string, npcModel: Mod
 		return
 	end
 
-	local route = PathFinding.GetRoute(jobId)
+	local route = PathFinding.GetRoute(jobId, teamId)
 
 	if not route or #route == 0 then
 		warn("Invalid route for job", jobId)
@@ -110,7 +110,7 @@ function PathFinding.GoUnloadSpot(jobId: number, helperId: string, npcModel: Mod
 		return
 	end
 
-	pathfindToDestinations(npc, helperId, route, Events.BindableNames.HelperAtUnloadingLoc, jobId, player)
+	pathfindToDestinations(npc, helperId, route, Events.BindableNames.HelperAtUnloadingLoc, jobId, player, teamId)
 end
 
 return PathFinding
