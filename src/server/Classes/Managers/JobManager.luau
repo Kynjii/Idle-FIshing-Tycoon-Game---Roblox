@@ -243,12 +243,10 @@ function JobManager.BeginAction(self: JobManager, actionType: string, helper: He
 					if helper.JobCategory == FFGEnum.JOB_CATEGORY.Transporting then
 						-- Multiply by the base value of fish (x2)
 						local baseValue = resourceCount * Formulas.FISH_BASEVALUE
-						print("basevalue", baseValue)
+
 						-- Get the Fish Value buff from the Helper and calculate
 						local priceMulti: number = 1 + helperStats.FishValue
-						print("priceMulti", priceMulti)
 						currencyAmount = baseValue * priceMulti
-						print("final amount", currencyAmount)
 					end
 					if not currencyAmount then error("No currencyAmount was defined") end
 
