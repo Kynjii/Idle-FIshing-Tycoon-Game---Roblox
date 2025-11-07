@@ -68,7 +68,7 @@ function AvailableJobListItem.Create(props: {
 	textLabel.Text = props.Label or ""
 	textLabel.TextColor3 = Color3.new(1, 1, 1)
 	textLabel.TextSize = 14
-	UIConfig.ApplyTextConstraints(textLabel, "body")
+	textLabel.TextScaled = true
 	textLabel.Parent = container
 
 	local mainContainer = Instance.new("Frame")
@@ -144,8 +144,7 @@ function AvailableJobListItem.Create(props: {
 		helperName.Font = FFGEnum.THEME.bigFont
 		helperName.TextColor3 = isTaken and FFGEnum.QUALITIES[props.Slots.AssignedHelpers[i].QualityId].Color or FFGEnum.THEME.color.white
 		helperName.Text = isTaken and props.Slots.AssignedHelpers[i] and props.Slots.AssignedHelpers[i].Name or ""
-
-		UIConfig.ApplyTextConstraints(helperName, "caption")
+		helperName.TextScaled = true
 		helperName.Parent = JobListBg
 
 		local helperLevel = Instance.new("TextLabel")
@@ -155,7 +154,7 @@ function AvailableJobListItem.Create(props: {
 		helperLevel.Font = FFGEnum.THEME.bigFont
 		helperLevel.TextColor3 = FFGEnum.THEME.color.white
 		helperLevel.Text = isTaken and `Level {props.Slots.AssignedHelpers[i].Level}` or ""
-		UIConfig.ApplyTextConstraints(helperLevel, "caption")
+		helperLevel.TextScaled = true
 		helperLevel.Parent = JobListBg
 
 		if isLocked then

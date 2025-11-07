@@ -164,7 +164,7 @@ function JobManager.AssignHelper(self: JobManager, helperId: number, jobId: numb
 				print("No JobSlots available for JobId: ", jobId)
 				return
 			elseif self:NumOfSlotsAvailable(jobId) == -1 then
-				error("No Jobstate or assignedHelpers: ", self.JobState)
+				error(`No Jobstate or assignedHelpers: {self.JobState}`)
 				return
 			end
 		end

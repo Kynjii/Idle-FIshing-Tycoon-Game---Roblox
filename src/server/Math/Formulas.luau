@@ -1,10 +1,10 @@
 -- //SECTION - Progression knobs
-local MAX_LEVEL = 500
+local MAX_LEVEL = 100
 
-local PROMO_LEVEL = { 1, 5, 10, 20, 35, 55, 80, 110, 145, 185, 230, 280, 335, 395, 460, 500 }
+local PROMO_LEVEL = { 1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
 
-local EARN_RATE = { 1.30, 1.25, 1.20, 1.18, 1.15, 1.12, 1.10, 1.08, 1.06, 1.05, 1.04, 1.04, 1.03, 1.03, 1.02, 1.02 }
-local COST_RATE = { 1.18, 1.20, 1.22, 1.23, 1.24, 1.25, 1.26, 1.27, 1.28, 1.29, 1.30, 1.31, 1.32, 1.33, 1.34, 1.35 }
+local EARN_RATE = { 1.15, 1.12, 1.10, 1.08, 1.06, 1.05, 1.04, 1.03, 1.025, 1.02, 1.015, 1.015, 1.01, 1.01, 1.008, 1.008 }
+local COST_RATE = { 1.12, 1.14, 1.16, 1.17, 1.18, 1.19, 1.20, 1.21, 1.22, 1.23, 1.24, 1.25, 1.26, 1.27, 1.28, 1.29 }
 
 local EARN_BONUS = {
 	[2] = 0.001,
@@ -130,11 +130,11 @@ local FORMULAS = {
 -- Additive per-level growth (before Stage/Quality)
 -- =========================
 
-FORMULAS.PER_LEVEL_STORAGE_ADD = 30.0 -- +30 storage / level
-FORMULAS.PER_LEVEL_FPS_ADD = 5 -- +5 FPS   / level
+FORMULAS.PER_LEVEL_STORAGE_ADD = 15.0 -- +15 storage / level
+FORMULAS.PER_LEVEL_FPS_ADD = 2 -- +2 FPS   / level
 
 -- Add percentage-based per-level growth for compound excitement
-FORMULAS.PER_LEVEL_MULT = 1.02 -- 2% compound growth per level
+FORMULAS.PER_LEVEL_MULT = 1.01 -- 1% compound growth per level
 
 -- =========================
 -- Time-stat tuning (Stage → % faster) - IMPROVED
@@ -184,15 +184,15 @@ FORMULAS.HELPER_BASE = {
 -- Per-level additive growth (small, before Stage/Quality)
 FORMULAS.HELPER_PER_LEVEL_ADD = {
 	Defaults = {
-		WalkSpeed = 0.05,
-		Storage = 30,
-		LoadTime = 0.01,
+		WalkSpeed = 0.03,
+		Storage = 15,
+		LoadTime = 0.008,
 	},
 	PerJobCategory = {
-		Fishing = { CatchRate = 0.005, Luck = 0.005, CastTime = 0.01 },
-		Woodcutting = { WoodYield = 0.005, CritChance = 0.005, SwingRate = 0.005 },
-		Mining = { OreYield = 0.005, CritChance = 0.005, SwingRate = 0.01 },
-		Transporting = { Storage = 50, FishValue = 0.05, LoadTime = 0.03 },
+		Fishing = { CatchRate = 0.003, Luck = 0.003, CastTime = 0.008 },
+		Woodcutting = { WoodYield = 0.003, CritChance = 0.003, SwingRate = 0.003 },
+		Mining = { OreYield = 0.003, CritChance = 0.003, SwingRate = 0.008 },
+		Transporting = { Storage = 25, FishValue = 0.025, LoadTime = 0.02 },
 	},
 }
 

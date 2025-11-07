@@ -94,7 +94,7 @@ function Tooltip.Create(props: {
 	else
 		itemLabel.TextColor3 = FFGEnum.THEME.color.white
 	end
-	UIConfig.ApplyTextConstraints(itemLabel, "h1")
+	itemLabel.TextScaled = true
 	itemLabel.Parent = frameHeader
 	-- //!SECTION
 	-- //!SECTION
@@ -136,11 +136,11 @@ function Tooltip.Create(props: {
 	descriptionLabel.Text = props.ItemDescription or ""
 	descriptionLabel.TextColor3 = FFGEnum.THEME.color.textMuted
 	descriptionLabel.TextWrapped = true
+	descriptionLabel.TextScaled = true
 	descriptionLabel.Font = FFGEnum.THEME.bigFont
 	descriptionLabel.BackgroundTransparency = 1
 	descriptionLabel.Size = UDim2.fromScale(1, 0.7)
 	descriptionLabel.Parent = addInfoContainer
-	UIConfig.ApplyTextConstraints(descriptionLabel, "caption")
 	-- //!SECTION
 
 	-- //SECTION - Quality Label
@@ -152,10 +152,10 @@ function Tooltip.Create(props: {
 	qualityLabel.Text = FFGEnum.QUALITIES[props.ItemQualityId].Label or ""
 	qualityLabel.TextColor3 = FFGEnum.QUALITIES[props.ItemQualityId].Color or Color3.new(1, 1, 1)
 	qualityLabel.TextStrokeTransparency = 0.7
+	qualityLabel.TextScaled = true
 	qualityLabel.Font = FFGEnum.THEME.bigFont
 	qualityLabel.BackgroundTransparency = 1
 	qualityLabel.Parent = addInfoContainer
-	UIConfig.ApplyTextConstraints(qualityLabel, "caption")
 	-- //!SECTION
 
 	-- //SECTION - Item Stats
@@ -237,11 +237,11 @@ function Tooltip.Create(props: {
 			statElementLabel.TextColor3 = FFGEnum.THEME.color.black
 			statElementLabel.TextWrapped = true
 			statElementLabel.LayoutOrder = 1
-			statElementLabel.Font = FFGEnum.THEME.normalFont
+			statElementLabel.TextScaled = true
+			statElementLabel.Font = FFGEnum.THEME.bigFont
 			statElementLabel.BackgroundTransparency = 1
 			statElementLabel.Size = UDim2.fromScale(0.5, 1)
 			statElementLabel.Parent = statFrameContainer
-			UIConfig.ApplyTextConstraints(statElementLabel, "body")
 
 			local statType = Format.GetStatType(stat.Label)
 			local isDecimal = statType == "decimal"
@@ -253,16 +253,11 @@ function Tooltip.Create(props: {
 			statElementValue.TextColor3 = FFGEnum.THEME.color.black
 			statElementValue.TextWrapped = true
 			statElementValue.LayoutOrder = 2
-			statElementValue.Font = FFGEnum.THEME.normalFont
+			statElementValue.TextScaled = true
+			statElementValue.Font = FFGEnum.THEME.bigFont
 			statElementValue.BackgroundTransparency = 1
 			statElementValue.Size = UDim2.fromScale(0.5, 1)
 			statElementValue.Parent = statFrameContainer
-			UIConfig.ApplyTextConstraints(statElementValue, "body")
-
-			UIConfig.ObserveViewport(function()
-				UIConfig.ApplyTextConstraints(statElementValue, "body")
-				UIConfig.ApplyTextConstraints(statElementLabel, "body")
-			end)
 		end
 	end
 	-- //!SECTION
@@ -277,9 +272,9 @@ function Tooltip.Create(props: {
 	purchaseTypeLabel.TextColor3 = FFGEnum.THEME.color.textGold
 	purchaseTypeLabel.TextXAlignment = Enum.TextXAlignment.Center
 	purchaseTypeLabel.TextStrokeTransparency = 0
+	purchaseTypeLabel.TextScaled = true
 	purchaseTypeLabel.BackgroundTransparency = 1
 	purchaseTypeLabel.Parent = bottomContainer
-	UIConfig.ApplyTextConstraints(purchaseTypeLabel, "h2")
 
 	-- //SECTION - Buttons
 	-- Buy Button
@@ -315,13 +310,6 @@ function Tooltip.Create(props: {
 	uiListLayout.Parent = itemInfoContainer
 	-- -- //!SECTION
 
-	UIConfig.ObserveViewport(function()
-		UIConfig.ApplyTextConstraints(itemLabel, "h1")
-		UIConfig.ApplyTextConstraints(descriptionLabel, "body")
-		UIConfig.ApplyTextConstraints(purchaseTypeLabel, "h2")
-		UIConfig.ApplyTextConstraints(qualityLabel, "caption")
-	end)
-
 	return tooltipContainer
 end
 
@@ -346,7 +334,7 @@ function Tooltip.Initialize()
 	if openTooltipEvent then
 		openTooltipEvent.Event:Connect(function(data: itemData)
 			if not data then
-				error("Not data was passed when attempting to open tooltip", data)
+				error(`Not data was passed when attempting to open tooltip: {data}`)
 				return
 			end
 

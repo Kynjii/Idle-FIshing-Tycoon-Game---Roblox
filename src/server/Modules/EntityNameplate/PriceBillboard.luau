@@ -52,7 +52,7 @@ function PriceBillboard.Create(props: {
 	priceLabel.Text = Format.CurrencyNumber(cost) or ""
 	priceLabel.TextColor3 = FFGEnum.THEME.color.textGold
 	priceLabel.TextStrokeTransparency = 0.7
-	UIConfig.ApplyTextConstraints(priceLabel, "caption")
+	priceLabel.TextScaled = true
 	UIConfig.AddPadding(priceLabel, "L")
 	priceLabel.Parent = container
 

@@ -19,6 +19,7 @@ export type HelperData = {
 	Entity: string,
 	Id: string, -- unique
 	RealmId: number,
+	TeamId: number,
 	Owner: number?,
 	Name: string, -- display
 	Level: number,
@@ -44,6 +45,7 @@ export type HelperInstance = {
 	Entity: string,
 	Id: string, -- unique
 	RealmId: number,
+	TeamId: number,
 	Owner: number?,
 	Name: string, -- display
 	Level: number,

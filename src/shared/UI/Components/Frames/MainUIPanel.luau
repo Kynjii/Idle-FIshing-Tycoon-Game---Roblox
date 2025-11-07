@@ -111,7 +111,7 @@ function MainUIPanel.Create(props: {
 	textLabel.Text = props.panelName
 	textLabel.TextColor3 = Color3.new(1, 1, 1)
 	textLabel.TextXAlignment = Enum.TextXAlignment.Left
-	UIConfig.ApplyTextConstraints(textLabel, "h1")
+	textLabel.TextScaled = true
 
 	local uIStroke = Instance.new("UIStroke")
 	uIStroke.Name = "UIStroke"
@@ -200,11 +200,6 @@ function MainUIPanel.Create(props: {
 	uIAspectRatioConstraint1.Parent = closeButton
 
 	closeButton.Parent = main
-
-	UIConfig.ObserveViewport(function()
-		UIConfig.ApplyTextConstraints(textLabel, "h1")
-		UIConfig.ApplyPanelStyle(innerWindow)
-	end)
 
 	return screenGui
 end

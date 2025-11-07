@@ -51,7 +51,7 @@ function AvailableHelperListItem.Create(helper: HelperType.HelperData)
 	textLabel.Size = UDim2.fromScale(1, 0.2)
 	textLabel.Text = helper.Name or ""
 	textLabel.TextColor3 = Color3.new(1, 1, 1)
-	UIConfig.ApplyTextConstraints(textLabel, "title")
+	textLabel.TextScaled = true
 	textLabel.Parent = container
 
 	local mainContainer = Instance.new("Frame")

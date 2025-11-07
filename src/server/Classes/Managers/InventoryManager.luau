@@ -28,11 +28,15 @@ end
 
 function InventoryManager.AttachEventListeners(self: InventoryManager)
 	local getPlayerInventoryEvent = Events.GetRemoteFn(Events.RemoteFunctionNames.GetPlayerInventory)
-	if getPlayerInventoryEvent then getPlayerInventoryEvent.OnServerInvoke = function(player: Player)
-		if self.Player ~= player or self.Owner ~= player.UserId then return end
-		self.Inventory = DataService.GetPlayerInventory(self.Player)
-		return self.Inventory
-	end end
+	if getPlayerInventoryEvent then
+		getPlayerInventoryEvent.OnServerInvoke = function(player: Player)
+			if self.Player ~= player or self.Owner ~= player.UserId then return end
+			print(self.Player, player)
+			self.Inventory = DataService.GetPlayerInventory(self.Player)
+			return self.Inventory
+		end
+		self._cleaner:Add(getPlayerInventoryEvent)
+	end
 end
 
 -- //SECTION - Cleanup

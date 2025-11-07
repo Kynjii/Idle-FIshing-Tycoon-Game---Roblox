@@ -84,7 +84,7 @@ function EntityNameplate.Create(props: Props)
 	name.Text = props.Name or ""
 	name.TextColor3 = Color3.new(1, 1, 1)
 	name.TextStrokeTransparency = 0.7
-	UIConfig.ApplyTextConstraints(name, "h1")
+	name.TextScaled = true
 	UIConfig.AddPadding(name, "L")
 	name.Parent = frameContainer
 
@@ -99,7 +99,7 @@ function EntityNameplate.Create(props: Props)
 	quality.Text = FFGEnum.QUALITIES[props.QualityId].Label or ""
 	quality.TextColor3 = FFGEnum.QUALITIES[props.QualityId].Color or Color3.new(1, 1, 1)
 	quality.TextStrokeTransparency = 0.7
-	UIConfig.ApplyTextConstraints(quality, "body")
+	quality.TextScaled = true
 	UIConfig.AddPadding(quality, "L")
 	quality.Parent = frameContainer
 
@@ -123,7 +123,7 @@ function EntityNameplate.Create(props: Props)
 	level.TextColor3 = Color3.fromRGB(0, 255, 0)
 	level.TextStrokeTransparency = 0.7
 	level.TextXAlignment = Enum.TextXAlignment.Left
-	UIConfig.ApplyTextConstraints(level, "caption")
+	level.TextScaled = true
 	UIConfig.AddPadding(level, "L")
 	level.Parent = infoContainer
 
@@ -155,9 +155,9 @@ function EntityNameplate.Create(props: Props)
 		jobInfoText.Text = props.JobCategory == FFGEnum.CLASS.ENTITY_NAME.Boat and `{props.FPS}/s` or props.MaxStorage or ""
 		jobInfoText.TextColor3 = FFGEnum.THEME.color.Blue
 		jobInfoText.TextStrokeTransparency = 0.7
+		jobInfoText.TextScaled = true
 		jobInfoText.TextXAlignment = Enum.TextXAlignment.Left
 		jobInfoText.Parent = jobInfoContainer
-		UIConfig.ApplyTextConstraints(jobInfoText, "caption")
 		UIConfig.AddPadding(jobInfoText, "L")
 	end
 
@@ -172,18 +172,11 @@ function EntityNameplate.Create(props: Props)
 	stage.TextColor3 = FFGEnum.STAGES[props.UpgradeStage].Color or Color3.new(1, 1, 1)
 	stage.TextStrokeTransparency = 0.7
 	stage.TextXAlignment = Enum.TextXAlignment.Right
-	UIConfig.ApplyTextConstraints(stage, "caption")
+	stage.TextScaled = true
 	UIConfig.AddPadding(stage, "L")
 	stage.Parent = infoContainer
 
 	infoContainer.Parent = frameContainer
-
-	UIConfig.ObserveViewport(function()
-		UIConfig.ApplyTextConstraints(name, "h1")
-		UIConfig.ApplyTextConstraints(quality, "body")
-		UIConfig.ApplyTextConstraints(level, "caption")
-		UIConfig.ApplyTextConstraints(stage, "caption")
-	end)
 
 	-- Event for handling Helper upgrades
 	-- local freshHelperData = Events.GetRemote(Events.RemoteNames.HelperData)

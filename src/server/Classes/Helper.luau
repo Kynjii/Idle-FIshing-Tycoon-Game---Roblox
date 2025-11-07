@@ -244,7 +244,7 @@ function Helper.CreateModel(self: Helper)
 		CollisionGroups.SetNpcCollisionGroup(clonedModel)
 	end
 
-	local startPos: Vector3 = Jobs.GetJobLocation(self.CurrentAssignment)
+	local startPos: Vector3 = Jobs.GetJobLocation(self.CurrentAssignment, self.TeamId)
 	if startPos then
 		self.Model:MoveTo(startPos)
 		Events.FireBindableEvent(Events.BindableNames.HelperAtUnloadingLoc, { Id = self.Id, JobId = self.CurrentAssignment, Player = self.Player })
@@ -427,6 +427,7 @@ function Helper.Serialize(self: Helper): { [string]: any }
 		Entity = self.Entity,
 		Id = self.Id,
 		RealmId = self.RealmId,
+		TeamId = self.TeamId,
 		Owner = self.Owner,
 		Name = self.Name,
 		Level = self.Level,
