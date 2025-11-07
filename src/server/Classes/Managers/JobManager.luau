@@ -193,12 +193,16 @@ end
 function JobManager.BeginAction(self: JobManager, actionType: string, helper: HelperType.HelperInstance, jobId: number)
 	local isGatherAction = actionType == "Gather"
 
-	local helperProgressBillboard: BillboardGui? = helper.Model and helper.Model:FindFirstChild("HelperProgress")
+	local nameplate: BillboardGui? = helper.Model and helper.Model:FindFirstChild("EntityNameplate")
 	local progressBarFrame
-	if helperProgressBillboard then
-		progressBarFrame = helperProgressBillboard:FindFirstChild("ProgressBar", true)
-		helperProgressBillboard.Enabled = true
-		ProgressBar.Show(helperProgressBillboard)
+	local progressBar
+	if nameplate then
+		progressBarFrame = nameplate:FindFirstChild("ProgressContainer")
+		if progressBarFrame then
+			nameplate.Enabled = true
+			progressBar = progressBarFrame:FindFirstChild("ProgressBar", true)
+			ProgressBar.Show(progressBarFrame)
+		end
 	end
 
 	local waitTime: number = helper.Stats and helper.Stats.LoadTime
@@ -212,13 +216,14 @@ function JobManager.BeginAction(self: JobManager, actionType: string, helper: He
 					finished = true
 				else
 					timePassed += 0.5
-					if progressBarFrame then ProgressBar.Update(progressBarFrame, timePassed, waitTime) end
+					if progressBar then ProgressBar.Update(progressBar, timePassed, waitTime) end
 					task.wait(0.5)
 				end
 			end
 
 			if finished then
-				ProgressBar.Hide(helperProgressBillboard)
+				ProgressBar.Hide(progressBarFrame)
+				ProgressBar.Reset(progressBar)
 				if isGatherAction then
 					local availableStorage = helper.Stats.Storage
 
@@ -238,7 +243,7 @@ function JobManager.BeginAction(self: JobManager, actionType: string, helper: He
 					self:StartJob(helper, jobId)
 				end
 			else
-				ProgressBar.Hide(helperProgressBillboard)
+				ProgressBar.Hide(progressBarFrame)
 				print("gathering cancelled")
 			end
 		end)

@@ -90,7 +90,7 @@ function ProgressBar.Show(parent)
 	if not parent then return end
 
 	for _, decendant in pairs(parent:GetDescendants()) do
-		if decendant:IsA("Frame") then decendant.Visible = true end
+		if decendant.Name == "ProgressContainer" then decendant.Visible = true end
 	end
 end
 
@@ -98,11 +98,11 @@ function ProgressBar.Hide(parent)
 	if not parent then return end
 
 	for _, decendant in pairs(parent:GetDescendants()) do
-		if decendant:IsA("Frame") then decendant.Visible = false end
+		if decendant.Name == "ProgressContainer" then decendant.Visible = false end
 	end
 end
 
-function ProgressBar.Update(progressBarFrame: Frame, currentValue: number, maxValue: number)
+function ProgressBar.Update(progressBarFrame: Frame | ImageLabel, currentValue: number, maxValue: number)
 	local max = maxValue or 0
 	local current = currentValue or 0
 	local progress = (max > 0) and math.clamp(current / max, 0, 1) or 0
@@ -113,6 +113,10 @@ function ProgressBar.Update(progressBarFrame: Frame, currentValue: number, maxVa
 	local tween = TweenService:Create(progressBarFrame, tweenInfo, goal)
 	tween:Play()
 	return tween
+end
+
+function ProgressBar.Reset(progressBar: Frame | ImageLabel)
+	progressBar.Size = UDim2.fromScale(0, 1)
 end
 
 return ProgressBar
