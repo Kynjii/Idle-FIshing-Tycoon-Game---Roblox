@@ -1,3 +1,4 @@
+local EncodingService = game:GetService("EncodingService")
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
@@ -14,6 +15,7 @@ local DataService = require(ServerScriptService.Server.Services.DataService)
 local Formulas = require(ServerScriptService.Server.Math.Formulas)
 local PopUp = require(ServerScriptService.Server.Modules.Tweens.PopUp)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
+local Events = require(ReplicatedStorage.Shared.Events.Events)
 local BuffType = require(ReplicatedStorage.Shared.Types.BuffType)
 local DeepWait = require(ReplicatedStorage.Shared.Utils.DeepWait)
 local SetInterval = require(ServerScriptService.Server.Modules.SetInterval)
@@ -131,7 +133,7 @@ function Boat.RecalculateAll(self: Boat): ()
 	self.CurrentMaxStorage, self.NextLvlMaxStorage = self:CalculateMaxStorage()
 	self.CurrentFPS, self.NextFPS = self:CalculateFPS()
 
-	self:UpdatepurchaseButtonUI()
+	Events.FireBindableEvent(Events.BindableNames.EntityUpdated, HttpService:JSONEncode(self:Serialize()))
 end
 -- //!SECTION
 
@@ -226,7 +228,7 @@ function Boat.StartFishing(self: Boat): ()
 		self._cleaner:Add(SetInterval(function()
 			if not self:IsStorageFull() then
 				self:AddFish(self.CurrentFPS)
-				self:UpdatepurchaseButtonUI()
+				Events.FireBindableEvent(Events.BindableNames.EntityUpdated, HttpService:JSONEncode(self:Serialize()))
 			else
 				self:UpdateStorageStatus(true)
 			end
@@ -289,14 +291,6 @@ function Boat.SetupPurchaseButton(self: Boat): (Model, { [string]: any })
 	local purchaseButton = self.Model:WaitForChild("Purchase_Button") :: Model
 
 	return PurchaseButton.CreatePB(purchaseButton, self :: any)
-end
-
-function Boat.UpdatepurchaseButtonUI(self: Boat, reset: boolean?): ()
-	if reset then
-		PurchaseButton.Destroy(self.PurchaseButton)
-	else
-		PurchaseButton.UpdatePB(self :: any)
-	end
 end
 
 function Boat.SetButtonLogic(self: Boat): ()
@@ -498,7 +492,7 @@ function Boat.Destroy(self: Boat)
 	self:Hide()
 	self:CannotCollide()
 	self:RemovePreviousVisualModel()
-	self:UpdatepurchaseButtonUI(true)
+	PurchaseButton.Destroy(self.PurchaseButton)
 	self:DestroyStorageFullBillboard()
 
 	pcall(function()

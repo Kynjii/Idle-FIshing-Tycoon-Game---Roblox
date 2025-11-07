@@ -17,7 +17,7 @@ Events.RemoteNames = {
 	PrepareHelperShop = "PrepareHelperShop",
 	UpdateHelperShopUI = "UpdateHelperShopUI",
 	PurchaseJobSlot = "PurchaseJobSlot",
-	EntityPurchased = "EntityPurchased",
+	EntityUpdated = "EntityUpdated",
 	HelperPurchased = "HelperPurchased",
 	UpgradeHelper = "UpgradeHelper",
 	UpdateJobManagementUI = "UpdateJobManagementUI",
@@ -57,9 +57,11 @@ Events.BindableNames = {
 
 	-- Entity Purchase/Upgrade/State
 	PurchaseEntity = "PurchaseEntity",
+	EntityUpdated = "EntityUpdated",
 	UpdateState = "UpdateState",
 
 	-- Helper Purchase
+	HelperUpgraded = "HelperUpgraded",
 	PurchasedHelper = "PurchasedHelper",
 
 	-- Tab selection

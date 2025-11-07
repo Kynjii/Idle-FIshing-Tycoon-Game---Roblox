@@ -12,6 +12,7 @@ local Buffs = require(ServerScriptService.Server.Math.Buffs)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local Formulas = require(ServerScriptService.Server.Math.Formulas)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
+local Events = require(ReplicatedStorage.Shared.Events.Events)
 local DeepWait = require(ReplicatedStorage.Shared.Utils.DeepWait)
 local FadeEffect = require(ServerScriptService.Server.Modules.Tweens.FadeEffect)
 local PopUp = require(ServerScriptService.Server.Modules.Tweens.PopUp)
@@ -124,7 +125,7 @@ function PortStorage.RecalculateAll(self: PortStorage)
 	self.UpgradeCost = self:CalculateUpgradeCost()
 	self.CurrentMaxStorage, self.NextLvlMaxStorage = self:CalculateMaxStorage()
 
-	self:UpdatepurchaseButtonUI()
+	Events.FireBindableEvent(Events.BindableNames.EntityUpdated, HttpService:JSONEncode(self:Serialize()))
 end
 -- //!SECTION
 
@@ -174,7 +175,7 @@ function PortStorage.AddFish(self: PortStorage, amount: number): ()
 		self:UpdateStorageStatus(true)
 	end
 
-	self:UpdatepurchaseButtonUI()
+	Events.FireBindableEvent(Events.BindableNames.EntityUpdated, HttpService:JSONEncode(self:Serialize()))
 	self:UpdateFishModel()
 end
 
@@ -182,7 +183,7 @@ function PortStorage.RemoveFish(self: PortStorage, amount: number): ()
 	self.FishInStorage = math.max(self.FishInStorage :: number - amount, 0)
 	self:UpdateStorageStatus(false)
 
-	self:UpdatepurchaseButtonUI()
+	Events.FireBindableEvent(Events.BindableNames.EntityUpdated, HttpService:JSONEncode(self:Serialize()))
 	self:UpdateFishModel()
 
 	self:Save()
@@ -299,14 +300,6 @@ function PortStorage.SetupPurchaseButton(self: PortStorage): (Model, { [string]:
 	local purchaseButton = self.Model:WaitForChild("Purchase_Button")
 
 	return PurchaseButton.CreatePB(purchaseButton, self :: any)
-end
-
-function PortStorage.UpdatepurchaseButtonUI(self: PortStorage, reset: boolean?)
-	if reset then
-		PurchaseButton.Destroy(self.PurchaseButton)
-	else
-		PurchaseButton.UpdatePB(self :: any)
-	end
 end
 
 function PortStorage.SetButtonLogic(self: PortStorage): ()
@@ -526,7 +519,7 @@ function PortStorage.Destroy(self: PortStorage)
 	self:Hide()
 	self:CannotCollide()
 	self:RemovePreviousVisualModel()
-	self:UpdatepurchaseButtonUI(true)
+	PurchaseButton.Destroy(self.PurchaseButton)
 	self:DestroyStorageFullBillboard()
 
 	pcall(function()

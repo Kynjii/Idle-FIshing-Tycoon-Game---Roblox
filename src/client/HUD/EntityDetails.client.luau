@@ -209,7 +209,7 @@ function updateEntityInteractiveFrameLabel()
 end
 
 function handleUpgradeClick()
-	local purchasedEvent = Events.GetRemote(Events.RemoteNames.EntityPurchased)
+	local purchasedEvent = Events.GetRemote(Events.RemoteNames.EntityUpdated)
 	purchasedEvent:FireServer(entityData.Id)
 end
 

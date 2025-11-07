@@ -1,3 +1,4 @@
+local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
@@ -181,26 +182,24 @@ function EntityNameplate.Create(props: Props)
 	if props.HasProgressBar then EntityNameplate.CreateProgressBar(entityBillboard, entity) end
 
 	-- Event for handling Helper upgrades
-	local helperUpgradedEvent = Events.GetRemote(Events.RemoteNames.HelperUpgraded)
+	local helperUpgradedEvent = Events.GetBindableEvent(Events.BindableNames.HelperUpgraded)
 	if helperUpgradedEvent then
-		helperUpgradedEvent.OnClientEvent:Connect(function(helperData: HelperType.HelperData)
-			print(`helperData, {helperData}`)
-			if not jobCategory or jobCategory == "None" then return end
-			if entity.Id ~= helperData.Id then return end
+		helperUpgradedEvent.Event:Connect(function(helperData: HelperType.HelperData)
+			local decoded = HttpService:JSONDecode(helperData)
+			if entity.Id ~= decoded.Id then return end
 
-			EntityNameplate.Update(entityBillboard, entity)
+			EntityNameplate.Update(entityBillboard, decoded)
 		end)
 	end
 
 	-- Event for handling non-helper upgrades/purchases
-	local updateEvent = Events.GetRemote(Events.RemoteNames.EntityPurchased)
-	if updateEvent then
-		updateEvent.OnClientEvent:Connect(function(player: Player, entityData: Boat | Tender | PortStorage | Building)
-			print(`entityData, {entityData}`)
-			if jobCategory and jobCategory ~= "None" then return end
-			if entity.Id ~= entityData.Id then return end
+	local entityUpdatedEvent = Events.GetBindableEvent(Events.BindableNames.EntityUpdated)
+	if entityUpdatedEvent then
+		entityUpdatedEvent.Event:Connect(function(entityData: Boat | Tender | PortStorage | Building)
+			local decoded = HttpService:JSONDecode(entityData)
+			if entity.Id ~= decoded.Id then return end
 
-			EntityNameplate.Update(entityBillboard, entityData)
+			EntityNameplate.Update(entityBillboard, decoded)
 		end)
 	end
 
@@ -229,15 +228,19 @@ function EntityNameplate.Update(entityBillboard: BillboardGui, class: Boat | Ten
 	local jobInfoIcon: ImageLabel = entityBillboard:FindFirstChild("JobInfoIcon", true)
 	local jobInfoText: TextLabel = entityBillboard:FindFirstChild("JobInfoText", true)
 
-	if levelLabel then levelLabel.Text = `Level {typedClass.Level}` end
+	if levelLabel then
+		levelLabel.Visible = true
+		levelLabel.Text = `Level {typedClass.Level}`
+	end
 
 	if stageLabel then
+		stageLabel.Visible = true
 		stageLabel.Text = FFGEnum.STAGES[typedClass.UpgradeStage].Label
 		stageLabel.TextColor3 = FFGEnum.STAGES[typedClass.UpgradeStage].Color or Color3.new(1, 1, 1)
 	end
 
 	if typedClass.Entity ~= FFGEnum.CLASS.ENTITY_NAME.Building then
-		if qualityLabel then qualityLabel.Text = FFGEnum.QUALITIES[typedClass.QualityId].Label or "" end
+		if qualityLabel then qualityLabel.Text = FFGEnum.QUALITIES[typedClass.QualityId or typedClass.Tier].Label or "" end
 	end
 
 	if jobInfoIcon then jobInfoIcon.Image = EntityNameplate.JobIconImage[typedClass.JobCategory] or EntityNameplate.JobIconImage.None end
@@ -249,7 +252,10 @@ function EntityNameplate.Update(entityBillboard: BillboardGui, class: Boat | Ten
 end
 
 function EntityNameplate.CreateProgressBar(parent: BillboardGui, class: Boat | Tender | PortStorage | Building | Helper)
-	local progressContainer = ProgressBar.Create({ Color = "Green", HasText = true, Adornee = parent })
+	local progressContainer: Frame = ProgressBar.Create({ Color = "Green", HasText = true, Adornee = parent })
+	progressContainer.AnchorPoint = Vector2.new(0.5, 0)
+	progressContainer.Position = UDim2.fromScale(0.5, 0.9)
+	progressContainer.Size = UDim2.fromScale(1, 0.2)
 	progressContainer.Parent = parent
 
 	local progressBarText = progressContainer:FindFirstChild("ProgressBarText", true)
@@ -271,6 +277,7 @@ function EntityNameplate.CreateProgressBar(parent: BillboardGui, class: Boat | T
 end
 
 function EntityNameplate.UpdateProgress(progressBar: Frame, class)
+	if not progressBar.Visible then progressBar.Visible = true end
 	local progressBarText = progressBar:FindFirstChild("ProgressBarText", true)
 
 	local progressBarFrame = progressBar:FindFirstChild("ProgressBar", true)

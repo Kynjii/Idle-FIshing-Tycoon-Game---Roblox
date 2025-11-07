@@ -59,7 +59,6 @@ export type BuildingInstance = {
 	-- Essential Methods (called by other modules)
 	Initialize: (self: BuildingInstance) -> (),
 	Destroy: (self: BuildingInstance) -> (),
-	UpdatepurchaseButtonUI: (self: BuildingInstance) -> (),
 
 	-- Allow any other properties/methods for internal use
 	[string]: any,

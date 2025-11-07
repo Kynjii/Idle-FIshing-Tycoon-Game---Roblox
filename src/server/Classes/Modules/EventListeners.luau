@@ -1,3 +1,4 @@
+local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
@@ -89,13 +90,13 @@ function EventListeners.Attach(class: Boat | Tender | PortStorage | Building)
 				if typedClass.Entity == FFGEnum.CLASS.ENTITY_NAME.Boat then typedClass:StartFishing() end
 			end
 
-			-- Update UIs
-			typedClass:UpdatepurchaseButtonUI()
 			typedClass:Save()
+
+			Events.FireBindableEvent(Events.BindableNames.EntityUpdated, HttpService:JSONEncode(typedClass:Serialize()))
 		end
 
 		-- Purchased Event (from Client)
-		local purchasedEvent = Events.GetRemote(Events.RemoteNames.EntityPurchased)
+		local purchasedEvent = Events.GetRemote(Events.RemoteNames.EntityUpdated)
 		if purchasedEvent then
 			typedClass._cleaner:Add(purchasedEvent.OnServerEvent:Connect(function(player: Player, entityId: string)
 				if typedClass.Player ~= player or typedClass.Owner ~= player.UserId then return end
@@ -115,18 +116,9 @@ function EventListeners.Attach(class: Boat | Tender | PortStorage | Building)
 				handleStateUpdate(data.Player)
 			end))
 		end
-
-		local updateStateEvent = Events.GetBindableEvent(Events.BindableNames.UpdateState)
-		if updateStateEvent then
-			typedClass._cleaner:Add(updateStateEvent.Event:Connect(function(player: Player)
-				if typedClass.Player ~= player or typedClass.Owner ~= player.UserId then return end
-
-				typedClass:UpdatepurchaseButtonUI()
-			end))
-		end
 		-- //!SECTION
 	else
-		-- Shop Item Purchased
+		-- Helper purchased from Shop (client triggered)
 		local itemPurchased = Events.GetRemote(Events.RemoteNames.HelperPurchased)
 		if itemPurchased then
 			typedClass._cleaner:Add(itemPurchased.OnServerEvent:Connect(function(player: Player, helperId: string)

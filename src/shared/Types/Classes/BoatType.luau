@@ -57,7 +57,6 @@ export type BoatInstance = {
 	-- Essential Methods (called by other modules)
 	Initialize: (self: BoatInstance) -> (),
 	Destroy: (self: BoatInstance) -> (),
-	UpdatepurchaseButtonUI: (self: BoatInstance) -> (),
 
 	-- Allow any other properties/methods for internal use
 	[string]: any,

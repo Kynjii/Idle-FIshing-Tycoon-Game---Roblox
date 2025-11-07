@@ -11,6 +11,7 @@ local Buffs = require(ServerScriptService.Server.Math.Buffs)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local Formulas = require(ServerScriptService.Server.Math.Formulas)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
+local Events = require(ReplicatedStorage.Shared.Events.Events)
 local BuffType = require(ReplicatedStorage.Shared.Types.BuffType)
 local DeepWait = require(ReplicatedStorage.Shared.Utils.DeepWait)
 local FadeEffect = require(ServerScriptService.Server.Modules.Tweens.FadeEffect)
@@ -148,9 +149,10 @@ function Building.Upgrade(self: Building): ()
 	self:UpdateBuffValue()
 
 	self.UpgradeCost = self:CalculateUpgradeCost()
-	self:UpdatepurchaseButtonUI()
 	if self.Upgraded then self.Upgraded:Fire(self) end
 	self:Save()
+
+	Events.FireBindableEvent(Events.BindableNames.EntityUpdated, HttpService:JSONEncode(self:Serialize()))
 end
 
 function Building.IncreaseUpgradeStage(self: Building, stage: number): ()
@@ -197,14 +199,6 @@ end
 function Building.SetupPurchaseButton(self: Building): (Model, { [string]: any })
 	local purchaseButton = self.Model:WaitForChild("Purchase_Button") :: Model
 	return PurchaseButton.CreatePB(purchaseButton, self :: any)
-end
-
-function Building.UpdatepurchaseButtonUI(self: Building, reset: boolean?): ()
-	if reset then
-		PurchaseButton.Destroy(self.PurchaseButton)
-	else
-		PurchaseButton.UpdatePB(self :: any)
-	end
 end
 
 function Building.SetButtonLogic(self: Building): ()
@@ -338,7 +332,7 @@ function Building.Destroy(self: Building): ()
 	self:Hide()
 	self:CannotCollide()
 	self:RemovePreviousVisualModel()
-	self:UpdatepurchaseButtonUI(true)
+	PurchaseButton.Destroy(self.PurchaseButton)
 
 	pcall(function()
 		self:Save()

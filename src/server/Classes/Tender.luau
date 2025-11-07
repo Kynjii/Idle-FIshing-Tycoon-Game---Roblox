@@ -7,6 +7,7 @@ local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local DeepWait = require(ReplicatedStorage.Shared.Utils.DeepWait)
 local TweenService = game:GetService("TweenService")
 local Trove = require(ReplicatedStorage.Packages.Trove)
+local Events = require(ReplicatedStorage.Shared.Events.Events)
 local BuffType = require(ReplicatedStorage.Shared.Types.BuffType)
 local Animator = require(ServerScriptService.Server.Classes.Modules.Animator)
 local ClassCalculators = require(ServerScriptService.Server.Classes.Modules.ClassCalculators)
@@ -144,7 +145,7 @@ function Tender.RecalculateAll(self: Tender)
 	self.LoadTime = self:CalculateLoadTime()
 	self.CurrentTravelTime = self:CalculateTravelTime()
 
-	self:UpdatepurchaseButtonUI()
+	Events.FireBindableEvent(Events.BindableNames.EntityUpdated, HttpService:JSONEncode(self:Serialize()))
 end
 -- //!SECTION
 
@@ -305,16 +306,18 @@ function Tender.AddFish(self: Tender, amount: number)
 		self:UpdateStorageStatus(true)
 	end
 
-	self:UpdatepurchaseButtonUI()
 	self:Save()
+
+	Events.FireBindableEvent(Events.BindableNames.EntityUpdated, HttpService:JSONEncode(self:Serialize()))
 end
 
 function Tender.RemoveFish(self: Tender, amount: number)
 	self.FishInStorage = math.max(self.FishInStorage - amount, 0)
 
 	self:UpdateStorageStatus(false)
-	self:UpdatepurchaseButtonUI()
 	self:Save()
+
+	Events.FireBindableEvent(Events.BindableNames.EntityUpdated, HttpService:JSONEncode(self:Serialize()))
 end
 
 function Tender.UpdateStorageStatus(self: Tender, status: boolean)
@@ -346,14 +349,6 @@ function Tender.SetupPurchaseButton(self: Tender): (Model, { [string]: any })
 	local purchaseButton = self.Model:WaitForChild("Purchase_Button")
 
 	return PurchaseButton.CreatePB(purchaseButton, self :: any)
-end
-
-function Tender.UpdatepurchaseButtonUI(self: Tender, reset: boolean?)
-	if reset then
-		PurchaseButton.Destroy(self.PurchaseButton)
-	else
-		PurchaseButton.UpdatePB(self :: any)
-	end
 end
 
 function Tender.SetButtonLogic(self: Tender): ()
@@ -557,7 +552,7 @@ function Tender.Destroy(self: Tender)
 	self:Hide()
 	self:CannotCollide()
 	self:RemovePreviousVisualModel()
-	self:UpdatepurchaseButtonUI(true)
+	PurchaseButton.Destroy(self.PurchaseButton)
 	self:DestroyTenderStoppedBillboard()
 
 	pcall(function()

@@ -31,6 +31,7 @@ function ProgressBar.Create(props: {
 	progressContainer.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 	progressContainer.Position = FFGEnum.THEME.alignment.position.center
 	progressContainer.BackgroundTransparency = 1
+	progressContainer.ClipsDescendants = true
 	progressContainer.LayoutOrder = 3
 	progressContainer.Size = UDim2.fromScale(1, 1)
 

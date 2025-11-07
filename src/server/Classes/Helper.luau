@@ -219,14 +219,9 @@ function Helper.CreateModel(self: Helper)
 		end
 
 		local nameplate: BillboardGui = EntityNameplate.Create({
+			EntityData = self,
 			Adornee = clonedModel,
-			Level = self.Level,
-			Name = self.Name,
-			QualityId = self.QualityId,
-			UpgradeStage = self.UpgradeStage,
-			JobCategory = self.JobCategory,
-			MaxStorage = self.Stats.Storage,
-			Id = self.Id,
+			HasProgressBar = false, -- //TODO -
 		})
 		nameplate.ExtentsOffsetWorldSpace = Vector3.new(0, 2, 0)
 		nameplate.Enabled = true
@@ -417,8 +412,10 @@ function Helper.AttachEventListeners(self: Helper)
 			DataService.Spend(self.Player, self.CurrencyType, self.BaseCost)
 
 			self:Upgrade()
-			local helperDataEvent = Events.GetRemote(Events.RemoteNames.HelperUpgraded)
-			if helperDataEvent then helperDataEvent:FireClient(player, self:Serialize()) end
+			local helperUpgradedEvent = Events.GetRemote(Events.RemoteNames.HelperUpgraded)
+			if helperUpgradedEvent then helperUpgradedEvent:FireClient(player, self:Serialize()) end
+
+			Events.FireBindableEvent(Events.BindableNames.HelperUpgraded, HttpService:JSONEncode(self:Serialize()))
 		end))
 	end
 end
