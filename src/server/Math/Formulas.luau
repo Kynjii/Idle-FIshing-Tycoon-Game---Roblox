@@ -185,10 +185,10 @@ FORMULAS.HELPER_PER_LEVEL_ADD = {
 		LoadTime = 0.01,
 	},
 	PerJobCategory = {
-		Fishing = { CatchRate = 0.30, Luck = 1, CastTime = 0.01 },
-		Woodcutting = { WoodYield = 0.30, CritChance = 1, SwingRate = 0.01 },
-		Mining = { OreYield = 0.30, CritChance = 1, SwingRate = 0.01 },
-		Transporting = { Storage = 0.50, FishValue = 1, LoadTime = 0.03 },
+		Fishing = { CatchRate = 0.005, Luck = 0.005, CastTime = 0.01 },
+		Woodcutting = { WoodYield = 0.005, CritChance = 0.005, SwingRate = 0.005 },
+		Mining = { OreYield = 0.005, CritChance = 0.005, SwingRate = 0.01 },
+		Transporting = { Storage = 50, FishValue = 0.05, LoadTime = 0.03 },
 	},
 }
 
