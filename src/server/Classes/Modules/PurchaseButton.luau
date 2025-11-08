@@ -82,6 +82,19 @@ function PB.CreatePB(pbModel: Model, class: Boat | Tender | PortStorage | Buildi
 		if qualityLabel then qualityLabel.Text = typedClass.BuildingBuff.Label end
 	end
 
+	local buttonColorStateEvent = Events.GetBindableEvent(Events.BindableNames.UpdateState)
+	if buttonColorStateEvent then
+		class._cleaner:Add(buttonColorStateEvent.Event:Connect(function(...: any)
+			if button then
+				if not DataService.CanAfford(class.Player, "Gold", not typedClass.IsPurchased and typedClass.BaseCost or typedClass.UpgradeCost) then
+					button.Color = FFGEnum.THEME.color.red
+				else
+					button.Color = FFGEnum.THEME.color.Green
+				end
+			end
+		end))
+	end
+
 	return purchaseButton, pbDetails
 end
 
