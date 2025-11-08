@@ -90,8 +90,6 @@ function PortStorage.New(state: { [string]: any }?, player: Player, model: Model
 	self.VisualModels = self:GetVisualModels()
 	self.CurrentVisualModel = nil
 
-	self.PurchaseButton, self.PBDetails = self:SetupPurchaseButton()
-
 	-- Warnings
 	self.ClonedBillboard = nil
 
@@ -101,6 +99,7 @@ function PortStorage.New(state: { [string]: any }?, player: Player, model: Model
 
 	self._cleaner = Trove.new()
 
+	self.PurchaseButton, self.PBDetails = self:SetupPurchaseButton()
 	if self.PurchaseButton then self:SetButtonLogic() end
 	self.ButtonDebounce = false
 

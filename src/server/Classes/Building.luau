@@ -110,10 +110,9 @@ function Building.New(state: { [string]: any }?, player: Player, model: Model, r
 	self.BuildingBuff = realmBuffs[BUILDING_BUFFS[self.BuildingName]]
 	if not self.BuildingBuff.CurrentValue then self.BuildingBuff.CurrentValue = self.IsPurchased and Buffs.CalculateLevelBuffValue(self.UpgradeStage, self.Level, self.BuildingBuff) or nil end
 
-	self.PurchaseButton, self.PBDetails = self:SetupPurchaseButton()
-
 	self._cleaner = Trove.new()
 
+	self.PurchaseButton, self.PBDetails = self:SetupPurchaseButton()
 	if self.PurchaseButton then self:SetButtonLogic() end
 	self.ButtonDebounce = false
 

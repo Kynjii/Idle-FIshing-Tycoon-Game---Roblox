@@ -1,4 +1,3 @@
-local EncodingService = game:GetService("EncodingService")
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
@@ -100,13 +99,12 @@ function Boat.New(state: { [string]: any }?, player: Player, model: Model, teamI
 	self.VisualModels = self:GetVisualModels()
 	self.CurrentVisualModel = nil
 
-	self.PurchaseButton, self.PBDetails = self:SetupPurchaseButton()
-
 	-- Warnings
 	self.ClonedBillboard = nil
 
 	self._cleaner = Trove.new()
 
+	self.PurchaseButton, self.PBDetails = self:SetupPurchaseButton()
 	if self.PurchaseButton then self:SetButtonLogic() end
 	self.ButtonDebounce = false
 
