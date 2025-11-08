@@ -65,6 +65,7 @@ function LootNotification.Create(props: Props)
 	textLabel.Position = FFGEnum.THEME.alignment.position.center
 	textLabel.Size = UDim2.fromScale(0.7, 0.9)
 	textLabel.TextColor3 = Color3.new(1, 1, 1)
+	textLabel.TextStrokeTransparency = 0.7
 	textLabel.TextXAlignment = Enum.TextXAlignment.Left
 	textLabel.TextScaled = true
 	textLabel.ZIndex = 5
