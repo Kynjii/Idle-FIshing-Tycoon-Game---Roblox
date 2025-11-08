@@ -46,9 +46,9 @@ function PB.CreatePB(pbModel: Model, class: Boat | Tender | PortStorage | Buildi
 	pbDetails.Parent = billboardRoot
 
 	PriceBillboard.Create({
-		IsPurchased = class.IsPurchased,
-		BaseCost = class.BaseCost,
-		UpgradeCost = class.UpgradeCost,
+		IsPurchased = typedClass.IsPurchased,
+		BaseCost = typedClass.BaseCost,
+		UpgradeCost = typedClass.UpgradeCost,
 		Parent = button,
 	})
 
@@ -57,7 +57,7 @@ function PB.CreatePB(pbModel: Model, class: Boat | Tender | PortStorage | Buildi
 	local qualityLabel = pbDetails:FindFirstChild("Quality", true)
 
 	if button then
-		if not DataService.CanAfford(class.Player, "Gold", not typedClass.IsPurchased and typedClass.BaseCost or typedClass.UpgradeCost) then
+		if not DataService.CanAfford(typedClass.Player, "Gold", not typedClass.IsPurchased and typedClass.BaseCost or typedClass.UpgradeCost) then
 			button.Color = FFGEnum.THEME.color.red
 		else
 			button.Color = FFGEnum.THEME.color.Green
@@ -86,12 +86,22 @@ function PB.CreatePB(pbModel: Model, class: Boat | Tender | PortStorage | Buildi
 	if buttonColorStateEvent then
 		typedClass._cleaner:Add(buttonColorStateEvent.Event:Connect(function(...: any)
 			if button then
-				if not DataService.CanAfford(class.Player, "Gold", not typedClass.IsPurchased and typedClass.BaseCost or typedClass.UpgradeCost) then
+				if not DataService.CanAfford(typedClass.Player, "Gold", not typedClass.IsPurchased and typedClass.BaseCost or typedClass.UpgradeCost) then
 					button.Color = FFGEnum.THEME.color.red
 				else
 					button.Color = FFGEnum.THEME.color.Green
 				end
 			end
+
+			local priceBillboard = button:FindFirstChild("PriceBillboard", true)
+			if priceBillboard then priceBillboard:Destroy() end
+
+			PriceBillboard.Create({
+				IsPurchased = typedClass.IsPurchased,
+				BaseCost = typedClass.BaseCost,
+				UpgradeCost = typedClass.UpgradeCost,
+				Parent = button,
+			})
 		end))
 	end
 
