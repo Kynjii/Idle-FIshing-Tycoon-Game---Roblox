@@ -236,19 +236,22 @@ function Tooltip.Create(props: {
 	entityLevelAndQualityContainer.Parent = addInfoContainer
 	UIConfig.ApplyList(entityLevelAndQualityContainer, Enum.FillDirection.Horizontal)
 
-	local levelLabel = Instance.new("TextLabel")
-	levelLabel.Name = "LevelLabel"
-	levelLabel.LayoutOrder = 1
-	levelLabel.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
-	levelLabel.Position = FFGEnum.THEME.alignment.position.center
-	levelLabel.Size = UDim2.fromScale(0.5, 1)
-	levelLabel.Text = props.IsPurchased and `Level {props.ItemLevel}` or ""
-	levelLabel.TextColor3 = FFGEnum.THEME.color.Green
-	levelLabel.TextStrokeTransparency = 0.7
-	levelLabel.TextScaled = true
-	levelLabel.Font = FFGEnum.THEME.bigFont
-	levelLabel.BackgroundTransparency = 1
-	levelLabel.Parent = entityLevelAndQualityContainer
+	local levelLabel
+	if props.IsPurchased then
+		levelLabel = Instance.new("TextLabel")
+		levelLabel.Name = "LevelLabel"
+		levelLabel.LayoutOrder = 1
+		levelLabel.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
+		levelLabel.Position = FFGEnum.THEME.alignment.position.center
+		levelLabel.Size = UDim2.fromScale(0.5, 1)
+		levelLabel.Text = props.IsPurchased and `Level {props.ItemLevel}` or ""
+		levelLabel.TextColor3 = FFGEnum.THEME.color.Green
+		levelLabel.TextStrokeTransparency = 0.7
+		levelLabel.TextScaled = true
+		levelLabel.Font = FFGEnum.THEME.bigFont
+		levelLabel.BackgroundTransparency = 1
+		levelLabel.Parent = entityLevelAndQualityContainer
+	end
 
 	local qualityLabel = Instance.new("TextLabel")
 	qualityLabel.Name = "QualityLabel"
@@ -358,7 +361,7 @@ function Tooltip.Create(props: {
 				qualityLabel.TextColor3 = FFGEnum.QUALITIES[helperData.QualityId].Color or Color3.new(1, 1, 1)
 
 				-- Update Level
-				levelLabel.Text = props.IsPurchased and `Level {helperData.Level}` or ""
+				if levelLabel then levelLabel.Text = props.IsPurchased and `Level {helperData.Level}` or "" end
 
 				-- Update Stats
 				local preparedData = StatsIndexer.Prepare(helperData)
@@ -366,7 +369,11 @@ function Tooltip.Create(props: {
 
 				-- Update Button State (disabled and or upgrade cost)
 				local btnText: TextLabel? = buyButton:FindFirstChild("ButtonText", true)
-				if btnText then btnText.Text = Format.CurrencyNumber(helperData.UpgradeCost) end
+				if btnText then
+					if helperData.Level ~= helperData.MaxLevel then btnText.Text = Format.CurrencyNumber(helperData.UpgradeCost) end
+				else
+					btnText.Text = "Max level"
+				end
 			end)
 		end
 	end

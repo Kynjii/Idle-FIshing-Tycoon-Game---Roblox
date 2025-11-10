@@ -166,7 +166,7 @@ FORMULAS.HELPER_BASE = {
 	Defaults = {
 		WalkSpeed = 5, -- "up"
 		Storage = 30, -- "up"
-		LoadTime = 12, -- "timeDown"
+		LoadTime = 20, -- "timeDown"
 	},
 	PerJobCategory = {
 		Fishing = { CatchRate = 3, Luck = 0.015, CastTime = 8 }, -- CastTime "timeDown"

@@ -90,10 +90,6 @@ local function chooseQuality()
 	local qualityId: number? = getRandomQuality()
 	return qualityId
 end
-
-local function generateStats(jobCategory: string, level: number, qualityId: number?, applyVariance: boolean?)
-	return HelperCalculators.CalculateStats(jobCategory, level, qualityId, applyVariance)
-end
 -- //!SECTION
 
 -- //SECTION - Constructor
@@ -132,7 +128,7 @@ function Helper.New(state: HelperType.HelperData, player: Player, teamId: number
 	self.ResourceType = state.ResourceType or FFGEnum.RESOURCE_TYPE[self.JobCategory]
 
 	-- Calculate default stats based on quality and job (with variance for new helpers)
-	self.Stats = state.Stats or generateStats(self.JobCategory, self.Level, self.QualityId, true) :: HelperType.HelperStats
+	self.Stats = state.Stats or HelperCalculators.GenerateBaseStats(self.JobCategory, self.QualityId) :: HelperType.HelperStats
 	self.BaseCost = self:CalculateBaseCost()
 	self.UpgradeCost = self:CalculateUpgradeCost()
 
@@ -172,7 +168,7 @@ function Helper.CreateStateData(player: Player, currencyType: string)
 	state.ResourceType = FFGEnum.RESOURCE_TYPE[state.JobCategory]
 
 	-- Calculate default stats based on quality and job (with variance for shop items)
-	state.Stats = state.Stats or generateStats(state.JobCategory, 1, state.QualityId, true)
+	state.Stats = state.Stats or HelperCalculators.GenerateBaseStats(state.JobCategory, state.QualityId)
 	state.BaseCost = state.BaseCost and state.BaseCost ~= DEFAULTS.BaseCost or ClassCalculators.CalculateBaseValue(DEFAULTS.BaseCost, state.QualityId, state.RealmId)
 	state.UpgradeCost = state.UpgradeCost or ClassCalculators.CalculateUpgradeCost(state.BaseCost, state.Level, state.QualityId, state.RealmId)
 
@@ -311,37 +307,7 @@ function Helper.GenerateJobCategory(self: Helper): number
 end
 
 function Helper.CalculateStats(self: Helper)
-	-- For upgrades, preserve the base variance from level 1 and apply deterministic scaling
-	if self.Stats and self.Level > 1 then
-		-- Get deterministic stats for current level
-		local newStats = generateStats(self.JobCategory, self.Level, self.QualityId, false)
-		-- Get deterministic stats for level 1 to calculate the base variance
-		local baseStats = generateStats(self.JobCategory, 1, self.QualityId, false)
-		
-		-- Calculate the variance ratio from the original level 1 stats
-		local preservedStats = {}
-		for statName, newValue in pairs(newStats) do
-			if self.Stats[statName] and baseStats[statName] and baseStats[statName] > 0 then
-				-- Preserve the original variance ratio and apply it to the new level
-				local originalVariance = self.Stats[statName] / baseStats[statName]
-				preservedStats[statName] = newValue * originalVariance
-				-- Round appropriately based on stat type
-				if statName == "WalkSpeed" or statName == "Storage" or statName == "CatchRate" or statName == "WoodYield" or statName == "OreYield" then
-					preservedStats[statName] = math.floor(preservedStats[statName] + 0.5)
-				elseif statName == "Luck" or statName == "CritChance" or statName == "FishValue" then
-					preservedStats[statName] = math.floor(preservedStats[statName] * 1000 + 0.5) / 1000
-				else -- timeDown stats
-					preservedStats[statName] = math.floor(preservedStats[statName] + 0.5)
-				end
-			else
-				preservedStats[statName] = newValue
-			end
-		end
-		return preservedStats
-	else
-		-- For new helpers or level 1, generate fresh deterministic stats
-		return generateStats(self.JobCategory, self.Level, self.QualityId, false)
-	end
+	return HelperCalculators.CalculateStats(self.JobCategory, self.Level, self.QualityId)
 end
 
 function Helper.DefineQuality(self: Helper): number?
@@ -430,7 +396,7 @@ function Helper.AttachEventListeners(self: Helper)
 			if self.Player ~= player or self.Owner ~= player.UserId then return end
 			if helperId ~= self.Id then return end
 
-			if not DataService.CanAfford(self.Player, self.CurrencyType, self.BaseCost or 0) then
+			if not DataService.CanAfford(self.Player, self.CurrencyType, not self.IsPurchased and self.BaseCost or self.UpgradeCost or 0) then
 				-- //TODO - Send event to hud for a message
 				return
 			end

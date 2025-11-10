@@ -11,12 +11,12 @@ local player = Players.LocalPlayer
 local hud: Frame = DeepWait(player, "PlayerGui", "HUD", "Main")
 
 local currencyTemplate = hud:FindFirstChild("CurrencyTextLabelTemplate", true)
+local baseSize = currencyTemplate.Size
 
 local currencyLabels = {}
 
 local function animate(currencyLabel: TextLabel)
 	if currencyLabel then
-		local baseSize = currencyLabel.Size
 		local tweenGoal = {
 			Size = baseSize + UDim2.fromScale(0.1, 0.1),
 		}
