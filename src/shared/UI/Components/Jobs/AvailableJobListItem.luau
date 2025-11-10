@@ -116,6 +116,7 @@ function AvailableJobListItem.Create(props: {
 		slot.Size = UDim2.fromScale(1, 0.4)
 
 		local slotMainContainer = Instance.new("Frame")
+		slotMainContainer.Name = "SlotMainContainer"
 		slotMainContainer.ZIndex = 5
 		slotMainContainer.Size = UDim2.fromScale(0.7, 1)
 		slotMainContainer.BackgroundTransparency = 1
@@ -134,7 +135,8 @@ function AvailableJobListItem.Create(props: {
 			JobListBg.ImageTransparency = 0.25
 		end
 		JobListBg.Parent = slotMainContainer
-		UIConfig.ApplyList(JobListBg, Enum.FillDirection.Horizontal, { HFlex = Enum.UIFlexAlignment.SpaceBetween })
+		UIConfig.ApplyList(JobListBg, Enum.FillDirection.Horizontal, { HFlex = Enum.UIFlexAlignment.SpaceEvenly, VAlign = Enum.VerticalAlignment.Center })
+		UIConfig.AddPadding(JobListBg, "L")
 
 		local helperName = Instance.new("TextLabel")
 		helperName.Name = "HelperName"
@@ -154,6 +156,7 @@ function AvailableJobListItem.Create(props: {
 		helperLevel.Font = FFGEnum.THEME.bigFont
 		helperLevel.TextColor3 = FFGEnum.THEME.color.white
 		helperLevel.Text = isTaken and `Level {props.Slots.AssignedHelpers[i].Level}` or ""
+		helperLevel.TextColor3 = FFGEnum.THEME.color.Green
 		helperLevel.TextScaled = true
 		helperLevel.Parent = JobListBg
 
@@ -196,7 +199,7 @@ function AvailableJobListItem.Create(props: {
 
 			local actionButton = Button.Create({ Color = buttonColor, CurrencyType = buttonCurrency, Text = buttonText, Size = UDim2.fromScale(0.4, 1) })
 			actionButton.Position = UDim2.fromScale(0.9, 0.5)
-			actionButton.Name = isLocked and "UnassignButon" or isLocked and "PuchaseButton" or ""
+			actionButton.Name = isTaken and "UnassignButon" or isLocked and "PuchaseButton" or "ActionButton"
 
 			actionButton.Activated:Connect(function()
 				if isTaken then

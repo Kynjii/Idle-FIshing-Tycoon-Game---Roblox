@@ -56,6 +56,11 @@ function PriceBillboard.Create(props: {
 	UIConfig.AddPadding(priceLabel, "L")
 	priceLabel.Parent = container
 
+	local priceStroke = Instance.new("UIStroke")
+	priceStroke.StrokeSizingMode = Enum.StrokeSizingMode.ScaledSize
+	priceStroke.Thickness = 0.1
+	priceStroke.Parent = priceLabel
+
 	return priceBillboard
 end
 
