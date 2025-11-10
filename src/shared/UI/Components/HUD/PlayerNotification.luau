@@ -56,11 +56,11 @@ function PlayerNotification.Create(props: Props)
 
 	local messageIcon = Instance.new("ImageLabel")
 	messageIcon.Name = "MessageIcon"
-	messageIcon.AnchorPoint = Vector2.new(0.5, 0.5)
+	messageIcon.AnchorPoint = Vector2.new(0.5, 1)
 	messageIcon.BackgroundTransparency = 1
 	messageIcon.Image = props.Type == "Red" and FFGEnum.UI.Icons.Alert or FFGEnum.UI.Icons.ThumbsUp
 	messageIcon.ImageColor3 = Color3.fromRGB(255, 255, 0)
-	messageIcon.Position = UDim2.fromScale(0.5, 1)
+	messageIcon.Position = UDim2.fromScale(0.5, 0)
 	messageIcon.ScaleType = Enum.ScaleType.Fit
 	messageIcon.Size = UDim2.fromScale(0.4, 1)
 	messageIcon.Parent = frame
