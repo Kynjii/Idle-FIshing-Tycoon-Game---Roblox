@@ -70,6 +70,7 @@ function ProgressBar.Create(props: {
 		progressBarText.Size = UDim2.fromScale(1, 0.8)
 		progressBarText.Text = "0 / 100"
 		progressBarText.TextColor3 = FFGEnum.THEME.color.white
+		progressBarText.TextStrokeTransparency = 0.7
 		progressBarText.ZIndex = 5
 		progressBarText.TextScaled = true
 		progressBarText.Parent = progressBG
