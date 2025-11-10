@@ -154,11 +154,11 @@ FORMULAS.TIME_BREAKTHROUGH_LEVELS = {
 
 FORMULAS.QUALITY_MULT = {
 	[1] = 1.00, -- Common
-	[2] = 1.20, -- Uncommon
-	[3] = 1.45, -- Rare
-	[4] = 1.75, -- Epic
-	[5] = 2.10, -- Legendary
-	[6] = 2.50, -- Mythic
+	[2] = 1.10, -- Uncommon
+	[3] = 1.25, -- Rare
+	[4] = 1.45, -- Epic
+	[5] = 1.70, -- Legendary
+	[6] = 2.00, -- Mythic
 }
 
 -- Base stats (defaults exist for all; per-jobCategory are exclusive)
@@ -179,15 +179,15 @@ FORMULAS.HELPER_BASE = {
 -- Per-level additive growth (small, before Stage/Quality)
 FORMULAS.HELPER_PER_LEVEL_ADD = {
 	Defaults = {
-		WalkSpeed = 0.2,
-		Storage = 8,
-		LoadTime = 0.05, -- Reduces load time per level (subtracted)
+		WalkSpeed = 0.1,
+		Storage = 5,
+		LoadTime = 0.02,
 	},
 	PerJobCategory = {
-		Fishing = { CatchRate = 0.15, Luck = 0.002, CastTime = 0.05 }, -- Reduces cast time per level (subtracted)
-		Woodcutting = { WoodYield = 0.15, CritChance = 0.002, SwingRate = 0.05 }, -- Reduces swing time per level (subtracted)
-		Mining = { OreYield = 0.15, CritChance = 0.002, SwingRate = 0.05 }, -- Reduces swing time per level (subtracted)
-		Transporting = { Storage = 12, FishValue = 0.008, LoadTime = 0.08 }, -- Reduces load time per level (subtracted)
+		Fishing = { CatchRate = 0.08, Luck = 0.001, CastTime = 0.02 },
+		Woodcutting = { WoodYield = 0.08, CritChance = 0.001, SwingRate = 0.02 },
+		Mining = { OreYield = 0.08, CritChance = 0.001, SwingRate = 0.02 },
+		Transporting = { Storage = 8, FishValue = 0.003, LoadTime = 0.025 },
 	},
 }
 

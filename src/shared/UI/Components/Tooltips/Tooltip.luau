@@ -366,7 +366,7 @@ function Tooltip.Create(props: {
 
 				-- Update Button State (disabled and or upgrade cost)
 				local btnText: TextLabel? = buyButton:FindFirstChild("ButtonText", true)
-				if btnText then btnText.Text = helperData.UpgradeCost end
+				if btnText then btnText.Text = Format.CurrencyNumber(helperData.UpgradeCost) end
 			end)
 		end
 	end

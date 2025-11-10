@@ -91,8 +91,8 @@ local function chooseQuality()
 	return qualityId
 end
 
-local function generateStats(jobCategory: string, level: number, qualityId: number?)
-	return HelperCalculators.CalculateStats(jobCategory, level, qualityId)
+local function generateStats(jobCategory: string, level: number, qualityId: number?, applyVariance: boolean?)
+	return HelperCalculators.CalculateStats(jobCategory, level, qualityId, applyVariance)
 end
 -- //!SECTION
 
@@ -131,10 +131,10 @@ function Helper.New(state: HelperType.HelperData, player: Player, teamId: number
 
 	self.ResourceType = state.ResourceType or FFGEnum.RESOURCE_TYPE[self.JobCategory]
 
-	-- Calculate default stats based on quality and job
-	self.Stats = state.Stats or generateStats(self.JobCategory, self.Level, self.QualityId) :: HelperType.HelperStats
-	self.BaseCost = ClassCalculators.CalculateBaseValue(DEFAULTS.BaseCost, self.QualityId, self.RealmId)
-	self.UpgradeCost = ClassCalculators.CalculateUpgradeCost(self.BaseCost, self.Level, self.QualityId, self.RealmId)
+	-- Calculate default stats based on quality and job (with variance for new helpers)
+	self.Stats = state.Stats or generateStats(self.JobCategory, self.Level, self.QualityId, true) :: HelperType.HelperStats
+	self.BaseCost = self:CalculateBaseCost()
+	self.UpgradeCost = self:CalculateUpgradeCost()
 
 	self.CurrentAssignment = state.CurrentAssignment
 
@@ -171,8 +171,8 @@ function Helper.CreateStateData(player: Player, currencyType: string)
 
 	state.ResourceType = FFGEnum.RESOURCE_TYPE[state.JobCategory]
 
-	-- Calculate default stats based on quality and job
-	state.Stats = state.Stats or generateStats(state.JobCategory, 1, state.QualityId)
+	-- Calculate default stats based on quality and job (with variance for shop items)
+	state.Stats = state.Stats or generateStats(state.JobCategory, 1, state.QualityId, true)
 	state.BaseCost = state.BaseCost and state.BaseCost ~= DEFAULTS.BaseCost or ClassCalculators.CalculateBaseValue(DEFAULTS.BaseCost, state.QualityId, state.RealmId)
 	state.UpgradeCost = state.UpgradeCost or ClassCalculators.CalculateUpgradeCost(state.BaseCost, state.Level, state.QualityId, state.RealmId)
 
@@ -275,13 +275,33 @@ function Helper.Upgrade(self: Helper): ()
 	local stage: number = Formulas.StageForLevel(self.Level)
 	if self.UpgradeStage < stage then self:IncreaseUpgradeStage(stage) end
 
+	self.UpgradeCost = self:CalculateUpgradeCost()
+
 	self.Stats = self:CalculateStats()
+	self:AdjustWalkSpeed()
 
 	self:Save()
 end
 
+function Helper.AdjustWalkSpeed(self: Helper): ()
+	local model: Model? = self.Model
+
+	if model then
+		local humanoid: Humanoid? = model:FindFirstChild("Humanoid")
+		if humanoid then humanoid.WalkSpeed = self.Stats.WalkSpeed end
+	end
+end
+
 function Helper.IncreaseUpgradeStage(self: Helper, stage: number): ()
 	self.UpgradeStage = stage
+end
+
+function Helper.CalculateBaseCost(self: Helper): number
+	return ClassCalculators.CalculateBaseValue(DEFAULTS.BaseCost, self.QualityId, self.RealmId)
+end
+
+function Helper.CalculateUpgradeCost(self: Helper): number
+	return ClassCalculators.CalculateUpgradeCost(self.BaseCost, self.Level, self.QualityId, self.RealmId)
 end
 -- //!SECTION
 
@@ -291,7 +311,37 @@ function Helper.GenerateJobCategory(self: Helper): number
 end
 
 function Helper.CalculateStats(self: Helper)
-	return generateStats(self.JobCategory, self.Level, self.QualityId)
+	-- For upgrades, preserve the base variance from level 1 and apply deterministic scaling
+	if self.Stats and self.Level > 1 then
+		-- Get deterministic stats for current level
+		local newStats = generateStats(self.JobCategory, self.Level, self.QualityId, false)
+		-- Get deterministic stats for level 1 to calculate the base variance
+		local baseStats = generateStats(self.JobCategory, 1, self.QualityId, false)
+		
+		-- Calculate the variance ratio from the original level 1 stats
+		local preservedStats = {}
+		for statName, newValue in pairs(newStats) do
+			if self.Stats[statName] and baseStats[statName] and baseStats[statName] > 0 then
+				-- Preserve the original variance ratio and apply it to the new level
+				local originalVariance = self.Stats[statName] / baseStats[statName]
+				preservedStats[statName] = newValue * originalVariance
+				-- Round appropriately based on stat type
+				if statName == "WalkSpeed" or statName == "Storage" or statName == "CatchRate" or statName == "WoodYield" or statName == "OreYield" then
+					preservedStats[statName] = math.floor(preservedStats[statName] + 0.5)
+				elseif statName == "Luck" or statName == "CritChance" or statName == "FishValue" then
+					preservedStats[statName] = math.floor(preservedStats[statName] * 1000 + 0.5) / 1000
+				else -- timeDown stats
+					preservedStats[statName] = math.floor(preservedStats[statName] + 0.5)
+				end
+			else
+				preservedStats[statName] = newValue
+			end
+		end
+		return preservedStats
+	else
+		-- For new helpers or level 1, generate fresh deterministic stats
+		return generateStats(self.JobCategory, self.Level, self.QualityId, false)
+	end
 end
 
 function Helper.DefineQuality(self: Helper): number?

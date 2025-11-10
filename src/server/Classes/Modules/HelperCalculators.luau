@@ -223,8 +223,8 @@ end
 
 -- ========= Apply exact (key -> value) set; stable for previews =========
 function HelperCalculator.GenerateStatsWithPerkValues(jobCategory: string, level: number, qualityId: number, perkValues: { [string]: number }): ({ [string]: number }, { string })
-	-- Base stats (deterministic)
-	local stats = select(1, HelperCalculator.CalculateStats(jobCategory, level, qualityId))
+	-- Base stats (deterministic - no variance for perk previews)
+	local stats = select(1, HelperCalculator.CalculateStats(jobCategory, level, qualityId, false))
 	local applied: { string } = {}
 
 	-- Apply in PERKS_DEF order for consistent stacking
@@ -321,16 +321,19 @@ end
 
 -- Main API (BASE STATS ONLY — no RNG, no perks)
 
--- Returns base stats (Defaults + this jobCategory’s stats) with:
--- (base + perLevelAdd*(level-1)) × stageMult × qualityMult  for “up” stats
--- base × (1 - stageReduction(stage)) × (1 / qualityMult) with a floor for “timeDown”
-function HelperCalculator.CalculateStats(jobCategory: string, level: number, qualityId: number?): (StatsTable, { string })
+-- Returns base stats (Defaults + this jobCategory's stats) with:
+-- (base + perLevelAdd*(level-1)) × stageMult × qualityMult  for "up" stats
+-- base × (1 - stageReduction(stage)) × (1 / qualityMult) with a floor for "timeDown"
+function HelperCalculator.CalculateStats(jobCategory: string, level: number, qualityId: number?, applyVariance: boolean?): (StatsTable, { string })
 	local lvl = clampLevel(level)
 	local stgIndex = getStageForLevel(lvl)
-	-- Reduce stage multiplier impact on helpers - use square root for much gentler scaling
-	local rawStageMult = getStageMult(stgIndex)
-	local helperStageMult = 1 + (math.sqrt(rawStageMult) - 1) * 0.3 -- Much gentler scaling
+	
+	-- For helpers, use a much more conservative stage bonus (ignore economic multipliers)
+	local helperStageBonus = 1 + (stgIndex - 1) * 0.02 -- Only 2% per stage instead of economic rates
 	local qualityMult = getQualityMult(qualityId)
+	
+	-- Only apply variance on initial generation (level 1), not on upgrades
+	local shouldApplyVariance = applyVariance == true and lvl == 1
 
 	local baseDefs = Formulas.HELPER_BASE
 	local addDefs = Formulas.HELPER_PER_LEVEL_ADD
@@ -359,12 +362,12 @@ function HelperCalculator.CalculateStats(jobCategory: string, level: number, qua
 		end
 
 		if statType == "up" then
-			local v = leveled * helperStageMult * qualityMult
-			v = addDeviance(v, 0.02)
+			local v = leveled * helperStageBonus * qualityMult
+			if shouldApplyVariance then v = addDeviance(v, 0.02) end
 			stats[key] = math.floor(v + 0.5)
 		elseif statType == "decimal" then
-			local v = leveled * helperStageMult * qualityMult
-			v = addDeviance(v, 0.02)
+			local v = leveled * helperStageBonus * qualityMult
+			if shouldApplyVariance then v = addDeviance(v, 0.02) end
 			stats[key] = math.floor(v * 1000 + 0.5) / 1000 -- Round to 3 decimal places
 		else -- "timeDown"
 			-- Apply stage and quality time reductions to the leveled base
@@ -395,12 +398,12 @@ function HelperCalculator.CalculateStats(jobCategory: string, level: number, qua
 		end
 
 		if statType == "up" then
-			local v = leveled * helperStageMult * qualityMult
-			v = addDeviance(v, 0.02)
+			local v = leveled * helperStageBonus * qualityMult
+			if shouldApplyVariance then v = addDeviance(v, 0.02) end
 			stats[key] = math.floor(v + 0.5)
 		elseif statType == "decimal" then
-			local v = leveled * helperStageMult * qualityMult
-			v = addDeviance(v, 0.02)
+			local v = leveled * helperStageBonus * qualityMult
+			if shouldApplyVariance then v = addDeviance(v, 0.02) end
 			stats[key] = math.floor(v * 1000 + 0.5) / 1000 -- Round to 3 decimal places
 		else -- "timeDown"
 			-- Apply stage and quality time reductions to the leveled base
