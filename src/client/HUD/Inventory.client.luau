@@ -32,18 +32,8 @@ function clearExistingTooltip()
 end
 
 function createitemComponent(helper: HelperType.HelperData)
-	local preparedStatData = StatsIndexer.Prepare(helper)
-
 	return ShopItem({
-		ItemLevel = helper.Level,
-		ItemImage = helper.ItemImage,
-		ItemName = helper.Name,
-		ItemId = helper.Id,
-		ItemDescription = helper.Description,
-		ItemBaseCost = Format.CurrencyNumber(helper.BaseCost),
-		ItemStats = preparedStatData,
-		ItemQualityId = helper.QualityId,
-		ItemUpgradeCost = Format.CurrencyNumber(helper.UpgradeCost),
+		ItemData = helper,
 		BackgroundColor3 = FFGEnum.QUALITIES[helper.QualityId].Color,
 		Size = UDim2.fromScale(1, 1),
 		Rounded = FFGEnum.THEME.button.cornerRadius,
@@ -53,8 +43,6 @@ function createitemComponent(helper: HelperType.HelperData)
 		SliceCenter = Rect.new(77, 77, 100, 111),
 		Parent = inventoryItemsContainer,
 		ShopInstance = main,
-		Owner = helper.Owner,
-		IsPurchased = helper.IsPurchased or false,
 	})
 end
 

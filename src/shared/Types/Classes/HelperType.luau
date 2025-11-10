@@ -20,7 +20,7 @@ export type HelperData = {
 	Id: string, -- unique
 	RealmId: number,
 	TeamId: number,
-	Owner: number?,
+	Owner: number,
 	Name: string, -- display
 	Level: number,
 	MaxLevel: number,
@@ -29,7 +29,7 @@ export type HelperData = {
 	JobCategory: string,
 	QualityId: number,
 	Stats: HelperStats,
-	UpgradeStage: number?,
+	UpgradeStage: number,
 	ResourceInStorage: number,
 	StorageFull: boolean?,
 	CurrentAssignment: number,
@@ -46,7 +46,7 @@ export type HelperInstance = {
 	Id: string, -- unique
 	RealmId: number,
 	TeamId: number,
-	Owner: number?,
+	Owner: number,
 	Name: string, -- display
 	Level: number,
 	MaxLevel: number,
@@ -55,7 +55,7 @@ export type HelperInstance = {
 	JobCategory: string,
 	QualityId: number,
 	Stats: { [string]: number }?,
-	UpgradeStage: number?,
+	UpgradeStage: number,
 	ResourceInStorage: number,
 	StorageFull: boolean?,
 	CurrentAssignment: number,

@@ -112,19 +112,11 @@ end
 function Tooltip.Create(props: {
 	Size: UDim2,
 	Visible: boolean?,
-	ItemLevel: number?,
-	ItemImage: string,
-	ItemQualityId: number,
-	ItemBaseCost: number,
-	ItemUpgradeCost: number,
-	ItemName: string,
-	ItemDescription: string,
-	ItemStats: { [number]: { [string]: any } }?,
-	ItemId: string,
-	IsPurchased: boolean?,
-	Owner: number?,
+	Item: HelperType.HelperData,
 	Parent: Instance?,
 })
+	local item = props.Item
+
 	-- //SECTION - Tooltip Container
 	local tooltipContainer = Instance.new("Frame")
 	tooltipContainer.Name = "Tooltip"
@@ -169,10 +161,10 @@ function Tooltip.Create(props: {
 	itemLabel.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 	itemLabel.Position = FFGEnum.THEME.alignment.position.textFrameHeaderCenter
 	itemLabel.TextStrokeTransparency = 0
-	itemLabel.Text = props.ItemName
+	itemLabel.Text = item.Name
 	itemLabel.Font = FFGEnum.THEME.bigFont
-	if props.ItemQualityId then
-		itemLabel.TextColor3 = FFGEnum.QUALITIES[props.ItemQualityId].Color
+	if item.QualityId or item.Tier then
+		itemLabel.TextColor3 = FFGEnum.QUALITIES[item.QualityId or item.Tier].Color
 	else
 		itemLabel.TextColor3 = FFGEnum.THEME.color.white
 	end
@@ -215,7 +207,7 @@ function Tooltip.Create(props: {
 	local descriptionLabel = Instance.new("TextLabel")
 	descriptionLabel.Name = "ItemDescription"
 	descriptionLabel.LayoutOrder = 3
-	descriptionLabel.Text = props.ItemDescription or ""
+	descriptionLabel.Text = item.Description or ""
 	descriptionLabel.TextColor3 = FFGEnum.THEME.color.textMuted
 	descriptionLabel.TextWrapped = true
 	descriptionLabel.TextScaled = true
@@ -236,31 +228,46 @@ function Tooltip.Create(props: {
 	entityLevelAndQualityContainer.Parent = addInfoContainer
 	UIConfig.ApplyList(entityLevelAndQualityContainer, Enum.FillDirection.Horizontal)
 
-	local levelLabel
-	if props.IsPurchased then
+	local levelLabel: TextLabel
+	local stageLabel: TextLabel
+	if item.IsPurchased then
 		levelLabel = Instance.new("TextLabel")
 		levelLabel.Name = "LevelLabel"
 		levelLabel.LayoutOrder = 1
 		levelLabel.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 		levelLabel.Position = FFGEnum.THEME.alignment.position.center
-		levelLabel.Size = UDim2.fromScale(0.5, 1)
-		levelLabel.Text = props.IsPurchased and `Level {props.ItemLevel}` or ""
+		levelLabel.Size = UDim2.fromScale(0.3, 1)
+		levelLabel.Text = item.IsPurchased and `Level {item.Level}` or ""
 		levelLabel.TextColor3 = FFGEnum.THEME.color.Green
 		levelLabel.TextStrokeTransparency = 0.7
 		levelLabel.TextScaled = true
 		levelLabel.Font = FFGEnum.THEME.bigFont
 		levelLabel.BackgroundTransparency = 1
 		levelLabel.Parent = entityLevelAndQualityContainer
+
+		stageLabel = Instance.new("TextLabel")
+		stageLabel.Name = "StageLabel"
+		stageLabel.LayoutOrder = 2
+		stageLabel.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
+		stageLabel.Position = FFGEnum.THEME.alignment.position.center
+		stageLabel.Size = UDim2.fromScale(0.3, 1)
+		stageLabel.Text = FFGEnum.STAGES[item.UpgradeStage].Label
+		stageLabel.TextColor3 = FFGEnum.STAGES[item.UpgradeStage].Color or Color3.new(1, 1, 1)
+		stageLabel.TextStrokeTransparency = 0.7
+		stageLabel.TextScaled = true
+		stageLabel.Font = FFGEnum.THEME.bigFont
+		stageLabel.BackgroundTransparency = 1
+		stageLabel.Parent = entityLevelAndQualityContainer
 	end
 
 	local qualityLabel = Instance.new("TextLabel")
 	qualityLabel.Name = "QualityLabel"
-	qualityLabel.LayoutOrder = 2
+	qualityLabel.LayoutOrder = 3
 	qualityLabel.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 	qualityLabel.Position = FFGEnum.THEME.alignment.position.center
-	qualityLabel.Size = UDim2.fromScale(0.5, 1)
-	qualityLabel.Text = FFGEnum.QUALITIES[props.ItemQualityId].Label or ""
-	qualityLabel.TextColor3 = FFGEnum.QUALITIES[props.ItemQualityId].Color or Color3.new(1, 1, 1)
+	qualityLabel.Size = UDim2.fromScale(0.3, 1)
+	qualityLabel.Text = FFGEnum.QUALITIES[item.QualityId or item.Tier].Label or ""
+	qualityLabel.TextColor3 = FFGEnum.QUALITIES[item.QualityId or item.Tier].Color or Color3.new(1, 1, 1)
 	qualityLabel.TextStrokeTransparency = 0.7
 	qualityLabel.TextScaled = true
 	qualityLabel.Font = FFGEnum.THEME.bigFont
@@ -302,14 +309,14 @@ function Tooltip.Create(props: {
 	UIConfig.SetPadding(innerStatsPadding, "XL")
 	innerStatsPadding.Parent = innerStatsContainer
 
-	createStats(props.ItemStats, innerStatsContainer)
+	createStats(item.Stats or {}, innerStatsContainer)
 	-- //!SECTION
 
 	local purchaseTypeLabel = Instance.new("TextLabel")
 	purchaseTypeLabel.Name = "PurchaseTypeLabel"
 	purchaseTypeLabel.LayoutOrder = 3
 	purchaseTypeLabel.Size = UDim2.fromScale(1, 0.1)
-	purchaseTypeLabel.Text = props.IsPurchased and "Upgrade" or "Purchase"
+	purchaseTypeLabel.Text = item.IsPurchased and "Upgrade" or "Purchase"
 	purchaseTypeLabel.AutomaticSize = Enum.AutomaticSize.X
 	purchaseTypeLabel.Font = FFGEnum.THEME.bigFont
 	purchaseTypeLabel.TextColor3 = FFGEnum.THEME.color.textGold
@@ -328,17 +335,17 @@ function Tooltip.Create(props: {
 	buyButtonContainer.Size = UDim2.fromScale(1, 0.2)
 	buyButtonContainer.Parent = bottomContainer
 
-	local cost = props.IsPurchased and props.ItemUpgradeCost or props.ItemBaseCost
+	local cost: number = item.IsPurchased and item.UpgradeCost or item.BaseCost or 0
 	local buyButton = Button.Create({
 		Color = "Green",
-		Text = cost,
+		Text = Format.CurrencyNumber(cost),
 		Size = UDim2.fromScale(1, 1),
 		CurrencyType = "Gold",
 	})
 	buyButton.Parent = buyButtonContainer
 
 	buyButton.Activated:Connect(function()
-		handleButtonClick(props.ItemId, props.IsPurchased or false)
+		handleButtonClick(item.Id, item.IsPurchased or false)
 	end)
 	-- //!SECTION
 	-- //!SECTION
@@ -353,7 +360,7 @@ function Tooltip.Create(props: {
 	-- -- //!SECTION
 
 	local helperUpgradedEvent = Events.GetRemote(Events.RemoteNames.HelperUpgraded)
-	if props.ItemStats then
+	if item.Stats then
 		if helperUpgradedEvent then
 			helperUpgradedEvent.OnClientEvent:Connect(function(helperData: HelperType.HelperData)
 				-- Update Quality
@@ -361,7 +368,7 @@ function Tooltip.Create(props: {
 				qualityLabel.TextColor3 = FFGEnum.QUALITIES[helperData.QualityId].Color or Color3.new(1, 1, 1)
 
 				-- Update Level
-				if levelLabel then levelLabel.Text = props.IsPurchased and `Level {helperData.Level}` or "" end
+				if levelLabel then levelLabel.Text = item.IsPurchased and `Level {helperData.Level}` or "" end
 
 				-- Update Stats
 				local preparedData = StatsIndexer.Prepare(helperData)
@@ -370,9 +377,11 @@ function Tooltip.Create(props: {
 				-- Update Button State (disabled and or upgrade cost)
 				local btnText: TextLabel? = buyButton:FindFirstChild("ButtonText", true)
 				if btnText then
-					if helperData.Level ~= helperData.MaxLevel then btnText.Text = Format.CurrencyNumber(helperData.UpgradeCost) end
-				else
-					btnText.Text = "Max level"
+					if helperData.Level ~= helperData.MaxLevel then
+						btnText.Text = Format.CurrencyNumber(helperData.UpgradeCost)
+					else
+						btnText.Text = "Max level"
+					end
 				end
 			end)
 		end
@@ -384,18 +393,7 @@ end
 function Tooltip.Initialize()
 	-- //SECTION - Bindables
 	type itemData = {
-		ItemLevel: number?,
-		ItemBaseCost: number,
-		ItemUpgradeCost: number,
-		ItemDescription: string,
-		ItemImage: string,
-		ItemQualityId: number,
-		ItemName: string,
-		ItemId: string,
-		Description: string,
-		ItemStats: HelperType.HelperStats?,
-		Owner: number,
-		IsPurchased: boolean?,
+		Item: HelperType.HelperData,
 		Parent: Instance,
 	}
 
@@ -407,19 +405,10 @@ function Tooltip.Initialize()
 				return
 			end
 
-			Tooltip.ClearExisting(data.Owner)
+			Tooltip.ClearExisting(data.Item.Owner)
 
-			Tooltip.Existing[data.Owner] = Tooltip.Create({
-				ItemLevel = data.ItemLevel,
-				ItemBaseCost = data.ItemBaseCost,
-				ItemUpgradeCost = data.ItemUpgradeCost,
-				ItemDescription = data.ItemDescription,
-				ItemName = data.ItemName,
-				ItemImage = data.ItemImage,
-				ItemStats = data.ItemStats,
-				ItemQualityId = data.ItemQualityId,
-				ItemId = data.ItemId,
-				IsPurchased = data.IsPurchased or false,
+			Tooltip.Existing[data.Item.Owner] = Tooltip.Create({
+				Item = data.Item,
 				Size = UDim2.fromScale(0.3, 1),
 				Visible = true,
 				Parent = data.Parent,

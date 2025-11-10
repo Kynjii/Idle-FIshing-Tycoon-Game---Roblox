@@ -8,8 +8,6 @@ local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
 local ShopGUI = require(ReplicatedStorage.Shared.UI.Components.Shop.ShopGUI)
 local ShopItem = require(ReplicatedStorage.Shared.UI.Components.Shop.ShopItem)
 local Tooltip = require(ReplicatedStorage.Shared.UI.Components.Tooltips.Tooltip)
-local Format = require(ReplicatedStorage.Shared.Utils.Format)
-local StatsIndexer = require(ReplicatedStorage.Shared.Utils.StatsIndexer)
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
@@ -31,18 +29,8 @@ function clearExistingTooltip()
 end
 
 function createShopitemComponent(helper: HelperType.HelperData)
-	local preparedStatData = StatsIndexer.Prepare(helper)
-
 	return ShopItem({
-		ItemLevel = helper.Level,
-		ItemImage = helper.ItemImage,
-		ItemName = helper.Name,
-		ItemId = helper.Id,
-		ItemDescription = helper.Description,
-		ItemUpgradeCost = Format.CurrencyNumber(helper.UpgradeCost),
-		ItemBaseCost = Format.CurrencyNumber(helper.BaseCost),
-		ItemStats = preparedStatData,
-		ItemQualityId = helper.QualityId,
+		ItemData = helper,
 		BackgroundColor3 = FFGEnum.QUALITIES[helper.QualityId].Color,
 		Size = UDim2.fromScale(1, 1),
 		Rounded = FFGEnum.THEME.button.cornerRadius,
@@ -52,8 +40,6 @@ function createShopitemComponent(helper: HelperType.HelperData)
 		SliceCenter = Rect.new(32, 83, 32, 83),
 		Parent = shopItemsContainer,
 		ShopInstance = main,
-		Owner = helper.Owner,
-		IsPurchased = helper.IsPurchased or false,
 	})
 end
 

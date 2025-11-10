@@ -1,38 +1,33 @@
+--!strict
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
+local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
 local UIConfig = require(ReplicatedStorage.Shared.UI.UIConfig)
+local Format = require(ReplicatedStorage.Shared.Utils.Format)
 
 local function ShopItem(
 	props: {
+		ItemData: HelperType.HelperData,
 		BackgroundColor3: Color3?,
 		Size: UDim2,
 		AnchorPoint: Vector2?,
 		Position: UDim2?, -- default to {.5 .5}
 		Rounded: UDim?,
-		ScaleType: Enum?,
+		ScaleType: Enum.ScaleType?,
 		SliceCenter: Rect?,
 		Visible: boolean?,
 		HoverEffect: boolean?,
-		ItemLevel: number?,
-		ItemImage: string,
-		ItemName: string,
-		ItemId: string,
-		ItemDescription: string,
-		ItemBaseCost: string,
-		ItemStats: { [number]: { [string]: any } }?,
-		ItemQualityId: number,
-		ItemUpgradeCost: number,
 		Parent: Instance,
 		ShopInstance: Instance,
-		Owner: number,
-		IsPurchased: boolean?,
 	}
 )
+	local item = props.ItemData
+
 	local shopItemContainer = Instance.new("Frame")
-	shopItemContainer.Name = props.ItemId
-	shopItemContainer.BackgroundTransparency = props.BackgroundTransparency or 1
+	shopItemContainer.Name = item.Id
+	shopItemContainer.BackgroundTransparency = 1
 	shopItemContainer.Size = props.Size
 	shopItemContainer.BackgroundColor3 = props.BackgroundColor3 or FFGEnum.THEME.color.white
 	shopItemContainer.AnchorPoint = props.AnchorPoint or FFGEnum.THEME.alignment.anchor.center
@@ -49,12 +44,12 @@ local function ShopItem(
 	local itemQualityBG = Instance.new("ImageLabel")
 	itemQualityBG.Name = "ItemBG"
 	itemQualityBG.Size = UDim2.fromScale(1, 1)
-	itemQualityBG.SliceCenter = props.SliceCenter or nil
-	itemQualityBG.ScaleType = props.ScaleType or nil
+	if props.SliceCenter ~= nil then itemQualityBG.SliceCenter = props.SliceCenter end
+	if props.ScaleType ~= nil then itemQualityBG.ScaleType = props.ScaleType end
 	itemQualityBG.BackgroundTransparency = 1
 	itemQualityBG.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 	itemQualityBG.Position = FFGEnum.THEME.alignment.position.center
-	itemQualityBG.Image = FFGEnum.UI.Items.BackgroundQualityId[props.ItemQualityId]
+	itemQualityBG.Image = FFGEnum.UI.Items.BackgroundQualityId[item.QualityId or item.Tier]
 	itemQualityBG.Parent = shopItemContainer
 
 	-- //SECTION - Shop Item Outline
@@ -75,7 +70,7 @@ local function ShopItem(
 
 	-- //SECTION -  Shop Item Corner
 	local corner = Instance.new("UICorner")
-	corner.CornerRadius = props.Rounded
+	corner.CornerRadius = props.Rounded or UDim.new(0, 0)
 	corner.Parent = shopItemContainer
 	-- //!SECTION
 
@@ -97,25 +92,25 @@ local function ShopItem(
 	itemName.BackgroundTransparency = 1
 	itemName.TextColor3 = FFGEnum.THEME.color.white
 	itemName.LayoutOrder = 1
-	itemName.Text = props.ItemName
+	itemName.Text = item.Name
 	itemName.TextScaled = true
 	itemName.Parent = mainContainer
 	-- //!SECTION
 
 	-- //SECTION -  Item Image
-	local item = Instance.new("ImageLabel")
-	item.Name = "ItemImage"
-	item.Image = props.ItemImage
-	item.LayoutOrder = 2
-	item.BackgroundTransparency = 1
-	item.Size = UDim2.fromScale(0.6, 0.6)
-	item.ZIndex = 2
-	UIConfig.ApplyAspect(item)
-	item.Parent = mainContainer
+	local itemImage = Instance.new("ImageLabel")
+	itemImage.Name = "ItemImage"
+	itemImage.Image = item.ItemImage
+	itemImage.LayoutOrder = 2
+	itemImage.BackgroundTransparency = 1
+	itemImage.Size = UDim2.fromScale(0.6, 0.6)
+	itemImage.ZIndex = 2
+	UIConfig.ApplyAspect(itemImage)
+	itemImage.Parent = mainContainer
 	-- //!SECTION
 
 	-- //SECTION -  Item Price
-	if not props.IsPurchased then
+	if not item.IsPurchased then
 		local priceContainer = Instance.new("Frame")
 		priceContainer.Name = "PriceContainer"
 		priceContainer.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
@@ -162,7 +157,7 @@ local function ShopItem(
 		ItemBaseCostTxt.TextColor3 = FFGEnum.THEME.color.white
 		ItemBaseCostTxt.BackgroundTransparency = 1
 		ItemBaseCostTxt.LayoutOrder = 2
-		ItemBaseCostTxt.Text = props.ItemBaseCost
+		ItemBaseCostTxt.Text = Format.CurrencyNumber(item.BaseCost or 0) or ""
 		ItemBaseCostTxt.Font = FFGEnum.THEME.bigFont
 		ItemBaseCostTxt.Size = UDim2.fromScale(0.5, 0.9)
 		ItemBaseCostTxt.TextScaled = true
@@ -194,17 +189,7 @@ local function ShopItem(
 		local bindableEvent = Events.GetBindableEvent(Events.BindableNames.ShowTooltip)
 		if bindableEvent then
 			local itemData = {
-				ItemLevel = props.ItemLevel,
-				ItemImage = props.ItemImage,
-				ItemBaseCost = props.ItemBaseCost,
-				ItemUpgradeCost = props.ItemUpgradeCost,
-				ItemName = props.ItemName,
-				ItemId = props.ItemId,
-				ItemDescription = props.ItemDescription,
-				ItemStats = props.ItemStats,
-				ItemQualityId = props.ItemQualityId,
-				IsPurchased = props.IsPurchased,
-				Owner = props.Owner,
+				Item = item,
 				Parent = props.ShopInstance,
 			}
 
