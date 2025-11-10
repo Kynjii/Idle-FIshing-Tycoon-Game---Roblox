@@ -138,7 +138,7 @@ function AvailableJobListItem.Create(props: {
 
 		local helperName = Instance.new("TextLabel")
 		helperName.Name = "HelperName"
-		helperName.Size = UDim2.fromScale(0.7, 1)
+		helperName.Size = UDim2.fromScale(0.7, 0.9)
 		helperName.TextXAlignment = Enum.TextXAlignment.Left
 		helperName.BackgroundTransparency = 1
 		helperName.Font = FFGEnum.THEME.bigFont
@@ -149,7 +149,7 @@ function AvailableJobListItem.Create(props: {
 
 		local helperLevel = Instance.new("TextLabel")
 		helperLevel.Name = "HelperLevel"
-		helperLevel.Size = UDim2.fromScale(0.3, 1)
+		helperLevel.Size = UDim2.fromScale(0.25, 0.9)
 		helperLevel.BackgroundTransparency = 1
 		helperLevel.Font = FFGEnum.THEME.bigFont
 		helperLevel.TextColor3 = FFGEnum.THEME.color.white
