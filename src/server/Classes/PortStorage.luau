@@ -330,11 +330,10 @@ function PortStorage.ShowStorageFullBillboard(self: PortStorage): ()
 	if self.ClonedBillboard then return end
 
 	local billboard: BillboardGui = game.Workspace.BillBoards:FindFirstChild("StorageFullAlert", true)
-
-	if billboard and self.PurchaseButton.PrimaryPart then
+	if billboard then
 		local clone: BillboardGui = billboard:Clone()
-		clone.Parent = self.PurchaseButton.PrimaryPart
-		clone.Adornee = self.PurchaseButton.PrimaryPart
+		clone.Parent = self.PurchaseButton.BillboardRoot
+		clone.Adornee = self.PurchaseButton.BillboardRoot
 		clone.Name = "StorageFullAlert_Clone"
 
 		local canvasGroup = clone:FindFirstChild("CanvasGroup") :: CanvasGroup

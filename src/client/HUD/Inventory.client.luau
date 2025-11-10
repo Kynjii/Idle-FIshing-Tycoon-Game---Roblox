@@ -7,8 +7,6 @@ local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
 local ShopGUI = require(ReplicatedStorage.Shared.UI.Components.Shop.ShopGUI)
 local ShopItem = require(ReplicatedStorage.Shared.UI.Components.Shop.ShopItem)
 local Tooltip = require(ReplicatedStorage.Shared.UI.Components.Tooltips.Tooltip)
-local Format = require(ReplicatedStorage.Shared.Utils.Format)
-local StatsIndexer = require(ReplicatedStorage.Shared.Utils.StatsIndexer)
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")

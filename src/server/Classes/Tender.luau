@@ -374,10 +374,10 @@ function Tender.ShowTenderStoppedBillboard(self: Tender): ()
 	if self.ClonedBillboard then return end
 
 	local billboard: BillboardGui = game.Workspace.BillBoards:FindFirstChild("TenderStopped", true)
-	if billboard and self.PurchaseButton.PrimaryPart then
+	if billboard then
 		local clone: BillboardGui = billboard:Clone()
-		clone.Parent = self.PurchaseButton.PrimaryPart
-		clone.Adornee = self.PurchaseButton.PrimaryPart
+		clone.Parent = self.PurchaseButton.BillboardRoot
+		clone.Adornee = self.PurchaseButton.BillboardRoot
 		clone.Name = "TenderStopped_Clone"
 
 		local canvasGroup: CanvasGroup = clone:FindFirstChild("CanvasGroup") :: CanvasGroup
