@@ -43,7 +43,7 @@ function createitemComponent(helper: HelperType.HelperData)
 		ItemBaseCost = Format.CurrencyNumber(helper.BaseCost),
 		ItemStats = preparedStatData,
 		ItemQualityId = helper.QualityId,
-		ItemUpgradeCost = helper.UpgradeCost,
+		ItemUpgradeCost = Format.CurrencyNumber(helper.UpgradeCost),
 		BackgroundColor3 = FFGEnum.QUALITIES[helper.QualityId].Color,
 		Size = UDim2.fromScale(1, 1),
 		Rounded = FFGEnum.THEME.button.cornerRadius,

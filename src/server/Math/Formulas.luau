@@ -3,19 +3,20 @@ local MAX_LEVEL = 100
 
 local PROMO_LEVEL = { 1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
 
-local EARN_RATE = { 1.15, 1.12, 1.10, 1.08, 1.06, 1.05, 1.04, 1.03, 1.025, 1.02 }
-local COST_RATE = { 1.12, 1.14, 1.16, 1.17, 1.18, 1.19, 1.20, 1.21, 1.22, 1.23 }
+local EARN_RATE = { 1.05, 1.04, 1.03, 1.025, 1.02, 1.015, 1.012, 1.01, 1.008, 1.006, 1.005 }
+local COST_RATE = { 1.08, 1.10, 1.12, 1.14, 1.16, 1.18, 1.19, 1.20, 1.21, 1.22, 1.23 }
 
 local EARN_BONUS = {
-	[2] = 0.001,
-	[3] = 0.001,
-	[4] = 0.002,
-	[5] = 0.002,
-	[6] = 0.003,
-	[7] = 0.003,
-	[8] = 0.004,
-	[9] = 0.004,
-	[10] = 0.005,
+	[2] = 0.002,
+	[3] = 0.003,
+	[4] = 0.005,
+	[5] = 0.008,
+	[6] = 0.012,
+	[7] = 0.015,
+	[8] = 0.018,
+	[9] = 0.022,
+	[10] = 0.025,
+	[11] = 0.030,
 }
 -- //!SECTION
 
@@ -104,9 +105,9 @@ local FORMULAS = {
 	BOAT = { BaseCost = 100, BaseStorage = 20, BaseFPS = 1 },
 	TENDER = { BaseCost = 110, BaseStorage = 25 },
 	STORAGE = { BaseCost = 150, BaseStorage = 25 },
-	BUILDING = { BaseCost = 1500 },
-	HELPER = { BaseCost = 1000 },
-	JOBSLOT = { BaseCost = 1300 },
+	BUILDING = { BaseCost = 1200 },
+	HELPER = { BaseCost = 800 },
+	JOBSLOT = { BaseCost = 1000 },
 
 	-- Tier (rarity) curve used elsewhere in the economy
 	TIER_MULTIPLIER = {
@@ -124,11 +125,11 @@ local FORMULAS = {
 -- Additive per-level growth (before Stage/Quality)
 -- =========================
 
-FORMULAS.PER_LEVEL_STORAGE_ADD = 15.0 -- +15 storage / level
-FORMULAS.PER_LEVEL_FPS_ADD = 2 -- +2 FPS   / level
+FORMULAS.PER_LEVEL_STORAGE_ADD = 8.0 -- +8 storage / level
+FORMULAS.PER_LEVEL_FPS_ADD = 1 -- +1 FPS   / level
 
 -- Add percentage-based per-level growth for compound excitement
-FORMULAS.PER_LEVEL_MULT = 1.01 -- 1% compound growth per level
+FORMULAS.PER_LEVEL_MULT = 1.005 -- 0.5% compound growth per level
 
 -- =========================
 -- Time-stat tuning (Stage → % faster) - IMPROVED
@@ -140,10 +141,11 @@ FORMULAS.TIME_MIN_FRACTION = 0.02 -- never below 2% of base (was 5%)
 
 -- Add breakthrough levels for major time reductions
 FORMULAS.TIME_BREAKTHROUGH_LEVELS = {
-	[25] = 0.15, -- -15% at level 25
-	[50] = 0.25, -- -25% at level 50
-	[75] = 0.40, -- -40% at level 75
-	[100] = 0.55, -- -55% at level 100
+	[20] = 0.10, -- -10% at level 20
+	[40] = 0.20, -- -20% at level 40
+	[60] = 0.30, -- -30% at level 60
+	[80] = 0.40, -- -40% at level 80
+	[100] = 0.50, -- -50% at level 100
 }
 
 -- =========================
@@ -163,29 +165,29 @@ FORMULAS.QUALITY_MULT = {
 FORMULAS.HELPER_BASE = {
 	Defaults = {
 		WalkSpeed = 5, -- "up"
-		Storage = 15, -- "up"
-		LoadTime = 15, -- "timeDown"
+		Storage = 30, -- "up"
+		LoadTime = 12, -- "timeDown"
 	},
 	PerJobCategory = {
-		Fishing = { CatchRate = 5, Luck = 0.02, CastTime = 6 }, -- CastTime "timeDown"
-		Woodcutting = { WoodYield = 5, CritChance = 0.02, SwingRate = 6 },
-		Mining = { OreYield = 5, CritChance = 0.02, SwingRate = 6 },
-		Transporting = { Storage = 25, FishValue = 0.10, LoadTime = 10 },
+		Fishing = { CatchRate = 3, Luck = 0.015, CastTime = 8 }, -- CastTime "timeDown"
+		Woodcutting = { WoodYield = 3, CritChance = 0.015, SwingRate = 8 },
+		Mining = { OreYield = 3, CritChance = 0.015, SwingRate = 8 },
+		Transporting = { Storage = 50, FishValue = 0.08, LoadTime = 10 },
 	},
 }
 
 -- Per-level additive growth (small, before Stage/Quality)
 FORMULAS.HELPER_PER_LEVEL_ADD = {
 	Defaults = {
-		WalkSpeed = 0.03,
-		Storage = 15,
-		LoadTime = 0.008,
+		WalkSpeed = 0.2,
+		Storage = 8,
+		LoadTime = 0.05, -- Reduces load time per level (subtracted)
 	},
 	PerJobCategory = {
-		Fishing = { CatchRate = 0.003, Luck = 0.003, CastTime = 0.008 },
-		Woodcutting = { WoodYield = 0.003, CritChance = 0.003, SwingRate = 0.003 },
-		Mining = { OreYield = 0.003, CritChance = 0.003, SwingRate = 0.008 },
-		Transporting = { Storage = 15, FishValue = 0.025, LoadTime = 0.01 },
+		Fishing = { CatchRate = 0.15, Luck = 0.002, CastTime = 0.05 }, -- Reduces cast time per level (subtracted)
+		Woodcutting = { WoodYield = 0.15, CritChance = 0.002, SwingRate = 0.05 }, -- Reduces swing time per level (subtracted)
+		Mining = { OreYield = 0.15, CritChance = 0.002, SwingRate = 0.05 }, -- Reduces swing time per level (subtracted)
+		Transporting = { Storage = 12, FishValue = 0.008, LoadTime = 0.08 }, -- Reduces load time per level (subtracted)
 	},
 }
 

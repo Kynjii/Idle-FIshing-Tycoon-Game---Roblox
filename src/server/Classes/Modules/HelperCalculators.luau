@@ -34,10 +34,10 @@ local function getStageMult(stageIndex: number): number
 end
 
 local function getStageTimeReductionFraction(stageIndex: number): number
-	local stageMult = getStageMult(stageIndex) -- normalized (Stage 1 == 1.0)
+	local rawStageMult = getStageMult(stageIndex) -- normalized (Stage 1 == 1.0)
 	local coeff = Formulas.STAGE_TIME_REDUCTION_COEFF or 0.20
 	local cap = Formulas.MAX_STAGE_TIME_REDUCTION or 0.50
-	local r = (stageMult - 1) * coeff
+	local r = (rawStageMult - 1) * coeff
 	if r > cap then r = cap end
 	if r < 0 then r = 0 end
 	return r
@@ -327,7 +327,9 @@ end
 function HelperCalculator.CalculateStats(jobCategory: string, level: number, qualityId: number?): (StatsTable, { string })
 	local lvl = clampLevel(level)
 	local stgIndex = getStageForLevel(lvl)
-	local stageMult = getStageMult(stgIndex)
+	-- Reduce stage multiplier impact on helpers - use square root for much gentler scaling
+	local rawStageMult = getStageMult(stgIndex)
+	local helperStageMult = 1 + (math.sqrt(rawStageMult) - 1) * 0.3 -- Much gentler scaling
 	local qualityMult = getQualityMult(qualityId)
 
 	local baseDefs = Formulas.HELPER_BASE
@@ -346,22 +348,35 @@ function HelperCalculator.CalculateStats(jobCategory: string, level: number, qua
 	for key, baseValue in pairs(defaults) do
 		local perLevel = defaultsAdd[key] or 0
 		local statType = typeMap[key] or "up"
-		local leveled = baseValue + perLevel * (lvl - 1)
+		
+		local leveled
+		if statType == "timeDown" then
+			-- For timeDown stats, subtract per-level improvement (gets faster)
+			leveled = baseValue - perLevel * (lvl - 1)
+		else
+			-- For up/decimal stats, add per-level improvement
+			leveled = baseValue + perLevel * (lvl - 1)
+		end
 
 		if statType == "up" then
-			local v = leveled * stageMult * qualityMult
+			local v = leveled * helperStageMult * qualityMult
 			v = addDeviance(v, 0.02)
 			stats[key] = math.floor(v + 0.5)
 		elseif statType == "decimal" then
-			local v = leveled * stageMult * qualityMult
+			local v = leveled * helperStageMult * qualityMult
 			v = addDeviance(v, 0.02)
 			stats[key] = math.floor(v * 1000 + 0.5) / 1000 -- Round to 3 decimal places
 		else -- "timeDown"
+			-- Apply stage and quality time reductions to the leveled base
 			local stageReduction = getStageTimeReductionFraction(stgIndex)
-			local combined = (1 - stageReduction) * (1 / qualityMult)
-			local minFrac = Formulas.TIME_MIN_FRACTION or 0.05
-			local reduced = math.max(leveled * minFrac, leveled * combined)
-			stats[key] = math.floor(reduced + 0.5)
+			local qualityReduction = 1 - (1 / qualityMult)
+			local totalReduction = math.min(0.95, stageReduction + qualityReduction)
+			
+			local reduced = leveled * (1 - totalReduction)
+			local minFrac = Formulas.TIME_MIN_FRACTION or 0.02
+			local minTime = math.max(0.5, baseValue * minFrac) -- Use base value for minimum
+			
+			stats[key] = math.max(minTime, math.floor(reduced + 0.5))
 		end
 	end
 
@@ -369,22 +384,35 @@ function HelperCalculator.CalculateStats(jobCategory: string, level: number, qua
 	for key, baseValue in pairs(helperBase) do
 		local perLevel = (helperAdd and helperAdd[key]) or 0
 		local statType = typeMap[key] or "up"
-		local leveled = baseValue + perLevel * (lvl - 1)
+		
+		local leveled
+		if statType == "timeDown" then
+			-- For timeDown stats, subtract per-level improvement (gets faster)
+			leveled = baseValue - perLevel * (lvl - 1)
+		else
+			-- For up/decimal stats, add per-level improvement
+			leveled = baseValue + perLevel * (lvl - 1)
+		end
 
 		if statType == "up" then
-			local v = leveled * stageMult * qualityMult
+			local v = leveled * helperStageMult * qualityMult
 			v = addDeviance(v, 0.02)
 			stats[key] = math.floor(v + 0.5)
 		elseif statType == "decimal" then
-			local v = leveled * stageMult * qualityMult
+			local v = leveled * helperStageMult * qualityMult
 			v = addDeviance(v, 0.02)
 			stats[key] = math.floor(v * 1000 + 0.5) / 1000 -- Round to 3 decimal places
 		else -- "timeDown"
+			-- Apply stage and quality time reductions to the leveled base
 			local stageReduction = getStageTimeReductionFraction(stgIndex)
-			local combined = (1 - stageReduction) * (1 / qualityMult)
-			local minFrac = Formulas.TIME_MIN_FRACTION or 0.05
-			local reduced = math.max(leveled * minFrac, leveled * combined)
-			stats[key] = math.floor(reduced + 0.5)
+			local qualityReduction = 1 - (1 / qualityMult)
+			local totalReduction = math.min(0.95, stageReduction + qualityReduction)
+			
+			local reduced = leveled * (1 - totalReduction)
+			local minFrac = Formulas.TIME_MIN_FRACTION or 0.02
+			local minTime = math.max(0.5, baseValue * minFrac) -- Use base value for minimum
+			
+			stats[key] = math.max(minTime, math.floor(reduced + 0.5))
 		end
 	end
 

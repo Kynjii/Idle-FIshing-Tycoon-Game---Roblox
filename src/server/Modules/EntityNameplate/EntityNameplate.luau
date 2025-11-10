@@ -247,7 +247,7 @@ function EntityNameplate.Update(entityBillboard: BillboardGui, class: Boat | Ten
 	if jobInfoIcon then jobInfoIcon.Image = EntityNameplate.JobIconImage[jobCategory] or EntityNameplate.JobIconImage.None end
 
 	local storageText = typedClass.CurrentMaxStorage or typedClass.Stats.Storage
-	if jobInfoText then jobInfoText.Text = jobCategory == FFGEnum.CLASS.ENTITY_NAME.Boat and `{typedClass.FPS}/s` or storageText or "" end
+	if jobInfoText then jobInfoText.Text = jobCategory == FFGEnum.CLASS.ENTITY_NAME.Boat and `{typedClass.CurrentFPS}/s` or storageText or "" end
 
 	if class.Entity ~= FFGEnum.CLASS.ENTITY_NAME.Helper and class.Entity ~= FFGEnum.CLASS.ENTITY_NAME.Building then
 		local hasProgressBar = entityBillboard:FindFirstChild("ProgressContainer", true)

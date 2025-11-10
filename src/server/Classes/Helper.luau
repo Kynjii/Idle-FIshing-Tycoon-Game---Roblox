@@ -133,8 +133,8 @@ function Helper.New(state: HelperType.HelperData, player: Player, teamId: number
 
 	-- Calculate default stats based on quality and job
 	self.Stats = state.Stats or generateStats(self.JobCategory, self.Level, self.QualityId) :: HelperType.HelperStats
-	self.BaseCost = state.BaseCost or ClassCalculators.CalculateBaseValue(DEFAULTS.BaseCost, self.QualityId, self.RealmId)
-	self.UpgradeCost = state.UpgradeCost or ClassCalculators.CalculateUpgradeCost(self.BaseCost, self.Level, self.QualityId, self.RealmId)
+	self.BaseCost = ClassCalculators.CalculateBaseValue(DEFAULTS.BaseCost, self.QualityId, self.RealmId)
+	self.UpgradeCost = ClassCalculators.CalculateUpgradeCost(self.BaseCost, self.Level, self.QualityId, self.RealmId)
 
 	self.CurrentAssignment = state.CurrentAssignment
 
@@ -185,10 +185,6 @@ end
 -- //!SECTION
 
 -- //SECTION - Assignments
-function Helper.GetAssignments(self: Helper)
-	return
-end
-
 function Helper.CanAssignJob(self: Helper, jobId: number): boolean
 	local jobInfo = Jobs.Data[jobId]
 	if not jobInfo then return false end
@@ -228,7 +224,7 @@ function Helper.CreateModel(self: Helper)
 
 		local hasProgressBar = nameplate:FindFirstChild("ProgressContainer")
 		if not hasProgressBar then
-			local progressContainer = ProgressBar.Create({ Color = "Blue", HasText = true, Adornee = nameplate })
+			local progressContainer = ProgressBar.Create({ Color = "Blue", HasText = true, hasProgressBar = true, Adornee = nameplate })
 			progressContainer.Size = UDim2.fromScale(1, 0.2)
 			progressContainer.Position = UDim2.fromScale(0.5, 1)
 			progressContainer.Parent = nameplate
