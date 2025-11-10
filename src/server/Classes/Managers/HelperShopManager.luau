@@ -107,10 +107,12 @@ function HelperShopManager.Purchasehelper(self: HelperShopManager, helperId: str
 
 	DataService.Spend(self.Player, helperClass.CurrencyType, helperClass.BaseCost)
 
-	self:Save()
+	self.Inventory[helperId] = nil
 
 	Events.FireEvent(Events.RemoteNames.UpdateHelperShopUI, self.Player, helperId)
 	Events.FireBindableEvent(Events.BindableNames.PurchasedHelper, { Player = self.Player })
+
+	self:Save()
 end
 
 function HelperShopManager.SetCurrentPeriod(self: HelperShopManager)
