@@ -346,7 +346,7 @@ FFGEnum.THEME = {
 	hoverStrokeColor = Color3.fromRGB(67, 170, 139),
 
 	Nameplate = {
-		MaxDistance = 80,
+		MaxDistance = 100,
 	},
 
 	sizes = {
@@ -384,6 +384,10 @@ FFGEnum.THEME = {
 			outlineThickness = 5,
 			border = Color3.fromHex("ffffdd"),
 		},
+	},
+
+	frameEffects = {
+		CircleBloom = "rbxassetid://91163708935372",
 	},
 
 	alignment = {
