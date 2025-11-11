@@ -142,6 +142,39 @@ function Tutorial.Show(player: Player, teamId: number, stageProgress: number)
 	AssignBeam(player, purchaseButton)
 end
 
+function Tutorial.CheckTutorialState(player: Player, class): boolean
+	if not DataService.CompletedTutorial(player) then
+		-- If the class is either a building or not tier 1, return
+		if class.Tier ~= 1 or class.Entity == FFGEnum.CLASS.ENTITY_NAME.Building then return false end
+
+		local tutorialOrder = {
+			[1] = FFGEnum.CLASS.ENTITY_NAME.Boat,
+			[2] = FFGEnum.CLASS.ENTITY_NAME.Tender,
+			[3] = FFGEnum.CLASS.ENTITY_NAME.PortStorage,
+			[4] = FFGEnum.CLASS.ENTITY_NAME.Shop,
+		}
+
+		-- Check to see if the entity matches the correct stage
+		local currentTutorialStage = DataService.CurrentTutorialStage(player)
+		if currentTutorialStage then
+			local currentTutorialEntity = tutorialOrder[currentTutorialStage + 1]
+			if currentTutorialEntity and class.Entity == currentTutorialEntity then
+				return true
+			else
+				return false
+			end
+		else
+			if class.Entity == FFGEnum.CLASS.ENTITY_NAME.Boat then
+				return true
+			else
+				return false
+			end
+		end
+	else
+		return true
+	end
+end
+
 function Tutorial.Update(player: Player, teamId: number?)
 	if not player or not teamId then return end
 

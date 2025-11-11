@@ -5,16 +5,15 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 local Animator = require(ServerScriptService.Server.Classes.Modules.Animator)
 local ClassCalculators = require(ServerScriptService.Server.Classes.Modules.ClassCalculators)
 local ClassVisualizer = require(ServerScriptService.Server.Classes.Modules.ClassVisualizer)
-local EventListeners = require(ServerScriptService.Server.Classes.Modules.EventListeners)
 local PurchaseButton = require(ServerScriptService.Server.Classes.Modules.PurchaseButton)
 local Tutorial = require(ServerScriptService.Server.Game.Tutorial.Tutorial)
 local BoatType = require(ReplicatedStorage.Shared.Types.Classes.BoatType)
 local Buffs = require(ServerScriptService.Server.Math.Buffs)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local Formulas = require(ServerScriptService.Server.Math.Formulas)
+local EntityNameplate = require(ServerScriptService.Server.Modules.EntityNameplate.EntityNameplate)
 local PopUp = require(ServerScriptService.Server.Modules.Tweens.PopUp)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
-local Events = require(ReplicatedStorage.Shared.Events.Events)
 local BuffType = require(ReplicatedStorage.Shared.Types.BuffType)
 local DeepWait = require(ReplicatedStorage.Shared.Utils.DeepWait)
 local SetInterval = require(ServerScriptService.Server.Modules.SetInterval)
@@ -104,11 +103,9 @@ function Boat.New(state: { [string]: any }?, player: Player, model: Model, teamI
 
 	self._cleaner = Trove.new()
 
-	self.PurchaseButton, self.PBDetails = self:SetupPurchaseButton()
+	self.PurchaseButton, self.Nameplate = self:SetupPurchaseButton()
 	if self.PurchaseButton then self:SetButtonLogic() end
 	self.ButtonDebounce = false
-
-	self:AttachEventListeners()
 
 	return self
 end
@@ -131,7 +128,7 @@ function Boat.RecalculateAll(self: Boat): ()
 	self.CurrentMaxStorage, self.NextLvlMaxStorage = self:CalculateMaxStorage()
 	self.CurrentFPS, self.NextFPS = self:CalculateFPS()
 
-	Events.FireBindableEvent(Events.BindableNames.EntityUpdated, HttpService:JSONEncode(self:Serialize()))
+	self:UpdateNameplate()
 end
 -- //!SECTION
 
@@ -226,7 +223,7 @@ function Boat.StartFishing(self: Boat): ()
 		self._cleaner:Add(SetInterval(function()
 			if not self:IsStorageFull() then
 				self:AddFish(self.CurrentFPS)
-				Events.FireBindableEvent(Events.BindableNames.EntityUpdated, HttpService:JSONEncode(self:Serialize()))
+				self:UpdateNameplate()
 			else
 				self:UpdateStorageStatus(true)
 			end
@@ -283,6 +280,10 @@ function Boat.Initialize(self: Boat): ()
 	if self.IsPurchased then task.delay(1, function()
 		self:StartFishing()
 	end) end
+end
+
+function Boat.UpdateNameplate(self: Boat)
+	EntityNameplate.Update(self.Nameplate, self)
 end
 
 function Boat.SetupPurchaseButton(self: Boat): (Model, { [string]: any })
@@ -470,12 +471,6 @@ function Boat.StartAnimation(self: Boat): ()
 		task.wait(math.random(0.5, 1.5))
 		animationTrack:Play()
 	end
-end
--- //!SECTION
-
--- //SECTION - Event Listeners
-function Boat.AttachEventListeners(self: Boat)
-	EventListeners.Attach(self :: any)
 end
 -- //!SECTION
 

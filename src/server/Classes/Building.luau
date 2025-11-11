@@ -1,17 +1,17 @@
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
+
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local ClassCalculators = require(ServerScriptService.Server.Classes.Modules.ClassCalculators)
 local ClassVisualizer = require(ServerScriptService.Server.Classes.Modules.ClassVisualizer)
-local EventListeners = require(ServerScriptService.Server.Classes.Modules.EventListeners)
 local PurchaseButton = require(ServerScriptService.Server.Classes.Modules.PurchaseButton)
 local Buffs = require(ServerScriptService.Server.Math.Buffs)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local Formulas = require(ServerScriptService.Server.Math.Formulas)
+local EntityNameplate = require(ServerScriptService.Server.Modules.EntityNameplate.EntityNameplate)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
-local Events = require(ReplicatedStorage.Shared.Events.Events)
 local BuffType = require(ReplicatedStorage.Shared.Types.BuffType)
 local DeepWait = require(ReplicatedStorage.Shared.Utils.DeepWait)
 local FadeEffect = require(ServerScriptService.Server.Modules.Tweens.FadeEffect)
@@ -112,14 +112,12 @@ function Building.New(state: { [string]: any }?, player: Player, model: Model, r
 
 	self._cleaner = Trove.new()
 
-	self.PurchaseButton, self.PBDetails = self:SetupPurchaseButton()
+	self.PurchaseButton, self.Nameplate = self:SetupPurchaseButton()
 	if self.PurchaseButton then self:SetButtonLogic() end
 	self.ButtonDebounce = false
 
 	self.Upgraded = self._cleaner:Add(Signal.new())
 	self.Purchased = self._cleaner:Add(Signal.new())
-
-	self:AttachEventListeners()
 
 	return self
 end
@@ -151,7 +149,7 @@ function Building.Upgrade(self: Building): ()
 	if self.Upgraded then self.Upgraded:Fire(self) end
 	self:Save()
 
-	Events.FireBindableEvent(Events.BindableNames.EntityUpdated, HttpService:JSONEncode(self:Serialize()))
+	self:UpdateNameplate()
 end
 
 function Building.IncreaseUpgradeStage(self: Building, stage: number): ()
@@ -203,6 +201,10 @@ end
 function Building.SetButtonLogic(self: Building): ()
 	PurchaseButton.CreateLogic(self)
 end
+
+function Building.UpdateNameplate(self: Building)
+	EntityNameplate.Update(self.Nameplate, self)
+end
 -- //!SECTION
 
 -- //SECTION - Visibility and Collision
@@ -226,12 +228,6 @@ end
 -- //SECTION - Buffs
 function Building.UpdateBuffValue(self: Building): ()
 	if self.BuildingBuff then self.BuildingBuff.CurrentValue = Buffs.CalculateLevelBuffValue(self.UpgradeStage, self.Level, self.BuildingBuff) end
-end
--- //!SECTION
-
--- //SECTION - Event Listeners
-function Building.AttachEventListeners(self: Building): ()
-	EventListeners.Attach(self :: any)
 end
 -- //!SECTION
 
@@ -261,6 +257,7 @@ function Building.Serialize(self: Building): { [string]: any }
 		UpgradeCost = self.UpgradeCost,
 		IsPurchased = self.IsPurchased,
 		UpgradeStage = self.UpgradeStage,
+		BuildingBuff = self.BuildingBuff,
 		BuildingId = self.BuildingId,
 		BuildingName = self.BuildingName,
 	}

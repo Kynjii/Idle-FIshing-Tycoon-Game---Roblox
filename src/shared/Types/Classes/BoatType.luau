@@ -32,8 +32,8 @@ export type BoatData = {
 	Animations: { [string]: any }?,
 	VisualModels: { [number]: Model }?,
 	CurrentVisualModel: Model?,
-	purchaseButton: Model,
-	PBDetails: { [string]: any }?,
+	PurchaseButton: Model,
+	Nameplate: BillboardGui?,
 	ClonedBillboard: Instance?,
 	_cleaner: any,
 	Buffs: { [string]: any },
@@ -52,7 +52,7 @@ export type BoatInstance = {
 	CurrentFPS: number,
 	StorageFull: boolean,
 	Buffs: { [string]: any }?,
-	PBDetails: { [string]: any }?,
+	Nameplate: BillboardGui?,
 
 	-- Essential Methods (called by other modules)
 	Initialize: (self: BoatInstance) -> (),

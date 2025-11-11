@@ -5,7 +5,6 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local TableUtil = require(ReplicatedStorage.Packages.TableUtil)
 local Helper = require(ServerScriptService.Server.Classes.Helper)
 local ClassVisualizer = require(ServerScriptService.Server.Classes.Modules.ClassVisualizer)
-local EventListeners = require(ServerScriptService.Server.Classes.Modules.EventListeners)
 local Notification = require(ServerScriptService.Server.Classes.Modules.Notification)
 local Tutorial = require(ServerScriptService.Server.Game.Tutorial.Tutorial)
 local SetInterval = require(ServerScriptService.Server.Modules.SetInterval)
@@ -63,6 +62,7 @@ function HelperShopManager.New(shopState: ShopState, player: Player, teamId: num
 	self:StartRefreshMonitor()
 
 	self:AttachEventListeners()
+
 	return self
 end
 
@@ -256,7 +256,20 @@ end
 
 -- //SECTION - Event Listeners
 function HelperShopManager.AttachEventListeners(self: HelperShopManager): ()
-	EventListeners.Attach(self :: any)
+	local itemPurchased = Events.GetRemote(Events.RemoteNames.HelperPurchased)
+	if itemPurchased then
+		self._cleaner:Add(itemPurchased.OnServerEvent:Connect(function(player: Player, helperId: string)
+			if self.Player ~= player or self.Owner ~= player.UserId then return end
+
+			local canProceed = Tutorial.CheckTutorialState(player, self)
+			if not canProceed then
+				Notification.SendAlert(player, "Follow the Tutorial to unlock this!")
+				return
+			end
+
+			self:Purchasehelper(helperId)
+		end))
+	end
 end
 -- //!SECTION
 

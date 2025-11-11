@@ -28,8 +28,8 @@ export type PortStorageData = {
 	VisualModels: { [number]: Model }?,
 	CurrentVisualModel: Model?,
 	TakeFishPrompt: ProximityPrompt?,
-	purchaseButton: Model,
-	PBDetails: { [string]: any }?,
+	PurchaseButton: Model,
+	Nameplate: BillboardGui?,
 	ClonedBillboard: Instance?,
 	_cleaner: any?,
 	Buffs: { [string]: any },
@@ -49,7 +49,7 @@ export type StorageInstance = {
 	CurrentMaxStorage: number?,
 	StorageFull: boolean?,
 	Buffs: { [string]: any }?,
-	PBDetails: { [string]: any }?,
+	Nameplate: BillboardGui?,
 
 	-- Essential Methods (called by other modules)
 	Initialize: (self: StorageInstance) -> (),

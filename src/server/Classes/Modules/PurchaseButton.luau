@@ -1,7 +1,10 @@
+local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local Notification = require(script.Parent.Notification)
+local Tutorial = require(ServerScriptService.Server.Game.Tutorial.Tutorial)
 local EntityNameplate = require(ServerScriptService.Server.Modules.EntityNameplate.EntityNameplate)
 local PriceBillboard = require(ServerScriptService.Server.Modules.EntityNameplate.PriceBillboard)
 local DataService = require(ServerScriptService.Server.Services.DataService)
@@ -37,13 +40,15 @@ function PB.CreatePB(pbModel: Model, class: Boat | Tender | PortStorage | Buildi
 	local billboardRoot = purchaseButton:FindFirstChild("BillboardRoot") :: Part
 	local button: Part = purchaseButton:FindFirstChild("Button")
 
-	local pbDetails = EntityNameplate.Create({
+	local isBuilding = class.Entity == FFGEnum.CLASS.ENTITY_NAME.Building
+
+	local nameplate = EntityNameplate.Create({
 		EntityData = typedClass,
 		Adornee = billboardRoot,
-		HasProgressBar = true,
+		HasProgressBar = not isBuilding and true or false,
 	})
-	pbDetails.Enabled = true
-	pbDetails.Parent = billboardRoot
+	nameplate.Enabled = true
+	nameplate.Parent = billboardRoot
 
 	PriceBillboard.Create({
 		IsPurchased = typedClass.IsPurchased,
@@ -52,9 +57,9 @@ function PB.CreatePB(pbModel: Model, class: Boat | Tender | PortStorage | Buildi
 		Parent = button,
 	})
 
-	local levelLabel = pbDetails:FindFirstChild("Level", true)
-	local stageLabel = pbDetails:FindFirstChild("Stage", true)
-	local qualityLabel = pbDetails:FindFirstChild("Quality", true)
+	local levelLabel = nameplate:FindFirstChild("Level", true)
+	local stageLabel = nameplate:FindFirstChild("Stage", true)
+	local qualityLabel = nameplate:FindFirstChild("Quality", true)
 
 	if button then
 		if not DataService.CanAfford(typedClass.Player, "Gold", not typedClass.IsPurchased and typedClass.BaseCost or typedClass.UpgradeCost) then
@@ -105,7 +110,7 @@ function PB.CreatePB(pbModel: Model, class: Boat | Tender | PortStorage | Buildi
 		end))
 	end
 
-	return purchaseButton, pbDetails
+	return purchaseButton, nameplate
 end
 
 function PB.Destroy(pbModel: Model)
@@ -122,8 +127,31 @@ function PB.CreateLogic(class)
 	local buttonBase: Part = class.PurchaseButton:FindFirstChild("Base")
 	class.ButtonDebounce = false
 
-	local function handleUpgrade(class)
-		Events.FireBindableEvent(Events.BindableNames.PurchaseEntity, { Id = class.Id, Player = class.Player })
+	local function handleStateUpdate(player: Player, class)
+		local canProceed = Tutorial.CheckTutorialState(player, class)
+		if not canProceed then
+			Notification.SendAlert(player, "Follow the Tutorial to unlock this!")
+			return
+		end
+
+		-- See if the player can afford the state update (purchase / upgrade)
+		if not DataService.CanAfford(player, FFGEnum.CURRENCY_TYPES.Gold, not class.IsPurchased and class.BaseCost or class.UpgradeCost) then return end
+
+		DataService.Spend(player, FFGEnum.CURRENCY_TYPES.Gold, not class.IsPurchased and class.BaseCost or class.UpgradeCost)
+
+		if class.IsPurchased then
+			class:Upgrade()
+		else
+			class:Purchase()
+			class:Show()
+			class:CanCollide()
+
+			if class.Entity == FFGEnum.CLASS.ENTITY_NAME.Boat then class:StartFishing() end
+		end
+
+		class:Save()
+
+		Events.FireBindableEvent(Events.BindableNames.EntityUpdated, HttpService:JSONEncode(class:Serialize()))
 	end
 
 	class._cleaner:Add(buttonBase.Touched:Connect(function(hit)
@@ -142,7 +170,7 @@ function PB.CreateLogic(class)
 					return
 				end
 
-				handleUpgrade(class)
+				handleStateUpdate(player, class)
 				task.spawn(function()
 					task.wait(1)
 					class.ButtonDebounce = false

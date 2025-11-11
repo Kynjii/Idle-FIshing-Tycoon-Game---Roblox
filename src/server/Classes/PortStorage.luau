@@ -1,18 +1,18 @@
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
+
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local ClassCalculators = require(ServerScriptService.Server.Classes.Modules.ClassCalculators)
 local ClassVisualizer = require(ServerScriptService.Server.Classes.Modules.ClassVisualizer)
-local EventListeners = require(ServerScriptService.Server.Classes.Modules.EventListeners)
 local PurchaseButton = require(ServerScriptService.Server.Classes.Modules.PurchaseButton)
 local Tutorial = require(ServerScriptService.Server.Game.Tutorial.Tutorial)
 local PortStorageType = require(ReplicatedStorage.Shared.Types.Classes.PortStorageType)
 local Buffs = require(ServerScriptService.Server.Math.Buffs)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local Formulas = require(ServerScriptService.Server.Math.Formulas)
+local EntityNameplate = require(ServerScriptService.Server.Modules.EntityNameplate.EntityNameplate)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
-local Events = require(ReplicatedStorage.Shared.Events.Events)
 local DeepWait = require(ReplicatedStorage.Shared.Utils.DeepWait)
 local FadeEffect = require(ServerScriptService.Server.Modules.Tweens.FadeEffect)
 local PopUp = require(ServerScriptService.Server.Modules.Tweens.PopUp)
@@ -99,11 +99,9 @@ function PortStorage.New(state: { [string]: any }?, player: Player, model: Model
 
 	self._cleaner = Trove.new()
 
-	self.PurchaseButton, self.PBDetails = self:SetupPurchaseButton()
+	self.PurchaseButton, self.Nameplate = self:SetupPurchaseButton()
 	if self.PurchaseButton then self:SetButtonLogic() end
 	self.ButtonDebounce = false
-
-	self:AttachEventListeners()
 
 	return self
 end
@@ -124,7 +122,7 @@ function PortStorage.RecalculateAll(self: PortStorage)
 	self.UpgradeCost = self:CalculateUpgradeCost()
 	self.CurrentMaxStorage, self.NextLvlMaxStorage = self:CalculateMaxStorage()
 
-	Events.FireBindableEvent(Events.BindableNames.EntityUpdated, HttpService:JSONEncode(self:Serialize()))
+	self:UpdateNameplate()
 end
 -- //!SECTION
 
@@ -174,7 +172,7 @@ function PortStorage.AddFish(self: PortStorage, amount: number): ()
 		self:UpdateStorageStatus(true)
 	end
 
-	Events.FireBindableEvent(Events.BindableNames.EntityUpdated, HttpService:JSONEncode(self:Serialize()))
+	self:UpdateNameplate()
 	self:UpdateFishModel()
 end
 
@@ -182,7 +180,7 @@ function PortStorage.RemoveFish(self: PortStorage, amount: number): ()
 	self.FishInStorage = math.max(self.FishInStorage :: number - amount, 0)
 	self:UpdateStorageStatus(false)
 
-	Events.FireBindableEvent(Events.BindableNames.EntityUpdated, HttpService:JSONEncode(self:Serialize()))
+	self:UpdateNameplate()
 	self:UpdateFishModel()
 
 	self:Save()
@@ -349,6 +347,10 @@ function PortStorage.DestroyStorageFullBillboard(self: PortStorage): ()
 	self.ClonedBillboard:Destroy()
 	self.ClonedBillboard = nil
 end
+
+function PortStorage.UpdateNameplate(self: PortStorage)
+	EntityNameplate.Update(self.Nameplate, self)
+end
 -- //!SECTION
 
 -- //SECTION - Visibility and Collision
@@ -404,12 +406,6 @@ function PortStorage.UpdateStorageStatus(self: PortStorage, status)
 	else
 		self:DestroyStorageFullBillboard()
 	end
-end
--- //!SECTION
-
--- //SECTION - Event Listeners
-function PortStorage.AttachEventListeners(self: PortStorage)
-	EventListeners.Attach(self :: any)
 end
 -- //!SECTION
 

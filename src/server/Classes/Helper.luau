@@ -137,8 +137,6 @@ function Helper.New(state: HelperType.HelperData, player: Player, teamId: number
 
 	self._cleaner = Trove.new()
 
-	self:AttachEventListeners()
-
 	return self
 end
 -- //!SECTION

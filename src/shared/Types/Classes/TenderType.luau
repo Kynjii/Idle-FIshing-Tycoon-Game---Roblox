@@ -37,8 +37,8 @@ export type TenderData = {
 	VisualModels: { [number]: Model }?,
 	CurrentVisualModel: Model?,
 	Buffs: { [string]: any },
-	purchaseButton: Model,
-	PBDetails: { [string]: any }?,
+	PurchaseButton: Model,
+	Nameplate: BillboardGui?,
 	ClonedBillboard: Instance?,
 	_cleaner: any?,
 	ProgressTween: Tween?,
@@ -58,7 +58,7 @@ export type TenderInstance = {
 	CurrentTravelTime: number?,
 	LoadTime: number?,
 	Buffs: { [string]: any }?,
-	PBDetails: { [string]: any }?,
+	Nameplate: BillboardGui?,
 
 	-- Essential Methods (called by other modules)
 	Initialize: (self: TenderInstance) -> (),

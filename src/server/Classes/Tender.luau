@@ -1,22 +1,22 @@
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
+local TweenService = game:GetService("TweenService")
+
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local Formulas = require(ServerScriptService.Server.Math.Formulas)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local DeepWait = require(ReplicatedStorage.Shared.Utils.DeepWait)
-local TweenService = game:GetService("TweenService")
 local Trove = require(ReplicatedStorage.Packages.Trove)
-local Events = require(ReplicatedStorage.Shared.Events.Events)
 local BuffType = require(ReplicatedStorage.Shared.Types.BuffType)
 local Animator = require(ServerScriptService.Server.Classes.Modules.Animator)
 local ClassCalculators = require(ServerScriptService.Server.Classes.Modules.ClassCalculators)
 local ClassVisualizer = require(ServerScriptService.Server.Classes.Modules.ClassVisualizer)
-local EventListeners = require(ServerScriptService.Server.Classes.Modules.EventListeners)
 local PurchaseButton = require(ServerScriptService.Server.Classes.Modules.PurchaseButton)
 local Tutorial = require(ServerScriptService.Server.Game.Tutorial.Tutorial)
 local TenderType = require(ReplicatedStorage.Shared.Types.Classes.TenderType)
 local Buffs = require(ServerScriptService.Server.Math.Buffs)
+local EntityNameplate = require(ServerScriptService.Server.Modules.EntityNameplate.EntityNameplate)
 local FadeEffect = require(ServerScriptService.Server.Modules.Tweens.FadeEffect)
 local PopUp = require(ServerScriptService.Server.Modules.Tweens.PopUp)
 
@@ -117,11 +117,10 @@ function Tender.New(state: { [string]: any }?, player: Player, model: Model, tea
 
 	self._cleaner = Trove.new()
 
-	self.PurchaseButton, self.PBDetails = self:SetupPurchaseButton()
+	self.PurchaseButton, self.Nameplate = self:SetupPurchaseButton()
 	if self.PurchaseButton then self:SetButtonLogic() end
 	self.ButtonDebounce = false
 
-	self:AttachEventListeners()
 	return self
 end
 -- //!SECTION
@@ -144,7 +143,7 @@ function Tender.RecalculateAll(self: Tender)
 	self.LoadTime = self:CalculateLoadTime()
 	self.CurrentTravelTime = self:CalculateTravelTime()
 
-	Events.FireBindableEvent(Events.BindableNames.EntityUpdated, HttpService:JSONEncode(self:Serialize()))
+	self:UpdateNameplate()
 end
 -- //!SECTION
 
@@ -307,7 +306,7 @@ function Tender.AddFish(self: Tender, amount: number)
 
 	self:Save()
 
-	Events.FireBindableEvent(Events.BindableNames.EntityUpdated, HttpService:JSONEncode(self:Serialize()))
+	self:UpdateNameplate()
 end
 
 function Tender.RemoveFish(self: Tender, amount: number)
@@ -316,7 +315,7 @@ function Tender.RemoveFish(self: Tender, amount: number)
 	self:UpdateStorageStatus(false)
 	self:Save()
 
-	Events.FireBindableEvent(Events.BindableNames.EntityUpdated, HttpService:JSONEncode(self:Serialize()))
+	self:UpdateNameplate()
 end
 
 function Tender.UpdateStorageStatus(self: Tender, status: boolean)
@@ -342,6 +341,10 @@ function Tender.Initialize(self: Tender)
 	if self.IsPurchased then
 		if self.Model.PrimaryPart then self.Model.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.IsPurchased, self.IsPurchased) end
 	end
+end
+
+function Tender.UpdateNameplate(self: Tender)
+	EntityNameplate.Update(self.Nameplate, self)
 end
 
 function Tender.SetupPurchaseButton(self: Tender): (Model, { [string]: any })
@@ -530,12 +533,6 @@ function Tender.StartAnimation(self: Tender)
 
 	task.wait(math.random(0.5, 1.5))
 	animationTrack:Play()
-end
--- //!SECTION
-
--- //SECTION - Event Listeners
-function Tender.AttachEventListeners(self: Tender)
-	EventListeners.Attach(self :: any)
 end
 -- //!SECTION
 

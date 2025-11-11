@@ -38,7 +38,7 @@ export type Props = {
 
 function EntityNameplate.Create(props: Props)
 	local entity = props.EntityData
-	local qualityId = entity.QualityId or entity.Tier
+	local qualityId = entity.QualityId or entity.Tier or 1
 	local jobCategory = entity.JobCategory or entity.Entity or "None"
 
 	local entityBillboard = Instance.new("BillboardGui")
@@ -98,7 +98,7 @@ function EntityNameplate.Create(props: Props)
 	quality.Position = UDim2.fromScale(0.5, 0.5)
 	quality.Size = UDim2.fromScale(1, 0.2)
 	quality.Text = FFGEnum.QUALITIES[qualityId].Label or ""
-	quality.TextColor3 = FFGEnum.QUALITIES[qualityId].Color or Color3.new(1, 1, 1)
+	quality.TextColor3 = FFGEnum.QUALITIES[qualityId].Color or FFGEnum.THEME.color.textOrange
 	quality.TextStrokeTransparency = 0.7
 	quality.TextScaled = true
 	UIConfig.AddPadding(quality, "L")
@@ -160,6 +160,9 @@ function EntityNameplate.Create(props: Props)
 		jobInfoText.TextXAlignment = Enum.TextXAlignment.Left
 		jobInfoText.Parent = jobInfoContainer
 		UIConfig.AddPadding(jobInfoText, "L")
+	else
+		quality.Text = entity.BuildingBuff.Label or ""
+		quality.TextColor3 = FFGEnum.THEME.color.textOrange
 	end
 
 	local stage = Instance.new("TextLabel")
@@ -186,17 +189,6 @@ function EntityNameplate.Create(props: Props)
 	if helperUpgradedEvent then
 		helperUpgradedEvent.Event:Connect(function(helperData: HelperType.HelperData)
 			local decoded = HttpService:JSONDecode(helperData)
-			if entity.Id ~= decoded.Id then return end
-
-			EntityNameplate.Update(entityBillboard, decoded)
-		end)
-	end
-
-	-- Event for handling non-helper upgrades/purchases
-	local entityUpdatedEvent = Events.GetBindableEvent(Events.BindableNames.EntityUpdated)
-	if entityUpdatedEvent then
-		entityUpdatedEvent.Event:Connect(function(entityData: Boat | Tender | PortStorage | Building)
-			local decoded = HttpService:JSONDecode(entityData)
 			if entity.Id ~= decoded.Id then return end
 
 			EntityNameplate.Update(entityBillboard, decoded)
@@ -239,9 +231,17 @@ function EntityNameplate.Update(entityBillboard: BillboardGui, class: Boat | Ten
 		stageLabel.TextColor3 = FFGEnum.STAGES[typedClass.UpgradeStage].Color or Color3.new(1, 1, 1)
 	end
 
-	if typedClass.Entity ~= FFGEnum.CLASS.ENTITY_NAME.Building then
-		if qualityLabel then qualityLabel.Text = FFGEnum.QUALITIES[typedClass.QualityId or typedClass.Tier].Label or "" end
+	if qualityLabel then
+		if typedClass.Entity == FFGEnum.CLASS.ENTITY_NAME.Building then
+			-- Quality becomes buff label if the nameplate is for a building
+			qualityLabel.Text = typedClass.BuildingBuff.Label or ""
+			qualityLabel.TextColor3 = FFGEnum.THEME.color.textOrange
+		else
+			qualityLabel.Text = FFGEnum.QUALITIES[typedClass.QualityId or typedClass.Tier].Label or ""
+		end
+	end
 
+	if typedClass.Entity ~= FFGEnum.CLASS.ENTITY_NAME.Building then
 		local jobCategory = typedClass.JobCategory or typedClass.Entity
 		if jobInfoIcon then jobInfoIcon.Image = EntityNameplate.JobIconImage[jobCategory] or EntityNameplate.JobIconImage.None end
 
