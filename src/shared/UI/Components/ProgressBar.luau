@@ -10,6 +10,7 @@ function ProgressBar.Create(props: {
 	HasText: boolean?,
 	HasBillboard: boolean?,
 	Adornee: Instance?,
+	Parent: Instance?,
 }): BillboardGui | Frame
 	local billBoard
 	if props.HasBillboard then
@@ -78,9 +79,11 @@ function ProgressBar.Create(props: {
 
 	progressBG.Parent = progressContainer
 
+	if props.Parent then progressContainer.Parent = props.Parent end
+
 	local container = props.HasBillboard and billBoard or progressContainer
 	if props.HasBillboard then progressContainer.Parent = container end
-	return container
+	return container, progressBar
 end
 
 function ProgressBar.Show(parent)
