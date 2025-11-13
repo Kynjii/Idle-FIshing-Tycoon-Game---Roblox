@@ -407,6 +407,7 @@ function JobManager.AttachEventListeners(self: JobManager): ()
 
 	local jobDataEvent = Events.GetRemoteFn(Events.RemoteFunctionNames.GetJobData)
 	if jobDataEvent then jobDataEvent.OnServerInvoke = function(player: Player)
+		if self.Player ~= player then return end
 		return self.JobState
 	end end
 

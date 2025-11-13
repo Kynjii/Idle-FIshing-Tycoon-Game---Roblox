@@ -25,12 +25,16 @@ Events.RemoteNames = {
 	-- Helpers
 	HelperUpgraded = "HelperUpgraded",
 	AssignJob = "AssignJob",
+
+	-- Player Fishing
+	StartFishingMiniGame = "StartFishingMiniGame",
 }
 
 Events.RemoteFunctionNames = {
 	GetPlayerInventory = "GetPlayerInventory",
 	GetCrewManagementState = "GetCrewManagementState",
 	GetJobData = "GetJobData",
+	GetFishItem = "GetFishItem",
 }
 
 Events.BindableFunctionNames = {

@@ -304,7 +304,7 @@ function PortStorage.SetupFishRemovalPrompt(self: PortStorage)
 		end))
 
 		-- Handle proximity prompt triggered
-		self._cleaner:Add(proximityPrompt.Triggered:Connect(function(player)
+		self._cleaner:Add(proximityPrompt.Triggered:Connect(function(player: Player)
 			-- Another safety check
 			if player.UserId ~= self.Owner then return end
 

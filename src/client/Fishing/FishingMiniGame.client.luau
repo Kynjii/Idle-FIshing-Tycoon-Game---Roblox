@@ -4,12 +4,13 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 
+local Events = require(ReplicatedStorage.Shared.Events.Events)
 local ProgressBar = require(ReplicatedStorage.Shared.UI.Components.ProgressBar)
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
-local screenGui = playerGui:WaitForChild("FishingMiniGame")
+local screenGui = playerGui:WaitForChild("FishingMiniGame") :: ScreenGui
 local hitBarContainer = screenGui:WaitForChild("Frame"):WaitForChild("HitBarContainer")
 local emojiContainer = screenGui:WaitForChild("Frame"):WaitForChild("SuccessContainer")
 
@@ -21,6 +22,12 @@ local fishCounterContainer = screenGui:WaitForChild("Frame"):WaitForChild("FishC
 local progressBar, pbFrame = ProgressBar.Create({ Color = "Green", Parent = fishCounterContainer })
 ProgressBar.Reset(pbFrame)
 ProgressBar.Show(fishCounterContainer)
+
+type PlayerRod = { Name: string, QualityId: number, BaseDmg: number }
+type Fish = { Name: string, QualityId: number, MaxHP: number }
+
+local caughtFish: Fish
+local playerRod: PlayerRod
 
 local elements = {
 	[0] = emojiContainer:FindFirstChild("0"),
@@ -110,14 +117,6 @@ local function relocateHitContainer()
 	end
 end
 
-local hp = {
-	[0] = 0,
-	[1] = 10,
-	[2] = 20,
-	[3] = 30,
-}
-
-local fishMaxHp = 170
 local currentFishHP = 0
 local isLosingHP = false
 
@@ -127,18 +126,20 @@ local function startLosingHP()
 	task.wait(1)
 	task.spawn(function()
 		while isLosingHP do
-			currentFishHP -= fishMaxHp / 30
+			currentFishHP -= caughtFish.MaxHP / 40
 
 			if currentFishHP <= 0 then
 				currentFishHP = 0
 				isLosingHP = false
 			end
 
-			ProgressBar.Update(pbFrame, currentFishHP, fishMaxHp)
+			ProgressBar.Update(pbFrame, currentFishHP, caughtFish.MaxHP)
 			task.wait(1)
 		end
 	end)
 end
+
+local getFishingDataEvent = Events.GetRemoteFn(Events.RemoteFunctionNames.GetFishItem)
 
 if catchButton then
 	catchButton.Activated:Connect(function()
@@ -154,20 +155,37 @@ if catchButton then
 
 		animate(area)
 
-		local hpAdded = hp[area]
+		local hpAdded = playerRod.BaseDmg * area
+		print(`+{hpAdded} DMG`)
 		local currentHp = currentFishHP
 
 		local newHp = currentHp + hpAdded
 		currentFishHP = newHp
 
-		if newHp >= fishMaxHp then
-			print("WOOOHOOO!")
+		if newHp >= caughtFish.MaxHP then
+			print(`GREAT CATCH! You caught a {caughtFish.Name}`)
 			currentFishHP = 0
+
+			local data = getFishingDataEvent:InvokeServer()
+			if data then
+				caughtFish = data.Fish
+				playerRod = data.Rod
+			end
 		end
 		relocateHitContainer()
 
-		ProgressBar.Update(pbFrame, currentFishHP, fishMaxHp)
+		ProgressBar.Update(pbFrame, currentFishHP, caughtFish.MaxHP)
 
 		if area > 0 then startLosingHP() end
 	end)
 end
+
+-- Events
+-- Open UI
+local startGameEvent = Events.GetRemote(Events.RemoteNames.StartFishingMiniGame)
+if startGameEvent then startGameEvent.OnClientEvent:Connect(function(data: { Fish: {}, Rod: {} })
+	screenGui.Enabled = true
+
+	caughtFish = data.Fish
+	playerRod = data.Rod
+end) end

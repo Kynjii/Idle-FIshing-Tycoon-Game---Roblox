@@ -190,26 +190,28 @@ function ChainManager.AttachAttListeners(self: ChainManagerInstance)
 
 	if self.LaneStorage then
 		local getStorageFish = Events.GetBindableEvent(Events.BindableNames.GetStorageFish)
-		if getStorageFish then getStorageFish.Event:Connect(function(request: GetStorageFishData)
-			if request.Player ~= self.Player then return end
-			if self.TeamId ~= request.TeamId then return end
-			if self.Tier ~= request.JobId then return end
+		if getStorageFish then
+			getStorageFish.Event:Connect(function(request: GetStorageFishData)
+				if request.Player ~= self.Player then return end
+				if self.TeamId ~= request.TeamId then return end
+				if self.Tier ~= request.JobId then return end
 
-			local helperStorage = request.AvailableStorage
-			local storage = self.LaneStorage
-			local availableFishInStorage = storage.FishInStorage
+				local helperStorage = request.AvailableStorage
+				local storage = self.LaneStorage
+				local availableFishInStorage = storage.FishInStorage
 
-			local amount = math.min(helperStorage, availableFishInStorage)
-			storage:RemoveFish(amount)
+				local amount = math.min(helperStorage, availableFishInStorage)
+				storage:RemoveFish(amount)
 
-			local data: SendStorageFishData = {
-				Amount = amount,
-				HelperId = request.HelperId,
-				JobId = request.JobId,
-				Player = request.Player,
-			}
-			Events.FireBindableEvent(Events.BindableNames.SendStorageFish, data)
-		end) end
+				local data: SendStorageFishData = {
+					Amount = amount,
+					HelperId = request.HelperId,
+					JobId = request.JobId,
+					Player = request.Player,
+				}
+				Events.FireBindableEvent(Events.BindableNames.SendStorageFish, data)
+			end)
+		end
 	end
 end
 
@@ -235,21 +237,21 @@ end
 -- //!SECTION
 
 -- //SECTION - Tender Travelling Cycle Functions used by the AttListeners
-function ChainManager:ResetTravellingAttributes()
+function ChainManager.ResetTravellingAttributes(self: ChainManagerInstance)
 	local primary = self.TenderModel.PrimaryPart
 	for name, _ in pairs(primary:GetAttributes()) do
 		if name ~= FFGEnum.ATTRIBUTES.IsPurchased then primary:SetAttribute(name, false) end
 	end
 end
 
-function ChainManager:StartTenderCycle()
+function ChainManager.StartTenderCycle(self: ChainManagerInstance)
 	self:ResetTravellingAttributes()
 
 	local boatPos = self.BoatModel.PrimaryPart.CFrame * CFrame.new(0, -15, 0)
 	self.LaneTender:MoveToBoat(boatPos)
 end
 
-function ChainManager:StartLoadingFish()
+function ChainManager.StartLoadingFish(self: ChainManagerInstance)
 	self.TenderModel.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.finishedUnloading, false)
 
 	local boat = self.LaneBoat
@@ -295,7 +297,7 @@ function ChainManager:StartLoadingFish()
 	end
 end
 
-function ChainManager:StartUnloadingFish()
+function ChainManager.StartUnloadingFish(self: ChainManagerInstance)
 	self.TenderModel.PrimaryPart:SetAttribute(FFGEnum.ATTRIBUTES.finishedLoading, false)
 
 	local tender = self.LaneTender
@@ -348,7 +350,7 @@ end
 -- //!SECTION
 
 -- //SECTION - Cleanup
-function ChainManager:Destroy()
+function ChainManager.Destroy(self: ChainManagerInstance)
 	if self._cleaner then
 		self._cleaner:Clean()
 		self._cleaner = nil
