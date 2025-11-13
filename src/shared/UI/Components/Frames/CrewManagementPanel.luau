@@ -1,10 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local TableUtil = require(ReplicatedStorage.Packages.TableUtil)
+local Events = require(ReplicatedStorage.Shared.Events.Events)
 local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
 local AvailableHelperListItem = require(ReplicatedStorage.Shared.UI.Components.Jobs.AvailableHelperListItem)
 local AvailableJobListItem = require(ReplicatedStorage.Shared.UI.Components.Jobs.AvailableJobListItem)
-local UIConfig = require(ReplicatedStorage.Shared.UI.UIConfig)
+local KinUI = require(ReplicatedStorage.Shared.UI.KinUI)
 local CrewManagementPanel = {}
 
 function CrewManagementPanel.Create(player: Player, jobsData, crewData, jobCategory: "Fishing" | "Woodcutting" | "Mining" | "Transporting")
@@ -14,7 +15,9 @@ function CrewManagementPanel.Create(player: Player, jobsData, crewData, jobCateg
 	crewManagementContainer.BackgroundTransparency = 1
 	crewManagementContainer.Position = UDim2.fromScale(0.5, 0.5)
 	crewManagementContainer.Size = UDim2.fromScale(1, 1)
-	UIConfig.ApplyList(crewManagementContainer, Enum.FillDirection.Horizontal, { HAlign = Enum.HorizontalAlignment.Center, HFlex = Enum.UIFlexAlignment.SpaceBetween })
+	KinUI.ApplyList(crewManagementContainer, Enum.FillDirection.Horizontal, { HAlign = Enum.HorizontalAlignment.Center, HFlex = Enum.UIFlexAlignment.SpaceBetween })
+
+	local selectedHelperState = KinUI.SetState("selectedHelperId", "", crewManagementContainer)
 
 	local availableJobs = Instance.new("ScrollingFrame")
 	availableJobs.Name = "AvailableJobs"
@@ -28,7 +31,7 @@ function CrewManagementPanel.Create(player: Player, jobsData, crewData, jobCateg
 	availableJobs.Size = UDim2.fromScale(0.45, 1)
 
 	local scrollingFramePadding = Instance.new("UIPadding")
-	UIConfig.SetPadding(scrollingFramePadding, "M")
+	KinUI.SetPadding(scrollingFramePadding, "M")
 	scrollingFramePadding.Parent = availableJobs
 
 	local uIGridLayout = Instance.new("UIGridLayout")
@@ -46,7 +49,7 @@ function CrewManagementPanel.Create(player: Player, jobsData, crewData, jobCateg
 		local jobData = job
 		local preparedData = TableUtil.Copy(jobData)
 		preparedData.Player = player
-		local availableJob = AvailableJobListItem.Create(preparedData)
+		local availableJob = AvailableJobListItem.Create(preparedData, selectedHelperState)
 		availableJob.LayoutOrder = id
 		availableJob.Parent = availableJobs
 	end
@@ -71,7 +74,7 @@ function CrewManagementPanel.Create(player: Player, jobsData, crewData, jobCateg
 	availableCrewUIGridLayout.Parent = availableCrew
 
 	local availableCrewUIUIPadding = Instance.new("UIPadding")
-	UIConfig.SetPadding(availableCrewUIUIPadding, "M")
+	KinUI.SetPadding(availableCrewUIUIPadding, "M")
 	availableCrewUIUIPadding.Parent = availableCrew
 
 	-- Handle available helpers
@@ -81,7 +84,7 @@ function CrewManagementPanel.Create(player: Player, jobsData, crewData, jobCateg
 		if helperData.CurrentAssignment > 0 then continue end
 		if helperData.JobCategory ~= jobCategory then continue end
 
-		local availableHelper = AvailableHelperListItem.Create(helperData)
+		local availableHelper = AvailableHelperListItem.Create(helperData, selectedHelperState)
 		availableHelper.LayoutOrder = index
 		availableHelper.Parent = availableCrew
 

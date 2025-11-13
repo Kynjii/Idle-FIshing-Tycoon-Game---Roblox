@@ -8,17 +8,11 @@ local CrewManagementPanel = require(ReplicatedStorage.Shared.UI.Components.Frame
 local function story(target)
 	local panel = CrewManagementPanel.Create(
 		Players.LocalPlayer,
-		{
-			Id = 1,
-			Tier = 1,
-			Category = FFGEnum.JOB_CATEGORY.Transporting,
-			Label = "Pier 1",
-			Slots = {
-				MaxSlots = 3,
-				LockedSlots = 2,
-				AssignedHelpers = {},
-			},
-		},
+		{ [1] = { Id = 1, Tier = 1, Category = FFGEnum.JOB_CATEGORY.Transporting, Label = "Pier 1", Slots = {
+			MaxSlots = 3,
+			LockedSlots = 2,
+			AssignedHelpers = {},
+		} } },
 		{
 			{
 				BaseCost = 16000,

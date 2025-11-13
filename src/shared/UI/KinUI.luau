@@ -21,12 +21,12 @@ end
 export type TextToken = "title" | "h1" | "h2" | "body" | "caption"
 export type SizeBand = "S" | "M" | "L"
 
-local UIConfig = {}
+local KinUI = {}
 
-function UIConfig.GetPlayerGui(): PlayerGui?
+function KinUI.GetPlayerGui(): PlayerGui?
 	if playerGui and playerGui.Parent then return playerGui end
 	if isUILabs() then
-		warn("[UIConfig] Running under UILabs or Studio — PlayerGui unavailable, using fallback")
+		warn("[KinUI] Running under UILabs or Studio — PlayerGui unavailable, using fallback")
 		return nil
 	end
 	return nil
@@ -54,9 +54,9 @@ end
 
 -- //SECTION - Tokens
 
-UIConfig.Padding = { XS = 0.001, S = 0.01, M = 0.03, L = 0.05, XL = 0.1 } -- scale units
+KinUI.Padding = { XS = 0.001, S = 0.01, M = 0.03, L = 0.05, XL = 0.1 } -- scale units
 
-UIConfig.Text = {
+KinUI.Text = {
 	-- min, max per band + relative scale to body
 	title = { S = { 20, 28 }, M = { 24, 36 }, L = { 28, 44 }, scale = 1.9 },
 	h1 = { S = { 16, 22 }, M = { 20, 28 }, L = { 24, 34 }, scale = 1.6 },
@@ -66,8 +66,8 @@ UIConfig.Text = {
 	LineHeight = 1.2,
 }
 
-UIConfig.CornerPx = { S = 8, M = 10, L = 12 }
-UIConfig.StrokePx = { S = 1, M = 1, L = 2 }
+KinUI.CornerPx = { S = 8, M = 10, L = 12 }
+KinUI.StrokePx = { S = 1, M = 1, L = 2 }
 -- //!SECTION
 
 -- //SECTION - Internals
@@ -81,9 +81,9 @@ local function currentShortSide(): number
 end
 
 -- Body target ~ shortSide/40, clamped per band; other tokens scale off body
-function UIConfig.ComputeFontSize(token: TextToken): (number, number, number)
+function KinUI.ComputeFontSize(token: TextToken): (number, number, number)
 	local b: SizeBand = band()
-	local t = UIConfig.Text :: any
+	local t = KinUI.Text :: any
 	local tokenSpec = t[token]
 	local bodyMin, bodyMax = table.unpack(t.body[b])
 	local bodyTarget = clamp(math.floor(currentShortSide() / 40 + 0.5), bodyMin, bodyMax)
@@ -93,10 +93,10 @@ function UIConfig.ComputeFontSize(token: TextToken): (number, number, number)
 end
 
 -- Attach/refresh UITextSizeConstraint; set TextScaled and LineHeight
-function UIConfig.ApplyTextConstraints(textObj: TextLabel | TextButton, token: "title" | "h1" | "h2" | "body" | "caption")
-	local okToken = (UIConfig.Text :: any)[token] and token or "body"
+function KinUI.ApplyTextConstraints(textObj: TextLabel | TextButton, token: "title" | "h1" | "h2" | "body" | "caption")
+	local okToken = (KinUI.Text :: any)[token] and token or "body"
 
-	local target, minV, maxV = UIConfig.ComputeFontSize(okToken)
+	local target, minV, maxV = KinUI.ComputeFontSize(okToken)
 
 	target = math.clamp(math.floor(target + 0.5), 1, 200)
 	minV = math.clamp(math.floor(minV + 0.5), 1, 200)
@@ -121,11 +121,11 @@ function UIConfig.ApplyTextConstraints(textObj: TextLabel | TextButton, token: "
 
 	textObj.TextScaled = true
 	textObj.TextSize = target
-	textObj.LineHeight = (UIConfig.Text :: any).LineHeight
+	textObj.LineHeight = (KinUI.Text :: any).LineHeight
 end
 
 -- Panel look: pixel-consistent corners & strokes
-function UIConfig.ApplyPanelStyle(frame: Frame | TextLabel | ImageLabel, panelColor: Color3?)
+function KinUI.ApplyPanelStyle(frame: Frame | TextLabel | ImageLabel, panelColor: Color3?)
 	local bg = frame:FindFirstChildOfClass("ImageLabel") or Instance.new("ImageLabel")
 	bg.Image = FFGEnum.UI.Frames.InnerPanel
 	bg.BackgroundTransparency = 1
@@ -141,7 +141,7 @@ end
 
 -- Safe area helper: for ScreenGui with IgnoreGuiInset = true
 -- Applies UIPadding (Scale) approximately matching the device inset.
-function UIConfig.ApplySafeAreaPadding(container: Instance)
+function KinUI.ApplySafeAreaPadding(container: Instance)
 	-- If IgnoreGuiInset=true, call this once on root container.
 	local insetTopLeft, insetBottomRight = GuiService:GetGuiInset()
 	-- Convert pixel inset to scale, relative to current viewport
@@ -163,16 +163,16 @@ function UIConfig.ApplySafeAreaPadding(container: Instance)
 end
 
 -- Set padding tokens on a UIPadding / UIListLayout
-function UIConfig.SetPadding(pad: UIPadding, token: "XS" | "S" | "M" | "L" | "XL")
-	local s = (UIConfig.Padding :: any)[token]
+function KinUI.SetPadding(pad: UIPadding, token: "XS" | "S" | "M" | "L" | "XL")
+	local s = (KinUI.Padding :: any)[token]
 	pad.PaddingTop = UDim.new(s, 0)
 	pad.PaddingBottom = UDim.new(s, 0)
 	pad.PaddingLeft = UDim.new(s, 0)
 	pad.PaddingRight = UDim.new(s, 0)
 end
 
-function UIConfig.AddPadding(instance: Instance, token: "XS" | "S" | "M" | "L" | "XL")
-	local s = (UIConfig.Padding :: any)[token]
+function KinUI.AddPadding(instance: Instance, token: "XS" | "S" | "M" | "L" | "XL")
+	local s = (KinUI.Padding :: any)[token]
 	local pad = Instance.new("UIPadding")
 	pad.PaddingTop = UDim.new(s, 0)
 	pad.PaddingBottom = UDim.new(s, 0)
@@ -181,8 +181,8 @@ function UIConfig.AddPadding(instance: Instance, token: "XS" | "S" | "M" | "L" |
 	pad.Parent = instance
 end
 
-function UIConfig.SetGap(layout: UIListLayout | UIGridLayout, token: "XS" | "S" | "M" | "L" | "XL")
-	local s = (UIConfig.Padding :: any)[token]
+function KinUI.SetGap(layout: UIListLayout | UIGridLayout, token: "XS" | "S" | "M" | "L" | "XL")
+	local s = (KinUI.Padding :: any)[token]
 	if layout:IsA("UIGridLayout") then
 		layout.CellPadding = UDim2.new(s, 0, s, 0)
 	else
@@ -193,7 +193,7 @@ end
 -- //!SECTION
 
 -- //SECTION - Aspect Constraints
-function UIConfig.ApplyAspect(frame: Frame | ImageLabel | ImageButton, ratio: number?, axis: Enum.DominantAxis?, aspectType: Enum.AspectType?)
+function KinUI.ApplyAspect(frame: Frame | ImageLabel | ImageButton, ratio: number?, axis: Enum.DominantAxis?, aspectType: Enum.AspectType?)
 	local aspect = frame:FindFirstChildOfClass("UIAspectRatioConstraint") or Instance.new("UIAspectRatioConstraint")
 	aspect.AspectRatio = ratio or 1 -- default: square
 	aspect.DominantAxis = axis or Enum.DominantAxis.Width
@@ -202,7 +202,7 @@ function UIConfig.ApplyAspect(frame: Frame | ImageLabel | ImageButton, ratio: nu
 end
 
 -- //SECTION - Apply List
-function UIConfig.ApplyList(
+function KinUI.ApplyList(
 	frame: Instance,
 	axis: Enum.FillDirection?,
 	options: {
@@ -220,7 +220,7 @@ function UIConfig.ApplyList(
 	if options and options.HFlex then list.HorizontalFlex = options.HFlex end
 	if options and options.VFlex then list.VerticalFlex = options.VFlex end
 	if options and options.Padding then
-		local s = (UIConfig.Padding :: any)[options.Padding]
+		local s = (KinUI.Padding :: any)[options.Padding]
 		list.Padding = UDim.new(s, 0)
 	end
 	list.SortOrder = Enum.SortOrder.LayoutOrder
@@ -237,7 +237,7 @@ local connections: { RBXScriptConnection } = {}
 
 -- Reapply callback whenever the size band may change
 -- Supply a function that re-applies constraints to the current UI.
-function UIConfig.ObserveViewport(onUpdate: () -> ())
+function KinUI.ObserveViewport(onUpdate: () -> ())
 	-- Disconnect prior observers
 	for _, c in ipairs(connections) do
 		c:Disconnect()
@@ -261,7 +261,7 @@ function UIConfig.ObserveViewport(onUpdate: () -> ())
 	) end
 
 	-- Some UIs are recreated under PlayerGui; watch top-level ScreenGuis if needed
-	local pg = UIConfig.GetPlayerGui()
+	local pg = KinUI.GetPlayerGui()
 	if pg then
 		table.insert(
 			connections,
@@ -282,4 +282,88 @@ function UIConfig.ObserveViewport(onUpdate: () -> ())
 end
 -- //!SECTION
 
-return UIConfig
+-- //SECTION - ValueBases
+function KinUI.SetState(name: string, value: any, parent: Instance): ValueBase
+	local valueType = typeof(value)
+	local valueBase: ValueBase?
+
+	local existing = parent:FindFirstChild(name)
+	if existing and existing:IsA("ValueBase") then
+		valueBase = existing :: ValueBase
+
+		local correctType = false
+		if valueType == "string" and valueBase:IsA("StringValue") then
+			correctType = true
+		elseif valueType == "number" and valueBase:IsA("NumberValue") then
+			correctType = true
+		elseif valueType == "boolean" and valueBase:IsA("BoolValue") then
+			correctType = true
+		elseif valueType == "Vector3" and valueBase:IsA("Vector3Value") then
+			correctType = true
+		elseif valueType == "Color3" and valueBase:IsA("Color3Value") then
+			correctType = true
+		elseif valueType == "CFrame" and valueBase:IsA("CFrameValue") then
+			correctType = true
+		elseif valueType == "Instance" and valueBase:IsA("ObjectValue") then
+			correctType = true
+		elseif valueType == "Ray" and valueBase:IsA("RayValue") then
+			correctType = true
+		end
+
+		if not correctType then
+			existing:Destroy()
+			valueBase = nil
+		end
+	end
+
+	if not valueBase then
+		if valueType == "string" then
+			valueBase = Instance.new("StringValue")
+		elseif valueType == "number" then
+			valueBase = Instance.new("NumberValue")
+		elseif valueType == "boolean" then
+			valueBase = Instance.new("BoolValue")
+		elseif valueType == "Vector3" then
+			valueBase = Instance.new("Vector3Value")
+		elseif valueType == "Color3" then
+			valueBase = Instance.new("Color3Value")
+		elseif valueType == "CFrame" then
+			valueBase = Instance.new("CFrameValue")
+		elseif valueType == "Instance" then
+			valueBase = Instance.new("ObjectValue")
+		elseif valueType == "Ray" then
+			valueBase = Instance.new("RayValue")
+		else
+			valueBase = Instance.new("StringValue")
+		end
+
+		valueBase.Name = name
+		valueBase.Parent = parent
+	end
+
+	assert(valueBase, "Failed to create or find ValueBase")
+	if valueType == "string" then
+		(valueBase :: StringValue).Value = value
+	elseif valueType == "number" then
+		(valueBase :: NumberValue).Value = value
+	elseif valueType == "boolean" then
+		(valueBase :: BoolValue).Value = value
+	elseif valueType == "Vector3" then
+		(valueBase :: Vector3Value).Value = value
+	elseif valueType == "Color3" then
+		(valueBase :: Color3Value).Value = value
+	elseif valueType == "CFrame" then
+		(valueBase :: CFrameValue).Value = value
+	elseif valueType == "Instance" then
+		(valueBase :: ObjectValue).Value = value
+	elseif valueType == "Ray" then
+		(valueBase :: RayValue).Value = value
+	else
+		(valueBase :: StringValue).Value = tostring(value)
+	end
+
+	return valueBase
+end
+-- //!SECTION
+
+return KinUI

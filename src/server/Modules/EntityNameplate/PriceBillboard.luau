@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
-local UIConfig = require(ReplicatedStorage.Shared.UI.UIConfig)
+local KinUI = require(ReplicatedStorage.Shared.UI.KinUI)
 local Format = require(ReplicatedStorage.Shared.Utils.Format)
 local PriceBillboard = {}
 
@@ -29,7 +29,7 @@ function PriceBillboard.Create(props: {
 	container.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 	container.Position = FFGEnum.THEME.alignment.position.center
 	container.Parent = priceBillboard
-	UIConfig.ApplyList(container, Enum.FillDirection.Horizontal, { HAlign = Enum.HorizontalAlignment.Center })
+	KinUI.ApplyList(container, Enum.FillDirection.Horizontal, { HAlign = Enum.HorizontalAlignment.Center })
 
 	local jobInfoIcon = Instance.new("ImageLabel")
 	jobInfoIcon.Name = "JobInfoIcon"
@@ -38,7 +38,7 @@ function PriceBillboard.Create(props: {
 	jobInfoIcon.LayoutOrder = 1
 	jobInfoIcon.BackgroundTransparency = 1
 	jobInfoIcon.Parent = container
-	UIConfig.ApplyAspect(jobInfoIcon)
+	KinUI.ApplyAspect(jobInfoIcon)
 
 	local priceLabel = Instance.new("TextLabel")
 	priceLabel.Name = "Price"
@@ -53,7 +53,7 @@ function PriceBillboard.Create(props: {
 	priceLabel.TextColor3 = FFGEnum.THEME.color.textGold
 	priceLabel.TextStrokeTransparency = 0.7
 	priceLabel.TextScaled = true
-	UIConfig.AddPadding(priceLabel, "L")
+	KinUI.AddPadding(priceLabel, "L")
 	priceLabel.Parent = container
 
 	local priceStroke = Instance.new("UIStroke")

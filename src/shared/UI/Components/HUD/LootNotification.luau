@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
-local UIConfig = require(ReplicatedStorage.Shared.UI.UIConfig)
+local KinUI = require(ReplicatedStorage.Shared.UI.KinUI)
 local LootNotification = {}
 
 export type Props = {
@@ -39,7 +39,7 @@ function LootNotification.Create(props: Props)
 	lootContainer.Position = FFGEnum.THEME.alignment.position.center
 	lootContainer.Size = UDim2.fromScale(1, 1)
 	lootContainer.ZIndex = 5
-	UIConfig.ApplyList(lootContainer, Enum.FillDirection.Horizontal, { HAlign = Enum.HorizontalAlignment.Left, VAlign = Enum.VerticalAlignment.Center, Padding = "M" })
+	KinUI.ApplyList(lootContainer, Enum.FillDirection.Horizontal, { HAlign = Enum.HorizontalAlignment.Left, VAlign = Enum.VerticalAlignment.Center, Padding = "M" })
 
 	if props.ItemType then
 		local lootImage = Instance.new("ImageLabel")
@@ -51,7 +51,7 @@ function LootNotification.Create(props: Props)
 		lootImage.Position = FFGEnum.THEME.alignment.position.center
 		lootImage.ScaleType = Enum.ScaleType.Fit
 		lootImage.Size = UDim2.fromScale(0.3, 0.7)
-		UIConfig.ApplyAspect(lootImage, 16 / 9, Enum.DominantAxis.Width, Enum.AspectType.ScaleWithParentSize)
+		KinUI.ApplyAspect(lootImage, 16 / 9, Enum.DominantAxis.Width, Enum.AspectType.ScaleWithParentSize)
 		lootImage.Parent = lootContainer
 	end
 

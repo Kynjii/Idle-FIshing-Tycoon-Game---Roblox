@@ -64,6 +64,9 @@ Events.BindableNames = {
 	HelperUpgraded = "HelperUpgraded",
 	PurchasedHelper = "PurchasedHelper",
 
+	-- Helper UI (CrewManagement)
+	AvailableHelperSelected = "AvailableHelperSelected",
+
 	-- Tab selection
 	TabSelected = "TabSelected",
 }

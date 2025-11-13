@@ -2,15 +2,15 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
-local UIConfig = require(ReplicatedStorage.Shared.UI.UIConfig)
+local KinUI = require(ReplicatedStorage.Shared.UI.KinUI)
 local Format = require(ReplicatedStorage.Shared.Utils.Format)
 local StatsIndexer = require(ReplicatedStorage.Shared.Utils.StatsIndexer)
 local AvailableHelperListItem = {}
 
-function AvailableHelperListItem.Create(helper: HelperType.HelperData)
+function AvailableHelperListItem.Create(helper: HelperType.HelperData, selectedHelperState: StringValue)
 	local availableHelperTemplate = Instance.new("Frame")
 	availableHelperTemplate.AutomaticSize = Enum.AutomaticSize.Y
-	availableHelperTemplate.Name = "availableHelperTemplate"
+	availableHelperTemplate.Name = "AvailableHelperTemplate"
 	availableHelperTemplate.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 	availableHelperTemplate.BackgroundTransparency = 1
 	availableHelperTemplate.Position = FFGEnum.THEME.alignment.position.center
@@ -34,11 +34,8 @@ function AvailableHelperListItem.Create(helper: HelperType.HelperData)
 	container.BackgroundTransparency = 1
 	container.Position = FFGEnum.THEME.alignment.position.center
 	container.Size = UDim2.fromScale(1, 1)
-	UIConfig.ApplyList(container, Enum.FillDirection.Vertical)
-
-	local uIPadding = Instance.new("UIPadding")
-	uIPadding.Parent = container
-	UIConfig.SetPadding(uIPadding, "M")
+	KinUI.ApplyList(container, Enum.FillDirection.Vertical)
+	KinUI.AddPadding(container, "XL")
 
 	local textLabel = Instance.new("TextLabel")
 	textLabel.Name = "HelperName"
@@ -60,24 +57,25 @@ function AvailableHelperListItem.Create(helper: HelperType.HelperData)
 	mainContainer.BackgroundTransparency = 1
 	mainContainer.AutomaticSize = Enum.AutomaticSize.Y
 	mainContainer.LayoutOrder = 2
-	UIConfig.ApplyList(mainContainer, Enum.FillDirection.Horizontal, { VAlign = Enum.VerticalAlignment.Center, HFlex = Enum.UIFlexAlignment.SpaceBetween })
+	KinUI.ApplyList(mainContainer, Enum.FillDirection.Horizontal, { VAlign = Enum.VerticalAlignment.Center, HFlex = Enum.UIFlexAlignment.SpaceBetween })
 	mainContainer.Parent = container
 
 	local assignButton = Instance.new("ImageButton")
 	assignButton.Name = "AssignButton"
 	assignButton.LayoutOrder = 2
-	assignButton.ImageColor3 = FFGEnum.THEME.intent.accent
+	assignButton.ImageColor3 = FFGEnum.THEME.color.white
 	assignButton.Position = UDim2.fromScale(0.8, 0.5)
 	assignButton.BackgroundTransparency = 1
-	assignButton.Image = "rbxassetid://119147831935362"
+	assignButton.Image = FFGEnum.UI.Buttons.ButtonImages.Assign
 	assignButton.ScaleType = Enum.ScaleType.Fit
 	assignButton.Size = UDim2.fromScale(0.2, 0.5)
-	UIConfig.ApplyAspect(assignButton, 16 / 9)
+	KinUI.ApplyAspect(assignButton, 16 / 9)
 	assignButton.Parent = mainContainer
 
 	local baseColor = assignButton.ImageColor3
+	local baseImage = assignButton.Image
 	assignButton.MouseEnter:Connect(function()
-		assignButton.ImageColor3 = FFGEnum.THEME.color.white
+		assignButton.ImageColor3 = FFGEnum.THEME.hoverStrokeColor
 	end)
 
 	assignButton.MouseLeave:Connect(function()
@@ -85,7 +83,14 @@ function AvailableHelperListItem.Create(helper: HelperType.HelperData)
 	end)
 
 	assignButton.Activated:Connect(function()
-		print("Clicky click, time to assign")
+		if selectedHelperState and selectedHelperState.Value == "" then
+			selectedHelperState.Value = helper.Id
+
+			assignButton.Image = FFGEnum.UI.Buttons.ButtonImages.Unassign
+		else
+			assignButton.Image = baseImage
+			selectedHelperState.Value = ""
+		end
 	end)
 
 	local helperInfoContainer = Instance.new("Frame")
@@ -93,14 +98,16 @@ function AvailableHelperListItem.Create(helper: HelperType.HelperData)
 	helperInfoContainer.BackgroundTransparency = 1
 	helperInfoContainer.Size = UDim2.fromScale(0.8, 1)
 	helperInfoContainer.LayoutOrder = 2
-	UIConfig.ApplyPanelStyle(helperInfoContainer)
+	KinUI.ApplyPanelStyle(helperInfoContainer)
+	KinUI.AddPadding(helperInfoContainer, "M")
 	helperInfoContainer.Parent = mainContainer
 
 	local helperInnerInfoContainer = Instance.new("Frame")
 	helperInnerInfoContainer.Name = "HelperInnerInfoContainer"
 	helperInnerInfoContainer.BackgroundTransparency = 1
 	helperInnerInfoContainer.Size = UDim2.fromScale(1, 1)
-	UIConfig.ApplyList(helperInnerInfoContainer, Enum.FillDirection.Horizontal, { VAlign = Enum.VerticalAlignment.Center, HFlex = Enum.UIFlexAlignment.SpaceBetween })
+	KinUI.ApplyList(helperInnerInfoContainer, Enum.FillDirection.Horizontal, { VAlign = Enum.VerticalAlignment.Center, HFlex = Enum.UIFlexAlignment.SpaceBetween })
+	KinUI.AddPadding(helperInnerInfoContainer, "L")
 	helperInnerInfoContainer.Parent = helperInfoContainer
 
 	local helperImage = Instance.new("ImageLabel")
@@ -112,14 +119,14 @@ function AvailableHelperListItem.Create(helper: HelperType.HelperData)
 	helperImage.BackgroundTransparency = 1
 	helperImage.Size = UDim2.fromScale(0.6, 0.6)
 	helperImage.ZIndex = 1
-	UIConfig.ApplyAspect(helperImage)
+	KinUI.ApplyAspect(helperImage)
 	helperImage.Parent = helperInnerInfoContainer
 
 	local helperInfo = Instance.new("Frame")
 	helperInfo.LayoutOrder = 2
 	helperInfo.BackgroundTransparency = 1
 	helperInfo.Size = UDim2.fromScale(0.6, 1)
-	UIConfig.ApplyList(helperInfo, Enum.FillDirection.Vertical, { VAlign = Enum.VerticalAlignment.Top, HAlign = Enum.HorizontalAlignment.Left })
+	KinUI.ApplyList(helperInfo, Enum.FillDirection.Vertical, { VAlign = Enum.VerticalAlignment.Top, HAlign = Enum.HorizontalAlignment.Left })
 	helperInfo.Parent = helperInnerInfoContainer
 
 	local entityLevelAndStageContainer = Instance.new("Frame")
@@ -129,7 +136,7 @@ function AvailableHelperListItem.Create(helper: HelperType.HelperData)
 	entityLevelAndStageContainer.Size = UDim2.fromScale(1, 0.2)
 	entityLevelAndStageContainer.BackgroundTransparency = 1
 	entityLevelAndStageContainer.Parent = helperInfo
-	UIConfig.ApplyList(
+	KinUI.ApplyList(
 		entityLevelAndStageContainer,
 		Enum.FillDirection.Horizontal,
 		{ HAlign = Enum.HorizontalAlignment.Center, HFlex = Enum.UIFlexAlignment.SpaceBetween, VAlign = Enum.VerticalAlignment.Center }
@@ -145,7 +152,7 @@ function AvailableHelperListItem.Create(helper: HelperType.HelperData)
 	helperLevel.LayoutOrder = 1
 	helperLevel.Text = `Level {helper.Level}`
 	helperLevel.TextScaled = true
-	UIConfig.AddPadding(helperLevel, "M")
+	KinUI.AddPadding(helperLevel, "M")
 	helperLevel.Parent = entityLevelAndStageContainer
 
 	local helperStage = Instance.new("TextLabel")
@@ -158,15 +165,15 @@ function AvailableHelperListItem.Create(helper: HelperType.HelperData)
 	helperStage.Text = FFGEnum.STAGES[helper.UpgradeStage].Label
 	helperStage.TextColor3 = FFGEnum.STAGES[helper.UpgradeStage].Color or Color3.new(1, 1, 1)
 	helperStage.TextScaled = true
-	UIConfig.AddPadding(helperStage, "M")
+	KinUI.AddPadding(helperStage, "M")
 	helperStage.Parent = entityLevelAndStageContainer
 
 	local helperStatsContainer = Instance.new("Frame")
 	helperStatsContainer.LayoutOrder = 2
 	helperStatsContainer.Size = UDim2.fromScale(1, 0.8)
 	helperStatsContainer.BackgroundTransparency = 1
-	UIConfig.ApplyList(helperStatsContainer, Enum.FillDirection.Vertical)
-	UIConfig.AddPadding(helperStatsContainer, "M")
+	KinUI.ApplyList(helperStatsContainer, Enum.FillDirection.Vertical)
+	KinUI.AddPadding(helperStatsContainer, "M")
 	helperStatsContainer.Parent = helperInfo
 
 	local preparedData = StatsIndexer.Prepare(helper)
@@ -213,7 +220,7 @@ function AvailableHelperListItem.Create(helper: HelperType.HelperData)
 			statElementLabel.Font = FFGEnum.THEME.bigFont
 			statElementLabel.BackgroundTransparency = 1
 			statElementLabel.Size = UDim2.fromScale(0.5, 1)
-			UIConfig.ApplyTextConstraints(statElementLabel, "body")
+			KinUI.ApplyTextConstraints(statElementLabel, "body")
 			statElementLabel.Parent = statFrameContainer
 
 			local statType = Format.GetStatType(stat.Label)
@@ -230,7 +237,7 @@ function AvailableHelperListItem.Create(helper: HelperType.HelperData)
 			statElementValue.Font = FFGEnum.THEME.bigFont
 			statElementValue.BackgroundTransparency = 1
 			statElementValue.Size = UDim2.fromScale(0.5, 1)
-			UIConfig.ApplyTextConstraints(statElementValue, "body")
+			KinUI.ApplyTextConstraints(statElementValue, "body")
 			statElementValue.Parent = statFrameContainer
 		end
 	end

@@ -3,7 +3,7 @@ local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
 local Button = require(ReplicatedStorage.Shared.UI.Components.Buttons.Button)
-local UIConfig = require(ReplicatedStorage.Shared.UI.UIConfig)
+local KinUI = require(ReplicatedStorage.Shared.UI.KinUI)
 local Format = require(ReplicatedStorage.Shared.Utils.Format)
 local StatsIndexer = require(ReplicatedStorage.Shared.Utils.StatsIndexer)
 
@@ -80,7 +80,7 @@ local function createStats(item, innerStatsContainer)
 			statElementLabel.Font = FFGEnum.THEME.bigFont
 			statElementLabel.BackgroundTransparency = 1
 			statElementLabel.Size = UDim2.fromScale(0.5, 1)
-			UIConfig.ApplyTextConstraints(statElementLabel, "body")
+			KinUI.ApplyTextConstraints(statElementLabel, "body")
 			statElementLabel.Parent = statFrameContainer
 
 			local statType = Format.GetStatType(stat.Label)
@@ -97,7 +97,7 @@ local function createStats(item, innerStatsContainer)
 			statElementValue.Font = FFGEnum.THEME.bigFont
 			statElementValue.BackgroundTransparency = 1
 			statElementValue.Size = UDim2.fromScale(0.5, 1)
-			UIConfig.ApplyTextConstraints(statElementValue, "body")
+			KinUI.ApplyTextConstraints(statElementValue, "body")
 			statElementValue.Parent = statFrameContainer
 		end
 	end
@@ -183,7 +183,7 @@ function Tooltip.Create(props: {
 	mainContainer.AnchorPoint = FFGEnum.THEME.alignment.anchor.bottom
 	mainContainer.BackgroundTransparency = 1
 	mainContainer.Parent = tooltipContainer
-	UIConfig.ApplyList(mainContainer, Enum.FillDirection.Vertical, { HAlign = Enum.HorizontalAlignment.Center, VAlign = Enum.VerticalAlignment.Center })
+	KinUI.ApplyList(mainContainer, Enum.FillDirection.Vertical, { HAlign = Enum.HorizontalAlignment.Center, VAlign = Enum.VerticalAlignment.Center })
 	-- //!SECTION
 
 	-- //SECTION - Item Info Container
@@ -193,7 +193,7 @@ function Tooltip.Create(props: {
 	itemInfoContainer.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 	itemInfoContainer.BackgroundTransparency = 1
 	itemInfoContainer.Parent = mainContainer
-	UIConfig.ApplyList(itemInfoContainer, Enum.FillDirection.Horizontal, { HFlex = Enum.UIFlexAlignment.SpaceAround, HAlign = Enum.HorizontalAlignment.Center, VAlign = Enum.VerticalAlignment.Center })
+	KinUI.ApplyList(itemInfoContainer, Enum.FillDirection.Horizontal, { HFlex = Enum.UIFlexAlignment.SpaceAround, HAlign = Enum.HorizontalAlignment.Center, VAlign = Enum.VerticalAlignment.Center })
 
 	local addInfoContainer = Instance.new("Frame")
 	addInfoContainer.Name = "AddInfoContainer"
@@ -203,7 +203,7 @@ function Tooltip.Create(props: {
 	addInfoContainer.LayoutOrder = 2
 	addInfoContainer.BackgroundTransparency = 1
 	addInfoContainer.Parent = itemInfoContainer
-	UIConfig.ApplyList(addInfoContainer, Enum.FillDirection.Vertical, { VAlign = Enum.VerticalAlignment.Bottom })
+	KinUI.ApplyList(addInfoContainer, Enum.FillDirection.Vertical, { VAlign = Enum.VerticalAlignment.Bottom })
 
 	-- //SECTION - Item Description
 	local descriptionLabel = Instance.new("TextLabel")
@@ -216,7 +216,7 @@ function Tooltip.Create(props: {
 	descriptionLabel.Font = FFGEnum.THEME.bigFont
 	descriptionLabel.BackgroundTransparency = 1
 	descriptionLabel.Size = UDim2.fromScale(1, 0.7)
-	UIConfig.ApplyTextConstraints(descriptionLabel, "body")
+	KinUI.ApplyTextConstraints(descriptionLabel, "body")
 	descriptionLabel.Parent = addInfoContainer
 	-- //!SECTION
 
@@ -228,7 +228,7 @@ function Tooltip.Create(props: {
 	entityLevelAndQualityContainer.Size = UDim2.fromScale(1, 0.2)
 	entityLevelAndQualityContainer.BackgroundTransparency = 1
 	entityLevelAndQualityContainer.Parent = addInfoContainer
-	UIConfig.ApplyList(
+	KinUI.ApplyList(
 		entityLevelAndQualityContainer,
 		Enum.FillDirection.Horizontal,
 		{ HAlign = Enum.HorizontalAlignment.Center, HFlex = Enum.UIFlexAlignment.SpaceBetween, VAlign = Enum.VerticalAlignment.Center }
@@ -289,7 +289,7 @@ function Tooltip.Create(props: {
 	bottomContainer.BackgroundTransparency = 1
 	bottomContainer.Size = UDim2.fromScale(1, 0.5)
 	bottomContainer.Parent = mainContainer
-	UIConfig.ApplyList(bottomContainer, Enum.FillDirection.Vertical, { HAlign = Enum.HorizontalAlignment.Center, VAlign = Enum.VerticalAlignment.Center, VFlex = Enum.UIFlexAlignment.SpaceBetween })
+	KinUI.ApplyList(bottomContainer, Enum.FillDirection.Vertical, { HAlign = Enum.HorizontalAlignment.Center, VAlign = Enum.VerticalAlignment.Center, VFlex = Enum.UIFlexAlignment.SpaceBetween })
 
 	local statsPanel = Instance.new("Frame")
 	statsPanel.Name = "StatsPanel"
@@ -299,7 +299,7 @@ function Tooltip.Create(props: {
 	statsPanel.Position = FFGEnum.THEME.alignment.position.center
 	statsPanel.Size = UDim2.fromScale(1, 0.6)
 	statsPanel.Parent = bottomContainer
-	UIConfig.ApplyPanelStyle(statsPanel, FFGEnum.THEME.color.white)
+	KinUI.ApplyPanelStyle(statsPanel, FFGEnum.THEME.color.white)
 
 	local innerStatsContainer = Instance.new("Frame")
 	innerStatsContainer.Name = "StatsContainer"
@@ -309,10 +309,10 @@ function Tooltip.Create(props: {
 	innerStatsContainer.Position = FFGEnum.THEME.alignment.position.center
 	innerStatsContainer.Size = UDim2.fromScale(1, 0.6)
 	innerStatsContainer.Parent = statsPanel
-	UIConfig.ApplyList(innerStatsContainer, Enum.FillDirection.Vertical, { HAlign = Enum.HorizontalAlignment.Center, Padding = "XL" })
+	KinUI.ApplyList(innerStatsContainer, Enum.FillDirection.Vertical, { HAlign = Enum.HorizontalAlignment.Center, Padding = "XL" })
 
 	local innerStatsPadding = Instance.new("UIPadding")
-	UIConfig.SetPadding(innerStatsPadding, "XL")
+	KinUI.SetPadding(innerStatsPadding, "XL")
 	innerStatsPadding.Parent = innerStatsContainer
 
 	createStats(item, innerStatsContainer)

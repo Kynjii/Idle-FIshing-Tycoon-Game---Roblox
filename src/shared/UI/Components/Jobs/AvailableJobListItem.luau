@@ -4,26 +4,28 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
-local AnimateButtonHover = require(ReplicatedStorage.Shared.UI.AnimateButtonHover)
 local Button = require(ReplicatedStorage.Shared.UI.Components.Buttons.Button)
-local UIConfig = require(ReplicatedStorage.Shared.UI.UIConfig)
+local KinUI = require(ReplicatedStorage.Shared.UI.KinUI)
 local Format = require(ReplicatedStorage.Shared.Utils.Format)
 local AvailableJobListItem = {}
 
-function AvailableJobListItem.Create(props: {
-	Id: number,
-	Category: "Fishing" | "Woodcutting" | "Mining" | "Transporting",
-	Label: string,
-	Slots: {
-		MaxSlots: number,
-		LockedSlots: number,
-		AssignedHelpers: {
-			[number]: { Id: string, Name: string, Level: number, QualityId: number },
+function AvailableJobListItem.Create(
+	props: {
+		Id: number,
+		Category: "Fishing" | "Woodcutting" | "Mining" | "Transporting",
+		Label: string,
+		Slots: {
+			MaxSlots: number,
+			LockedSlots: number,
+			AssignedHelpers: {
+				[number]: { Id: string, Name: string, Level: number, QualityId: number },
+			},
+			UnlockCost: number?,
 		},
-		UnlockCost: number?,
+		Player: Player,
 	},
-	Player: Player,
-})
+	helperSelectedState: StringValue
+)
 	local availableJobTemplate = Instance.new("Frame")
 	availableJobTemplate.AutomaticSize = Enum.AutomaticSize.Y
 	availableJobTemplate.Name = "AvailableJobTemplate"
@@ -50,11 +52,11 @@ function AvailableJobListItem.Create(props: {
 	container.BackgroundTransparency = 1
 	container.Position = UDim2.fromScale(0.5, 0.5)
 	container.Size = UDim2.fromScale(1, 1)
-	UIConfig.ApplyList(container, Enum.FillDirection.Vertical)
+	KinUI.ApplyList(container, Enum.FillDirection.Vertical)
 
 	local uIPadding = Instance.new("UIPadding")
 	uIPadding.Parent = container
-	UIConfig.SetPadding(uIPadding, "M")
+	KinUI.SetPadding(uIPadding, "M")
 
 	local textLabel = Instance.new("TextLabel")
 	textLabel.Name = "JobName"
@@ -77,7 +79,7 @@ function AvailableJobListItem.Create(props: {
 	mainContainer.BackgroundTransparency = 1
 	mainContainer.AutomaticSize = Enum.AutomaticSize.Y
 	mainContainer.LayoutOrder = 2
-	UIConfig.ApplyList(mainContainer, Enum.FillDirection.Horizontal, { VAlign = Enum.VerticalAlignment.Center, HFlex = Enum.UIFlexAlignment.SpaceBetween })
+	KinUI.ApplyList(mainContainer, Enum.FillDirection.Horizontal, { VAlign = Enum.VerticalAlignment.Center, HFlex = Enum.UIFlexAlignment.SpaceBetween })
 	mainContainer.Parent = container
 
 	local slotContainer = Instance.new("Frame")
@@ -87,8 +89,8 @@ function AvailableJobListItem.Create(props: {
 	slotContainer.LayoutOrder = 1
 	slotContainer.BackgroundTransparency = 1
 	slotContainer.Parent = mainContainer
-	local list = UIConfig.ApplyList(slotContainer, Enum.FillDirection.Vertical, { VAlign = Enum.VerticalAlignment.Center })
-	UIConfig.SetGap(list, "S")
+	local list = KinUI.ApplyList(slotContainer, Enum.FillDirection.Vertical, {})
+	KinUI.SetGap(list, "S")
 
 	local lockedSlots: number = props.Slots.LockedSlots
 	for i = 1, props.Slots.MaxSlots do
@@ -135,8 +137,8 @@ function AvailableJobListItem.Create(props: {
 			JobListBg.ImageTransparency = 0.25
 		end
 		JobListBg.Parent = slotMainContainer
-		UIConfig.ApplyList(JobListBg, Enum.FillDirection.Horizontal, { HFlex = Enum.UIFlexAlignment.SpaceEvenly, VAlign = Enum.VerticalAlignment.Center })
-		UIConfig.AddPadding(JobListBg, "L")
+		KinUI.ApplyList(JobListBg, Enum.FillDirection.Horizontal, { HFlex = Enum.UIFlexAlignment.SpaceEvenly, VAlign = Enum.VerticalAlignment.Center })
+		KinUI.AddPadding(JobListBg, "L")
 
 		local helperName = Instance.new("TextLabel")
 		helperName.Name = "HelperName"
@@ -170,77 +172,117 @@ function AvailableJobListItem.Create(props: {
 			lockedIcon.ZIndex = 5
 			lockedIcon.Image = FFGEnum.UI.Icons.PadLock
 			lockedIcon.ScaleType = Enum.ScaleType.Fit
-			UIConfig.ApplyAspect(lockedIcon, 16 / 9)
+			KinUI.ApplyAspect(lockedIcon, 16 / 9)
 			lockedIcon.Parent = slot
 		end
 
-		if isTaken or isLocked then
-			local buttonColor: string
-			if isTaken then
-				buttonColor = "Red"
-			else
-				buttonColor = "Green"
-			end
+		local buttonColor: string
+		if isTaken then
+			buttonColor = "Red"
+		else
+			buttonColor = "Green"
+		end
 
-			local buttonCurrency: string
-			if isTaken then
-				buttonCurrency = "None"
-			else
-				buttonCurrency = "Gold"
-			end
+		local buttonCurrency: string
+		if isTaken then
+			buttonCurrency = "None"
+		else
+			buttonCurrency = "Gold"
+		end
 
-			local buttonText: string
-			if isTaken then
-				buttonText = "-"
-			else
-				local formattedAmount = Format.CurrencyNumber(props.Slots.UnlockCost or 0)
-				buttonText = `{formattedAmount}`
-			end
+		local buttonText: string
+		if isTaken then
+			buttonText = "-"
+		else
+			local formattedAmount = Format.CurrencyNumber(props.Slots.UnlockCost or 0)
+			buttonText = `{formattedAmount}`
+		end
 
-			local actionButton = Button.Create({ Color = buttonColor, CurrencyType = buttonCurrency, Text = buttonText, Size = UDim2.fromScale(0.4, 1) })
-			actionButton.Position = UDim2.fromScale(0.9, 0.5)
-			actionButton.Name = isTaken and "UnassignButon" or isLocked and "PuchaseButton" or "ActionButton"
+		local actionButton = Button.Create({ Color = buttonColor, CurrencyType = buttonCurrency, Text = buttonText, Size = UDim2.fromScale(0.3, 1) })
+		actionButton.Position = UDim2.fromScale(0.9, 0.5)
+		actionButton.Name = isTaken and "UnassignButon" or isLocked and "PuchaseButton" or "ActionButton"
 
-			actionButton.Activated:Connect(function()
-				if isTaken then
-					local helperData = props.Slots.AssignedHelpers[i]
-					if helperData then
-						local assignJobEvent = Events.GetRemote(Events.RemoteNames.AssignJob)
-						local unassignedJobId = 0
-						if assignJobEvent then assignJobEvent:FireServer(helperData.Id, unassignedJobId) end
-					end
+		if not isTaken and not isLocked then actionButton.Visible = false end
+
+		actionButton.Activated:Connect(function()
+			local helperData = props.Slots.AssignedHelpers[i]
+			local assignJobEvent = Events.GetRemote(Events.RemoteNames.AssignJob)
+			if isTaken and helperData then
+				if helperData then
+					local unassignedJobId = 0
+					if assignJobEvent then assignJobEvent:FireServer(helperData.Id, unassignedJobId) end
 				end
+			else
+				if helperSelectedState then
+					local selectedHelperId = helperSelectedState.Value
+					if selectedHelperId == "" then return end
 
-				if isLocked then
-					local buySlotEvent = Events.GetRemote(Events.RemoteNames.PurchaseJobSlot)
-					if buySlotEvent then buySlotEvent:FireServer(props.Id) end
+					local jobId = props.Id
+					if assignJobEvent then assignJobEvent:FireServer(selectedHelperId, jobId) end
+
+					helperSelectedState.Value = ""
+				end
+			end
+
+			if isLocked then
+				local buySlotEvent = Events.GetRemote(Events.RemoteNames.PurchaseJobSlot)
+				if buySlotEvent then buySlotEvent:FireServer(props.Id) end
+			end
+		end)
+
+		local baseText = buttonText
+		local baseImage = actionButton.Image
+		local buttonIcon = actionButton:FindFirstChild("CurrencyIcon", true) :: ImageLabel?
+
+		-- State Listener
+		if helperSelectedState then
+			helperSelectedState.Changed:Connect(function(value: any)
+				if value ~= "" then
+					if not isTaken and not isLocked then
+						actionButton.Visible = true
+						local buttonText = actionButton:FindFirstChild("ButtonText", true) :: TextLabel?
+						if buttonText then buttonText.Text = "Assign" end
+
+						actionButton.Image = FFGEnum.UI.Buttons.ButtonImages.SquareColor.Yellow
+
+						if buttonIcon then buttonIcon.Visible = false end
+					end
+				else
+					if not isTaken and not isLocked then actionButton.Visible = false end
+					local buttonText = actionButton:FindFirstChild("ButtonText", true) :: TextLabel?
+					if buttonText then buttonText.Text = baseText end
+
+					actionButton.Image = baseImage
+
+					if buttonIcon then buttonIcon.Visible = true end
 				end
 			end)
-
-			actionButton.Parent = slot
 		end
+
+		actionButton.Parent = slot
 
 		slot.Parent = slotContainer
 	end
 
 	local assignButton = Instance.new("ImageButton")
-	assignButton.Name = "AssignButton"
-	assignButton.LayoutOrder = 2
+	assignButton.Name = "QuickAssignButton"
 	assignButton.Position = UDim2.fromScale(0.8, 0.5)
+	assignButton.ImageColor3 = FFGEnum.THEME.color.white
 	assignButton.BackgroundTransparency = 1
-	assignButton.Image = "rbxassetid://119147831935362"
+	assignButton.LayoutOrder = 2
+	assignButton.Image = FFGEnum.UI.Buttons.ButtonImages.Assign
 	assignButton.ScaleType = Enum.ScaleType.Fit
 	assignButton.Size = UDim2.fromScale(0.2, 0.5)
-	UIConfig.ApplyAspect(assignButton, 16 / 9)
 	assignButton.Parent = mainContainer
+	KinUI.ApplyAspect(assignButton, 16 / 9)
 
-	local baseSize = assignButton.Size
+	local baseColor = assignButton.ImageColor3
 	assignButton.MouseEnter:Connect(function()
-		AnimateButtonHover.Enter(assignButton, baseSize)
+		assignButton.ImageColor3 = FFGEnum.THEME.hoverStrokeColor
 	end)
 
 	assignButton.MouseLeave:Connect(function()
-		AnimateButtonHover.Leave(assignButton, baseSize)
+		assignButton.ImageColor3 = baseColor
 	end)
 
 	-- Quick Assign (assigns the first helper it finds)
@@ -266,6 +308,17 @@ function AvailableJobListItem.Create(props: {
 			end
 		end
 	end)
+
+	local assignText = Instance.new("TextLabel")
+	assignText.Font = FFGEnum.THEME.bigFont
+	assignText.TextColor3 = FFGEnum.THEME.color.white
+	assignText.BackgroundTransparency = 1
+	assignText.AnchorPoint = FFGEnum.THEME.alignment.anchor.bottom
+	assignText.Position = FFGEnum.THEME.alignment.position.top
+	assignText.TextScaled = true
+	assignText.Size = UDim2.fromScale(1, 0.3)
+	assignText.Text = "Quick Assign"
+	assignText.Parent = assignButton
 
 	container.Parent = availableJobTemplate
 

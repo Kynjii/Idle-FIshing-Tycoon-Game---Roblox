@@ -9,7 +9,7 @@ local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
 local PortStorageType = require(ReplicatedStorage.Shared.Types.Classes.PortStorageType)
 local TenderType = require(ReplicatedStorage.Shared.Types.Classes.TenderType)
 local ProgressBar = require(ReplicatedStorage.Shared.UI.Components.ProgressBar)
-local UIConfig = require(ReplicatedStorage.Shared.UI.UIConfig)
+local KinUI = require(ReplicatedStorage.Shared.UI.KinUI)
 local Format = require(ReplicatedStorage.Shared.Utils.Format)
 
 -- //SECTION - TYPES
@@ -59,7 +59,7 @@ function EntityNameplate.Create(props: Props)
 	frameContainer.Position = FFGEnum.THEME.alignment.position.center
 	frameContainer.Size = UDim2.fromScale(1, 1)
 	frameContainer.Parent = entityBillboard
-	UIConfig.ApplyList(frameContainer, Enum.FillDirection.Vertical, { HAlign = Enum.HorizontalAlignment.Center, VAlign = Enum.VerticalAlignment.Center })
+	KinUI.ApplyList(frameContainer, Enum.FillDirection.Vertical, { HAlign = Enum.HorizontalAlignment.Center, VAlign = Enum.VerticalAlignment.Center })
 
 	local nameplateBg = Instance.new("ImageLabel")
 	nameplateBg.Name = "NameplateBG"
@@ -86,7 +86,7 @@ function EntityNameplate.Create(props: Props)
 	name.TextColor3 = Color3.new(1, 1, 1)
 	name.TextStrokeTransparency = 0.7
 	name.TextScaled = true
-	UIConfig.AddPadding(name, "L")
+	KinUI.AddPadding(name, "L")
 	name.Parent = frameContainer
 
 	local quality = Instance.new("TextLabel")
@@ -101,7 +101,7 @@ function EntityNameplate.Create(props: Props)
 	quality.TextColor3 = FFGEnum.QUALITIES[qualityId].Color or FFGEnum.THEME.color.textOrange
 	quality.TextStrokeTransparency = 0.7
 	quality.TextScaled = true
-	UIConfig.AddPadding(quality, "L")
+	KinUI.AddPadding(quality, "L")
 	quality.Parent = frameContainer
 
 	local infoContainer = Instance.new("Frame")
@@ -111,7 +111,7 @@ function EntityNameplate.Create(props: Props)
 	infoContainer.LayoutOrder = 3
 	infoContainer.Position = UDim2.fromScale(0.5, 0.5)
 	infoContainer.Size = UDim2.fromScale(0.8, 0.3)
-	UIConfig.ApplyList(infoContainer, Enum.FillDirection.Horizontal, { HAlign = Enum.HorizontalAlignment.Center, HFlex = Enum.UIFlexAlignment.SpaceBetween, VAlign = Enum.VerticalAlignment.Center })
+	KinUI.ApplyList(infoContainer, Enum.FillDirection.Horizontal, { HAlign = Enum.HorizontalAlignment.Center, HFlex = Enum.UIFlexAlignment.SpaceBetween, VAlign = Enum.VerticalAlignment.Center })
 
 	local level = Instance.new("TextLabel")
 	level.Name = "Level"
@@ -125,7 +125,7 @@ function EntityNameplate.Create(props: Props)
 	level.TextStrokeTransparency = 0.7
 	level.TextXAlignment = Enum.TextXAlignment.Left
 	level.TextScaled = true
-	UIConfig.AddPadding(level, "L")
+	KinUI.AddPadding(level, "L")
 	level.Parent = infoContainer
 
 	local jobInfoContainer = Instance.new("Frame")
@@ -135,7 +135,7 @@ function EntityNameplate.Create(props: Props)
 	jobInfoContainer.LayoutOrder = 2
 	jobInfoContainer.Size = UDim2.fromScale(0.33, 1)
 	jobInfoContainer.Parent = infoContainer
-	UIConfig.ApplyList(jobInfoContainer, Enum.FillDirection.Horizontal, { HAlign = Enum.HorizontalAlignment.Center, VAlign = Enum.VerticalAlignment.Center })
+	KinUI.ApplyList(jobInfoContainer, Enum.FillDirection.Horizontal, { HAlign = Enum.HorizontalAlignment.Center, VAlign = Enum.VerticalAlignment.Center })
 
 	if jobCategory ~= "Building" then
 		local jobInfoIcon = Instance.new("ImageLabel")
@@ -144,7 +144,7 @@ function EntityNameplate.Create(props: Props)
 		jobInfoIcon.Image = EntityNameplate.JobIconImage[jobCategory] or EntityNameplate.JobIconImage.None
 		jobInfoIcon.BackgroundTransparency = 1
 		jobInfoIcon.Parent = jobInfoContainer
-		UIConfig.ApplyAspect(jobInfoIcon)
+		KinUI.ApplyAspect(jobInfoIcon)
 
 		local jobInfoText = Instance.new("TextLabel")
 		jobInfoText.Name = "JobInfoText"
@@ -159,7 +159,7 @@ function EntityNameplate.Create(props: Props)
 		jobInfoText.TextScaled = true
 		jobInfoText.TextXAlignment = Enum.TextXAlignment.Left
 		jobInfoText.Parent = jobInfoContainer
-		UIConfig.AddPadding(jobInfoText, "L")
+		KinUI.AddPadding(jobInfoText, "L")
 	else
 		quality.Text = entity.BuildingBuff.Label or ""
 		quality.TextColor3 = FFGEnum.THEME.color.textOrange
@@ -177,7 +177,7 @@ function EntityNameplate.Create(props: Props)
 	stage.TextStrokeTransparency = 0.7
 	stage.TextXAlignment = Enum.TextXAlignment.Right
 	stage.TextScaled = true
-	UIConfig.AddPadding(stage, "L")
+	KinUI.AddPadding(stage, "L")
 	stage.Parent = infoContainer
 
 	infoContainer.Parent = frameContainer

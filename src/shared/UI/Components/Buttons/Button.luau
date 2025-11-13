@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local AnimateButtonHover = require(ReplicatedStorage.Shared.UI.AnimateButtonHover)
-local UIConfig = require(ReplicatedStorage.Shared.UI.UIConfig)
+local KinUI = require(ReplicatedStorage.Shared.UI.KinUI)
 local Button = {}
 
 local buttonImages = {
@@ -25,6 +25,7 @@ function Button.Create(props: {
 	Text: string?,
 	Size: UDim2?,
 	CurrencyType: "None" | "Gold",
+	Image: string?,
 })
 	local button = Instance.new("ImageButton")
 	button.Name = "Button"
@@ -36,7 +37,7 @@ function Button.Create(props: {
 	button.SliceCenter = Rect.new(25, 64, 39, 161)
 	button.BackgroundTransparency = 1
 	button.Size = props.Size or UDim2.fromScale(1, 1)
-	UIConfig.AddPadding(button, "S")
+	KinUI.AddPadding(button, "S")
 
 	local buttonText: TextLabel?
 	if props.Text then
@@ -48,7 +49,7 @@ function Button.Create(props: {
 		buttonText.TextColor3 = FFGEnum.THEME.color.white
 		buttonText.BackgroundTransparency = 1
 		buttonText.TextScaled = true
-		buttonText.Size = UDim2.fromScale(0.7, 1)
+		buttonText.Size = UDim2.fromScale(0.7, 0.5)
 		buttonText.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 		buttonText.Position = FFGEnum.THEME.alignment.position.textCenter
 		buttonText.Parent = button
@@ -62,13 +63,13 @@ function Button.Create(props: {
 		currencyIcon.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 		currencyIcon.Position = FFGEnum.THEME.alignment.position.center
 		currencyIcon.BackgroundTransparency = 1
-		currencyIcon.Size = UDim2.fromScale(0.3, 0.3)
-		UIConfig.ApplyAspect(currencyIcon)
+		currencyIcon.Size = UDim2.fromScale(0.25, 0.25)
+		KinUI.ApplyAspect(currencyIcon)
 		currencyIcon.Parent = button
 
 		if buttonText then buttonText.Size = UDim2.fromScale(0.3, 1) end
 
-		UIConfig.ApplyList(button, Enum.FillDirection.Horizontal, { HAlign = Enum.HorizontalAlignment.Center, VAlign = Enum.VerticalAlignment.Center })
+		KinUI.ApplyList(button, Enum.FillDirection.Horizontal, { HAlign = Enum.HorizontalAlignment.Center, VAlign = Enum.VerticalAlignment.Center })
 	end
 
 	local baseSize = button.Size

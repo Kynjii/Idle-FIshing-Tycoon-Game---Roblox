@@ -177,6 +177,22 @@ FFGEnum.UI = {
 			ScaleType = Rect.new(25, 64, 39, 161),
 			Image = "rbxassetid://128292351912310",
 		},
+		ButtonImages = {
+			SquareColor = {
+				Green = "rbxassetid://117523854412152",
+				Blue = "rbxassetid://106924732482845", -- pressed/hovered
+				BlueGray = "rbxassetid://97163201361197",
+				Gray = "rbxassetid://120715593495406", -- disabled
+				Orange = "rbxassetid://83441298838791",
+				Purple = "rbxassetid://125793396941611",
+				Red = "rbxassetid://94099958341252",
+				SkyBlue = "rbxassetid://130856420084871",
+				White = "rbxassetid://136257301484168",
+				Yellow = "rbxassetid://122172302659103",
+			},
+			Assign = "rbxassetid://130413344361128",
+			Unassign = "rbxassetid://113359020701380",
+		},
 	},
 	Items = {
 		Hovered = "rbxassetid://119714101000238",

@@ -4,7 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
-local UIConfig = require(ReplicatedStorage.Shared.UI.UIConfig)
+local KinUI = require(ReplicatedStorage.Shared.UI.KinUI)
 local Format = require(ReplicatedStorage.Shared.Utils.Format)
 
 local function ShopItem(
@@ -105,7 +105,7 @@ local function ShopItem(
 	itemImage.BackgroundTransparency = 1
 	itemImage.Size = UDim2.fromScale(0.6, 0.6)
 	itemImage.ZIndex = 2
-	UIConfig.ApplyAspect(itemImage)
+	KinUI.ApplyAspect(itemImage)
 	itemImage.Parent = mainContainer
 	-- //!SECTION
 

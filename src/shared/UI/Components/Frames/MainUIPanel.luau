@@ -4,7 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PanelTab = require(script.Parent.PanelTab)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local AnimateButtonHover = require(ReplicatedStorage.Shared.UI.AnimateButtonHover)
-local UIConfig = require(ReplicatedStorage.Shared.UI.UIConfig)
+local KinUI = require(ReplicatedStorage.Shared.UI.KinUI)
 
 local MainUIPanel = {}
 
@@ -38,7 +38,7 @@ function MainUIPanel.Create(props: {
 	panelContainer.Size = UDim2.fromScale(0.619, 0.7)
 	panelContainer.ZIndex = 0
 	panelContainer.Parent = screenGui
-	UIConfig.ApplyAspect(panelContainer, 16 / 9)
+	KinUI.ApplyAspect(panelContainer, 16 / 9)
 
 	local panelBG = Instance.new("ImageLabel")
 	panelBG.Name = "PanelBG"
@@ -61,7 +61,7 @@ function MainUIPanel.Create(props: {
 	tabContainer.Parent = panelContainer
 
 	local uIListLayout = Instance.new("UIListLayout")
-	UIConfig.SetGap(uIListLayout, "XS")
+	KinUI.SetGap(uIListLayout, "XS")
 	uIListLayout.Name = "UIListLayout"
 	uIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	uIListLayout.Parent = tabContainer
@@ -86,7 +86,7 @@ function MainUIPanel.Create(props: {
 	main.Parent = panelContainer
 
 	local mainPadding = Instance.new("UIPadding")
-	UIConfig.SetPadding(mainPadding, "S")
+	KinUI.SetPadding(mainPadding, "S")
 	mainPadding.Parent = main
 
 	local panelNameContainer = Instance.new("Frame")
@@ -98,7 +98,7 @@ function MainUIPanel.Create(props: {
 	panelNameContainer.Parent = main
 
 	local panelNameContainerPadding = Instance.new("UIPadding")
-	UIConfig.SetPadding(panelNameContainerPadding, "S")
+	KinUI.SetPadding(panelNameContainerPadding, "S")
 	panelNameContainerPadding.Parent = panelNameContainer
 
 	local textLabel = Instance.new("TextLabel")
@@ -129,7 +129,7 @@ function MainUIPanel.Create(props: {
 	innerWindow.Position = UDim2.fromScale(0.5, 0.55)
 	innerWindow.Size = UDim2.fromScale(1, 0.8)
 	innerWindow.ZIndex = 10
-	UIConfig.ApplyPanelStyle(innerWindow)
+	KinUI.ApplyPanelStyle(innerWindow)
 	innerWindow.Parent = main
 
 	local container = Instance.new("Frame")
