@@ -84,7 +84,7 @@ function AvailableJobListItem.Create(
 
 	local slotContainer = Instance.new("Frame")
 	slotContainer.Name = "SlotContainer"
-	slotContainer.Size = UDim2.fromScale(0.7, 1)
+	slotContainer.Size = UDim2.fromScale(0.8, 1)
 	slotContainer.AutomaticSize = Enum.AutomaticSize.Y
 	slotContainer.LayoutOrder = 1
 	slotContainer.BackgroundTransparency = 1
@@ -120,7 +120,7 @@ function AvailableJobListItem.Create(
 		local slotMainContainer = Instance.new("Frame")
 		slotMainContainer.Name = "SlotMainContainer"
 		slotMainContainer.ZIndex = 5
-		slotMainContainer.Size = UDim2.fromScale(0.7, 1)
+		slotMainContainer.Size = UDim2.fromScale(0.75, 1)
 		slotMainContainer.BackgroundTransparency = 1
 		slotMainContainer.Parent = slot
 
@@ -198,7 +198,7 @@ function AvailableJobListItem.Create(
 			buttonText = `{formattedAmount}`
 		end
 
-		local actionButton = Button.Create({ Color = buttonColor, CurrencyType = buttonCurrency, Text = buttonText, Size = UDim2.fromScale(0.3, 1) })
+		local actionButton = Button.Create({ Color = buttonColor, CurrencyType = buttonCurrency, Text = buttonText, Size = UDim2.fromScale(0.2, 1) })
 		actionButton.Position = UDim2.fromScale(0.9, 0.5)
 		actionButton.Name = isTaken and "UnassignButon" or isLocked and "PuchaseButton" or "ActionButton"
 
