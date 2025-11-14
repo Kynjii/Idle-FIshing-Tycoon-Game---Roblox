@@ -1,7 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local TableUtil = require(ReplicatedStorage.Packages.TableUtil)
 local Fish = require(ServerScriptService.Server.Classes.Fish)
+local DataService = require(ServerScriptService.Server.Services.DataService)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 
@@ -27,7 +29,6 @@ function FishDexManager.New(fishDexState, player: Player, teamId: number, curren
 	self.RealmId = currentRealm
 
 	self.FishDexState = fishDexState
-
 	self._cleaner = Trove.new()
 
 	self:AttachAttListeners()
@@ -35,12 +36,32 @@ function FishDexManager.New(fishDexState, player: Player, teamId: number, curren
 	return self
 end
 
-function FishDexManager.CheckCaughtStatus(self: FishDexManager, fish: Fish.Fish)
-	--
+function FishDexManager.CheckCaughtStatus(self: FishDexManager, caughtFish: Fish.Fish)
+	local existing = TableUtil.Find(self.FishDexState, function(fish): boolean
+		local speciesName = fish.Species
+		local variant = fish.Variant
+
+		return speciesName == caughtFish.Species and variant == caughtFish.Variant
+	end)
+
+	if existing and existing.Caught then
+		return true
+	else
+		return false
+	end
 end
 
-function FishDexManager.UpdateCaughtStatus(self: FishDexManager, fish: Fish.Fish)
-	--
+function FishDexManager.UpdateCaughtStatus(self: FishDexManager, caughtFish: Fish.Fish)
+	local existing = TableUtil.Find(self.FishDexState, function(fish): boolean
+		local speciesName = fish.Species
+		local variant = fish.Variant
+
+		return speciesName == caughtFish.Species and variant == caughtFish.Variant
+	end)
+
+	if existing then existing.Caught = true end
+
+	self:Save()
 end
 
 function FishDexManager.AttachAttListeners(self: FishDexManager)
@@ -57,12 +78,18 @@ function FishDexManager.AttachAttListeners(self: FishDexManager)
 	end
 end
 
+function FishDexManager.Save(self: FishDexManager)
+	DataService.SaveFishDex(self.Player, self.FishDexState)
+end
+
 -- //SECTION - Cleanup
 function FishDexManager.Destroy(self: FishDexManager)
 	if self._cleaner then
 		self._cleaner:Clean()
 		self._cleaner = nil
 	end
+
+	self:Save()
 
 	self.Player = nil
 	self.Owner = nil

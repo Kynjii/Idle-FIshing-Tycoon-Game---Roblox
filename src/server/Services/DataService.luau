@@ -36,6 +36,7 @@ local stateTypes = {
 	SaveJobState = "save Job State",
 	GetJobState = "get Job State",
 	SaveFish = "save Fish",
+	SaveFishDex = "save Fish Dex",
 }
 
 local function getProfile(player: Player, stateType: string): any | boolean
@@ -529,6 +530,20 @@ function DataService.SaveFish(player: Player, fish): boolean
 
 	local replica = DataService.Replicas[player]
 	if replica then replica:Set({ "Realms", currentRealm, "FishInventory" }, profile.Data.Realms[currentRealm].FishInventory) end
+
+	return true
+end
+-- //!SECTION
+
+-- //SECTION - Fish Dex
+function DataService.SaveFishDex(player: Player, fishDexState): boolean
+	local profile = getProfile(player, stateTypes.SaveFishDex)
+	if not profile then return false end
+
+	-- Initialize Fish Dex array if it doesn't exist
+	if not profile.Data.FishDex then profile.Data.FishDex = {} end
+
+	profile.Data.FishDex = fishDexState
 
 	return true
 end

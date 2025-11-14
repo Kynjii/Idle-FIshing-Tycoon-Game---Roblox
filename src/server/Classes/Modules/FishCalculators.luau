@@ -51,6 +51,14 @@ local FISH_SPECIES = {
 local FISH_VARIANT = {
 	NORMAL = "normal",
 	ELEMENTAL = "elemental",
+	ELDER = "elder",
+}
+
+local REALM_ELEMENTS = {
+	[1] = "Hydro",
+	[2] = "Frostreed",
+	[3] = "Cinder",
+	[4] = "Mossy",
 }
 
 local FISH_ASSETS = {
@@ -221,10 +229,19 @@ local SPECIES_DROPS_BY_TIER = {
 	},
 }
 
--- Variant drop chances - elemental variants are rarer
+-- Variant drop chances - elemental variants are rarer, elder only in tier 6
 local VARIANT_DROP_CHANCES = {
-	[FISH_VARIANT.NORMAL] = 0.85, -- 85% chance for normal
-	[FISH_VARIANT.ELEMENTAL] = 0.15, -- 15% chance for elemental
+	-- Tiers 1-5: Only normal and elemental
+	standard = {
+		[FISH_VARIANT.NORMAL] = 0.85, -- 85% chance for normal
+		[FISH_VARIANT.ELEMENTAL] = 0.15, -- 15% chance for elemental
+	},
+	-- Tier 6: Includes elder variant
+	tier6 = {
+		[FISH_VARIANT.NORMAL] = 0.74, -- 74% chance for normal
+		[FISH_VARIANT.ELEMENTAL] = 0.25, -- 25% chance for elemental
+		[FISH_VARIANT.ELDER] = 0.01, -- 1% chance for elder
+	},
 }
 
 -- Quality drops by fishing location tier
@@ -359,10 +376,7 @@ function FishCalculator.ChooseSpecie(fishingLocTier: number?): { Species: string
 	local tier = math.clamp(fishingLocTier or 1, 1, 6)
 	local availableSpecies = SPECIES_DROPS_BY_TIER[tier]
 
-	if not availableSpecies then
-		-- Fallback to basic tier if tier not found
-		availableSpecies = SPECIES_DROPS_BY_TIER[1]
-	end
+	if not availableSpecies then availableSpecies = SPECIES_DROPS_BY_TIER[1] end
 
 	-- Calculate total weight for species drops
 	local totalWeight = 0
@@ -383,15 +397,22 @@ function FishCalculator.ChooseSpecie(fishingLocTier: number?): { Species: string
 		end
 	end
 
-	-- Determine variant (normal vs elemental)
 	local variantRoll = math.random()
 	local chosenVariant = FISH_VARIANT.NORMAL
 
-	if variantRoll <= VARIANT_DROP_CHANCES[FISH_VARIANT.ELEMENTAL] then chosenVariant = FISH_VARIANT.ELEMENTAL end
+	local dropTable = (tier == 6) and VARIANT_DROP_CHANCES.tier6 or VARIANT_DROP_CHANCES.standard
 
-	-- Get the display name and asset from mappings
+	local cumulativeChance = 0
+	for variant, chance in pairs(dropTable) do
+		cumulativeChance += chance
+		if variantRoll <= cumulativeChance then
+			chosenVariant = variant
+			break
+		end
+	end
+
 	local speciesName = FISH_SPECIES[chosenSpeciesKey] or chosenSpeciesKey
-	local itemImage = FISH_ASSETS[chosenSpeciesKey] or FISH_ASSETS.Guppy -- fallback to Guppy asset
+	local itemImage = FISH_ASSETS[chosenSpeciesKey] or FISH_ASSETS.Guppy
 
 	return {
 		Species = speciesName,
@@ -406,6 +427,64 @@ end
 
 function FishCalculator.GetFishAsset(speciesKey: string): string?
 	return FISH_ASSETS[speciesKey]
+end
+
+function FishCalculator.GetAllFishVariations(): { { Species: string, Variant: string, ItemImage: string, SpeciesKey: string, Caught: boolean } }
+	local variations = {}
+
+	-- Get tier 6 species for elder variants
+	local tier6Species = {}
+	for speciesKey, _ in pairs(SPECIES_DROPS_BY_TIER[6]) do
+		tier6Species[speciesKey] = true
+	end
+
+	for speciesKey, speciesName in pairs(FISH_SPECIES) do
+		local itemImage = FISH_ASSETS[speciesKey] or FISH_ASSETS.Guppy
+
+		-- Add normal variant (all species)
+		table.insert(variations, {
+			Species = speciesName,
+			Variant = FISH_VARIANT.NORMAL,
+			ItemImage = itemImage,
+			SpeciesKey = speciesKey,
+			Caught = false,
+		})
+
+		-- Add elemental variant (all species)
+		table.insert(variations, {
+			Species = speciesName,
+			Variant = FISH_VARIANT.ELEMENTAL,
+			ItemImage = itemImage,
+			SpeciesKey = speciesKey,
+			Caught = false,
+		})
+
+		-- Add elder variant (only tier 6 species)
+		if tier6Species[speciesKey] then
+			table.insert(variations, {
+				Species = speciesName,
+				Variant = FISH_VARIANT.ELDER,
+				ItemImage = itemImage,
+				SpeciesKey = speciesKey,
+				Caught = false,
+			})
+		end
+	end
+
+	return variations
+end
+
+function FishCalculator.GetFishName(species: string, variant: string, realmId: number): string
+	local baseName = species
+
+	if variant == FISH_VARIANT.ELEMENTAL then
+		local element = REALM_ELEMENTS[realmId] or "Unknown"
+		return `{element} {baseName}`
+	elseif variant == FISH_VARIANT.ELDER then
+		return `Elder {baseName}`
+	else
+		return baseName
+	end
 end
 
 return FishCalculator

@@ -6,7 +6,7 @@ local KinUI = require(ReplicatedStorage.Shared.UI.KinUI)
 local LootNotification = {}
 
 export type Props = {
-	ItemType: "Gold",
+	ItemType: "Gold" | "Fishing",
 	Text: string?,
 }
 

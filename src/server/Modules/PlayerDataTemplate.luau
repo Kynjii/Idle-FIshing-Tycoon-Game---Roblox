@@ -1,5 +1,6 @@
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local FishCalculators = require(ServerScriptService.Server.Classes.Modules.FishCalculators)
 local Jobs = require(ServerScriptService.Server.Modules.Jobs.Jobs)
 local realmBuffs = {
 	-- FISH
@@ -36,7 +37,7 @@ local realmBuffs = {
 return {
 	CurrentRealm = 1,
 	GlobalBuffs = {},
-	FishDex = {},
+	FishDex = FishCalculators.GetAllFishVariations(),
 	Realms = {
 		[1] = {
 			Lanes = 6,
