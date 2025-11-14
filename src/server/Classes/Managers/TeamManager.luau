@@ -152,8 +152,9 @@ end
 
 function TeamManager.AssignFishingManager(profile, player: Player, teamId: number): ()
 	TeamManager.FishingManager[player.UserId] = TeamManager.FishingManager[player.UserId] or { OwnerId = player.UserId }
+	local currentRealm = profile.CurrentRealm or 1
 
-	local fishingManager = FishingManager.New(player, teamId)
+	local fishingManager = FishingManager.New(player, teamId, currentRealm)
 	if not fishingManager then return end
 
 	TeamManager.FishingManager[player.UserId] = fishingManager
