@@ -59,6 +59,14 @@ RunService.Heartbeat:Connect(function(deltaTime: number)
 	end
 end)
 
+function startGame(value: boolean)
+	gameStarted = value
+end
+
+function showGame(value: boolean)
+	screenGui.Enabled = value
+end
+
 function handleClosingShopDetailsUI()
 	local character = player.Character.PrimaryPart
 	local originalPosition = character.CFrame.Position
@@ -66,8 +74,8 @@ function handleClosingShopDetailsUI()
 	while true do
 		local distance = player:DistanceFromCharacter(originalPosition)
 		if distance >= 8 then
-			screenGui.Enabled = false
-			gameStarted = false
+			showGame(false)
+			startGame(false)
 			break
 		end
 
@@ -79,7 +87,7 @@ local hitArea1 = hitBoxContainer
 local hitArea2 = hitBoxContainer:FindFirstChild("InnerHit")
 local hitArea3 = hitBoxContainer:FindFirstChild("Bullseye")
 
-local function checkObjectsOverlap(a: GuiObject, b: GuiObject)
+function checkObjectsOverlap(a: GuiObject, b: GuiObject)
 	local aAbsPos = a.AbsolutePosition
 	local aAbsSize = a.AbsoluteSize
 
@@ -95,7 +103,7 @@ local function checkObjectsOverlap(a: GuiObject, b: GuiObject)
 	return aLeft < bRight and aRight > bLeft
 end
 
-local function animate(area: number)
+function animate(area: number)
 	local element: Frame = elements[area]
 
 	if element then
@@ -126,11 +134,11 @@ local function animate(area: number)
 	end
 end
 
-local function resetHitMarker()
+function resetHitMarker()
 	hitMarker.Position = UDim2.fromScale(0, 0.5)
 end
 
-local function relocateHitContainer()
+function relocateHitContainer()
 	if hitArea1 then
 		local randX = math.random()
 
@@ -143,7 +151,7 @@ end
 local currentFishHP = 0
 local isLosingHP = false
 
-local function startLosingHP()
+function startLosingHP()
 	if isLosingHP then return end
 	isLosingHP = true
 	task.wait(1)
@@ -210,8 +218,8 @@ if startGameEvent then
 	startGameEvent.OnClientEvent:Connect(function(data: { Fish: {}, Rod: {} })
 		resetHitMarker()
 
-		screenGui.Enabled = true
-		gameStarted = true
+		showGame(true)
+		startGame(true)
 
 		hookedFish = data.Fish
 		playerRod = data.Rod
