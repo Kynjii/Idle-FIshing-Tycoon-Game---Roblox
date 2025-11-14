@@ -1,6 +1,8 @@
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local satchel = require(ReplicatedStorage.Packages.satchel)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
@@ -101,3 +103,15 @@ if helperUpgradedEvent then
 		populateDetailsUI(keepTooltip)
 	end)
 end
+
+if not game:IsLoaded() then game.Loaded:Wait() end
+
+task.wait(7)
+satchel:SetBackpackEnabled(true)
+
+satchel.GetStateChangedEvent().Event:Connect(function(isOpened: boolean)
+	if isOpened then
+	else
+		print("Inventory closed")
+	end
+end)

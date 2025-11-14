@@ -5,13 +5,13 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
 
-local InventoryManager = {}
-InventoryManager.__index = InventoryManager
+local HelperManager = {}
+HelperManager.__index = HelperManager
 
-type InventoryManager = typeof(setmetatable({}, InventoryManager))
+type HelperManager = typeof(setmetatable({}, HelperManager))
 
-function InventoryManager.New(InventoryState: { HelperType.HelperData }, player: Player, teamId: number): InventoryManager
-	local self = setmetatable({} :: InventoryManager, InventoryManager)
+function HelperManager.New(InventoryState: { HelperType.HelperData }, player: Player, teamId: number): HelperManager
+	local self = setmetatable({} :: HelperManager, HelperManager)
 
 	self.Player = player
 	self.Owner = self.Owner or player.UserId
@@ -26,7 +26,7 @@ function InventoryManager.New(InventoryState: { HelperType.HelperData }, player:
 	return self
 end
 
-function InventoryManager.AttachEventListeners(self: InventoryManager)
+function HelperManager.AttachEventListeners(self: HelperManager)
 	local getPlayerInventoryEvent = Events.GetRemoteFn(Events.RemoteFunctionNames.GetPlayerInventory)
 	if getPlayerInventoryEvent then
 		getPlayerInventoryEvent.OnServerInvoke = function(player: Player)
@@ -40,7 +40,7 @@ function InventoryManager.AttachEventListeners(self: InventoryManager)
 end
 
 -- //SECTION - Cleanup
-function InventoryManager.Destroy(self: InventoryManager): ()
+function HelperManager.Destroy(self: HelperManager): ()
 	if self._cleaner then
 		self._cleaner:Clean()
 		self._cleaner = nil
@@ -50,4 +50,4 @@ function InventoryManager.Destroy(self: InventoryManager): ()
 end
 -- //!SECTION
 
-return InventoryManager
+return HelperManager
