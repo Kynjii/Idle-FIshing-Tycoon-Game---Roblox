@@ -198,12 +198,12 @@ FFGEnum.UI = {
 	Items = {
 		Hovered = "rbxassetid://119714101000238",
 		BackgroundQualityId = {
-			[1] = "rbxassetid://94138515421739",
-			[2] = "rbxassetid://78206843085783",
-			[3] = "rbxassetid://125653281446487",
-			[4] = "rbxassetid://113686615974215",
-			[5] = "rbxassetid://130543839885527",
-			[6] = "rbxassetid://104966714958616",
+			[1] = "rbxassetid://116550160036557",
+			[2] = "rbxassetid://79683515767790",
+			[3] = "rbxassetid://91830357643705",
+			[4] = "rbxassetid://138089822484721",
+			[5] = "rbxassetid://120034088685825",
+			[6] = "rbxassetid://127554426008778",
 		},
 	},
 	ProgressBar = {

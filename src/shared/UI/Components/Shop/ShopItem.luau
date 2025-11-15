@@ -100,6 +100,7 @@ local function ShopItem(
 	itemName.LayoutOrder = 1
 	itemName.Text = item.Name or item.Species
 	itemName.TextScaled = true
+	KinUI.AddStroke(itemName, "L")
 	itemName.Parent = mainContainer
 	-- //!SECTION
 

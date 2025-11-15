@@ -67,7 +67,7 @@ KinUI.Text = {
 }
 
 KinUI.CornerPx = { S = 8, M = 10, L = 12 }
-KinUI.StrokePx = { S = 1, M = 1, L = 2 }
+KinUI.StrokePx = { S = 0.5, M = 1, L = 2 }
 -- //!SECTION
 
 -- //SECTION - Internals
@@ -137,6 +137,13 @@ function KinUI.ApplyPanelStyle(frame: Frame | TextLabel | ImageLabel, panelColor
 	bg.ZIndex = 0
 	bg.Size = UDim2.fromScale(1, 1)
 	bg.Parent = frame
+end
+
+function KinUI.AddStroke(instance: Instance, thickness: "S" | "M" | "L")
+	local t = (KinUI.StrokePx :: any)[thickness]
+	local stroke = Instance.new("UIStroke")
+	stroke.Thickness = t
+	stroke.Parent = instance
 end
 
 -- Safe area helper: for ScreenGui with IgnoreGuiInset = true
