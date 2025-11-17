@@ -11,7 +11,7 @@ function ProgressBar.Create(props: {
 	HasBillboard: boolean?,
 	Adornee: Instance?,
 	Parent: Instance?,
-}): BillboardGui | Frame
+})
 	local billBoard
 	if props.HasBillboard then
 		billBoard = Instance.new("BillboardGui")

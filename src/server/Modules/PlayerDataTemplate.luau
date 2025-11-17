@@ -1,6 +1,5 @@
 local ServerScriptService = game:GetService("ServerScriptService")
 
-local FishCalculators = require(ServerScriptService.Server.Classes.Modules.FishCalculators)
 local Jobs = require(ServerScriptService.Server.Modules.Jobs.Jobs)
 local realmBuffs = {
 	-- FISH

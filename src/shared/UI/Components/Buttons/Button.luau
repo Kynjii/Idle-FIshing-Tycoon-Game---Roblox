@@ -25,10 +25,12 @@ function Button.Create(props: {
 	Text: string?,
 	Size: UDim2?,
 	CurrencyType: "None" | "Gold",
+	HoverEffect: boolean?,
 	Image: string?,
 })
 	local button = Instance.new("ImageButton")
 	button.Name = "Button"
+	button.HoverImage = buttonImages.squareColor.BlueGray
 	button.Image = buttonImages.squareColor[props.Color] or ""
 	button.PressedImage = buttonImages.squareColor.Blue
 	button.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
@@ -54,6 +56,7 @@ function Button.Create(props: {
 		buttonText.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 		buttonText.Position = FFGEnum.THEME.alignment.position.textCenter
 		buttonText.Parent = button
+		KinUI.AddStroke(buttonText, "S")
 	end
 
 	if props.CurrencyType == "Gold" then
@@ -71,14 +74,16 @@ function Button.Create(props: {
 		KinUI.ApplyList(button, Enum.FillDirection.Horizontal, { HAlign = Enum.HorizontalAlignment.Center, VAlign = Enum.VerticalAlignment.Center, Padding = "S" })
 	end
 
-	local baseSize = button.Size
-	button.MouseEnter:Connect(function()
-		AnimateButtonHover.Enter(button, baseSize)
-	end)
+	if props.HoverEffect then
+		local baseSize = button.Size
+		button.MouseEnter:Connect(function()
+			AnimateButtonHover.Enter(button, baseSize)
+		end)
 
-	button.MouseLeave:Connect(function()
-		AnimateButtonHover.Leave(button, baseSize)
-	end)
+		button.MouseLeave:Connect(function()
+			AnimateButtonHover.Leave(button, baseSize)
+		end)
+	end
 
 	return button
 end

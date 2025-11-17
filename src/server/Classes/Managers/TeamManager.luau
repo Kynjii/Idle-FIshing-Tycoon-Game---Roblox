@@ -2,7 +2,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local Teams = game:GetService("Teams")
 
-local TableUtil = require(ReplicatedStorage.Packages.TableUtil)
 local FishCalculators = require(ServerScriptService.Server.Classes.Modules.FishCalculators)
 local BuildingsManager = require(script.Parent.BuildingsManager)
 local ChainManager = require(script.Parent.ChainManager)
@@ -173,16 +172,13 @@ function TeamManager.AssignFishDexManager(profile, player: Player, teamId: numbe
 
 	local fishDexState = profile.FishDex
 	if not fishDexState then fishDexState = {} end
-
 	if not fishDexState[currentRealm] then fishDexState[currentRealm] = FishCalculators.GetAllFishVariations(currentRealm) end
 
-	task.delay(1.5, function()
-		local fishDexRealmState = fishDexState[currentRealm]
-		local fishDexManager = FishDexManager.New(fishDexRealmState, player, teamId, currentRealm)
-		if not FishDexManager then return end
+	local fishDexRealmState = fishDexState[currentRealm]
+	local fishDexManager = FishDexManager.New(fishDexRealmState, player, teamId, currentRealm)
+	if not FishDexManager then return end
 
-		TeamManager.FishDexManager[player.UserId] = fishDexManager
-	end)
+	TeamManager.FishDexManager[player.UserId] = fishDexManager
 end
 
 function TeamManager.AssignInventoryManager(profile, player: Player, teamId: number): ()
@@ -213,14 +209,23 @@ function TeamManager.AssignTeam(player: Player): number?
 end
 
 function TeamManager.AssignManagers(profile, player: Player, teamId: number): ()
-	TeamManager.AssignBuildingsManager(profile.Data, player, teamId)
-	TeamManager.AssignChainManagers(profile.Data, player, teamId)
-	TeamManager.AssignHelperShopManager(profile.Data, player, teamId)
-	TeamManager.AssignHelperManager(profile.Data, player, teamId)
-	TeamManager.AssignJobManager(profile.Data, player, teamId)
-	TeamManager.AssignFishingManager(profile.Data, player, teamId)
 	TeamManager.AssignFishDexManager(profile.Data, player, teamId)
 	TeamManager.AssignInventoryManager(profile.Data, player, teamId)
+	TeamManager.AssignFishingManager(profile.Data, player, teamId)
+	TeamManager.AssignHelperManager(profile.Data, player, teamId)
+	TeamManager.AssignHelperShopManager(profile.Data, player, teamId)
+	TeamManager.AssignBuildingsManager(profile.Data, player, teamId)
+	TeamManager.AssignChainManagers(profile.Data, player, teamId)
+	TeamManager.AssignJobManager(profile.Data, player, teamId)
+end
+
+function TeamManager.GetManager(
+	player: Player,
+	managerName: "ChainManagers" | "BuildingsManager" | "HelperShopManager" | "HelperManager" | "JobManager" | "FishingManager" | "FishDexManager" | "InventoryManager"
+): ()
+	local list = TeamManager[managerName][player.UserId]
+
+	return list
 end
 
 local managerTypes = {

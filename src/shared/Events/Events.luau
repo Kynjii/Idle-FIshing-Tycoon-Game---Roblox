@@ -1,3 +1,4 @@
+local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
@@ -21,6 +22,7 @@ Events.RemoteNames = {
 	HelperPurchased = "HelperPurchased",
 	UpgradeHelper = "UpgradeHelper",
 	UpdateJobManagementUI = "UpdateJobManagementUI",
+	UpdateInfoPanel = "UpdateInfoPanel",
 
 	-- Helpers
 	HelperUpgraded = "HelperUpgraded",
@@ -37,6 +39,7 @@ Events.RemoteFunctionNames = {
 	GetJobData = "GetJobData",
 	GetFishItem = "GetFishItem",
 	GetFishDex = "GetFishDex",
+	GetFishStat = "GetFishStat",
 }
 
 Events.BindableFunctionNames = {
@@ -78,6 +81,9 @@ Events.BindableNames = {
 
 	-- Tab selection
 	TabSelected = "TabSelected",
+
+	-- FishDex
+	UpdateCaughtFish = "UpdateCaughtFish",
 }
 
 local FOLDER_NAME = "RME"
@@ -200,13 +206,14 @@ function Events.FireBindableEvent(name: string, data: any)
 end
 
 function Events.FireEvent(name: string, player: Player, data: any)
-	assert(RunService:IsServer(), "FireEvent must be called from the server")
 	local folder = ReplicatedStorage:FindFirstChild(FOLDER_NAME)
 	local ev = folder and folder:FindFirstChild(name)
 	if ev and ev:IsA("RemoteEvent") then
 		local safeData = data
 		if type(data) == "table" and type(data.Serialize) == "function" then safeData = data:Serialize() end
-		ev:FireClient(player, safeData)
+		if RunService:IsServer() then ev:FireClient(player, safeData) end
+		if RunService:IsClient() then ev:FireServer(safeData) end
+
 		return true
 	else
 		warn(("RemoteEvent %q not found under ReplicatedStorage/%s"):format(name, FOLDER_NAME))

@@ -371,6 +371,19 @@ FFGEnum.THEME = {
 		disabled = Color3.fromRGB(108, 146, 179),
 	},
 
+	Variants = {
+		Normal = Color3.fromRGB(184, 181, 169),
+		Elemental = {
+			[1] = Color3.fromHex("#4EA7C8"),
+			[2] = Color3.fromHex("#A8E7FF"),
+			[3] = Color3.fromHex("#CC4A2B"),
+			[4] = Color3.fromHex("#6B8F3A"),
+			[5] = Color3.fromHex("#3C2147"),
+			[6] = Color3.fromHex("#C4B7FF"),
+		},
+		Elder = Color3.fromHex("#B59A5A"),
+	},
+
 	-- Sizing/styling
 	radius = 8,
 	padding = 10,

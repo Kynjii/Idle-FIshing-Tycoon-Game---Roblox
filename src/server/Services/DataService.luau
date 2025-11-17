@@ -64,6 +64,7 @@ local stateTypes = {
 	SaveJobState = "save Job State",
 	GetJobState = "get Job State",
 	SaveFish = "save Fish",
+	GetFishStat = "GetFishStat",
 	SaveFishDex = "save Fish Dex",
 }
 
@@ -561,10 +562,13 @@ function DataService.SaveFishDex(player: Player, fishDexState): boolean
 	local profile = getProfile(player, stateTypes.SaveFishDex)
 	if not profile then return false end
 
+	local currentRealm = getRealmData(profile)
+	if not currentRealm then return false end
+
 	-- Initialize Fish Dex array if it doesn't exist
 	if not profile.Data.FishDex then profile.Data.FishDex = {} end
 
-	profile.Data.FishDex = fishDexState
+	profile.Data.FishDex[currentRealm] = fishDexState
 
 	return true
 end
@@ -611,6 +615,36 @@ function DataService.SaveFishStat(player: Player, fish)
 
 	return true
 end
+
+function DataService.GetFishStat(player: Player, fish)
+	local profile = getProfile(player, stateTypes.GetFishStat)
+	if not profile then return false end
+
+	-- Initialize Fish Stats array if it doesn't exist
+	if not profile.Data.AccountStats then profile.Data.AccountStats = {} end
+	if not profile.Data.AccountStats.Fish then profile.Data.AccountStats.Fish = {} end
+
+	local speciesKey = fish.SpeciesKey
+	if not speciesKey then return false end
+
+	local storedFishData = profile.Data.AccountStats.Fish[speciesKey]
+	if not storedFishData then
+		profile.Data.AccountStats.Fish[speciesKey] = profile.Data.AccountStats.Fish[speciesKey]
+		local clonedStructure = fishStatStructure
+
+		profile.Data.AccountStats.Fish[speciesKey] = clonedStructure
+
+		storedFishData = profile.Data.AccountStats.Fish[speciesKey]
+	end
+
+	return storedFishData
+end
+
+local getFishStatFn = Events.GetRemoteFn(Events.RemoteFunctionNames.GetFishStat)
+if getFishStatFn then getFishStatFn.OnServerInvoke = function(player, fish)
+	print(`sending fish stat fpr {player}: {fish}`)
+	return DataService.GetFishStat(player, fish)
+end end
 -- //!SECTION
 
 function DataService.ResetAllPlayerData(player: Player): boolean

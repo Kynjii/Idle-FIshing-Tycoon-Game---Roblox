@@ -1,11 +1,9 @@
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
-local ShopGUI = require(ReplicatedStorage.Shared.UI.Components.Shop.ShopGUI)
-local ShopItem = require(ReplicatedStorage.Shared.UI.Components.Shop.ShopItem)
-local Tooltip = require(ReplicatedStorage.Shared.UI.Components.Tooltips.Tooltip)
+local FishDexItem = require(ReplicatedStorage.Shared.UI.Components.FishDex.FishDexItem)
+local FishDexUI = require(ReplicatedStorage.Shared.UI.Components.FishDex.FishDexUI)
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
@@ -17,38 +15,26 @@ local fishDexButtonScreenGui = playerGui:WaitForChild("FishDexButton")
 local hudFishDexButton = fishDexButtonScreenGui:FindFirstChild("OpenButton", true) :: ImageButton
 
 task.spawn(function()
-	screenGui = ShopGUI.Create({ screenGuiName = "PlayerFishDex", shopName = "FISHDEX" })
+	screenGui = FishDexUI.Create({ screenGuiName = "PlayerFishDex", shopName = "Fish Dex" })
 	screenGui.Parent = playerGui
 
 	main = screenGui:FindFirstChild("Main", true) :: Frame
 	if main then inventoryItemsContainer = main:FindFirstChild("ItemContainer", true) :: ScrollingFrame end
 end)
 
-function clearExistingTooltip()
-	Tooltip.ClearExisting(player.UserId)
-end
-
 function createitemComponent(fish)
-	return ShopItem({
+	return FishDexItem({
 		ItemData = fish,
-		BackgroundColor3 = FFGEnum.QUALITIES[1].Color,
 		Size = UDim2.fromScale(1, 1),
-		Rounded = FFGEnum.THEME.button.cornerRadius,
-		HoverEffect = true,
 		Visible = true,
-		ScaleType = Enum.ScaleType.Slice,
-		SliceCenter = Rect.new(77, 77, 100, 111),
 		Parent = inventoryItemsContainer,
-		ShopInstance = main,
 	})
 end
 
 local playerFishDex: { [string]: any } = {}
 local itemComponents = {}
 
-function updateUI(keepTooltip: boolean)
-	if not keepTooltip then clearExistingTooltip() end
-
+function updateUI()
 	for _, component: Instance in pairs(itemComponents) do
 		component:Destroy()
 	end
@@ -58,17 +44,26 @@ function updateUI(keepTooltip: boolean)
 	if inventoryItemsContainer then
 		for k, item in pairs(playerFishDex) do
 			local itemComponent = createitemComponent(item)
+			if item.Species == "Angelfish" then
+				if item.Variant == "Normal" then
+					local btn = itemComponent:FindFirstChildOfClass("ImageButton")
+					if btn then
+						btn.Selected = true
+						Events.FireEvent(Events.RemoteNames.UpdateInfoPanel, player, item)
+					end
+				end
+			end
 			itemComponents[`{item.SpeciesKey}_{item.Variant}`] = itemComponent
 		end
 	end
 end
 
-function populateDetailsUI(keepTooltip: boolean?)
+function populateDetailsUI()
 	if not playerFishDex then return end
 	local blur = Instance.new("BlurEffect")
 	blur.Parent = Lighting
 
-	updateUI(keepTooltip)
+	updateUI()
 end
 
 local getFishDexFn = Events.GetRemoteFn(Events.RemoteFunctionNames.GetFishDex)

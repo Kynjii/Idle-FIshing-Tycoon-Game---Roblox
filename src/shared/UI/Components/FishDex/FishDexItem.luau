@@ -1,7 +1,9 @@
 --!strict
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
+local Events = require(ReplicatedStorage.Shared.Events.Events)
 local FishData = require(ReplicatedStorage.Shared.Fish.FishData)
 local FishType = require(ReplicatedStorage.Shared.Types.Classes.FishType)
 local KinUI = require(ReplicatedStorage.Shared.UI.KinUI)
@@ -10,13 +12,12 @@ local function FishDexItem(props: {
 	ItemData: FishType.FishData,
 	Size: UDim2,
 	Visible: boolean?,
-	HoverEffect: boolean?,
 	Parent: Instance,
 })
 	local item = props.ItemData
 
 	local fishDexItemContainer = Instance.new("Frame")
-	fishDexItemContainer.Name = item.Id or item.Species
+	fishDexItemContainer.Name = item.Id or item.Species or "UnknownFishContainer"
 	fishDexItemContainer.BackgroundTransparency = 1
 	fishDexItemContainer.Size = props.Size
 	fishDexItemContainer.BackgroundColor3 = FFGEnum.THEME.color.white
@@ -37,7 +38,7 @@ local function FishDexItem(props: {
 		Elder = 5,
 	}
 
-	local itemQualityBG = Instance.new("ImageLabel")
+	local itemQualityBG = Instance.new("ImageButton")
 	itemQualityBG.Name = "ItemBG"
 	itemQualityBG.Size = UDim2.fromScale(1, 1)
 	itemQualityBG.BackgroundTransparency = 1
@@ -45,22 +46,6 @@ local function FishDexItem(props: {
 	itemQualityBG.Position = FFGEnum.THEME.alignment.position.center
 	itemQualityBG.Image = FFGEnum.UI.Items.BackgroundQualityId[item.QualityId or item.Tier or variant[item.Variant]]
 	itemQualityBG.Parent = fishDexItemContainer
-
-	-- //SECTION - Shop Item Outline
-	local hoverImage = Instance.new("ImageLabel")
-	hoverImage.Name = "HoverImage"
-	hoverImage.Image = FFGEnum.UI.Items.Hovered
-	hoverImage.BackgroundTransparency = 1
-	hoverImage.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
-	hoverImage.Position = FFGEnum.THEME.alignment.position.center
-	hoverImage.ScaleType = Enum.ScaleType.Slice
-	hoverImage.SliceCenter = Rect.new(26, 34, 31, 37)
-	hoverImage.ImageColor3 = FFGEnum.THEME.color.white
-	hoverImage.ImageTransparency = 0.7
-	hoverImage.Size = UDim2.fromScale(0.95, 0.85)
-	hoverImage.Visible = false
-	hoverImage.Parent = fishDexItemContainer
-	-- //!SECTION
 
 	-- //SECTION Holds all the main elements
 	local mainContainer = Instance.new("Frame")
@@ -70,6 +55,7 @@ local function FishDexItem(props: {
 	mainContainer.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 	mainContainer.BackgroundTransparency = 1
 	mainContainer.Parent = fishDexItemContainer
+	KinUI.ApplyList(mainContainer, Enum.FillDirection.Vertical, { VFlex = Enum.UIFlexAlignment.SpaceAround, HAlign = Enum.HorizontalAlignment.Center })
 	-- //!SECTION
 
 	-- //SECTION - Item Name
@@ -109,14 +95,10 @@ local function FishDexItem(props: {
 	itemImage.Parent = mainContainer
 	-- //!SECTION
 
-	-- //SECTION - UI List Layout
-	local uiList = Instance.new("UIListLayout")
-	uiList.HorizontalAlignment = Enum.HorizontalAlignment.Center
-	uiList.VerticalFlex = Enum.UIFlexAlignment.SpaceAround
-	uiList.FillDirection = Enum.FillDirection.Vertical
-	uiList.SortOrder = Enum.SortOrder.LayoutOrder
-	uiList.Parent = mainContainer
-	-- //!SECTION
+	itemQualityBG.Activated:Connect(function()
+		print(`click: {item}`)
+		Events.FireEvent(Events.RemoteNames.UpdateInfoPanel, Players.LocalPlayer, item)
+	end)
 
 	return fishDexItemContainer
 end

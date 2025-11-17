@@ -2,7 +2,6 @@ local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
-local FishDexManager = require(script.Parent.FishDexManager)
 local Fish = require(ServerScriptService.Server.Classes.Fish)
 local Notification = require(ServerScriptService.Server.Classes.Modules.Notification)
 local Trove = require(ReplicatedStorage.Packages.Trove)
@@ -81,7 +80,8 @@ function FishingManager.SaveCaughtFish(self: FishingManager, caughtFishId)
 	local fish = self.GeneratedFish[caughtFishId]
 	fish:Save()
 
-	FishDexManager:UpdateCaughtStatus(fish)
+	local updateCaughtFishEvent = Events.GetBindableEvent(Events.BindableNames.UpdateCaughtFish)
+	if updateCaughtFishEvent then updateCaughtFishEvent:Fire({ Fish = fish:Serialize(), Player = self.Player }) end
 
 	Notification.SendSuccess(self.Player, `You caught a {fish.Name}`)
 end

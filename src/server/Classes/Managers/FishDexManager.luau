@@ -20,9 +20,9 @@ type FishDexManager = {
 	Destroy: (self: FishDexManager) -> (),
 }
 
-function FishDexManager.New(fishDexState, player: Player, teamId: number, currentRealm: number)
-	local self = setmetatable({}, FishDexManager)
-	print(fishDexState)
+function FishDexManager.New(fishDexState, player: Player, teamId: number, currentRealm: number): FishDexManager
+	local self = setmetatable({} :: FishDexManager, FishDexManager)
+
 	self.Player = player
 	self.Owner = self.Owner or player.UserId
 	self.TeamId = teamId
@@ -36,15 +36,23 @@ function FishDexManager.New(fishDexState, player: Player, teamId: number, curren
 	return self
 end
 
-function FishDexManager.CheckCaughtStatus(self: FishDexManager, caughtFish: Fish.Fish)
-	local existing = TableUtil.Find(self.FishDexState, function(fish): boolean
+local function findExistingFish(fishDexState, caughtFish)
+	local existingFish = TableUtil.Find(fishDexState, function(fish): boolean
 		local speciesName = fish.Species
 		local variant = fish.Variant
 
 		return speciesName == caughtFish.Species and variant == caughtFish.Variant
 	end)
 
-	print(self.FishDexState, existing)
+	if existingFish then
+		return existingFish
+	else
+		return false
+	end
+end
+
+function FishDexManager.CheckCaughtStatus(self: FishDexManager, caughtFish: Fish.Fish)
+	local existing = findExistingFish(self.FishDexState, caughtFish)
 
 	if existing and existing.Caught then
 		return true
@@ -57,19 +65,12 @@ function FishDexManager.UpdateCaughtStatus(self: FishDexManager, caughtFish: Fis
 	local hasCaught = self:CheckCaughtStatus(caughtFish)
 	if hasCaught then return end
 
-	local existing = TableUtil.Find(self.FishDexState, function(fish): boolean
-		local speciesName = fish.Species
-		local variant = fish.Variant
+	local existing = findExistingFish(self.FishDexState, caughtFish)
 
-		return speciesName == caughtFish.Species and variant == caughtFish.Variant
-	end)
-	print(existing)
 	if existing then
 		TableUtil.Reconcile(existing, caughtFish)
 		existing.Caught = true
 	end
-
-	print(existing)
 
 	self:Save()
 
@@ -83,6 +84,29 @@ function FishDexManager.AttachAttListeners(self: FishDexManager)
 
 		return self.FishDexState
 	end end
+
+	local updateInfoPanel = Events.GetRemote(Events.RemoteNames.UpdateInfoPanel)
+	if updateInfoPanel then
+		updateInfoPanel.OnServerEvent:Connect(function(player: Player, fish: Fish.Fish)
+			if self.Player ~= player or self.Owner ~= player.UserId then return end
+			local existing = findExistingFish(self.FishDexState, fish)
+			if existing then
+				Events.FireEvent(Events.RemoteNames.UpdateInfoPanel, player, fish)
+			else
+				local fishData = DataService.GetFishStat(player, fish)
+				Events.FireEvent(Events.RemoteNames.UpdateInfoPanel, player, fishData)
+			end
+		end)
+	end
+
+	local updateCaughtFishEvent = Events.GetBindableEvent(Events.BindableNames.UpdateCaughtFish)
+	if updateCaughtFishEvent then
+		updateCaughtFishEvent.Event:Connect(function(data: { Fish: Fish.Fish, Player: Player })
+			if self.Player ~= data.Player or self.Owner ~= data.Player.UserId then return end
+
+			self:UpdateCaughtStatus(data.Fish)
+		end)
+	end
 end
 
 function FishDexManager.Save(self: FishDexManager)

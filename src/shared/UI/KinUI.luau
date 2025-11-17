@@ -66,8 +66,8 @@ KinUI.Text = {
 	LineHeight = 1.2,
 }
 
-KinUI.CornerPx = { S = 8, M = 10, L = 12 }
-KinUI.StrokePx = { S = 0.5, M = 1, L = 2 }
+KinUI.CornerPx = { XS = UDim.new(0, 6), S = UDim.new(0, 8), M = UDim.new(0, 10), L = UDim.new(0, 12) }
+KinUI.StrokePx = { S = 0.5, M = 1, L = 2, XL = 4 }
 -- //!SECTION
 
 -- //SECTION - Internals
@@ -139,11 +139,19 @@ function KinUI.ApplyPanelStyle(frame: Frame | TextLabel | ImageLabel, panelColor
 	bg.Parent = frame
 end
 
-function KinUI.AddStroke(instance: Instance, thickness: "S" | "M" | "L")
+function KinUI.AddStroke(instance: Instance, thickness: "S" | "M" | "L" | "XL", color: Color3?)
 	local t = (KinUI.StrokePx :: any)[thickness]
 	local stroke = Instance.new("UIStroke")
+	if color then stroke.Color = color end
 	stroke.Thickness = t
 	stroke.Parent = instance
+end
+
+function KinUI.AddCorner(instance: Instance, radius: "XS" | "S" | "M" | "L")
+	local r = (KinUI.CornerPx :: any)[radius]
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = r
+	corner.Parent = instance
 end
 
 -- Safe area helper: for ScreenGui with IgnoreGuiInset = true
@@ -195,6 +203,52 @@ function KinUI.SetGap(layout: UIListLayout | UIGridLayout, token: "XS" | "S" | "
 	else
 		layout.Padding = UDim.new(s, 0)
 	end
+end
+
+-- //!SECTION
+
+-- //SECTION - Components
+
+function KinUI.AddTextLabel(parent: Instance, size: UDim2?, text: string, strokeSize: "S" | "M" | "L" | "XL"): TextLabel
+	local textLabel = Instance.new("TextLabel")
+	textLabel.Name = "TextLabel"
+	textLabel.Font = FFGEnum.THEME.bigFont
+	textLabel.Size = size or UDim2.fromScale(0.8, 0.8)
+	textLabel.Position = FFGEnum.THEME.alignment.position.center
+	textLabel.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
+	textLabel.BackgroundTransparency = 1
+	textLabel.TextColor3 = FFGEnum.THEME.color.white
+	textLabel.Text = text
+	textLabel.TextScaled = true
+	KinUI.AddStroke(textLabel, strokeSize)
+	textLabel.Parent = parent
+
+	return textLabel
+end
+
+function KinUI.AddBadge(parent: Instance, size: UDim2?, text: string, strokeSize: "S" | "M" | "L" | "XL", layoutOrder: number?, color: Color3?): Frame
+	local badgeContainer = Instance.new("Frame")
+	badgeContainer.Size = size or UDim2.fromScale(0.6, 1)
+	badgeContainer.LayoutOrder = layoutOrder or 1
+	badgeContainer.BackgroundColor3 = color or Color3.new(1, 1, 1)
+	badgeContainer.Parent = parent
+	KinUI.AddCorner(badgeContainer, "XS")
+
+	local textLabel = Instance.new("TextLabel")
+	textLabel.Name = "TextLabel"
+	textLabel.Font = FFGEnum.THEME.bigFont
+	textLabel.Size = UDim2.fromScale(0.8, 0.8)
+	textLabel.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
+	textLabel.Position = FFGEnum.THEME.alignment.position.center
+	textLabel.BackgroundTransparency = 1
+	textLabel.TextColor3 = FFGEnum.THEME.color.white
+	textLabel.Text = text
+	textLabel.TextScaled = true
+	KinUI.AddStroke(textLabel, strokeSize)
+	KinUI.AddPadding(textLabel, "XL")
+	textLabel.Parent = badgeContainer
+
+	return badgeContainer
 end
 
 -- //!SECTION
