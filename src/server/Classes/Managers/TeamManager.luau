@@ -1,6 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local Teams = game:GetService("Teams")
 
+local TableUtil = require(ReplicatedStorage.Packages.TableUtil)
+local FishCalculators = require(ServerScriptService.Server.Classes.Modules.FishCalculators)
 local BuildingsManager = require(script.Parent.BuildingsManager)
 local ChainManager = require(script.Parent.ChainManager)
 local FishDexManager = require(script.Parent.FishDexManager)
@@ -168,12 +171,18 @@ function TeamManager.AssignFishDexManager(profile, player: Player, teamId: numbe
 	TeamManager.FishDexManager[player.UserId] = TeamManager.FishDexManager[player.UserId] or { OwnerId = player.UserId }
 	local currentRealm = profile.CurrentRealm or 1
 
-	local fishDexState = profile.FishDex or {}
+	local fishDexState = profile.FishDex
+	if not fishDexState then fishDexState = {} end
 
-	local fishDexManager = FishDexManager.New(fishDexState, player, teamId, currentRealm)
-	if not FishDexManager then return end
+	if not fishDexState[currentRealm] then fishDexState[currentRealm] = FishCalculators.GetAllFishVariations(currentRealm) end
 
-	TeamManager.FishDexManager[player.UserId] = fishDexManager
+	task.delay(1.5, function()
+		local fishDexRealmState = fishDexState[currentRealm]
+		local fishDexManager = FishDexManager.New(fishDexRealmState, player, teamId, currentRealm)
+		if not FishDexManager then return end
+
+		TeamManager.FishDexManager[player.UserId] = fishDexManager
+	end)
 end
 
 function TeamManager.AssignInventoryManager(profile, player: Player, teamId: number): ()

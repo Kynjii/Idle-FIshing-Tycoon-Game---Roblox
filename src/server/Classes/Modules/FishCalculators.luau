@@ -405,6 +405,8 @@ function FishCalculator.GetAllFishVariations(realmId: number): { { Species: stri
 		end
 	end
 
+	print(variations)
+
 	return variations
 end
 

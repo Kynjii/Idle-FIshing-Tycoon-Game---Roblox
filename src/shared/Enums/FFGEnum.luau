@@ -171,6 +171,7 @@ FFGEnum.UI = {
 		Alert = "rbxassetid://85527034084832",
 		ThumbsUp = "rbxassetid://117741528720677",
 		Close = "rbxassetid://83362863401865",
+		Water = "rbxassetid://71379777562758",
 	},
 	Frames = {
 		MainUIPanel = "rbxassetid://95574095879865",

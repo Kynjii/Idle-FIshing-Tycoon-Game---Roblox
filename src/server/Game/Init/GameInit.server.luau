@@ -57,6 +57,18 @@ local function updateTools()
 			fishTool.ToolTip = fish.Species
 			fishTool.RequiresHandle = true
 			fishTool.CanBeDropped = true
+		else
+			-- //TODO - Remove once models are in-game
+			local tempTool = Instance.new("Tool")
+			tempTool.TextureId = fish.ItemImage
+			tempTool.ToolTip = fish.Species
+			tempTool.RequiresHandle = true
+			tempTool.CanBeDropped = true
+			tempTool.Parent = ServerStorage.Tools
+
+			local tempPart = Instance.new("Part")
+			tempPart.Name = "Handle"
+			tempPart.Parent = tempTool
 		end
 	end
 end

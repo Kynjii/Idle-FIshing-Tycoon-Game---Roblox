@@ -12,7 +12,7 @@ function FishDexUI.Create()
 		panelName = "Fish Dex",
 		hasTabs = true,
 		tabs = {
-			{ Name = "Transporting", Index = 1, Icon = FFGEnum.UI.Icons.Transporting },
+			{ Name = "Transporting", Index = 1, Icon = FFGEnum.UI.Icons.Water },
 		},
 	})
 

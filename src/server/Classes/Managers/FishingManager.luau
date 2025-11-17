@@ -2,6 +2,7 @@ local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local FishDexManager = require(script.Parent.FishDexManager)
 local Fish = require(ServerScriptService.Server.Classes.Fish)
 local Notification = require(ServerScriptService.Server.Classes.Modules.Notification)
 local Trove = require(ReplicatedStorage.Packages.Trove)
@@ -80,7 +81,9 @@ function FishingManager.SaveCaughtFish(self: FishingManager, caughtFishId)
 	local fish = self.GeneratedFish[caughtFishId]
 	fish:Save()
 
-	Notification.SendSuccess(self.Player, `GRATZ! You caught a {fish.Name}`)
+	FishDexManager:UpdateCaughtStatus(fish)
+
+	Notification.SendSuccess(self.Player, `You caught a {fish.Name}`)
 end
 
 function FishingManager.GetPlayerRod(self: FishingManager)
@@ -103,7 +106,6 @@ function FishingManager.SetupProximityPrompts(self: FishingManager)
 			if self.Player ~= player or self.Owner ~= player.UserId then return end
 
 			self.CurrentFishingLocTier = taggedLocationTier
-			print(self.CurrentFishingLocTier)
 
 			Events.FireEvent(Events.RemoteNames.StartFishingMiniGame, player, { Fish = self:GetRandomFish(taggedLocationTier, self.RealmId), Rod = self:GetPlayerRod() })
 		end))

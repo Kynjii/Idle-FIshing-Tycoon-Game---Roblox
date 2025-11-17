@@ -37,7 +37,7 @@ local realmBuffs = {
 return {
 	CurrentRealm = 1,
 	GlobalBuffs = {},
-	FishDex = FishCalculators.GetAllFishVariations(1),
+	FishDex = {},
 	Inventory = {
 		Fish = {},
 		Equipment = {},

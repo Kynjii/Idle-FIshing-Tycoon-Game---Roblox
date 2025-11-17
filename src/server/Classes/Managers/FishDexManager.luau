@@ -22,7 +22,7 @@ type FishDexManager = {
 
 function FishDexManager.New(fishDexState, player: Player, teamId: number, currentRealm: number)
 	local self = setmetatable({}, FishDexManager)
-
+	print(fishDexState)
 	self.Player = player
 	self.Owner = self.Owner or player.UserId
 	self.TeamId = teamId
@@ -44,6 +44,8 @@ function FishDexManager.CheckCaughtStatus(self: FishDexManager, caughtFish: Fish
 		return speciesName == caughtFish.Species and variant == caughtFish.Variant
 	end)
 
+	print(self.FishDexState, existing)
+
 	if existing and existing.Caught then
 		return true
 	else
@@ -52,14 +54,22 @@ function FishDexManager.CheckCaughtStatus(self: FishDexManager, caughtFish: Fish
 end
 
 function FishDexManager.UpdateCaughtStatus(self: FishDexManager, caughtFish: Fish.Fish)
+	local hasCaught = self:CheckCaughtStatus(caughtFish)
+	if hasCaught then return end
+
 	local existing = TableUtil.Find(self.FishDexState, function(fish): boolean
 		local speciesName = fish.Species
 		local variant = fish.Variant
 
 		return speciesName == caughtFish.Species and variant == caughtFish.Variant
 	end)
+	print(existing)
+	if existing then
+		TableUtil.Reconcile(existing, caughtFish)
+		existing.Caught = true
+	end
 
-	if existing then existing.Caught = true end
+	print(existing)
 
 	self:Save()
 
@@ -67,18 +77,6 @@ function FishDexManager.UpdateCaughtStatus(self: FishDexManager, caughtFish: Fis
 end
 
 function FishDexManager.AttachAttListeners(self: FishDexManager)
-	local caughtFishEvent = Events.GetRemote(Events.RemoteNames.FishCaught)
-	if caughtFishEvent then
-		self._cleaner:Add(caughtFishEvent.OnServerEvent:Connect(function(player: Player, fish: Fish.Fish)
-			if self.Player ~= player or self.Owner ~= player.UserId then return end
-
-			local hasCaught = self:CheckCaughtStatus(fish)
-			if hasCaught then return end
-
-			self:UpdateCaughtStatus(fish)
-		end))
-	end
-
 	local getFishDexFn = Events.GetRemoteFn(Events.RemoteFunctionNames.GetFishDex)
 	if getFishDexFn then getFishDexFn.OnServerInvoke = function(player: Player)
 		if self.Player ~= player or self.Owner ~= player.UserId then return end

@@ -3,7 +3,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
-local FishData = require(ReplicatedStorage.Shared.Fish.FishData)
 local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
 local KinUI = require(ReplicatedStorage.Shared.UI.KinUI)
 local Format = require(ReplicatedStorage.Shared.Utils.Format)
@@ -27,7 +26,7 @@ local function ShopItem(
 	local item = props.ItemData
 
 	local shopItemContainer = Instance.new("Frame")
-	shopItemContainer.Name = item.Id or item.Species
+	shopItemContainer.Name = item.Id or "Shopitem"
 	shopItemContainer.BackgroundTransparency = 1
 	shopItemContainer.Size = props.Size
 	shopItemContainer.BackgroundColor3 = props.BackgroundColor3 or FFGEnum.THEME.color.white
@@ -42,12 +41,6 @@ local function ShopItem(
 	shopItemContainerAspect.AspectType = Enum.AspectType.ScaleWithParentSize
 	shopItemContainerAspect.Parent = shopItemContainer
 
-	local variant = {
-		normal = 1,
-		elemental = 2,
-		elder = 5,
-	}
-
 	local itemQualityBG = Instance.new("ImageLabel")
 	itemQualityBG.Name = "ItemBG"
 	itemQualityBG.Size = UDim2.fromScale(1, 1)
@@ -56,7 +49,7 @@ local function ShopItem(
 	itemQualityBG.BackgroundTransparency = 1
 	itemQualityBG.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 	itemQualityBG.Position = FFGEnum.THEME.alignment.position.center
-	itemQualityBG.Image = FFGEnum.UI.Items.BackgroundQualityId[item.QualityId or item.Tier or variant[item.Variant]]
+	itemQualityBG.Image = FFGEnum.UI.Items.BackgroundQualityId[item.QualityId or item.Tier]
 	itemQualityBG.Parent = shopItemContainer
 
 	-- //SECTION - Shop Item Outline
@@ -99,27 +92,16 @@ local function ShopItem(
 	itemName.BackgroundTransparency = 1
 	itemName.TextColor3 = FFGEnum.THEME.color.white
 	itemName.LayoutOrder = 1
-	itemName.Text = not item.Caught and item.SpeciesKey and "?" or item.Name
+	itemName.Text = item.Name
 	itemName.TextScaled = true
 	KinUI.AddStroke(itemName, "L")
 	itemName.Parent = mainContainer
 	-- //!SECTION
 
 	-- //SECTION -  Item Image
-	local image
-	if item.SpeciesKey then
-		if item.Caught then
-			image = item.ItemImage
-		else
-			image = FishData.FISH_ASSETS_MASKED[item.SpeciesKey]
-		end
-	else
-		image = item.ItemImage
-	end
-
 	local itemImage = Instance.new("ImageLabel")
 	itemImage.Name = "ItemImage"
-	itemImage.Image = image or ""
+	itemImage.Image = item.ItemImage or ""
 	itemImage.LayoutOrder = 2
 	itemImage.BackgroundTransparency = 1
 	itemImage.Size = UDim2.fromScale(0.6, 0.6)
@@ -129,7 +111,7 @@ local function ShopItem(
 	-- //!SECTION
 
 	-- //SECTION -  Item Price
-	if not item.IsPurchased and not item.SpeciesKey then
+	if not item.IsPurchased then
 		local priceContainer = Instance.new("Frame")
 		priceContainer.Name = "PriceContainer"
 		priceContainer.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
@@ -176,7 +158,7 @@ local function ShopItem(
 		ItemBaseCostTxt.TextColor3 = FFGEnum.THEME.color.white
 		ItemBaseCostTxt.BackgroundTransparency = 1
 		ItemBaseCostTxt.LayoutOrder = 2
-		ItemBaseCostTxt.Text = item.Caught and "CAUGHT" or Format.CurrencyNumber(item.BaseCost or 0) or ""
+		ItemBaseCostTxt.Text = Format.CurrencyNumber(item.BaseCost or 0) or ""
 		ItemBaseCostTxt.Font = FFGEnum.THEME.bigFont
 		ItemBaseCostTxt.Size = UDim2.fromScale(0.5, 0.9)
 		ItemBaseCostTxt.TextScaled = true
