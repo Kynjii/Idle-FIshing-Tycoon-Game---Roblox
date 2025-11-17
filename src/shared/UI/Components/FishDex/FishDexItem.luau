@@ -17,7 +17,7 @@ local function FishDexItem(props: {
 	local item = props.ItemData
 
 	local fishDexItemContainer = Instance.new("Frame")
-	fishDexItemContainer.Name = item.Id or item.Species or "UnknownFishContainer"
+	fishDexItemContainer.Name = item.SpeciesKey or "UnknownFishContainer"
 	fishDexItemContainer.BackgroundTransparency = 1
 	fishDexItemContainer.Size = props.Size
 	fishDexItemContainer.BackgroundColor3 = FFGEnum.THEME.color.white
@@ -96,7 +96,6 @@ local function FishDexItem(props: {
 	-- //!SECTION
 
 	itemQualityBG.Activated:Connect(function()
-		print(`click: {item}`)
 		Events.FireEvent(Events.RemoteNames.UpdateInfoPanel, Players.LocalPlayer, item)
 	end)
 

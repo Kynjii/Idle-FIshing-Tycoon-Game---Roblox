@@ -90,12 +90,7 @@ function FishDexManager.AttachAttListeners(self: FishDexManager)
 		updateInfoPanel.OnServerEvent:Connect(function(player: Player, fish: Fish.Fish)
 			if self.Player ~= player or self.Owner ~= player.UserId then return end
 			local existing = findExistingFish(self.FishDexState, fish)
-			if existing then
-				Events.FireEvent(Events.RemoteNames.UpdateInfoPanel, player, fish)
-			else
-				local fishData = DataService.GetFishStat(player, fish)
-				Events.FireEvent(Events.RemoteNames.UpdateInfoPanel, player, fishData)
-			end
+			if existing then Events.FireEvent(Events.RemoteNames.UpdateInfoPanel, player, existing) end
 		end)
 	end
 

@@ -78,10 +78,6 @@ function Fish.New(state, player: Player, teamId: number, fishingLocTier: number,
 	self.Quality = FFGEnum.QUALITIES[self.QualityId]
 	self.MaxHP, self.Weight = self:CalculateStats()
 
-	print(`Fish: {fishingLocTier}`)
-	print(`Fish Quality: {self.QualityId}`)
-	print(`Fish {self.MaxHP}`)
-
 	self._cleaner = Trove.new()
 
 	return self

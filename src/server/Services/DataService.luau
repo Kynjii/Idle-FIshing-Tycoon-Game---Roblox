@@ -5,6 +5,7 @@ local TableUtil = require(ReplicatedStorage.Packages.TableUtil)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local BuildingType = require(ReplicatedStorage.Shared.Types.Classes.BuildingType)
+local FishType = require(ReplicatedStorage.Shared.Types.Classes.FishType)
 local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
 local Format = require(ReplicatedStorage.Shared.Utils.Format)
 local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
@@ -640,11 +641,15 @@ function DataService.GetFishStat(player: Player, fish)
 	return storedFishData
 end
 
-local getFishStatFn = Events.GetRemoteFn(Events.RemoteFunctionNames.GetFishStat)
-if getFishStatFn then getFishStatFn.OnServerInvoke = function(player, fish)
-	print(`sending fish stat fpr {player}: {fish}`)
-	return DataService.GetFishStat(player, fish)
-end end
+-- Gives server time to create all events
+task.delay(9, function()
+	local getFishStatFn = Events.GetRemoteFn(Events.RemoteFunctionNames.GetFishStat)
+	if getFishStatFn then getFishStatFn.OnServerInvoke = function(player: Player, fish: FishType.FishData)
+		local value = DataService.GetFishStat(player, fish)
+		return value
+	end end
+end)
+
 -- //!SECTION
 
 function DataService.ResetAllPlayerData(player: Player): boolean

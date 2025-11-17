@@ -1,5 +1,4 @@
 --!strict
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
@@ -101,9 +100,12 @@ function InfoPanel.Create(props: {
 	local statData = nil
 	local fishStatFn = Events.GetRemoteFn(Events.RemoteFunctionNames.GetFishStat)
 	if fishStatFn then
-		if data.Caught then statData = fishStatFn:InvokeServer(data) end
+		if data.Caught then
+			local freshData = fishStatFn:InvokeServer(data)
+			local variantData = freshData[data.Variant]
+			statData = variantData
+		end
 	end
-	print(statData)
 
 	local itemProgress = Instance.new("Frame")
 	itemProgress.Name = "ItemProgress"
@@ -132,15 +134,15 @@ function InfoPanel.Create(props: {
 			local textLabel = KinUI.AddTextLabel(qualityContainer, UDim2.fromScale(0.25, 0.8), FFGEnum.QUALITIES[i].Label, "M")
 			textLabel.LayoutOrder = 1
 
-			local countLabel = KinUI.AddTextLabel(qualityContainer, UDim2.fromScale(0.15, 0.8), statData[data.Variant].Count, "M")
+			local countLabel = KinUI.AddTextLabel(qualityContainer, UDim2.fromScale(0.15, 0.8), statData[FFGEnum.QUALITIES[i].Label].Caught, "M")
 			countLabel.LayoutOrder = 2
 
 			local progressBarContainer, progressBar = ProgressBar.Create({ Color = "Green", Parent = qualityContainer })
 			progressBarContainer.Size = UDim2.fromScale(0.4, 1)
 			if typeof(progressBarContainer) == "Frame" then progressBarContainer.LayoutOrder = 3 end
 
-			-- //TODO - currentCount, achievement target
-			ProgressBar.Update(progressBar, statData[data.Variant].Count, 1000)
+			-- //TODO - currentCaught, achievement target
+			ProgressBar.Update(progressBar, statData[FFGEnum.QUALITIES[i].Label].Caught, 1000)
 
 			local claimButton = Button.Create({ Color = "White", Text = "Claim", CurrencyType = "None", Size = UDim2.fromScale(0.1, 1) })
 			claimButton.ImageColor3 = FFGEnum.THEME.intent.disabled

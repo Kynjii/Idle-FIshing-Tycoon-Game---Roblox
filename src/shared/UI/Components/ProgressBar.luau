@@ -45,7 +45,7 @@ function ProgressBar.Create(props: {
 	progressBG.ImageColor3 = FFGEnum.UI.ProgressBar.BackgroundColor
 	progressBG.Position = FFGEnum.THEME.alignment.position.center
 	progressBG.ScaleType = Enum.ScaleType.Slice
-	progressBG.Size = UDim2.fromScale(1, 1)
+	progressBG.Size = UDim2.fromScale(0, 1)
 	progressBG.SliceCenter = FFGEnum.UI.ProgressBar.BackgroundWhite.SliceCenter
 
 	local progressBar = Instance.new("ImageLabel")
