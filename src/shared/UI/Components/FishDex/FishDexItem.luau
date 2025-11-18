@@ -32,19 +32,15 @@ local function FishDexItem(props: {
 	fishDexItemContainerAspect.AspectType = Enum.AspectType.ScaleWithParentSize
 	fishDexItemContainerAspect.Parent = fishDexItemContainer
 
-	local variant = {
-		Normal = 1,
-		Elemental = 2,
-		Elder = 5,
-	}
-
 	local itemQualityBG = Instance.new("ImageButton")
 	itemQualityBG.Name = "ItemBG"
 	itemQualityBG.Size = UDim2.fromScale(1, 1)
 	itemQualityBG.BackgroundTransparency = 1
 	itemQualityBG.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 	itemQualityBG.Position = FFGEnum.THEME.alignment.position.center
-	itemQualityBG.Image = FFGEnum.UI.Items.BackgroundQualityId[item.QualityId or item.Tier or variant[item.Variant]]
+	itemQualityBG.Image = FFGEnum.UI.Items.BackgroundQualityId[1]
+	local elementColor = not item.Caught and FFGEnum.THEME.Variants.Elemental[1] or item.ElementNum and FFGEnum.THEME.Variants.Elemental[item.ElementNum]
+	if elementColor then itemQualityBG.ImageColor3 = elementColor end
 	itemQualityBG.Parent = fishDexItemContainer
 
 	-- //SECTION Holds all the main elements

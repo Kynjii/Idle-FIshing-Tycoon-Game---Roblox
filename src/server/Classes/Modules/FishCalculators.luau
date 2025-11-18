@@ -387,6 +387,8 @@ function FishCalculator.GetAllFishVariations(realmId: number): { { Species: stri
 			SpeciesKey = speciesKey,
 			Name = elementalName,
 			NameKey = elementalNameKey,
+			ElementName = FishData.REALM_ELEMENTS[realmId],
+			ElementNum = realmId,
 			Caught = false,
 		})
 

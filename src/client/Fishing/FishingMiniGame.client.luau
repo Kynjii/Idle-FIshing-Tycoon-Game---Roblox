@@ -20,7 +20,7 @@ local hitMarker = hitBarContainer:FindFirstChild("HitMarker") :: ImageLabel
 local catchButton = hitBarContainer:FindFirstChild("CatchButton") :: TextButton
 
 local fishCounterContainer = screenGui:WaitForChild("Frame"):WaitForChild("FishCounterContainer")
-local progressBar, pbFrame = ProgressBar.Create({ Color = "Green", Parent = fishCounterContainer })
+local _progressBar, pbFrame = ProgressBar.Create({ Color = "Green", Parent = fishCounterContainer })
 ProgressBar.Reset(pbFrame)
 ProgressBar.Show(fishCounterContainer)
 

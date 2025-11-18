@@ -87,7 +87,7 @@ function InventoryManager.GrantTool(self: InventoryManager, item)
 	runtimeTool.Parent = self.Player.Backpack
 
 	if item.Variant == FishData.FISH_VARIANT.ELEMENTAL then
-		local elementName = FishData.REALM_ELEMENTS[item.RealmId]
+		local elementName = item.ElementName
 
 		if elementName then
 			Emitter.AttachElement(invTool.Handle or invTool:FindFirstChild("Handle"), elementName)

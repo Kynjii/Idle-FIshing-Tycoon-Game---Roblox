@@ -13,6 +13,8 @@ export type FishData = {
 	MaxHP: number,
 	Weight: number,
 	ItemImage: string,
+	ElementNum: number?,
+	ElementName: string?,
 	Caught: boolean?,
 }
 

@@ -242,7 +242,7 @@ function KinUI.AddBadge(parent: Instance, size: UDim2?, text: string, strokeSize
 	textLabel.Position = FFGEnum.THEME.alignment.position.center
 	textLabel.BackgroundTransparency = 1
 	textLabel.TextColor3 = FFGEnum.THEME.color.white
-	textLabel.Text = text
+	textLabel.Text = text or ""
 	textLabel.TextScaled = true
 	KinUI.AddStroke(textLabel, strokeSize)
 	KinUI.AddPadding(textLabel, "XL")

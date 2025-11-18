@@ -37,7 +37,7 @@ function InfoPanel.Create(props: {
 	itemName.Size = UDim2.fromScale(1, 0.15)
 	itemName.Parent = panelContainer
 
-	KinUI.AddTextLabel(itemName, nil, ((not data.Caught and "?") or data.Name), "L")
+	KinUI.AddTextLabel(itemName, nil, ((not data.Caught and "???") or data.Name), "L")
 	-- //!SECTION
 
 	-- //SECTION - Item Image
@@ -87,13 +87,13 @@ function InfoPanel.Create(props: {
 	KinUI.ApplyList(variantsContainer, Enum.FillDirection.Horizontal, { HAlign = Enum.HorizontalAlignment.Center, VAlign = Enum.VerticalAlignment.Center })
 
 	if data.Variant == FishData.FISH_VARIANT.NORMAL then
-		KinUI.AddBadge(variantsContainer, UDim2.fromScale(0.3, 0.8), "Normal", "M", 1, FFGEnum.THEME.Variants.Normal)
+		KinUI.AddBadge(variantsContainer, UDim2.fromScale(0.3, 0.8), not data.Caught and "???" or "Normal", "M", 1, FFGEnum.THEME.Variants.Normal)
 	elseif data.Variant == FishData.FISH_VARIANT.ELEMENTAL then
-		local element = not data.Caught and "Elemental" or data.RealmId and FishData.REALM_ELEMENTS[data.RealmId]
-		local elementColor = not data.Caught and FFGEnum.THEME.Variants.Elemental[1] or data.RealmId and FFGEnum.THEME.Variants.Elemental[data.RealmId]
+		local element = not data.Caught and "???" or data.ElementName or "Elemental"
+		local elementColor = not data.Caught and FFGEnum.THEME.Variants.Elemental[1] or data.ElementNum and FFGEnum.THEME.Variants.Elemental[data.ElementNum]
 		KinUI.AddBadge(variantsContainer, UDim2.fromScale(0.3, 0.8), element, "M", 2, elementColor)
 	elseif data.Variant == FishData.FISH_VARIANT.ELDER then
-		KinUI.AddBadge(variantsContainer, UDim2.fromScale(0.3, 0.8), "Elder", "M", 3, FFGEnum.THEME.Variants.Elder)
+		KinUI.AddBadge(variantsContainer, UDim2.fromScale(0.3, 0.8), not data.Caught and "???" or "Elder", "M", 3, FFGEnum.THEME.Variants.Elder)
 	end
 	-- //!SECTION
 
