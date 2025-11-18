@@ -110,7 +110,7 @@ function FishingManager.SetupProximityPrompts(self: FishingManager)
 
 			Events.FireEvent(Events.RemoteNames.StartFishingMiniGame, player, { Fish = self:GetRandomFish(taggedLocationTier, self.RealmId), Rod = self:GetPlayerRod(), Tier = taggedLocationTier })
 
-			proximityPrompt.MaxActivationDistance = 0
+			proximityPrompt.Enabled = false
 		end))
 
 		local gameEndedEvent = Events.GetRemote(Events.RemoteNames.GameEnded)
@@ -122,7 +122,7 @@ function FishingManager.SetupProximityPrompts(self: FishingManager)
 
 				if tier ~= promptTier then return end
 
-				proximityPrompt.MaxActivationDistance = 5
+				proximityPrompt.Enabled = true
 			end))
 		end
 	end
