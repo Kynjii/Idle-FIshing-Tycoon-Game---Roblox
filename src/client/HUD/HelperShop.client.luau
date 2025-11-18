@@ -2,6 +2,8 @@ local HttpService = game:GetService("HttpService")
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local satchel = require(ReplicatedStorage.Packages.satchel)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
@@ -55,6 +57,7 @@ function handleClosingShopDetailsUI()
 		local distance = player:DistanceFromCharacter(originalPosition)
 		if distance >= 8 then
 			clearExistingTooltip()
+			satchel:SetBackpackEnabled(true)
 			ShopGUI.CloseShop(screenGui)
 			break
 		end
@@ -98,6 +101,7 @@ if shopDetails then
 			shopData = decodedData
 
 			populateDetailsUI()
+			satchel:SetBackpackEnabled(false)
 			screenGui.Enabled = true
 			task.spawn(function()
 				handleClosingShopDetailsUI()

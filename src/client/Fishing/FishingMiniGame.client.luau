@@ -4,6 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 
+local satchel = require(ReplicatedStorage.Packages.satchel)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local ProgressBar = require(ReplicatedStorage.Shared.UI.Components.ProgressBar)
 local Format = require(ReplicatedStorage.Shared.Utils.Format)
@@ -64,11 +65,21 @@ end)
 function startGame(value: boolean)
 	gameStarted = value
 
+	resetHitMarker()
+	resetProgress()
+	relocateHitContainer()
+
 	if not value then Events.FireEvent(Events.RemoteNames.GameEnded, player, currentTier) end
 end
 
 function showGame(value: boolean)
 	screenGui.Enabled = value
+
+	if value then
+		satchel:SetBackpackEnabled(false)
+	else
+		satchel:SetBackpackEnabled(true)
+	end
 end
 
 function handleClosingGameUI()
@@ -236,9 +247,6 @@ local startGameEvent = Events.GetRemote(Events.RemoteNames.StartFishingMiniGame)
 if startGameEvent then
 	startGameEvent.OnClientEvent:Connect(function(data: { Fish: {}, Rod: {}, Tier: number })
 		currentTier = data.Tier
-
-		resetHitMarker()
-		resetProgress()
 
 		showGame(true)
 		startGame(true)

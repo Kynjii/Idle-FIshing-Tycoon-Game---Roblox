@@ -79,6 +79,7 @@ end
 local getInventoryFn = Events.GetRemoteFn(Events.RemoteFunctionNames.GetPlayerInventory)
 hudInventoryButton.Activated:Connect(function()
 	if screenGui.Enabled then
+		satchel:SetBackpackEnabled(true)
 		screenGui.Enabled = false
 		if Lighting then
 			local blur = Lighting:FindFirstChild("Blur")
@@ -92,6 +93,7 @@ hudInventoryButton.Activated:Connect(function()
 		playerInventory = data
 
 		populateDetailsUI()
+		satchel:SetBackpackEnabled(false)
 		screenGui.Enabled = true
 	end
 end)
@@ -110,10 +112,3 @@ if not game:IsLoaded() then game.Loaded:Wait() end
 
 task.wait(10)
 satchel:SetBackpackEnabled(true)
-
-satchel.GetStateChangedEvent().Event:Connect(function(isOpened: boolean)
-	if isOpened then
-	else
-		print("Inventory closed")
-	end
-end)

@@ -69,6 +69,7 @@ function Fish.New(state, player: Player, teamId: number, fishingLocTier: number,
 	local specieData = FishCalculators.ChooseSpecie(fishingLocTier, self.RealmId)
 	self.Species = state.Species or specieData.Species
 	self.Variant = state.Variant or specieData.Variant
+	self.ItemImage = state.ItemImage or specieData.ItemImage
 
 	self.ElementName = state.ElementName or nil
 	self.ElementNum = state.ElementNum or nil
@@ -85,16 +86,6 @@ function Fish.New(state, player: Player, teamId: number, fishingLocTier: number,
 	self.QualityId = state.QualityId or self:DefineQuality(fishingLocTier)
 	self.Quality = FFGEnum.QUALITIES[self.QualityId]
 	self.MaxHP, self.Weight = self:CalculateStats()
-
-	if self.Variant == FishData.FISH_VARIANT.NORMAL then
-		self.ItemImage = FishData.FISH_ASSETS[self.SpeciesKey].Normal[self.QualityId]
-	elseif self.Variant == FishData.FISH_VARIANT.ELEMENTAL then
-		self.ItemImage = FishData.FISH_ASSETS[self.SpeciesKey].Elemental[self.RealmId][self.QualityId]
-	elseif self.Variant == FishData.FISH_VARIANT.ELDER then
-		self.ItemImage = FishData.FISH_ASSETS[self.SpeciesKey].Elder[self.QualityId]
-	else
-		self.ItemImage = FishData.FISH_ASSETS[self.SpeciesKey].Basic
-	end
 
 	self._cleaner = Trove.new()
 

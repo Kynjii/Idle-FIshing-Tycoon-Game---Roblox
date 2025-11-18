@@ -1,6 +1,8 @@
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local satchel = require(ReplicatedStorage.Packages.satchel)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local FishDexItem = require(ReplicatedStorage.Shared.UI.Components.FishDex.FishDexItem)
 local FishDexUI = require(ReplicatedStorage.Shared.UI.Components.FishDex.FishDexUI)
@@ -69,6 +71,7 @@ end
 local getFishDexFn = Events.GetRemoteFn(Events.RemoteFunctionNames.GetFishDex)
 hudFishDexButton.Activated:Connect(function()
 	if screenGui.Enabled then
+		satchel:SetBackpackEnabled(true)
 		screenGui.Enabled = false
 		if Lighting then
 			local blur = Lighting:FindFirstChild("Blur")
@@ -82,6 +85,7 @@ hudFishDexButton.Activated:Connect(function()
 		playerFishDex = data
 
 		populateDetailsUI()
+		satchel:SetBackpackEnabled(false)
 		screenGui.Enabled = true
 	end
 end)
