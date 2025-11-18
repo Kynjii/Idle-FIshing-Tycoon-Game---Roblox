@@ -78,6 +78,7 @@ FFGEnum.ATTRIBUTES = {
 	JobId = "JobId",
 	PathStep = "PathStep",
 	UnloadLoc = "UnloadLoc",
+	Variant = "Variant",
 }
 
 FFGEnum.CLASS = {
@@ -391,7 +392,7 @@ FFGEnum.THEME = {
 	hoverStrokeColor = Color3.fromRGB(67, 170, 139),
 
 	Nameplate = {
-		MaxDistance = 100,
+		MaxDistance = 200,
 	},
 
 	sizes = {

@@ -127,7 +127,7 @@ function FishingManager.AttachAttListeners(self: FishingManager)
 	if caughtFishEvent then
 		self._cleaner:Add(caughtFishEvent.OnServerEvent:Connect(function(player: Player, fish: Fish.Fish)
 			if self.Player ~= player or self.Owner ~= player.UserId then return end
-			self:SaveCaughtFish(fish.Id)
+			self:SaveCaughtFish(fish)
 		end))
 	end
 end

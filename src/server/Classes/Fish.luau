@@ -84,12 +84,6 @@ function Fish.New(state, player: Player, teamId: number, fishingLocTier: number,
 end
 -- //!SECTION
 
--- //SECTION - Model
-function Fish.CreateModel(self: Fish)
-	--
-end
--- //!SECTION
-
 -- //SECTION - Calculations
 function Fish.CalculateStats(self: Fish)
 	return FishCalculators.GenerateStats(self.QualityId)

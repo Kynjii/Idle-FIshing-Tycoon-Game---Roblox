@@ -183,10 +183,11 @@ end
 
 function TeamManager.AssignInventoryManager(profile, player: Player, teamId: number): ()
 	TeamManager.InventoryManager[player.UserId] = TeamManager.InventoryManager[player.UserId] or { OwnerId = player.UserId }
+	local currentRealm = profile.CurrentRealm or 1
 
 	local inventoryState = profile.Inventory or {}
 
-	local assignInventoryManager = InventoryManager.New(inventoryState, player, teamId)
+	local assignInventoryManager = InventoryManager.New(inventoryState, player, teamId, currentRealm)
 	if not assignInventoryManager then return end
 
 	TeamManager.InventoryManager[player.UserId] = assignInventoryManager

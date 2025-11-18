@@ -4,8 +4,10 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 
 local Fish = require(ServerScriptService.Server.Classes.Fish)
+local Emitter = require(ServerScriptService.Server.Modules.Emitters.Emitter)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
+local FishData = require(ReplicatedStorage.Shared.Fish.FishData)
 
 local InventoryManager = {}
 InventoryManager.__index = InventoryManager
@@ -35,11 +37,11 @@ function InventoryManager.SetupInventory(self: InventoryManager): { [any]: any }
 	inventory.Parent = self.Player
 
 	for _, item in pairs(self.Inventory.Fish) do
-		self:GrantTool(item.Name or "Fish")
+		self:GrantTool(item)
 	end
 
 	for _, item in pairs(self.Inventory.Equipment) do
-		self:GrantTool(item.Name)
+		self:GrantTool(item)
 	end
 
 	return inventory
@@ -68,20 +70,35 @@ function InventoryManager.AttachEventListeners(self: InventoryManager)
 	if caughtFishEvent then
 		self._cleaner:Add(caughtFishEvent.OnServerEvent:Connect(function(player: Player, fish: Fish.Fish)
 			if self.Player ~= player or self.Owner ~= player.UserId then return end
-			self:GrantTool(fish.NameKey)
+			self:GrantTool(fish)
 		end))
 	end
 end
 
-function InventoryManager.GrantTool(self: InventoryManager, toolName: string)
+function InventoryManager.GrantTool(self: InventoryManager, item)
+	local toolName = item.SpeciesKey or item.NameKey
 	local toolTemplate = ServerStorage.Tools:FindFirstChild(toolName)
 	if not toolTemplate then return end
 
-	local invTool = toolTemplate:Clone()
+	local invTool: Tool = toolTemplate:Clone()
 	invTool.Parent = self.Player.Inventory
 
-	local runtimeTool = invTool:Clone()
+	local runtimeTool: Tool = invTool:Clone()
 	runtimeTool.Parent = self.Player.Backpack
+
+	if item.Variant == FishData.FISH_VARIANT.ELEMENTAL then
+		local elementName = FishData.REALM_ELEMENTS[item.RealmId]
+
+		if elementName then
+			Emitter.AttachElement(invTool.Handle or invTool:FindFirstChild("Handle"), elementName)
+			Emitter.AttachElement(runtimeTool.Handle or runtimeTool:FindFirstChild("Handle"), elementName)
+
+			invTool.ToolTip = item.Name
+			runtimeTool.ToolTip = item.Name
+
+			-- //TODO -  Change image to correct quality and image
+		end
+	end
 end
 
 -- //SECTION - Cleanup
