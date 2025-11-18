@@ -100,6 +100,7 @@ function FishingManager.SetupProximityPrompts(self: FishingManager)
 		local proximityPrompt = Instance.new("ProximityPrompt")
 		proximityPrompt.ObjectText = `Tier {taggedLocationTier}`
 		proximityPrompt.ActionText = "Begin Fishing"
+		proximityPrompt:SetAttribute(FFGEnum.ATTRIBUTES.Tier, taggedLocationTier)
 		proximityPrompt.Parent = location
 
 		self._cleaner:Add(proximityPrompt.Triggered:Connect(function(player: Player)
@@ -107,8 +108,23 @@ function FishingManager.SetupProximityPrompts(self: FishingManager)
 
 			self.CurrentFishingLocTier = taggedLocationTier
 
-			Events.FireEvent(Events.RemoteNames.StartFishingMiniGame, player, { Fish = self:GetRandomFish(taggedLocationTier, self.RealmId), Rod = self:GetPlayerRod() })
+			Events.FireEvent(Events.RemoteNames.StartFishingMiniGame, player, { Fish = self:GetRandomFish(taggedLocationTier, self.RealmId), Rod = self:GetPlayerRod(), Tier = taggedLocationTier })
+
+			proximityPrompt.Enabled = false
 		end))
+
+		local gameEndedEvent = Events.GetRemote(Events.RemoteNames.GameEnded)
+		if gameEndedEvent then
+			self._cleaner:Add(gameEndedEvent.OnServerEvent:Connect(function(player: Player, tier: number)
+				if self.Player ~= player or self.Owner ~= player.UserId then return end
+
+				local promptTier = proximityPrompt:GetAttribute(FFGEnum.ATTRIBUTES.Tier)
+
+				if tier ~= promptTier then return end
+
+				proximityPrompt.Enabled = true
+			end))
+		end
 	end
 end
 

@@ -6,6 +6,7 @@ local TweenService = game:GetService("TweenService")
 
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local ProgressBar = require(ReplicatedStorage.Shared.UI.Components.ProgressBar)
+local Format = require(ReplicatedStorage.Shared.Utils.Format)
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
@@ -28,6 +29,7 @@ type Fish = { Id: string, QualityId: number, MaxHP: number, Species: string, Var
 
 local hookedFish: Fish
 local playerRod: PlayerRod
+local currentTier: number
 
 local elements = {
 	[0] = emojiContainer:FindFirstChild("0"),
@@ -61,13 +63,15 @@ end)
 
 function startGame(value: boolean)
 	gameStarted = value
+
+	if not value then Events.FireEvent(Events.RemoteNames.GameEnded, player, currentTier) end
 end
 
 function showGame(value: boolean)
 	screenGui.Enabled = value
 end
 
-function handleClosingShopDetailsUI()
+function handleClosingGameUI()
 	local character = player.Character.PrimaryPart
 	local originalPosition = character.CFrame.Position
 
@@ -103,7 +107,7 @@ function checkObjectsOverlap(a: GuiObject, b: GuiObject)
 	return aLeft < bRight and aRight > bLeft
 end
 
-function animate(area: number)
+function animate(area: number, hpAdded: number)
 	local element: Frame = elements[area]
 
 	if element then
@@ -111,14 +115,21 @@ function animate(area: number)
 
 		local emoji = element.SuperHappy
 		local bg = element.BG
+		local text = element.TextLabel
+		text.Text = Format.CurrencyNumber(hpAdded)
 
 		local tweenGoal = {
 			ImageTransparency = 0,
 		}
 
+		local tweenGoal2 = {
+			TextTransparency = 0,
+		}
+
 		local tweenInfo = TweenInfo.new(0.5)
 		local tween1 = TweenService:Create(emoji, tweenInfo, tweenGoal)
 		local tween2 = TweenService:Create(bg, tweenInfo, tweenGoal)
+		local tween3 = TweenService:Create(text, tweenInfo, tweenGoal2)
 
 		tween1.Completed:Once(function()
 			emoji.ImageTransparency = 1
@@ -129,9 +140,18 @@ function animate(area: number)
 			bg.ImageTransparency = 1
 		end)
 
+		tween3.Completed:Once(function()
+			text.TextTransparency = 1
+		end)
+
 		tween1:Play()
 		tween2:Play()
+		tween3:Play()
 	end
+end
+
+function resetProgress()
+	ProgressBar.Reset(pbFrame)
 end
 
 function resetHitMarker()
@@ -185,9 +205,8 @@ if catchButton then
 		if isOverLapping2 then area = 2 end
 		if isOverLapping3 then area = 3 end
 
-		animate(area)
-
 		local hpAdded = playerRod.BaseDmg * area
+		animate(area, hpAdded)
 		local currentHp = currentFishHP
 
 		local newHp = currentHp + hpAdded
@@ -215,8 +234,11 @@ end
 
 local startGameEvent = Events.GetRemote(Events.RemoteNames.StartFishingMiniGame)
 if startGameEvent then
-	startGameEvent.OnClientEvent:Connect(function(data: { Fish: {}, Rod: {} })
+	startGameEvent.OnClientEvent:Connect(function(data: { Fish: {}, Rod: {}, Tier: number })
+		currentTier = data.Tier
+
 		resetHitMarker()
+		resetProgress()
 
 		showGame(true)
 		startGame(true)
@@ -224,6 +246,6 @@ if startGameEvent then
 		hookedFish = data.Fish
 		playerRod = data.Rod
 
-		handleClosingShopDetailsUI()
+		handleClosingGameUI()
 	end)
 end
