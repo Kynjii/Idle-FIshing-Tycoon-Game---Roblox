@@ -63,6 +63,8 @@ FFGEnum.SCREENGUI = {
 	PlayerMessages = "PlayerMessages",
 
 	FishDex = "FishDex",
+
+	HelperShop = "CrewShop",
 }
 
 FFGEnum.ATTRIBUTES = {

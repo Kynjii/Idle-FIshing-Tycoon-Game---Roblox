@@ -5,6 +5,7 @@ local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local FishData = require(ReplicatedStorage.Shared.Fish.FishData)
 local FishType = require(ReplicatedStorage.Shared.Types.Classes.FishType)
+local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
 local Button = require(ReplicatedStorage.Shared.UI.Components.Buttons.Button)
 local ProgressBar = require(ReplicatedStorage.Shared.UI.Components.ProgressBar)
 local KinUI = require(ReplicatedStorage.Shared.UI.KinUI)
@@ -12,10 +13,12 @@ local KinUI = require(ReplicatedStorage.Shared.UI.KinUI)
 local InfoPanel = {}
 
 function InfoPanel.Create(props: {
-	Infodata: FishType.FishData,
+	Infodata: any,
 	Parent: Instance,
 })
 	local data = props.Infodata
+	local isFish = props.Infodata.Entity == FFGEnum.CLASS.ENTITY_NAME.Fish
+	local isHelper = props.Infodata.Entity == FFGEnum.CLASS.ENTITY_NAME.Helper
 
 	local panelContainer = Instance.new("Frame")
 	panelContainer.Name = "PanelContainer"
@@ -37,7 +40,17 @@ function InfoPanel.Create(props: {
 	itemName.Size = UDim2.fromScale(1, 0.15)
 	itemName.Parent = panelContainer
 
-	KinUI.AddTextLabel(itemName, nil, ((not data.Caught and "???") or data.Name), "L")
+	local text
+	if isFish and data then
+		local fishData = data :: FishType.FishData
+		text = ((not fishData.Caught and "???") or fishData.Name)
+	end
+
+	if isHelper and data then
+		local helperData = data :: HelperType.HelperData
+		text = helperData.Name
+	end
+	KinUI.AddTextLabel(itemName, nil, text or "", "L")
 	-- //!SECTION
 
 	-- //SECTION - Item Image
@@ -47,20 +60,28 @@ function InfoPanel.Create(props: {
 	itemImage.Size = UDim2.fromScale(1, 0.3)
 	itemImage.Parent = panelContainer
 
-	local image = nil
-	if data.SpeciesKey then
-		if data.Caught then
-			image = data.ItemImage
+	local image
+	if isFish and data then
+		local fishData = data :: FishType.FishData
+		if fishData.SpeciesKey then
+			if fishData.Caught then
+				image = fishData.ItemImage
+			else
+				image = FishData.FISH_ASSETS_MASKED[fishData.SpeciesKey]
+			end
 		else
-			image = FishData.FISH_ASSETS_MASKED[data.SpeciesKey]
+			image = fishData.ItemImage or ""
 		end
-	else
-		image = data.ItemImage or ""
+	end
+
+	if isHelper and data then
+		local helperData = data :: HelperType.HelperData
+		image = helperData.ItemImage
 	end
 
 	local imageLabel = Instance.new("ImageLabel")
 	imageLabel.Name = "ItemImage"
-	imageLabel.Image = image or ""
+	if image then imageLabel.Image = image end
 	imageLabel.BackgroundTransparency = 1
 	imageLabel.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 	imageLabel.Position = FFGEnum.THEME.alignment.position.center
@@ -70,14 +91,14 @@ function InfoPanel.Create(props: {
 	imageLabel.Parent = itemImage
 	-- //!SECTION
 
-	-- //SECTION - Item Variants
+	-- //SECTION - Item Variants / Quality
 	local itemVariants = Instance.new("Frame")
 	itemVariants.BackgroundTransparency = 1
 	itemVariants.Name = "ItemVariants"
 	itemVariants.Size = UDim2.fromScale(1, 0.15)
 	itemVariants.Parent = panelContainer
 	KinUI.ApplyList(itemVariants, Enum.FillDirection.Vertical)
-	KinUI.AddTextLabel(itemVariants, UDim2.fromScale(1, 0.3), "Variant", "M")
+	KinUI.AddTextLabel(itemVariants, UDim2.fromScale(1, 0.3), isFish and "Variant" or isHelper and "Quality" or "", "M")
 	KinUI.AddPadding(itemVariants, "M")
 
 	local variantsContainer = Instance.new("Frame")

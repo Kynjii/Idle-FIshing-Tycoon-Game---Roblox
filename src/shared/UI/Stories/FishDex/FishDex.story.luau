@@ -17,6 +17,9 @@ local function story(target)
 
 	uiFrame.Parent = frame
 
+	local innerWindow = uiFrame:FindFirstChild("InnerWindow", true)
+	FishDexUI.RenderInfoPanel(innerWindow, {})
+
 	return function()
 		instance:Destroy()
 	end

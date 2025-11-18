@@ -369,6 +369,7 @@ function FishCalculator.GetAllFishVariations(realmId: number): { { Species: stri
 		-- Add normal variant (all species)
 		local normalName, normalNameKey = FishCalculator.GetFishName(speciesName, speciesKey, FishData.FISH_VARIANT.NORMAL, realmId)
 		table.insert(variations, {
+			Entity = FFGEnum.CLASS.ENTITY_NAME.Fish,
 			Species = speciesName,
 			Variant = FishData.FISH_VARIANT.NORMAL,
 			ItemImage = itemImage,
@@ -382,6 +383,7 @@ function FishCalculator.GetAllFishVariations(realmId: number): { { Species: stri
 
 		local elementalName, elementalNameKey = FishCalculator.GetFishName(speciesName, speciesKey, FishData.FISH_VARIANT.ELEMENTAL, realmId)
 		table.insert(variations, {
+			Entity = FFGEnum.CLASS.ENTITY_NAME.Fish,
 			Species = speciesName,
 			Variant = FishData.FISH_VARIANT.ELEMENTAL,
 			ItemImage = itemImage,
@@ -397,6 +399,7 @@ function FishCalculator.GetAllFishVariations(realmId: number): { { Species: stri
 		local elderName, elderNameKey = FishCalculator.GetFishName(speciesName, speciesKey, FishData.FISH_VARIANT.ELDER, realmId)
 		if tier6ExclusiveSpecies[speciesKey] then
 			table.insert(variations, {
+				Entity = FFGEnum.CLASS.ENTITY_NAME.Fish,
 				Species = speciesName,
 				Variant = FishData.FISH_VARIANT.ELDER,
 				ItemImage = itemImage,
