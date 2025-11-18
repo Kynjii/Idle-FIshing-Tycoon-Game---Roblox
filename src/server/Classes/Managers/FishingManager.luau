@@ -74,10 +74,10 @@ function FishingManager.GetRandomFish(self: FishingManager, fishingLocTier: numb
 	return fish
 end
 
-function FishingManager.SaveCaughtFish(self: FishingManager, caughtFishId)
-	if not self.GeneratedFish[caughtFishId] then return end
+function FishingManager.SaveCaughtFish(self: FishingManager, caughtFish: Fish.Fish)
+	if not self.GeneratedFish[caughtFish.Id] then return end
 
-	local fish = self.GeneratedFish[caughtFishId]
+	local fish = self.GeneratedFish[caughtFish.Id]
 	fish:Save()
 
 	local updateCaughtFishEvent = Events.GetBindableEvent(Events.BindableNames.UpdateCaughtFish)
@@ -110,7 +110,7 @@ function FishingManager.SetupProximityPrompts(self: FishingManager)
 
 			Events.FireEvent(Events.RemoteNames.StartFishingMiniGame, player, { Fish = self:GetRandomFish(taggedLocationTier, self.RealmId), Rod = self:GetPlayerRod(), Tier = taggedLocationTier })
 
-			proximityPrompt.Enabled = false
+			proximityPrompt.MaxActivationDistance = 0
 		end))
 
 		local gameEndedEvent = Events.GetRemote(Events.RemoteNames.GameEnded)
@@ -122,7 +122,7 @@ function FishingManager.SetupProximityPrompts(self: FishingManager)
 
 				if tier ~= promptTier then return end
 
-				proximityPrompt.Enabled = true
+				proximityPrompt.MaxActivationDistance = 5
 			end))
 		end
 	end
