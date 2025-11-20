@@ -235,10 +235,6 @@ if catchButton then
 
 			showGame(false)
 			startGame(false)
-			task.delay(4, function()
-				local explosion: Sound = workspace.Audio.Explosion
-				if explosion then explosion:Play() end
-			end)
 		end
 		relocateHitContainer()
 

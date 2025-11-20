@@ -16,23 +16,7 @@ local taggedFishingLocs = CollectionService:GetTagged("FishingLocation")
 local FishingManager = {}
 FishingManager.__index = FishingManager
 
-type FishingManager = {
-	Player: Player,
-	Owner: number,
-	TeamId: number,
-	RealmId: number,
-	CurrentFishingLocTier: number,
-	FishingLocations: { Instance },
-	GeneratedFish: { [string]: any },
-	_cleaner: any,
-	GetLocations: (self: FishingManager) -> { Instance },
-	GetRandomFish: (self: FishingManager) -> any,
-	SaveCaughtFish: (self: FishingManager, caughtFishId: string) -> (),
-	GetPlayerRod: (self: FishingManager) -> { Name: string, QualityId: number, BaseDmg: number },
-	SetupProximityPrompts: (self: FishingManager) -> (),
-	AttachAttListeners: (self: FishingManager) -> (),
-	Destroy: (self: FishingManager) -> (),
-}
+type FishingManager = typeof(setmetatable({}, FishingManager))
 
 function FishingManager.New(player: Player, teamId: number, currentRealm: number)
 	local self = setmetatable({}, FishingManager)
@@ -146,7 +130,7 @@ function FishingManager.PlayerAnim(self: FishingManager, player: Player)
 		task.wait()
 		animationTrack:Play()
 
-		animationTrack.Ended:Connect(function(...: any)
+		animationTrack.Ended:Connect(function()
 			Events.FireEvent(
 				Events.RemoteNames.StartFishingMiniGame,
 				player,
