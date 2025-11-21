@@ -341,6 +341,7 @@ function FishingManager.ApplyFishingXP(self: FishingManager, stats)
 	local dataToSave = {
 		FishingLevel = newLevel,
 		FishingXP = newXP,
+		TotalForNextLevel = FishingXP.GetTotalForLevel(newLevel + 1),
 	}
 	DataService.UpdateSkillData(self.Player, "Fishing", dataToSave)
 

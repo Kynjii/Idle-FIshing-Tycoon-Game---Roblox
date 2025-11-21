@@ -1,5 +1,6 @@
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local FishingXP = require(ServerScriptService.Server.Data.FishingXP)
 local Jobs = require(ServerScriptService.Server.Modules.Jobs.Jobs)
 local realmBuffs = {
 	-- FISH
@@ -41,6 +42,7 @@ return {
 		Fishing = {
 			FishingLevel = 1,
 			FishingXP = 0,
+			TotalForNextLevel = FishingXP.GetTotalForLevel(1),
 		},
 	},
 	Inventory = {

@@ -259,36 +259,37 @@ function startLosingHP()
 						lastEscapeAttemptTime = currentTime
 						fishEscapeAttempts += 1
 						print(string.format("Fish escape attempt %d/%d (after %d hits)", fishEscapeAttempts, maxEscapeAttempts, totalHits))
+
+						-- Check if fish should escape ONLY after incrementing escape attempts
+						if fishEscapeAttempts >= maxEscapeAttempts then
+							print("Fish escaped after", fishEscapeAttempts, "attempts!")
+
+							local failSound = workspace.Audio:FindFirstChild("Fail")
+							if failSound then failSound:Play() end
+
+							-- Send fish escaped result to server
+							local fishingResult = {
+								Success = false, -- Fish escaped
+								TotalHits = totalHits,
+								PerfectHits = perfectHits,
+								Duration = tick() - sessionStartTime,
+								EscapeReason = "TooManyFailures",
+								EscapeAttempts = fishEscapeAttempts, -- Send actual count
+							}
+
+							local fishingResultEvent = Events.GetRemote(Events.RemoteNames.FishingResult)
+							if fishingResultEvent and currentSessionId then fishingResultEvent:FireServer(currentSessionId, fishingResult) end
+
+							-- Close game
+							showGame(false)
+							startGame(false)
+							return
+						end
 					end
 				else
 					-- Reset HP to 1 to give player another chance if they haven't hit minimum
 					currentFishHP = 1
 					print(string.format("Fish at 0 HP but only %d/%d hits - giving another chance", totalHits, minHitsBeforeEscape))
-				end
-
-				if fishEscapeAttempts >= maxEscapeAttempts then
-					print("Fish escaped after", fishEscapeAttempts, "attempts!")
-
-					local failSound = workspace.Audio:FindFirstChild("Fail")
-					if failSound then failSound:Play() end
-
-					-- Send fish escaped result to server
-					local fishingResult = {
-						Success = false, -- Fish escaped
-						TotalHits = totalHits,
-						PerfectHits = perfectHits,
-						Duration = tick() - sessionStartTime,
-						EscapeReason = "TooManyFailures",
-						EscapeAttempts = fishEscapeAttempts, -- Send actual count
-					}
-
-					local fishingResultEvent = Events.GetRemote(Events.RemoteNames.FishingResult)
-					if fishingResultEvent and currentSessionId then fishingResultEvent:FireServer(currentSessionId, fishingResult) end
-
-					-- Close game
-					showGame(false)
-					startGame(false)
-					return
 				end
 			end
 

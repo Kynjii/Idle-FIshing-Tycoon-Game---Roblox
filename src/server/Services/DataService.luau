@@ -105,6 +105,7 @@ function DataService.AttachReplica(player: Player, profile)
 	local currencies = {}
 	local globalBuffs = {}
 	local realms = {}
+	local skills = {}
 
 	-- Get and store data to be replicated
 	-- Curencies
@@ -122,6 +123,11 @@ function DataService.AttachReplica(player: Player, profile)
 		realms[k] = data or {}
 	end
 
+	-- Skill Data
+	for skillName, skillTable in pairs(profile.Data.Skills) do
+		skills[skillName] = skillTable or {}
+	end
+
 	local replica = Replica.New({
 		Token = PlayerStateToken,
 		Data = {
@@ -129,6 +135,7 @@ function DataService.AttachReplica(player: Player, profile)
 			Currencies = currencies,
 			GlobalBuffs = globalBuffs,
 			Realms = realms,
+			Skills = skills,
 		},
 	}) :: ReplicaType
 
@@ -653,14 +660,17 @@ function DataService.GetSkillData(player: Player, skill: "Fishing")
 	return profile.Data.Skills[skill]
 end
 
-function DataService.UpdateSkillData(player: Player, skill: "Fishing", skillData)
+function DataService.UpdateSkillData(player: Player, skillName: "Fishing", skillData)
 	local profile = getProfile(player, stateTypes.SaveSkillData)
 	if not profile then return false end
 
 	-- Initialize Skills array if it doesn't exist
 	if not profile.Data.Skills then profile.Data.Skills = {} end
 
-	profile.Data.Skills[skill] = skillData
+	profile.Data.Skills[skillName] = skillData
+
+	local replica = DataService.Replicas[player]
+	if replica then replica:Set({ "Skills", skillName }, skillData) end
 	return true
 end
 
