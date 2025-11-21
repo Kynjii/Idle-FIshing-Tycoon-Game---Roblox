@@ -2,20 +2,16 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
-local PlayerNotification = {}
+local SkillTypes = require(ReplicatedStorage.Shared.Types.SkillTypes)
+local SkillUpNotification = {}
 
-export type Props = {
-	Text: string,
-	Type: "Green" | "Red",
-}
-
-function PlayerNotification.Create(props: Props)
+function SkillUpNotification.Create(text: string, skill: SkillTypes.SkillType)
 	local messageTemplate = Instance.new("Frame")
 	messageTemplate.Name = "MessageTemplate"
 	messageTemplate.AnchorPoint = Vector2.new(0.5, 1)
 	messageTemplate.BackgroundColor3 = Color3.new(1, 1, 1)
 	messageTemplate.Position = UDim2.fromScale(0.5, 1)
-	messageTemplate.Size = UDim2.fromScale(1, 0.3)
+	messageTemplate.Size = UDim2.fromScale(1, 0.7)
 
 	local uIGradient = Instance.new("UIGradient")
 	uIGradient.Name = "UIGradient"
@@ -41,8 +37,8 @@ function PlayerNotification.Create(props: Props)
 	textLabel.FontFace = Font.new("rbxasset://fonts/families/Bangers.json")
 	textLabel.Position = UDim2.fromScale(0.5, 0.5)
 	textLabel.Size = UDim2.fromScale(1, 1)
-	textLabel.Text = props.Text or ""
-	textLabel.TextColor3 = props.Type == "Red" and FFGEnum.THEME.color.red or FFGEnum.THEME.color.Green
+	textLabel.Text = text or ""
+	textLabel.TextColor3 = FFGEnum.THEME.color.Green
 	textLabel.TextScaled = true
 	textLabel.TextStrokeTransparency = 0.5
 	textLabel.Parent = messageTemplate
@@ -58,8 +54,7 @@ function PlayerNotification.Create(props: Props)
 	messageIcon.Name = "MessageIcon"
 	messageIcon.AnchorPoint = Vector2.new(0.5, 1)
 	messageIcon.BackgroundTransparency = 1
-	messageIcon.Image = props.Type == "Red" and FFGEnum.UI.Icons.Alert or FFGEnum.UI.Icons.ThumbsUp
-	messageIcon.ImageColor3 = Color3.fromRGB(255, 255, 0)
+	messageIcon.Image = FFGEnum.UI.Icons[skill]
 	messageIcon.Position = UDim2.fromScale(0.5, 0)
 	messageIcon.ScaleType = Enum.ScaleType.Fit
 	messageIcon.Size = UDim2.fromScale(0.4, 1)
@@ -92,14 +87,19 @@ local function fadeOut(frame: Frame, duration: number)
 	tween:Play()
 end
 
-function PlayerNotification.Animate(frame: Frame)
+function SkillUpNotification.Animate(frame: Frame)
 	local DEFAULTS = {
-		Duration = 3,
+		Duration1 = 2.5,
+		Duration2 = 0.5,
 	}
 
 	if frame then
-		local tweenGoal = {
+		local tweenGoal1 = {
 			Position = FFGEnum.THEME.alignment.position.top,
+		}
+
+		local tweenGoal2 = {
+			Position = FFGEnum.THEME.alignment.position.bottom,
 		}
 
 		local _progressTween = nil
@@ -108,16 +108,23 @@ function PlayerNotification.Animate(frame: Frame)
 			_progressTween = nil
 		end
 
-		local tweenInfo = TweenInfo.new(DEFAULTS.Duration)
-		local tween = TweenService:Create(frame, tweenInfo, tweenGoal)
+		local tweenInfo1 = TweenInfo.new(DEFAULTS.Duration1)
+		local tweenInfo2 = TweenInfo.new(DEFAULTS.Duration2)
+		local tween1 = TweenService:Create(frame, tweenInfo1, tweenGoal1)
+		local tween2 = TweenService:Create(frame, tweenInfo2, tweenGoal2)
 
-		tween.Completed:Once(function()
-			if _progressTween == tween then _progressTween = nil end
+		tween1.Completed:Once(function()
+			if _progressTween == tween1 then _progressTween = tween2 end
+			tween2:Play()
+		end)
+
+		tween2.Completed:Once(function()
+			if _progressTween == tween2 then _progressTween = nil end
 			fadeOut(frame, 1)
 		end)
 
-		tween:Play()
+		tween1:Play()
 	end
 end
 
-return PlayerNotification
+return SkillUpNotification

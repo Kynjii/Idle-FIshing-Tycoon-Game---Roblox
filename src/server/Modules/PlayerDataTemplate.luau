@@ -37,6 +37,12 @@ return {
 	CurrentRealm = 1,
 	GlobalBuffs = {},
 	FishDex = {},
+	Skills = {
+		Fishing = {
+			FishingLevel = 1,
+			FishingXP = 0,
+		},
+	},
 	Inventory = {
 		Fish = {},
 		Equipment = {},

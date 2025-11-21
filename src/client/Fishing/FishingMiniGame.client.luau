@@ -227,8 +227,8 @@ end
 function relocateHitContainer()
 	if hitArea1 then
 		local hitZoneSize = minigameConfig.HitZoneSize
-		local minPosition = 0.1  -- Minimum 10% from left edge
-		local maxPosition = 1 - hitZoneSize - 0.1  -- Maximum with 10% margin from right edge
+		local minPosition = 0.1 -- Minimum 10% from left edge
+		local maxPosition = 1 - hitZoneSize - 0.1 -- Maximum with 10% margin from right edge
 		local randX = minPosition + math.random() * (maxPosition - minPosition)
 
 		hitArea1.Size = UDim2.fromScale(hitZoneSize, 1)
@@ -250,7 +250,7 @@ function startLosingHP()
 			if currentFishHP <= 0 then
 				currentFishHP = 0
 				isLosingHP = false
-				
+
 				-- Only allow escape attempts if minimum hits have been reached
 				if totalHits >= minHitsBeforeEscape then
 					-- Add debounce to prevent rapid escape attempts
@@ -265,7 +265,7 @@ function startLosingHP()
 					currentFishHP = 1
 					print(string.format("Fish at 0 HP but only %d/%d hits - giving another chance", totalHits, minHitsBeforeEscape))
 				end
-				
+
 				if fishEscapeAttempts >= maxEscapeAttempts then
 					print("Fish escaped after", fishEscapeAttempts, "attempts!")
 
@@ -297,8 +297,6 @@ function startLosingHP()
 		end
 	end)
 end
-
-local _caughtFishEvent = Events.GetRemote(Events.RemoteNames.FishCaught)
 
 local function buttonReleased()
 	isButtonHeld = false
@@ -352,7 +350,7 @@ local function buttonReleased()
 
 		-- Send fishing result to server for validation
 		local fishingResult = {
-			Success = true, 
+			Success = true,
 			TotalHits = totalHits,
 			PerfectHits = perfectHits,
 			Duration = tick() - sessionStartTime,
@@ -364,7 +362,7 @@ local function buttonReleased()
 		-- Close game UI - server will decide if fish was actually caught
 		showGame(false)
 		startGame(false)
-		return  -- Exit early to prevent starting HP decay after catching fish
+		return -- Exit early to prevent starting HP decay after catching fish
 	end
 	relocateHitContainer()
 

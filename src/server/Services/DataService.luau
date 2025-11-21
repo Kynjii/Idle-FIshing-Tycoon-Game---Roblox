@@ -67,6 +67,8 @@ local stateTypes = {
 	SaveFish = "save Fish",
 	GetFishStat = "GetFishStat",
 	SaveFishDex = "save Fish Dex",
+	GetSkillData = "get Skill Data",
+	SaveSkillData = "save Skill Data",
 }
 
 local function getProfile(player: Player, stateType: string): any | boolean
@@ -639,6 +641,27 @@ function DataService.GetFishStat(player: Player, fish)
 	end
 
 	return storedFishData
+end
+
+function DataService.GetSkillData(player: Player, skill: "Fishing")
+	local profile = getProfile(player, stateTypes.GetSkillData)
+	if not profile then return false end
+
+	-- Initialize Skills array if it doesn't exist
+	if not profile.Data.Skills then profile.Data.Skills = {} end
+
+	return profile.Data.Skills[skill]
+end
+
+function DataService.UpdateSkillData(player: Player, skill: "Fishing", skillData)
+	local profile = getProfile(player, stateTypes.SaveSkillData)
+	if not profile then return false end
+
+	-- Initialize Skills array if it doesn't exist
+	if not profile.Data.Skills then profile.Data.Skills = {} end
+
+	profile.Data.Skills[skill] = skillData
+	return true
 end
 
 -- Gives server time to create all events
