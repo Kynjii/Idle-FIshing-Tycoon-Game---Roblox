@@ -157,6 +157,8 @@ function Tender.Purchase(self: Tender)
 	self:Save()
 
 	if self.Tier == 1 then Tutorial.Update(self.Player, self.TeamId) end
+
+	self:UpdateNameplate()
 end
 
 function Tender.Upgrade(self: Tender)

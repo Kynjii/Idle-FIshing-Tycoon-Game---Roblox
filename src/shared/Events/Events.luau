@@ -4,6 +4,9 @@ local RunService = game:GetService("RunService")
 local Events = {}
 
 Events.RemoteNames = {
+	-- Game Start
+	PlayerAssigned = "PlayerAssigned",
+
 	-- HUD Messages
 	LootNotification = "LootNotification",
 	PlayerNotification = "PlayerNotification",
@@ -31,7 +34,6 @@ Events.RemoteNames = {
 	-- Player Fishing
 	StartFishingMiniGame = "StartFishingMiniGame",
 	FishingResult = "FishingResult",
-	FishCaught = "FishCaught",
 	GameEnded = "GameEnded",
 }
 
@@ -86,6 +88,9 @@ Events.BindableNames = {
 
 	-- FishDex
 	UpdateCaughtFish = "UpdateCaughtFish",
+
+	-- Fishing
+	FishCaught = "FishCaught",
 }
 
 local FOLDER_NAME = "RME"

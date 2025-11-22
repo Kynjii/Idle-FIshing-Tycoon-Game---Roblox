@@ -66,11 +66,11 @@ function InventoryManager.AttachEventListeners(self: InventoryManager)
 		end)
 	end)
 
-	local caughtFishEvent = Events.GetRemote(Events.RemoteNames.FishCaught)
+	local caughtFishEvent = Events.GetBindableEvent(Events.BindableNames.FishCaught)
 	if caughtFishEvent then
-		self._cleaner:Add(caughtFishEvent.OnServerEvent:Connect(function(player: Player, fish: Fish.Fish)
-			if self.Player ~= player or self.Owner ~= player.UserId then return end
-			self:GrantTool(fish)
+		self._cleaner:Add(caughtFishEvent.Event:Connect(function(data: { Player: Player, Fish: Fish.Fish })
+			if self.Player ~= data.Player or self.Owner ~= data.Player.UserId then return end
+			self:GrantTool(data.Fish)
 		end))
 	end
 end

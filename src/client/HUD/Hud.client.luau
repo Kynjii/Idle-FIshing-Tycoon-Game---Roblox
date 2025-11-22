@@ -3,11 +3,13 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
+local Events = require(ReplicatedStorage.Shared.Events.Events)
 local Replica = require(ReplicatedStorage.Shared.ReplicaClient)
 local DeepWait = require(ReplicatedStorage.Shared.Utils.DeepWait)
 local Format = require(ReplicatedStorage.Shared.Utils.Format)
 
 local player = Players.LocalPlayer
+local screenGui = player.PlayerGui:WaitForChild("HUD")
 local hud: Frame = DeepWait(player, "PlayerGui", "HUD", "Main")
 
 local currencyTemplate = hud:FindFirstChild("CurrencyTextLabelTemplate", true)
@@ -57,6 +59,11 @@ local function setCurrency(name: string, v: number)
 	currencyLabel.FontFace.Bold = true
 	currencyLabel.Text = Format.CurrencyNumber(v)
 end
+
+local playerAssignedEvent = Events.GetRemote(Events.RemoteNames.PlayerAssigned)
+if playerAssignedEvent then playerAssignedEvent.OnClientEvent:Once(function()
+	if screenGui and not screenGui.Enabled then screenGui.Enabled = true end
+end) end
 
 Replica.OnNew("PlayerState", function(replicaData)
 	-- Set intial snapshot

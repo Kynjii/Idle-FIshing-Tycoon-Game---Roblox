@@ -202,6 +202,7 @@ function TeamManager.AssignTeam(player: Player): number?
 			player.Neutral = false
 
 			player:LoadCharacter()
+
 			return i
 		end
 	end

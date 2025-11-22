@@ -8,12 +8,14 @@ local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
 local screenGui = playerGui:WaitForChild("SkillMessages")
+screenGui.Enabled = false
 local notificationContainer = screenGui:WaitForChild("MessageContainer")
 
 if notificationContainer then
 	local skillMessageEvent = Events.GetRemote(Events.RemoteNames.SkillMessage)
 	if skillMessageEvent then
 		skillMessageEvent.OnClientEvent:Connect(function(data)
+			if not screenGui.Enabled then screenGui.Enabled = true end
 			if data then
 				local message = SkillUpNotification.Create(data.Text, data.Skill)
 				if message then

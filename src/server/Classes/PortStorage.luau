@@ -136,6 +136,8 @@ function PortStorage.Purchase(self: PortStorage): ()
 	self:Save()
 
 	if self.Tier == 1 then Tutorial.Update(self.Player, self.TeamId) end
+
+	self:UpdateNameplate()
 end
 
 function PortStorage.Upgrade(self: PortStorage): ()

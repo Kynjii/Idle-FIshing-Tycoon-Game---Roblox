@@ -36,7 +36,7 @@ local playerInventory: { [string]: any } = {}
 
 task.spawn(function()
 	screenGui = MainUIPanel.Create({
-		screenGuiName = "JobPanel",
+		screenGuiName = "CrewManagementPanel",
 		panelName = "Crew Management",
 		panelTabs = {
 			hasTabs = true,

@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Events = require(ReplicatedStorage.Shared.Events.Events)
 local Replica = require(ReplicatedStorage.Shared.ReplicaClient)
 local ProgressBar = require(ReplicatedStorage.Shared.UI.Components.ProgressBar)
 local KinUI = require(ReplicatedStorage.Shared.UI.KinUI)
@@ -43,9 +44,12 @@ local function updateXP(skill: "Fishing", newLevel, newXpAmount, totalForNextLev
 	end
 end
 
-Replica.OnNew("PlayerState", function(replicaData)
-	if not screenGui.Enabled then screenGui.Enabled = true end
+local playerAssignedEvent = Events.GetRemote(Events.RemoteNames.PlayerAssigned)
+if playerAssignedEvent then playerAssignedEvent.OnClientEvent:Once(function()
+	if screenGui and not screenGui.Enabled then screenGui.Enabled = true end
+end) end
 
+Replica.OnNew("PlayerState", function(replicaData)
 	-- Set intial snapshot
 	local fishingLevel = replicaData.Data.Skills.Fishing.FishingLevel
 	local xpAmount = replicaData.Data.Skills.Fishing.FishingXP

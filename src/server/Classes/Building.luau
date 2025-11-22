@@ -132,6 +132,8 @@ function Building.Purchase(self: Building): ()
 
 	if self.Purchased then self.Purchased:Fire(self) end
 	self:Save()
+
+	self:UpdateNameplate()
 end
 
 function Building.Upgrade(self: Building): ()

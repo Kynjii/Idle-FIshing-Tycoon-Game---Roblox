@@ -8,7 +8,6 @@ local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
 local PlayerDataTemplate = require(ServerScriptService.Server.Modules.PlayerDataTemplate)
 local ProfileStore = require(ServerScriptService.Server.Libs.ProfileStore)
 local TeamManager = require(ServerScriptService.Server.Classes.Managers.TeamManager)
-local Animator = require(ReplicatedStorage.Shared.Utils.Animator)
 local FishCalculators = require(ServerScriptService.Server.Classes.Modules.FishCalculators)
 local Tutorial = require(ServerScriptService.Server.Game.Tutorial.Tutorial)
 local Badges = require(ServerScriptService.Server.Modules.Badges.Badges)
@@ -118,6 +117,8 @@ local function PlayerAdded(player: Player)
 			TeamManager.AssignManagers(profile, player, teamId)
 
 			Badges.CheckAlphaBadgeStatus(player)
+
+			Events.FireEvent(Events.RemoteNames.PlayerAssigned, player)
 		else
 			profile:EndSession()
 		end

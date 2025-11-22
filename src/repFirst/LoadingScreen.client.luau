@@ -88,21 +88,9 @@ ReplicatedFirst:RemoveDefaultLoadingScreen()
 
 if not game:IsLoaded() then game.Loaded:Wait() end
 
-task.wait(10) -- Force screen to appear for a minimum number of seconds
+task.wait(5) -- Force screen to appear for a minimum number of seconds
 task.cancel(textUpdater)
 textUpdater = nil
-
-local hudElements = playerGui:GetChildren()
-local elementsToShow = {
-	HUD = "HUD",
-	InventoryButton = "InventoryButton",
-	CrewManagementButton = "CrewManagementButton",
-	FishDexButton = "FishDexButton",
-	PlayerSkills = "PlayerSkills",
-}
-for _, screenGUI: ScreenGui in pairs(hudElements) do
-	if elementsToShow[screenGUI.Name] then screenGUI.Enabled = true end
-end
 
 StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, true)
 
