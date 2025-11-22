@@ -34,7 +34,7 @@ function ShopGUI.Create()
 end
 
 function ShopGUI.RenderInfoPanel(innerWindow, item)
-	local existing = innerWindow:FindFirstChild("PanelContainer", true)
+	local existing = innerWindow:FindFirstChild("InfoPanelContainer", true)
 	if existing then existing:Destroy() end
 
 	InfoPanel.Create({ Parent = innerWindow, Infodata = item })

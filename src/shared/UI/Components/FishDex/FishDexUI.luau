@@ -35,7 +35,7 @@ function FishDexUI.Create()
 end
 
 function FishDexUI.RenderInfoPanel(innerWindow, fish)
-	local existing = innerWindow:FindFirstChild("PanelContainer", true)
+	local existing = innerWindow:FindFirstChild("InfoPanelContainer", true)
 	if existing then existing:Destroy() end
 
 	InfoPanel.Create({ Parent = innerWindow, Infodata = fish })

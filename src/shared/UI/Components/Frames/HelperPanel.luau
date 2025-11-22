@@ -15,8 +15,6 @@ function HelperPanel.Create(player: Player, crewData, innerWindow: Frame): Scrol
 	local index = 0
 	for _, helper in pairs(crewData) do
 		local helperData: HelperType.HelperInstance = helper
-		if helperData.CurrentAssignment > 0 then continue end
-		if helperData.JobCategory ~= FFGEnum.JOB_CATEGORY.Transporting then continue end
 
 		index += 1
 
@@ -63,7 +61,7 @@ function HelperPanel.AddEmptyState(parent: Instance, text: string)
 end
 
 function HelperPanel.RenderInfoPanel(innerWindow, helper)
-	local existing = innerWindow:FindFirstChild("PanelContainer", true)
+	local existing = innerWindow:FindFirstChild("InfoPanelContainer", true)
 	if existing then existing:Destroy() end
 
 	InfoPanel.Create({ Parent = innerWindow, Infodata = helper })

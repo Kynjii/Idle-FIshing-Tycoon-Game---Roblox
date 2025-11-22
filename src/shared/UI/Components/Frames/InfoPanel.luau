@@ -117,7 +117,7 @@ function InfoPanel.Create(props: {
 	local isHelper = data.Entity == FFGEnum.CLASS.ENTITY_NAME.Helper
 
 	local panelContainer = Instance.new("Frame")
-	panelContainer.Name = "PanelContainer"
+	panelContainer.Name = "InfoPanelContainer"
 	panelContainer.AnchorPoint = Vector2.new(0.5, 0.5)
 	panelContainer.BackgroundTransparency = 1
 	panelContainer.Position = UDim2.fromScale(0.80, 0.5)
