@@ -16,10 +16,15 @@ local playerGui = player:WaitForChild("PlayerGui")
 local crewManagementButtonScreenGui = playerGui:WaitForChild("CrewManagementButton")
 local crewManagementButton = crewManagementButtonScreenGui:FindFirstChild("OpenButton", true) :: ImageButton
 local screenGui: ScreenGui
+local innerWindow: any
 
 -- Events
 local getJobDataEvent = Events.GetRemoteFn(Events.RemoteFunctionNames.GetJobData)
 local getCrewManagementState = Events.GetRemoteFn(Events.RemoteFunctionNames.GetPlayerInventory)
+local tabSelectedEvent = Events.GetBindableEvent(Events.BindableNames.TabSelected)
+local getInventoryFn = Events.GetRemoteFn(Events.RemoteFunctionNames.GetPlayerInventory)
+local updateUIEvent = Events.GetRemote(Events.RemoteNames.UpdateJobManagementUI)
+local helperUpgradedEvent = Events.GetRemote(Events.RemoteNames.HelperUpgraded)
 
 -- State
 local crewState: { [string]: any } = {}
@@ -29,8 +34,23 @@ local selectedTab: Tab = "Crew"
 local itemComponents: { [string]: Instance } = {}
 local playerInventory: { [string]: any } = {}
 
+task.spawn(function()
+	screenGui = MainUIPanel.Create({
+		screenGuiName = "JobPanel",
+		panelName = "Crew Management",
+		panelTabs = {
+			hasTabs = true,
+			tabs = {
+				{ Name = "Crew", Index = 1, Icon = FFGEnum.UI.Icons.CrewManagement },
+				{ Name = "Jobs", Index = 2, Icon = FFGEnum.UI.Icons.CrewJobs },
+			},
+		},
+	})
+	screenGui.Parent = playerGui
+	innerWindow = screenGui:FindFirstChild("InnerWindow", true) :: Frame
+end)
+
 function updateCrewPanel()
-	local innerWindow = screenGui:FindFirstChild("InnerWindow", true)
 	if not innerWindow then return end
 
 	local crewItemsContainer = innerWindow:FindFirstChild("ItemContainer", true) :: ScrollingFrame
@@ -75,8 +95,7 @@ function updateCrewPanel()
 end
 
 function updateCrewMngPanelUI()
-	local innerWindow = screenGui:FindFirstChild("InnerWindow", true)
-	local crewManagementContainer = innerWindow and innerWindow:WaitForChild("CrewManagementContainer", 5)
+	local crewManagementContainer = innerWindow and innerWindow:FindFirstChild("CrewManagementContainer", true)
 	if crewManagementContainer then crewManagementContainer:Destroy() end
 
 	if innerWindow then
@@ -94,6 +113,9 @@ function updateCrewMngPanelUI()
 				jobPanel.Parent = innerWindow
 			end
 		elseif selectedTab == "Crew" then
+			local data
+			if getInventoryFn then data = getInventoryFn:InvokeServer() end
+			if data then playerInventory = data end
 			updateCrewPanel()
 		end
 	end
@@ -111,23 +133,6 @@ function updateCrewMngPanelUI()
 		end
 	end
 end
-
-task.spawn(function()
-	screenGui = MainUIPanel.Create({
-		screenGuiName = "JobPanel",
-		panelName = "Crew Management",
-		panelTabs = {
-			hasTabs = true,
-			tabs = {
-				{ Name = "Crew", Index = 1, Icon = FFGEnum.UI.Icons.CrewManagement },
-				{ Name = "Jobs", Index = 2, Icon = FFGEnum.UI.Icons.CrewJobs },
-			},
-		},
-	})
-	screenGui.Parent = playerGui
-
-	updateCrewMngPanelUI()
-end)
 
 function populateDetailsUI()
 	if not crewState then return end
@@ -158,26 +163,16 @@ if crewManagementButton and getCrewManagementState then
 	end)
 end
 
-local updateUIEvent = Events.GetRemote(Events.RemoteNames.UpdateJobManagementUI)
 if updateUIEvent then updateUIEvent.OnClientEvent:Connect(function()
 	updateCrewMngPanelUI()
 end) end
 
-local tabSelectedEvent = Events.GetBindableEvent(Events.BindableNames.TabSelected)
-local getInventoryFn = Events.GetRemoteFn(Events.RemoteFunctionNames.GetPlayerInventory)
-if tabSelectedEvent and getInventoryFn then
-	tabSelectedEvent.Event:Connect(function(tabName)
-		selectedTab = tabName
+if tabSelectedEvent and getInventoryFn then tabSelectedEvent.Event:Connect(function(tabName)
+	selectedTab = tabName
 
-		if tabName == "Crew" then
-			local data = getInventoryFn:InvokeServer()
-			if data then playerInventory = data end
-		end
-		updateCrewMngPanelUI()
-	end)
-end
+	updateCrewMngPanelUI()
+end) end
 
-local helperUpgradedEvent = Events.GetRemote(Events.RemoteNames.HelperUpgraded)
 if helperUpgradedEvent then
 	helperUpgradedEvent.OnClientEvent:Connect(function(helperData: HelperType.HelperData)
 		if playerInventory[helperData.Id] then playerInventory[helperData.Id] = helperData end
