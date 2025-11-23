@@ -255,8 +255,9 @@ function FishCalculator.ChooseSpecie(fishingLocTier: number?, realmId: number): 
 		end
 	end
 
-	local speciesName = FFGEnum.FISH_SPECIES[chosenSpeciesKey] or chosenSpeciesKey
+	local speciesName = FishData.FISH_SPECIES[chosenSpeciesKey] or chosenSpeciesKey
 	local itemImage = FishData.FISH_ASSETS[chosenSpeciesKey].Basic or FishData.FISH_ASSETS.Guppy.Basic
+	local itemImageMasked = FishData.FISH_ASSETS_MASKED[chosenSpeciesKey] or FishData.FISH_ASSETS_MASKED[chosenSpeciesKey].Guppy
 	local name, nameKey = FishCalculator.GetFishName(speciesName, chosenSpeciesKey, chosenVariant, realmId)
 
 	return {
@@ -264,6 +265,7 @@ function FishCalculator.ChooseSpecie(fishingLocTier: number?, realmId: number): 
 		SpeciesKey = chosenSpeciesKey,
 		Variant = chosenVariant,
 		ItemImage = itemImage,
+		itemImageMasked = itemImageMasked,
 		Name = name,
 		NameKey = nameKey,
 	}
