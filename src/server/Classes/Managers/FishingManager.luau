@@ -6,7 +6,6 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local Fish = require(ServerScriptService.Server.Classes.Fish)
 local Difficulty = require(ServerScriptService.Server.Classes.Modules.Difficulty)
 local Notification = require(ServerScriptService.Server.Classes.Modules.Notification)
-local SkillMessage = require(ServerScriptService.Server.Classes.Modules.SkillMessage)
 local FishingXP = require(ServerScriptService.Server.Data.FishingXP)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 local Trove = require(ReplicatedStorage.Packages.Trove)
@@ -27,7 +26,7 @@ FishingManager.__index = FishingManager
 
 type FishingManager = typeof(setmetatable({}, FishingManager))
 
-function FishingManager.New(player: Player, teamId: number, currentRealm: number)
+function FishingManager.New(player: Player, teamId: number, currentRealm: number): FishingManager
 	local self = setmetatable({}, FishingManager)
 
 	self.Player = player
@@ -350,7 +349,7 @@ function FishingManager.ApplyFishingXP(self: FishingManager, stats)
 	DataService.UpdateSkillData(self.Player, "Fishing", dataToSave)
 
 	-- Notify player of XP gain
-	if SkillMessage and SkillMessage.Send then SkillMessage.Send(self.Player, string.format("+%d Fishing XP", xpReward), "Fishing") end
+	Events.FireEvent(Events.RemoteNames.LootNotification, self.Player, { ItemType = "Fishing", Text = string.format("+%d Fishing XP", xpReward) })
 
 	-- Handle level up
 	if newLevel > oldLevel then
@@ -456,8 +455,8 @@ function FishingManager.Destroy(self: FishingManager)
 		self._cleaner = nil
 	end
 
-	self.Player = nil
-	self.Owner = nil
+	self.Player = nil :: any
+	self.Owner = nil :: any
 end
 -- //!SECTION
 

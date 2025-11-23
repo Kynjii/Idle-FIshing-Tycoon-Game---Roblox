@@ -13,7 +13,6 @@ Events.RemoteNames = {
 	-- HUD Messages
 	LootNotification = "LootNotification",
 	PlayerNotification = "PlayerNotification",
-	SkillMessage = "SkillMessage",
 
 	-- Open UIs
 	OpenEntityDetails = "OpenEntityDetails",

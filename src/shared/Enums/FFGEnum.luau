@@ -173,6 +173,9 @@ FFGEnum.CURRENCY_TYPES = {
 }
 
 FFGEnum.UI = {
+	Notifications = {
+		ToastWhite = "rbxassetid://100093380061039",
+	},
 	Icons = {
 		Transporting = "rbxassetid://95580835468179",
 		Mining = "rbxassetid://74868423178075",

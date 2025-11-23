@@ -6,72 +6,57 @@ local KinUI = require(ReplicatedStorage.Shared.UI.KinUI)
 local LootNotification = {}
 
 export type Props = {
-	ItemType: "Gold" | "Fishing",
+	ItemImage: "Gold" | "Fishing",
 	Text: string?,
 }
 
 function LootNotification.Create(props: Props)
 	local lootNotificationContainer = Instance.new("CanvasGroup")
-	lootNotificationContainer.Name = "LootNotificationContainer"
-	lootNotificationContainer.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
-	lootNotificationContainer.Position = FFGEnum.THEME.alignment.position.bottom
-	lootNotificationContainer.Transparency = 1
-	lootNotificationContainer.Visible = true
-	lootNotificationContainer.Size = UDim2.fromScale(1, 0.4)
+	lootNotificationContainer.Name = "NotificationContainer"
+	lootNotificationContainer.AnchorPoint = Vector2.new(0.5, 0.5)
+	lootNotificationContainer.BackgroundTransparency = 1
+	lootNotificationContainer.Position = UDim2.fromScale(0.5, 0.130233)
+	lootNotificationContainer.Size = UDim2.fromScale(1, 0.28)
+	KinUI.AddCorner(lootNotificationContainer, "M")
 
 	local bG = Instance.new("ImageLabel")
 	bG.Name = "BG"
-	bG.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
+	bG.AnchorPoint = Vector2.new(0.5, 0.5)
 	bG.BackgroundTransparency = 1
-	bG.Image = FFGEnum.UI.ProgressBar.InnerBar.BlueTrape.Asset
-	bG.Position = FFGEnum.THEME.alignment.position.center
-	bG.Rotation = 180
-	bG.ImageColor3 = FFGEnum.THEME.button.pressedColor
+	bG.Image = FFGEnum.UI.Notifications.ToastWhite
+	bG.ImageColor3 = Color3.fromRGB(37, 190, 255)
+	bG.Position = UDim2.fromScale(0.5, 0.5)
 	bG.ScaleType = Enum.ScaleType.Slice
 	bG.Size = UDim2.fromScale(1, 1)
-	bG.SliceCenter = FFGEnum.UI.ProgressBar.InnerBar.BlueTrape.SliceCenter
-	bG.Parent = lootNotificationContainer
-
-	local lootContainer = Instance.new("Frame")
-	lootContainer.Name = "LootContainer"
-	lootContainer.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
-	lootContainer.BackgroundTransparency = 1
-	lootContainer.Position = FFGEnum.THEME.alignment.position.center
-	lootContainer.Size = UDim2.fromScale(1, 1)
-	lootContainer.ZIndex = 5
-	KinUI.ApplyList(lootContainer, Enum.FillDirection.Horizontal, { HAlign = Enum.HorizontalAlignment.Left, VAlign = Enum.VerticalAlignment.Center, Padding = "M" })
-
-	if props.ItemType then
-		local lootImage = Instance.new("ImageLabel")
-		lootImage.Name = "LootImage"
-		lootImage.AnchorPoint = Vector2.new(1, 0.5)
-		lootImage.BackgroundTransparency = 1
-		lootImage.Image = FFGEnum.UI.Icons[props.ItemType] or ""
-		lootImage.LayoutOrder = 1
-		lootImage.Position = FFGEnum.THEME.alignment.position.center
-		lootImage.ScaleType = Enum.ScaleType.Fit
-		lootImage.Size = UDim2.fromScale(0.3, 0.7)
-		KinUI.ApplyAspect(lootImage, 16 / 9, Enum.DominantAxis.Width, Enum.AspectType.ScaleWithParentSize)
-		lootImage.Parent = lootContainer
-	end
+	bG.SliceCenter = Rect.new(4, 26, 7, 29)
 
 	local textLabel = Instance.new("TextLabel")
 	textLabel.Name = "TextLabel"
-	textLabel.Text = props.Text or ""
-	textLabel.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
+	textLabel.AnchorPoint = Vector2.new(0.5, 1)
 	textLabel.BackgroundTransparency = 1
 	textLabel.Font = FFGEnum.THEME.bigFont
-	textLabel.LayoutOrder = 2
-	textLabel.Position = FFGEnum.THEME.alignment.position.center
-	textLabel.Size = UDim2.fromScale(0.7, 0.9)
+	textLabel.Position = UDim2.fromScale(0.5, 1)
+	textLabel.Size = UDim2.fromScale(0.826442, 0.675447)
+	textLabel.Text = props.Text or ""
 	textLabel.TextColor3 = Color3.new(1, 1, 1)
-	textLabel.TextStrokeTransparency = 0.7
-	textLabel.TextXAlignment = Enum.TextXAlignment.Left
 	textLabel.TextScaled = true
-	textLabel.ZIndex = 5
-	textLabel.Parent = lootContainer
+	textLabel.Parent = bG
 
-	lootContainer.Parent = lootNotificationContainer
+	bG.Parent = lootNotificationContainer
+
+	if props.ItemType then
+		local icon = Instance.new("ImageLabel")
+		icon.Name = "Icon"
+		icon.AnchorPoint = Vector2.new(0.5, 1)
+		icon.BackgroundTransparency = 1
+		icon.Position = UDim2.fromScale(0.5, 0.35)
+		icon.Size = UDim2.fromScale(0.239935, 0.324553)
+		icon.ZIndex = 5
+		icon.Image = FFGEnum.UI.Icons[props.ItemImage] or ""
+		KinUI.ApplyAspect(icon)
+
+		icon.Parent = lootNotificationContainer
+	end
 
 	return lootNotificationContainer
 end
@@ -100,29 +85,34 @@ end
 
 function LootNotification.Animate(frame: Frame)
 	local DEFAULTS = {
-		Duration = 3,
+		UP = 3,
+		SWIPE = 0.5,
 	}
 
 	if frame then
-		local tweenGoal = {
+		local tweenGoalUp = {
 			Position = FFGEnum.THEME.alignment.position.top,
 		}
 
-		local _progressTween = nil
-		if _progressTween then
-			_progressTween:Cancel()
-			_progressTween = nil
-		end
+		local tweenGoalSwipe = {
+			Position = UDim2.fromScale(1.1, 0.5),
+		}
 
-		local tweenInfo = TweenInfo.new(DEFAULTS.Duration)
-		local tween = TweenService:Create(frame, tweenInfo, tweenGoal)
+		local tweenInfoUp = TweenInfo.new(DEFAULTS.UP)
+		local tweenUp = TweenService:Create(frame, tweenInfoUp, tweenGoalUp)
 
-		tween.Completed:Once(function()
-			if _progressTween == tween then _progressTween = nil end
+		local tweenInfoSwipe = TweenInfo.new(DEFAULTS.SWIPE)
+		local tweenSwipe = TweenService:Create(frame, tweenInfoSwipe, tweenGoalSwipe)
+
+		tweenUp.Completed:Once(function()
+			tweenSwipe:Play()
+		end)
+
+		tweenSwipe.Completed:Once(function()
 			fadeOut(frame, 1)
 		end)
 
-		tween:Play()
+		tweenUp:Play()
 	end
 end
 
