@@ -40,7 +40,7 @@ export type Fish = {
 -- //!SECTION
 
 -- //SECTION - Constructor
-function Fish.New(state, player: Player, teamId: number, fishingLocTier: number, currentRealm: number): Fish
+function Fish.New(state, player: Player, teamId: number, fishingLocTier: number, fishingLocId: number, currentRealm: number): Fish
 	local self = setmetatable({}, Fish)
 
 	-- Start with default stats as base
@@ -65,7 +65,7 @@ function Fish.New(state, player: Player, teamId: number, fishingLocTier: number,
 
 	self.Model = nil
 
-	local specieData = FishCalculators.ChooseSpecie(fishingLocTier, self.RealmId)
+	local specieData = FishCalculators.ChooseSpecie(fishingLocTier, fishingLocId, self.RealmId)
 	self.Species = state.Species or specieData.Species
 	self.Variant = state.Variant or specieData.Variant
 	self.ItemImage = state.ItemImage or specieData.ItemImage

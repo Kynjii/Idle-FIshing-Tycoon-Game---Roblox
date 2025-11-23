@@ -81,6 +81,7 @@ FFGEnum.ATTRIBUTES = {
 	PathStep = "PathStep",
 	UnloadLoc = "UnloadLoc",
 	Variant = "Variant",
+	LocationId = "LocationId",
 }
 
 FFGEnum.CLASS = {

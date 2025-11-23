@@ -34,6 +34,7 @@ function FishingManager.New(player: Player, teamId: number, currentRealm: number
 	self.TeamId = teamId
 	self.RealmId = currentRealm
 	self.CurrentFishingLocTier = 1
+	self.CurrentFishingLocId = 1
 	self.FishingLocations = self:GetLocations()
 	self.GeneratedFish = {}
 	self.FishingSessions = FishingSessions
@@ -224,8 +225,8 @@ function FishingManager.ValidateAndScoreFishing(self: FishingManager, player: Pl
 		}
 end
 
-function FishingManager.GetRandomFish(self: FishingManager, fishingLocTier: number)
-	local fish = Fish.New({}, self.Player, self.TeamId, fishingLocTier, self.RealmId)
+function FishingManager.GetRandomFish(self: FishingManager, fishingLocTier: number, fishingLocId: number)
+	local fish = Fish.New({}, self.Player, self.TeamId, fishingLocTier, fishingLocId, self.RealmId)
 	if fish then self.GeneratedFish[fish.Id] = fish end
 	return fish
 end
@@ -269,6 +270,7 @@ function FishingManager.SetupProximityPrompts(self: FishingManager)
 		if taggedLocationTeamId ~= self.TeamId then continue end
 
 		local taggedLocationTier = location:GetAttribute(FFGEnum.ATTRIBUTES.Tier)
+		local taggedLocationId = location:GetAttribute(FFGEnum.ATTRIBUTES.LocationId)
 
 		local proximityPrompt = Instance.new("ProximityPrompt")
 		proximityPrompt.ObjectText = `Tier {taggedLocationTier}`
@@ -280,8 +282,9 @@ function FishingManager.SetupProximityPrompts(self: FishingManager)
 			if self.Player ~= player or self.Owner ~= player.UserId then return end
 
 			self.CurrentFishingLocTier = taggedLocationTier
+			self.CurrentFishingLocId = taggedLocationId
 
-			local fishConfig = self:GetRandomFish(taggedLocationTier, self.RealmId)
+			local fishConfig = self:GetRandomFish(taggedLocationTier, taggedLocationId)
 			self:StartFishingSession(player, fishConfig, taggedLocationTier)
 
 			proximityPrompt.Enabled = false
@@ -404,7 +407,7 @@ function FishingManager.AttachAttListeners(self: FishingManager)
 		getFishItemEvent.OnServerInvoke = function(player: Player)
 			if self.Player ~= player or self.Owner ~= player.UserId then return end
 
-			return { Fish = self:GetRandomFish(self.CurrentFishingLocTier, self.RealmId), Rod = self:GetPlayerRod() }
+			return { Fish = self:GetRandomFish(self.CurrentFishingLocTier, self.CurrentFishingLocId), Rod = self:GetPlayerRod() }
 		end
 		self._cleaner:Add(getFishItemEvent)
 	end
