@@ -6,7 +6,7 @@ local satchel = require(ReplicatedStorage.Packages.satchel)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local FishType = require(ReplicatedStorage.Shared.Types.Classes.FishType)
-local ShopGUI = require(ReplicatedStorage.Shared.UI.Components.Shop.ShopGUI)
+local MarketGUI = require(ReplicatedStorage.Shared.UI.Components.Market.MarketGUI)
 local ShopItem = require(ReplicatedStorage.Shared.UI.Components.Shop.ShopItem)
 
 local player = Players.LocalPlayer
@@ -17,7 +17,7 @@ local shopItemsContainer: Instance
 local screenGui: ScreenGui
 
 task.spawn(function()
-	screenGui = ShopGUI.Create()
+	screenGui = MarketGUI.Create()
 	screenGui.Parent = playerGui
 
 	main = screenGui:FindFirstChild("Main", true) :: Frame
@@ -29,8 +29,6 @@ function createShopitemComponent(item: FishType.FishData)
 		ItemData = item,
 		BackgroundColor3 = FFGEnum.QUALITIES[item.QualityId].Color,
 		Size = UDim2.fromScale(1, 1),
-		Rounded = FFGEnum.THEME.button.cornerRadius,
-		HoverEffect = true,
 		Visible = true,
 		ScaleType = Enum.ScaleType.Slice,
 		SliceCenter = Rect.new(32, 83, 32, 83),
@@ -50,7 +48,7 @@ function handleClosingShopDetailsUI()
 		local distance = player:DistanceFromCharacter(originalPosition)
 		if distance >= 8 then
 			satchel:SetBackpackEnabled(true)
-			ShopGUI.CloseShop(screenGui)
+			MarketGUI.CloseShop(screenGui)
 			break
 		end
 

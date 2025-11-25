@@ -238,10 +238,9 @@ function FishingManager.SaveCaughtFish(self: FishingManager, caughtFish: Fish.Fi
 	fish:Save()
 
 	local updateCaughtFishEvent = Events.GetBindableEvent(Events.BindableNames.UpdateCaughtFish)
-	if updateCaughtFishEvent then updateCaughtFishEvent:Fire({ Fish = fish:Serialize(), Player = self.Player }) end
-
+	if updateCaughtFishEvent then updateCaughtFishEvent:Fire({ Player = self.Player, Fish = self.GeneratedFish[caughtFish.Id] }) end
 	local grantFishToolEvent = Events.GetBindableEvent(Events.BindableNames.FishCaught)
-	if grantFishToolEvent then grantFishToolEvent:Fire({ Player = self.Player, Fish = fish:Serialize() }) end
+	if grantFishToolEvent then grantFishToolEvent:Fire({ Player = self.Player, Fish = self.GeneratedFish[caughtFish.Id]:Serialize() }) end
 
 	Notification.SendSuccess(self.Player, `You caught a {fish.Name}`)
 end

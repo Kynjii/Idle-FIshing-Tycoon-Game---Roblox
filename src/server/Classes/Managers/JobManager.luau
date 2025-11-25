@@ -429,8 +429,6 @@ function JobManager.Destroy(self: JobManager): ()
 		self._cleaner = nil
 	end
 
-	self.Save()
-
 	self.Player = nil
 	self.Owner = nil
 	self.TeamId = nil

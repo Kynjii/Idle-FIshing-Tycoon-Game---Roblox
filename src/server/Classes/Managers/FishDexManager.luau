@@ -113,12 +113,15 @@ end
 
 -- //SECTION - Cleanup
 function FishDexManager.Destroy(self: FishDexManager)
+	print(self.FishDexState)
+	pcall(function()
+		self:Save()
+	end)
+
 	if self._cleaner then
 		self._cleaner:Clean()
 		self._cleaner = nil
 	end
-
-	self:Save()
 
 	self.Player = nil
 	self.Owner = nil

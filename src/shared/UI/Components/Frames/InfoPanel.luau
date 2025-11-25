@@ -15,13 +15,21 @@ local canAffordEvent = Events.GetRemoteFn(Events.RemoteFunctionNames.CanAfford)
 
 local InfoPanel = {}
 
-local function handleButtonClick(itemId: string, isPurchased: boolean): ()
-	if isPurchased then
-		local upgradeHelper = Events.GetRemote(Events.RemoteNames.UpgradeHelper)
-		if upgradeHelper then upgradeHelper:FireServer(itemId) end
+local function handleButtonClick(item): ()
+	local isHelper = item.Entity == FFGEnum.CLASS.ENTITY_NAME.Helper
+	if isHelper then
+		if item.isPurchased then
+			local upgradeHelper = Events.GetRemote(Events.RemoteNames.UpgradeHelper)
+			if upgradeHelper then upgradeHelper:FireServer(item.Id) end
+		else
+			local purchaseEvent = Events.GetRemote(Events.RemoteNames.HelperPurchased)
+			if purchaseEvent then purchaseEvent:FireServer(item.Id) end
+		end
 	else
-		local purchaseEvent = Events.GetRemote(Events.RemoteNames.HelperPurchased)
-		if purchaseEvent then purchaseEvent:FireServer(itemId) end
+		if item.SellPrice then
+			local sellItemEvent = Events.GetRemote(Events.RemoteNames.SellItem)
+			if sellItemEvent then sellItemEvent:FireServer(item) end
+		end
 	end
 end
 
@@ -109,11 +117,15 @@ end
 
 function InfoPanel.Create(props: {
 	Infodata: any,
+	isMarket: boolean?,
 	Parent: Instance,
 })
 	local data = props.Infodata
 	local isFish = data.Entity == FFGEnum.CLASS.ENTITY_NAME.Fish
 	local isHelper = data.Entity == FFGEnum.CLASS.ENTITY_NAME.Helper
+	local isMarket = props.isMarket or false
+
+	print(data)
 
 	local panelContainer = Instance.new("Frame")
 	panelContainer.Name = "InfoPanelContainer"
@@ -223,6 +235,7 @@ function InfoPanel.Create(props: {
 	end
 	-- //!SECTION
 
+	-- //SECTION - FishDex
 	local statData = nil
 	if isFish then
 		local fishData = data :: FishType.FishData
@@ -247,55 +260,64 @@ function InfoPanel.Create(props: {
 	KinUI.ApplyList(itemProgress, Enum.FillDirection.Vertical, { VFlex = Enum.UIFlexAlignment.SpaceBetween, HAlign = Enum.HorizontalAlignment.Center })
 
 	if isFish then
-		if data.Caught then
-			local progressHeader = Instance.new("Frame")
-			progressHeader.BackgroundTransparency = 1
-			progressHeader.Size = UDim2.fromScale(1, 0.1)
-			progressHeader.LayoutOrder = 1
-			progressHeader.Parent = itemProgress
-			local label = KinUI.AddTextLabel(progressHeader, UDim2.fromScale(0.3, 1), "Total Count", "M")
-			label.Position = UDim2.fromScale(0.35, 0.5)
+		if not isMarket then
+			if data.Caught then
+				local progressHeader = Instance.new("Frame")
+				progressHeader.BackgroundTransparency = 1
+				progressHeader.Size = UDim2.fromScale(1, 0.1)
+				progressHeader.LayoutOrder = 1
+				progressHeader.Parent = itemProgress
+				local label = KinUI.AddTextLabel(progressHeader, UDim2.fromScale(0.3, 1), "Total Count", "M")
+				label.Position = UDim2.fromScale(0.35, 0.5)
 
-			for i, qualityNum in ipairs(FFGEnum.QUALITIES) do
-				local qualityContainer = Instance.new("Frame")
-				qualityContainer.Size = UDim2.fromScale(1, 0.15)
-				qualityContainer.BackgroundTransparency = 1
-				qualityContainer.LayoutOrder = i + 1
-				qualityContainer.Parent = itemProgress
-				KinUI.ApplyList(qualityContainer, Enum.FillDirection.Horizontal, { HFlex = Enum.UIFlexAlignment.SpaceBetween, VAlign = Enum.VerticalAlignment.Center })
+				for i, qualityNum in ipairs(FFGEnum.QUALITIES) do
+					local qualityContainer = Instance.new("Frame")
+					qualityContainer.Size = UDim2.fromScale(1, 0.15)
+					qualityContainer.BackgroundTransparency = 1
+					qualityContainer.LayoutOrder = i + 1
+					qualityContainer.Parent = itemProgress
+					KinUI.ApplyList(qualityContainer, Enum.FillDirection.Horizontal, { HFlex = Enum.UIFlexAlignment.SpaceBetween, VAlign = Enum.VerticalAlignment.Center })
 
-				local textLabel = KinUI.AddTextLabel(qualityContainer, UDim2.fromScale(0.25, 0.8), FFGEnum.QUALITIES[i].Label, "M")
-				textLabel.LayoutOrder = 1
+					local textLabel = KinUI.AddTextLabel(qualityContainer, UDim2.fromScale(0.25, 0.8), FFGEnum.QUALITIES[i].Label, "M")
+					textLabel.LayoutOrder = 1
 
-				local countLabel = KinUI.AddTextLabel(qualityContainer, UDim2.fromScale(0.15, 0.8), statData[FFGEnum.QUALITIES[i].Label].Caught, "M")
-				countLabel.LayoutOrder = 2
+					local countLabel = KinUI.AddTextLabel(qualityContainer, UDim2.fromScale(0.15, 0.8), statData[FFGEnum.QUALITIES[i].Label].Caught, "M")
+					countLabel.LayoutOrder = 2
 
-				local progressBarContainer, progressBar = ProgressBar.Create({ Color = "Green", Parent = qualityContainer })
-				progressBarContainer.Size = UDim2.fromScale(0.4, 1)
-				if typeof(progressBarContainer) == "Frame" then progressBarContainer.LayoutOrder = 3 end
+					local progressBarContainer, progressBar = ProgressBar.Create({ Color = "Green", Parent = qualityContainer })
+					progressBarContainer.Size = UDim2.fromScale(0.4, 1)
+					if typeof(progressBarContainer) == "Frame" then progressBarContainer.LayoutOrder = 3 end
 
-				ProgressBar.Update(progressBar, statData[FFGEnum.QUALITIES[i].Label].Caught, 1000)
+					ProgressBar.Update(progressBar, statData[FFGEnum.QUALITIES[i].Label].Caught, 1000)
 
-				local claimButton = Button.Create({ Color = "White", Text = "Claim", CurrencyType = "None", Size = UDim2.fromScale(0.1, 1) })
-				claimButton.ImageColor3 = FFGEnum.THEME.intent.disabled
-				claimButton.LayoutOrder = 4
-				claimButton.Interactable = false
-				claimButton.Parent = qualityContainer
+					local claimButton = Button.Create({ Color = "White", Text = "Claim", CurrencyType = "None", Size = UDim2.fromScale(0.1, 1) })
+					claimButton.ImageColor3 = FFGEnum.THEME.intent.disabled
+					claimButton.LayoutOrder = 4
+					claimButton.Interactable = false
+					claimButton.Parent = qualityContainer
+				end
+			else
+				KinUI.AddTextLabel(itemProgress, UDim2.fromScale(0.8, 0.8), "Undiscovered", "M")
 			end
-		else
-			KinUI.AddTextLabel(itemProgress, UDim2.fromScale(0.8, 0.8), "Undiscovered", "M")
 		end
 	end
 
-	if isHelper then
-		local helperData = data :: HelperType.HelperInstance
+	local progressHeader = Instance.new("Frame")
+	progressHeader.BackgroundTransparency = 1
+	progressHeader.Size = UDim2.fromScale(1, 0.1)
+	progressHeader.LayoutOrder = 1
+	KinUI.ApplyList(progressHeader, Enum.FillDirection.Horizontal, { HAlign = Enum.HorizontalAlignment.Center })
 
-		local progressHeader = Instance.new("Frame")
-		progressHeader.BackgroundTransparency = 1
-		progressHeader.Size = UDim2.fromScale(1, 0.1)
-		progressHeader.LayoutOrder = 1
+	local buyButtonContainer = Instance.new("Frame")
+	buyButtonContainer.Name = "BuyButtonContainer"
+	buyButtonContainer.BackgroundTransparency = 1
+	buyButtonContainer.LayoutOrder = 10
+	buyButtonContainer.Size = UDim2.fromScale(1, 0.2)
+
+	if isHelper then
 		progressHeader.Parent = itemProgress
-		KinUI.ApplyList(progressHeader, Enum.FillDirection.Horizontal, { HAlign = Enum.HorizontalAlignment.Center })
+		buyButtonContainer.Parent = itemProgress
+		local helperData = data :: HelperType.HelperInstance
 
 		local levelLabel: TextLabel
 		local stageLabel: TextLabel
@@ -332,13 +354,6 @@ function InfoPanel.Create(props: {
 		createStats(helperData, itemProgress)
 
 		if isHelper then
-			local buyButtonContainer = Instance.new("Frame")
-			buyButtonContainer.Name = "BuyButtonContainer"
-			buyButtonContainer.BackgroundTransparency = 1
-			buyButtonContainer.LayoutOrder = 10
-			buyButtonContainer.Size = UDim2.fromScale(1, 0.2)
-			buyButtonContainer.Parent = itemProgress
-
 			local cost: number = helperData.IsPurchased and helperData.UpgradeCost or helperData.BaseCost or 0
 			local canAfford = false
 			if canAffordEvent then canAfford = canAffordEvent:InvokeServer("Gold", cost) end
@@ -360,7 +375,7 @@ function InfoPanel.Create(props: {
 			end
 
 			buyButton.Activated:Connect(function()
-				handleButtonClick(helperData.Id, helperData.IsPurchased or false)
+				handleButtonClick(data)
 			end)
 
 			local goldChangedEvent = Events.GetRemote(Events.RemoteNames.GoldChanged)
@@ -404,6 +419,26 @@ function InfoPanel.Create(props: {
 					end)
 				end
 			end
+		end
+	else
+		if isMarket then
+			progressHeader.Parent = itemProgress
+			buyButtonContainer.Parent = itemProgress
+			buyButtonContainer.Name = "SellButtonContainer"
+
+			local sellPrice = data.SellPrice or 0
+
+			local sellButton = Button.Create({
+				Color = "Green",
+				Text = Format.CurrencyNumber(sellPrice),
+				Size = UDim2.fromScale(0.5, 1),
+				CurrencyType = "Gold",
+			})
+			sellButton.Parent = buyButtonContainer
+
+			sellButton.Activated:Connect(function()
+				handleButtonClick(data)
+			end)
 		end
 	end
 

@@ -1,3 +1,4 @@
+local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
@@ -13,17 +14,26 @@ local FishData = require(ReplicatedStorage.Shared.Fish.FishData)
 local InventoryManager = {}
 InventoryManager.__index = InventoryManager
 
-type InventoryManager = typeof(setmetatable({}, InventoryManager))
+type InventoryManager = typeof(setmetatable(
+	{} :: {
+		Player: Player,
+		Owner: number,
+		TeamId: number,
+		Inventory: { [any]: any },
+		_cleaner: any,
+	},
+	InventoryManager
+))
 
 function InventoryManager.New(InventoryState, player: Player, teamId: number): InventoryManager
-	local self = setmetatable({} :: InventoryManager, InventoryManager)
+	local self = setmetatable({}, InventoryManager)
 
 	self.Player = player
 	self.Owner = self.Owner or player.UserId
 	self.TeamId = teamId
 
 	self.Inventory = InventoryState or {}
-	self.PlayerInventory = self:SetupInventory()
+	self:SetupInventory()
 
 	self._cleaner = Trove.new()
 
@@ -72,6 +82,7 @@ function InventoryManager.AttachEventListeners(self: InventoryManager)
 		self._cleaner:Add(caughtFishEvent.Event:Connect(function(data: { Player: Player, Fish: Fish.Fish })
 			if self.Player ~= data.Player or self.Owner ~= data.Player.UserId then return end
 			self:GrantTool(data.Fish)
+			self.Inventory[data.Fish.Id] = data.Fish
 		end))
 	end
 
@@ -84,6 +95,16 @@ function InventoryManager.AttachEventListeners(self: InventoryManager)
 		end
 
 		self._cleaner:Add(getPlayerInventoryEvent)
+	end
+
+	local sellInventoryItemEvent = Events.GetRemote(Events.RemoteNames.SellItem)
+	if sellInventoryItemEvent then
+		self._cleaner:Add(sellInventoryItemEvent.OnServerEvent:Connect(function(player: Player, item)
+			if self.Player ~= player or self.Owner ~= player.UserId then return end
+			if not self.Inventory[item.Id] then return end
+
+			print(`Found the item: {self.Inventory[item.Id]}`)
+		end))
 	end
 end
 
@@ -133,6 +154,8 @@ function InventoryManager.Destroy(self: InventoryManager): ()
 	self.Player = nil
 	self.Owner = nil
 	self.TeamId = nil
+	self.Inventory = nil
+	self.PlayerInventory = nil
 end
 -- //!SECTION
 

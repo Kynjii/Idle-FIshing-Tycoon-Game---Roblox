@@ -3,7 +3,6 @@ local TweenService = game:GetService("TweenService")
 
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local KinUI = require(ReplicatedStorage.Shared.UI.KinUI)
-local Shime = require(ReplicatedStorage.Shared.UI.Shime)
 local LootNotification = {}
 
 export type Props = {
@@ -27,7 +26,6 @@ function LootNotification.Create(props: Props): Frame & CanvasGroup
 	notification.Size = UDim2.fromScale(1, 1)
 	KinUI.AddCorner(notification, "M")
 	notification.Parent = lootNotificationContainer
-	Shime.new(notification)
 
 	local bG = Instance.new("ImageLabel")
 	bG.Name = "BG"

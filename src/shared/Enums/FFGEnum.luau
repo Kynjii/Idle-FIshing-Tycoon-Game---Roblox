@@ -65,6 +65,8 @@ FFGEnum.SCREENGUI = {
 	FishDex = "FishDex",
 
 	HelperShop = "CrewShop",
+
+	Market = "Market",
 }
 
 FFGEnum.ATTRIBUTES = {

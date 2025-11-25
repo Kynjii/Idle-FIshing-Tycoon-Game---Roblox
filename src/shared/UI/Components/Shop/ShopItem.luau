@@ -4,13 +4,14 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
+local FishType = require(ReplicatedStorage.Shared.Types.Classes.FishType)
 local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
 local KinUI = require(ReplicatedStorage.Shared.UI.KinUI)
 local Format = require(ReplicatedStorage.Shared.Utils.Format)
 
 local function ShopItem(
 	props: {
-		ItemData: HelperType.HelperData,
+		ItemData: any,
 		BackgroundColor3: Color3?,
 		Size: UDim2,
 		AnchorPoint: Vector2?,
@@ -24,10 +25,17 @@ local function ShopItem(
 		ShopInstance: Instance,
 	}
 )
-	local item = props.ItemData
+	local typedItem
+	if props.ItemData.Entity == FFGEnum.CLASS.ENTITY_NAME.Fish then
+		typedItem = props.ItemData :: FishType.FishData
+	elseif props.ItemData.Entity == FFGEnum.CLASS.ENTITY_NAME.Helper then
+		typedItem = props.ItemData :: HelperType.HelperData
+	else
+		typedItem = props.ItemData
+	end
 
 	local shopItemContainer = Instance.new("Frame")
-	shopItemContainer.Name = item.Id or "Shopitem"
+	shopItemContainer.Name = typedItem.Id or "Shopitem"
 	shopItemContainer.BackgroundTransparency = 1
 	shopItemContainer.Size = props.Size
 	shopItemContainer.BackgroundColor3 = props.BackgroundColor3 or FFGEnum.THEME.color.white
@@ -50,24 +58,8 @@ local function ShopItem(
 	itemQualityBG.BackgroundTransparency = 1
 	itemQualityBG.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
 	itemQualityBG.Position = FFGEnum.THEME.alignment.position.center
-	itemQualityBG.Image = FFGEnum.UI.Items.BackgroundQualityId[item.QualityId or item.Tier]
+	itemQualityBG.Image = FFGEnum.UI.Items.BackgroundQualityId[typedItem.QualityId or 1]
 	itemQualityBG.Parent = shopItemContainer
-
-	-- //SECTION - Shop Item Outline
-	local hoverImage = Instance.new("ImageLabel")
-	hoverImage.Name = "HoverImage"
-	hoverImage.Image = FFGEnum.UI.Items.Hovered
-	hoverImage.BackgroundTransparency = 1
-	hoverImage.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
-	hoverImage.Position = FFGEnum.THEME.alignment.position.center
-	hoverImage.ScaleType = Enum.ScaleType.Slice
-	hoverImage.SliceCenter = Rect.new(26, 34, 31, 37)
-	hoverImage.ImageColor3 = FFGEnum.THEME.color.white
-	hoverImage.ImageTransparency = 0.7
-	hoverImage.Size = UDim2.fromScale(0.95, 0.85)
-	hoverImage.Visible = false
-	hoverImage.Parent = shopItemContainer
-	-- //!SECTION
 
 	-- //SECTION -  Shop Item Corner
 	local corner = Instance.new("UICorner")
@@ -93,7 +85,7 @@ local function ShopItem(
 	itemName.BackgroundTransparency = 1
 	itemName.TextColor3 = FFGEnum.THEME.color.white
 	itemName.LayoutOrder = 1
-	itemName.Text = item.Name
+	itemName.Text = typedItem.Name
 	itemName.TextScaled = true
 	KinUI.AddStroke(itemName, "L")
 	itemName.Parent = mainContainer
@@ -102,7 +94,7 @@ local function ShopItem(
 	-- //SECTION -  Item Image
 	local itemImage = Instance.new("ImageLabel")
 	itemImage.Name = "ItemImage"
-	itemImage.Image = item.ItemImage or ""
+	itemImage.Image = typedItem.ItemImage or ""
 	itemImage.LayoutOrder = 2
 	itemImage.BackgroundTransparency = 1
 	itemImage.Size = UDim2.fromScale(0.6, 0.6)
@@ -112,7 +104,7 @@ local function ShopItem(
 	-- //!SECTION
 
 	-- //SECTION -  Item Price
-	if not item.IsPurchased then
+	if not typedItem.IsPurchased or typedItem.Entity == FFGEnum.CLASS.ENTITY_NAME.Fish then
 		local priceContainer = Instance.new("Frame")
 		priceContainer.Name = "PriceContainer"
 		priceContainer.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
@@ -159,7 +151,8 @@ local function ShopItem(
 		ItemBaseCostTxt.TextColor3 = FFGEnum.THEME.color.white
 		ItemBaseCostTxt.BackgroundTransparency = 1
 		ItemBaseCostTxt.LayoutOrder = 2
-		ItemBaseCostTxt.Text = Format.CurrencyNumber(item.BaseCost or 0) or ""
+		local value = typedItem.BaseCost or typedItem.SellPrice or 0
+		ItemBaseCostTxt.Text = Format.CurrencyNumber(value) or ""
 		ItemBaseCostTxt.Font = FFGEnum.THEME.bigFont
 		ItemBaseCostTxt.Size = UDim2.fromScale(0.5, 0.9)
 		ItemBaseCostTxt.TextScaled = true
@@ -184,7 +177,7 @@ local function ShopItem(
 	-- //!SECTION
 
 	itemQualityBG.Activated:Connect(function()
-		Events.FireEvent(Events.RemoteNames.UpdateInfoPanel, Players.LocalPlayer, item)
+		Events.FireEvent(Events.RemoteNames.UpdateInfoPanel, Players.LocalPlayer, typedItem)
 	end)
 
 	return shopItemContainer

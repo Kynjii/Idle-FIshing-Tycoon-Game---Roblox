@@ -323,7 +323,7 @@ function FishCalculator.GenerateStats(qualityId: number): (number, number)
 
 	-- Base values for fish stats
 	local baseMaxHP = 100 * qualityId
-	local baseWeight = 1.0
+	local baseWeight = 0.5 * qualityId
 
 	-- Apply quality multiplier
 	local maxHP = baseMaxHP * qualityMult
@@ -489,6 +489,50 @@ function FishCalculator.GetAllFishVariations(realmId: number): { { Species: stri
 	end
 
 	return variations
+end
+
+function FishCalculator.CalculateSellPrice(speciesKey: string, tier: number, location: number, quality: number, variant: string, weight: number): number
+	-- Base price from rarity (inverse of drop chance)
+	local availableSpecies = LOCATION_SPECIES_BY_TIER[tier] and LOCATION_SPECIES_BY_TIER[tier][location]
+	local dropChance = 0.1 -- fallback
+
+	if availableSpecies and availableSpecies[speciesKey] then dropChance = availableSpecies[speciesKey].dropChance end
+
+	-- Base price: rarer fish (lower drop chance) = higher price
+	local basePrice = math.floor(100 / math.max(dropChance, 0.01)) -- Min 0.01 to prevent division by zero
+
+	-- Quality multiplier - exponential scaling
+	local qualityMultipliers = {
+		[1] = 1.0, -- Q1: Base price
+		[2] = 2.2, -- Q2: 2.2x
+		[3] = 4.8, -- Q3: 4.8x
+		[4] = 10.5, -- Q4: 10.5x
+		[5] = 23.0, -- Q5: 23x
+		[6] = 50.0, -- Q6: 50x (legendary)
+	}
+	local qualityMult = qualityMultipliers[quality] or 1.0
+
+	-- Variant multiplier
+	local variantMultipliers = {
+		[FFGEnum.FISH_VARIANT.NORMAL] = 1.0,
+		[FFGEnum.FISH_VARIANT.ELEMENTAL] = 3.5, -- Elemental fish worth 3.5x
+		[FFGEnum.FISH_VARIANT.ELDER] = 12.0, -- Elder fish worth 12x (very rare)
+	}
+	local variantMult = variantMultipliers[variant] or 1.0
+
+	-- Weight bonus: larger fish worth more (up to +50% for 2x weight)
+	local weightBonus = 1.0 + math.min(weight - 1.0, 1.0) * 0.5 -- Max +50% at 2.0+ weight
+
+	-- Tier bonus: higher tier locations give small bonus
+	local tierBonus = 1.0 + (tier - 1) * 0.1 -- +10% per tier above 1
+
+	-- Calculate final price
+	local finalPrice = basePrice * qualityMult * variantMult * weightBonus * tierBonus
+
+	-- Round to nearest whole number, minimum 1 coin
+	finalPrice = math.max(1, math.floor(finalPrice + 0.5))
+
+	return finalPrice
 end
 
 function FishCalculator.GetFishName(species: string, speciesKey: string, variant: string, realmId: number): string

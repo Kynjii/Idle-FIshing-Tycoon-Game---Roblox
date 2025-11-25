@@ -131,6 +131,7 @@ if updateUIEvent then updateUIEvent.OnClientEvent:Connect(function()
 end) end
 
 if tabSelectedEvent and getCrewManagementState then tabSelectedEvent.Event:Connect(function(tabName)
+	if not screenGui.Enabled then return end
 	selectedTab = tabName
 
 	updateCrewMngPanelUI()

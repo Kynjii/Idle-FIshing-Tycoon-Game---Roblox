@@ -33,6 +33,7 @@ export type Fish = {
 	Quality: string,
 	MaxHP: number,
 	Weight: number,
+	SellPrice: number,
 	_cleaner: any,
 }
 
@@ -81,10 +82,11 @@ function Fish.New(state, player: Player, teamId: number, fishingLocTier: number,
 	self.Name = state.Name or specieData.Name
 	self.NameKey = state.NameKey or specieData.NameKey
 
-	-- Define quality first
 	self.QualityId = state.QualityId or self:DefineQuality(fishingLocTier)
 	self.Quality = FFGEnum.QUALITIES[self.QualityId]
 	self.MaxHP, self.Weight = self:CalculateStats()
+
+	self.SellPrice = FishCalculators.CalculateSellPrice(self.SpeciesKey, fishingLocTier, fishingLocId, self.QualityId, self.Variant, self.Weight)
 
 	self._cleaner = Trove.new()
 
@@ -121,6 +123,7 @@ function Fish.Serialize(self: Fish): { [string]: any }
 		MaxHP = self.MaxHP,
 		Weight = self.Weight,
 		ItemImage = self.ItemImage,
+		SellPrice = self.SellPrice,
 	}
 end
 

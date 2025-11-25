@@ -274,12 +274,14 @@ end
 
 -- //SECTION - Cleanup
 function HelperShopManager.Destroy(self: HelperShopManager): ()
+	pcall(function()
+		self:Save()
+	end)
+
 	if self._cleaner then
 		self._cleaner:Clean()
 		self._cleaner = nil
 	end
-
-	self.Save()
 
 	self.Player = nil
 	self.Owner = nil

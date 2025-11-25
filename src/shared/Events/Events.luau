@@ -1,3 +1,4 @@
+local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
@@ -38,6 +39,9 @@ Events.RemoteNames = {
 	StartFishingMiniGame = "StartFishingMiniGame",
 	FishingResult = "FishingResult",
 	GameEnded = "GameEnded",
+
+	-- Market
+	SellItem = "SellItem",
 }
 
 Events.RemoteFunctionNames = {
@@ -222,10 +226,8 @@ function Events.FireEvent(name: string, player: Player, data: any)
 	local folder = ReplicatedStorage:FindFirstChild(FOLDER_NAME)
 	local ev = folder and folder:FindFirstChild(name)
 	if ev and ev:IsA("RemoteEvent") then
-		local safeData = data
-		if type(data) == "table" and type(data.Serialize) == "function" then safeData = data:Serialize() end
-		if RunService:IsServer() then ev:FireClient(player, safeData) end
-		if RunService:IsClient() then ev:FireServer(safeData) end
+		if RunService:IsServer() then ev:FireClient(player, data) end
+		if RunService:IsClient() then ev:FireServer(data) end
 
 		return true
 	else
