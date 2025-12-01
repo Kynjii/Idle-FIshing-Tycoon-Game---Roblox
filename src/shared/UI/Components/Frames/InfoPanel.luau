@@ -302,6 +302,7 @@ function InfoPanel.Create(props: {
 	end
 
 	local progressHeader = Instance.new("Frame")
+	progressHeader.Name = "ProgressHeader"
 	progressHeader.BackgroundTransparency = 1
 	progressHeader.Size = UDim2.fromScale(1, 0.1)
 	progressHeader.LayoutOrder = 1
@@ -352,73 +353,71 @@ function InfoPanel.Create(props: {
 
 		createStats(helperData, itemProgress)
 
-		if isHelper then
-			local cost: number = helperData.IsPurchased and helperData.UpgradeCost or helperData.BaseCost or 0
-			local canAfford = false
-			if canAffordEvent then canAfford = canAffordEvent:InvokeServer("Gold", cost) end
+		local cost: number = helperData.IsPurchased and helperData.UpgradeCost or helperData.BaseCost or 0
+		local canAfford = false
+		if canAffordEvent then canAfford = canAffordEvent:InvokeServer("Gold", cost) end
 
-			local colorToUse = canAfford and "Green" or "Gray"
+		local colorToUse = canAfford and "Green" or "Gray"
 
-			local buyButton = Button.Create({
-				Color = colorToUse,
-				Text = Format.CurrencyNumber(cost),
-				Size = UDim2.fromScale(0.5, 1),
-				CurrencyType = "Gold",
-			})
-			buyButton.Parent = buyButtonContainer
+		local buyButton = Button.Create({
+			Color = colorToUse,
+			Text = Format.CurrencyNumber(cost),
+			Size = UDim2.fromScale(0.5, 1),
+			CurrencyType = "Gold",
+		})
+		buyButton.Parent = buyButtonContainer
 
-			if canAfford then
-				Button.Enable(buyButton)
-			else
-				Button.Disable(buyButton)
-			end
+		if canAfford then
+			Button.Enable(buyButton)
+		else
+			Button.Disable(buyButton)
+		end
 
-			buyButton.Activated:Connect(function()
-				handleButtonClick(data)
+		buyButton.Activated:Connect(function()
+			handleButtonClick(data)
+		end)
+
+		local goldChangedEvent = Events.GetRemote(Events.RemoteNames.GoldChanged)
+		if goldChangedEvent then
+			goldChangedEvent.OnClientEvent:Connect(function(encodedAmount)
+				local newGoldAmount = HttpService:JSONDecode(encodedAmount)
+				if buyButton then
+					if newGoldAmount < cost then
+						Button.Disable(buyButton)
+					elseif newGoldAmount >= cost then
+						Button.Enable(buyButton)
+					end
+				end
 			end)
+		end
 
-			local goldChangedEvent = Events.GetRemote(Events.RemoteNames.GoldChanged)
-			if goldChangedEvent then
-				goldChangedEvent.OnClientEvent:Connect(function(encodedAmount)
-					local newGoldAmount = HttpService:JSONDecode(encodedAmount)
-					if buyButton then
-						if newGoldAmount < cost then
-							Button.Disable(buyButton)
-						elseif newGoldAmount >= cost then
-							Button.Enable(buyButton)
+		local helperUpgradedEvent = Events.GetRemote(Events.RemoteNames.HelperUpgraded)
+		if helperData.Stats then
+			if helperUpgradedEvent then
+				helperUpgradedEvent.OnClientEvent:Connect(function(encodedData)
+					local helperData = HttpService:JSONDecode(encodedData) :: HelperType.HelperInstance
+					-- Update Level
+					if levelLabel then levelLabel.Text = helperData.IsPurchased and `Level {helperData.Level}` or "" end
+
+					-- Update Stage
+					if stageLabel then
+						stageLabel.Text = FFGEnum.STAGES[helperData.UpgradeStage].Label
+						stageLabel.TextColor3 = FFGEnum.STAGES[helperData.UpgradeStage].Color or Color3.new(1, 1, 1)
+					end
+
+					-- Update Stats
+					createStats(helperData, itemProgress)
+
+					-- Update Button State (disabled and or upgrade cost)
+					local btnText = buyButton:FindFirstChild("ButtonText", true) :: TextLabel?
+					if btnText then
+						if helperData.Level ~= helperData.MaxLevel then
+							btnText.Text = Format.CurrencyNumber(helperData.UpgradeCost or 0)
+						else
+							btnText.Text = "Max level"
 						end
 					end
 				end)
-			end
-
-			local helperUpgradedEvent = Events.GetRemote(Events.RemoteNames.HelperUpgraded)
-			if helperData.Stats then
-				if helperUpgradedEvent then
-					helperUpgradedEvent.OnClientEvent:Connect(function(encodedData)
-						local helperData = HttpService:JSONDecode(encodedData) :: HelperType.HelperInstance
-						-- Update Level
-						if levelLabel then levelLabel.Text = helperData.IsPurchased and `Level {helperData.Level}` or "" end
-
-						-- Update Stage
-						if stageLabel then
-							stageLabel.Text = FFGEnum.STAGES[helperData.UpgradeStage].Label
-							stageLabel.TextColor3 = FFGEnum.STAGES[helperData.UpgradeStage].Color or Color3.new(1, 1, 1)
-						end
-
-						-- Update Stats
-						createStats(helperData, itemProgress)
-
-						-- Update Button State (disabled and or upgrade cost)
-						local btnText = buyButton:FindFirstChild("ButtonText", true) :: TextLabel?
-						if btnText then
-							if helperData.Level ~= helperData.MaxLevel then
-								btnText.Text = Format.CurrencyNumber(helperData.UpgradeCost or 0)
-							else
-								btnText.Text = "Max level"
-							end
-						end
-					end)
-				end
 			end
 		end
 	else

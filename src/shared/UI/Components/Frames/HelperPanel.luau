@@ -42,10 +42,7 @@ function HelperPanel.Create(player: Player, crewData, innerWindow: Frame): Scrol
 		updateInfoPanelEvent.OnClientEvent:Connect(function(encodedData: { Item: HelperType.HelperInstance, isFishDex: boolean? })
 			local data = HttpService:JSONDecode(encodedData)
 
-			if data.isFishDex then
-				print(`it is FishDex`)
-				return
-			end
+			if data.isFishDex then return end
 
 			HelperPanel.RenderInfoPanel(innerWindow, data.Item)
 		end)
