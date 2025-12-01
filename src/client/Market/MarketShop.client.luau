@@ -16,12 +16,14 @@ local playerGui = player:WaitForChild("PlayerGui")
 local main: Instance
 local shopItemsContainer: Instance
 local screenGui: ScreenGui
+local innerWindow: Frame
 
 task.spawn(function()
 	screenGui = MarketGUI.Create()
 	screenGui.Parent = playerGui
 
 	main = screenGui:FindFirstChild("Main", true) :: Frame
+	innerWindow = screenGui:FindFirstChild("InnerWindow", true) :: Frame
 	if main then shopItemsContainer = main:FindFirstChild("ItemContainer", true) :: ScrollingFrame end
 end)
 
@@ -67,11 +69,13 @@ function updateUI()
 
 	if shopItemsContainer then
 		local isFirst = true
+		local hasItems = false
 		for k, item in pairs(playerInventoryData) do
 			if item.IsPurchased then
 				continue
 			else
 				local itemComponent = createShopitemComponent(item)
+				hasItems = true
 				if isFirst then
 					local btn = itemComponent:FindFirstChildOfClass("ImageButton")
 					if btn then
@@ -83,6 +87,11 @@ function updateUI()
 				end
 				itemComponents[item.Id] = itemComponent
 			end
+		end
+
+		if not hasItems then
+			local infoPanel = innerWindow and innerWindow:FindFirstChild("InfoPanelContainer")
+			if infoPanel then infoPanel:Destroy() end
 		end
 	end
 end
@@ -116,9 +125,9 @@ end
 
 local updateUIEvent = Events.GetRemote(Events.RemoteNames.UpdateMarketUI)
 if updateUIEvent then
-	updateUIEvent.OnClientEvent:Connect(function(helperId)
-		if not helperId then return end
-		if playerInventoryData[helperId] then playerInventoryData[helperId] = nil end
+	updateUIEvent.OnClientEvent:Connect(function(itemId)
+		if not itemId then return end
+		if playerInventoryData[itemId] then playerInventoryData[itemId] = nil end
 		updateUI()
 	end)
 end
