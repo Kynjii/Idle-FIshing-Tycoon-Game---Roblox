@@ -34,7 +34,9 @@ function HelperPanel.Create(player: Player, crewData, innerWindow: Frame): Scrol
 		if index == 1 then HelperPanel.RenderInfoPanel(innerWindow, helperData) end
 	end
 
-	if index == 0 then HelperPanel.AddEmptyState(scrollingFrame, "Purchase Crew Members from the Crew Shop to see them here.") end
+	if index == 0 then
+		HelperPanel.AddEmptyState(innerWindow, "Purchase Crew Members from the Crew Shop to see them here.", { size = UDim2.fromScale(0.4, 0.5), position = UDim2.fromScale(0.8, 0.5) })
+	end
 
 	local updateInfoPanelEvent = Events.GetRemote(Events.RemoteNames.UpdateInfoPanel)
 	if updateInfoPanelEvent then
@@ -48,15 +50,15 @@ function HelperPanel.Create(player: Player, crewData, innerWindow: Frame): Scrol
 	return scrollingFrame
 end
 
-function HelperPanel.AddEmptyState(parent: Instance, text: string)
+function HelperPanel.AddEmptyState(parent: Instance, text: string, props: { size: UDim2?, position: UDim2? }?)
 	local emptyState = Instance.new("TextLabel")
 	emptyState.Name = "EmptyState"
 	emptyState.Font = FFGEnum.THEME.bigFont
 	emptyState.TextColor3 = FFGEnum.THEME.color.white
 	emptyState.BackgroundTransparency = 1
-	emptyState.Size = UDim2.fromScale(0.8, 0.5)
+	emptyState.Size = props and props.size or UDim2.fromScale(0.8, 0.5)
 	emptyState.AnchorPoint = FFGEnum.THEME.alignment.anchor.center
-	emptyState.Position = FFGEnum.THEME.alignment.position.center
+	emptyState.Position = props and props.position or FFGEnum.THEME.alignment.position.center
 	emptyState.Text = text
 	emptyState.TextScaled = true
 	emptyState.Parent = parent
