@@ -165,14 +165,14 @@ FORMULAS.QUALITY_MULT = {
 FORMULAS.HELPER_BASE = {
 	Defaults = {
 		WalkSpeed = 5, -- "up"
-		Storage = 30, -- "up"
+		Storage = 150, -- "up"
 		LoadTime = 20, -- "timeDown"
 	},
 	PerJobCategory = {
 		Fishing = { CatchRate = 3, Luck = 0.015, CastTime = 8 }, -- CastTime "timeDown"
 		Woodcutting = { WoodYield = 3, CritChance = 0.015, SwingRate = 8 },
 		Mining = { OreYield = 3, CritChance = 0.015, SwingRate = 8 },
-		Transporting = { Storage = 50, FishValue = 0.08, LoadTime = 10 },
+		Transporting = { Storage = 125, FishValue = 0.08, LoadTime = 10 },
 	},
 }
 

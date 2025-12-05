@@ -14,7 +14,6 @@ function LootNotification.Create(props: Props): Frame & CanvasGroup
 	local lootNotificationContainer = Instance.new("Frame")
 	lootNotificationContainer.Name = "NotificationContainer"
 	lootNotificationContainer.AnchorPoint = Vector2.new(0.5, 0.5)
-	lootNotificationContainer.BackgroundTransparency = 1
 	lootNotificationContainer.Position = UDim2.fromScale(0.5, 0.5)
 	lootNotificationContainer.Size = UDim2.fromScale(1, 0.28)
 
@@ -42,7 +41,7 @@ function LootNotification.Create(props: Props): Frame & CanvasGroup
 		NumberSequenceKeypoint.new(0.799252, 0.7375),
 		NumberSequenceKeypoint.new(1, 1),
 	})
-	uIGradient.Parent = notification
+	uIGradient.Parent = lootNotificationContainer
 
 	local textLabel = Instance.new("TextLabel")
 	textLabel.Name = "TextLabel"

@@ -210,17 +210,17 @@ function AvailableJobListItem.Create(
 			if isTaken and helperData then
 				if helperData then
 					local unassignedJobId = 0
-					if assignJobEvent then assignJobEvent:FireServer(helperData.Id, unassignedJobId) end
+					if assignJobEvent then assignJobEvent:FireServer({ helperId = helperData.Id, jobId = unassignedJobId }) end
 				end
 			else
 				if helperSelectedState then
 					local selectedHelperId = helperSelectedState.Value
-					if selectedHelperId == "" then return end
+					if selectedHelperId ~= "" then
+						local job_Id = props.Id
+						if assignJobEvent then assignJobEvent:FireServer({ helperId = selectedHelperId, jobId = job_Id }) end
 
-					local jobId = props.Id
-					if assignJobEvent then assignJobEvent:FireServer(selectedHelperId, jobId) end
-
-					helperSelectedState.Value = ""
+						helperSelectedState.Value = ""
+					end
 				end
 			end
 
@@ -302,7 +302,7 @@ function AvailableJobListItem.Create(
 					if typedHelper.CurrentAssignment > 0 then continue end
 
 					local assignJobEvent = Events.GetRemote(Events.RemoteNames.AssignJob)
-					if assignJobEvent then assignJobEvent:FireServer(typedHelper.Id, props.Id) end
+					if assignJobEvent then assignJobEvent:FireServer({ typedHelper.Id, props.Id }) end
 					break
 				end
 			end

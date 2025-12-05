@@ -323,12 +323,11 @@ function JobManager.AttachEventListeners(self: JobManager): ()
 	-- Remote events for assigning helper to a job
 	local assignJobEvent = Events.GetRemote(Events.RemoteNames.AssignJob)
 	if assignJobEvent then
-		self._cleaner:Add(assignJobEvent.OnServerEvent:Connect(function(player: Player, helperId: string, jobId: number)
+		self._cleaner:Add(assignJobEvent.OnServerEvent:Connect(function(player: Player, data: { helperId: string, jobId: number })
 			if self.Player ~= player or self.Owner ~= player.UserId then return end
-			print(helperId, jobId)
-			if not helperId or not jobId then return end
+			if not data.helperId or not data.jobId then return end
 
-			self:AssignHelper(helperId, jobId)
+			self:AssignHelper(data.helperId, data.jobId)
 		end))
 	end
 
