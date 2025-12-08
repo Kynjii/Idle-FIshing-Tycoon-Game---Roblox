@@ -451,7 +451,7 @@ function KinUI.SetState(name: string, value: any, parent: Instance): ValueBase
 end
 -- //!SECTION
 
-function KinUI.ScrollTo(props: { direction: "Up" | "Down", smooth: boolean?, instance: ScrollingFrame })
+function KinUI.ScrollTo(props: { direction: "Up" | "Down"?, smooth: boolean?, instance: ScrollingFrame })
 	if not props.instance.ScrollingEnabled then
 		error("Passed Instance does not have Scrolling Enabled.")
 		return

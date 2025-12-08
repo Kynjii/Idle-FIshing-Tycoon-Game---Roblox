@@ -9,7 +9,6 @@ local DataService = require(ServerScriptService.Server.Services.DataService)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
-local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
 local RodType = require(ReplicatedStorage.Shared.Types.RodType)
 
 -- //SECTION - Tagged Entities within Workspace
@@ -31,7 +30,7 @@ function FishingRodShopManager.New(player: Player, teamId: number): FishingRodSh
 	self.TeamId = teamId
 	self.ShopModel = self:FindShopModel(teamId)
 
-	self.Inventory = FishingRods
+	self.Inventory = self:GenerateInventory()
 
 	self._cleaner = Trove.new()
 
@@ -50,10 +49,26 @@ function FishingRodShopManager.FindShopModel(self: FishingRodShopManager, teamId
 	return nil
 end
 
+function FishingRodShopManager.GenerateInventory(self: FishingRodShopManager)
+	local copy = TableUtil.Copy(FishingRods, true)
+
+	local playerRods = DataService.GetRods(self.Player)
+	for _, rod in pairs(playerRods) do
+		for key, rodCopy in pairs(copy) do
+			if rodCopy.Id == rod.Id then
+				copy[key] = nil
+				break
+			end
+		end
+	end
+
+	return copy
+end
+
 function FishingRodShopManager.PurchaseRod(self: FishingRodShopManager, rodId: number): ()
 	local rodInShop = TableUtil.Find(self.Inventory, function(rod)
 		return rod.Id == rodId
-	end) :: HelperType.HelperData
+	end) :: RodType.FishingRodType
 
 	if not rodInShop then return end
 
@@ -64,10 +79,10 @@ function FishingRodShopManager.PurchaseRod(self: FishingRodShopManager, rodId: n
 
 	DataService.Spend(self.Player, rodInShop.CurrencyType, rodInShop.Cost)
 
-	self.Inventory[rodId] = nil
+	Events.FireBindableEvent(Events.BindableNames.PurchasedRod, { Player = self.Player, Rod = rodInShop })
+	self.Inventory[rodInShop.Key] = nil
 
-	Events.FireEvent(Events.RemoteNames.UpdateFishingRodShopUI, self.Player, rodId)
-	Events.FireBindableEvent(Events.BindableNames.PurchasedRod, { Player = self.Player, RodId = rodId })
+	Events.FireEvent(Events.RemoteNames.UpdateFishingRodShopUI, self.Player, self.Inventory)
 end
 
 -- //SECTION - UI Setup
@@ -88,8 +103,7 @@ function FishingRodShopManager.SetupProximityPrompt(self: FishingRodShopManager,
 	self._cleaner:Add(proximityPrompt.Triggered:Connect(function(player)
 		if player.UserId ~= self.Owner then return end
 
-		local shopInventory = self.Inventory or {}
-		Events.FireEvent(Events.RemoteNames.OpenFishingRodShop, self.Player, shopInventory)
+		Events.FireEvent(Events.RemoteNames.OpenFishingRodShop, self.Player, self.Inventory)
 	end))
 
 	return proximityPrompt
@@ -119,7 +133,8 @@ function FishingRodShopManager.AttachEventListeners(self: FishingRodShopManager)
 			end) :: RodType.FishingRodType
 
 			if not rodInShop then return end
-			if rodInShop then Events.FireEvent(Events.RemoteNames.UpdateInfoPanel, player, { Item = rodInShop }) end
+
+			Events.FireEvent(Events.RemoteNames.UpdateInfoPanel, player, { Item = rodInShop })
 		end)
 	end
 end

@@ -9,6 +9,7 @@ local PlayerDataTemplate = require(ServerScriptService.Server.Modules.PlayerData
 local ProfileStore = require(ServerScriptService.Server.Libs.ProfileStore)
 local TeamManager = require(ServerScriptService.Server.Classes.Managers.TeamManager)
 local FishCalculators = require(ServerScriptService.Server.Classes.Modules.FishCalculators)
+local FishingRods = require(ServerScriptService.Server.Data.FishingRods)
 local Tutorial = require(ServerScriptService.Server.Game.Tutorial.Tutorial)
 local Badges = require(ServerScriptService.Server.Modules.Badges.Badges)
 local MusicManager = require(ServerScriptService.Server.Music.MusicManager)
@@ -50,8 +51,8 @@ end
 local function updateTools()
 	for _, fish in pairs(FishCalculators.GetAllFishVariations(1)) do
 		local fishSpeciesKey = fish.SpeciesKey
-		if ServerStorage.Tools:FindFirstChild(fishSpeciesKey) then
-			local fishTool = ServerStorage.Tools[fishSpeciesKey]
+		if ServerStorage.FishTools:FindFirstChild(fishSpeciesKey) then
+			local fishTool = ServerStorage.FishTools[fishSpeciesKey]
 			fishTool.TextureId = fish.ItemImage
 			fishTool.ToolTip = fish.Species
 			fishTool.RequiresHandle = true
@@ -63,7 +64,32 @@ local function updateTools()
 			tempTool.ToolTip = fish.Species
 			tempTool.RequiresHandle = true
 			tempTool.CanBeDropped = true
-			tempTool.Parent = ServerStorage.Tools
+			tempTool.Parent = ServerStorage.FishTools
+
+			local tempPart = Instance.new("Part")
+			tempPart.Name = "Handle"
+			tempPart.Parent = tempTool
+		end
+	end
+
+	for _, rod in pairs(FishingRods) do
+		local id = rod.Id
+
+		if ServerStorage.RodTools:FindFirstChild(id) then
+			local rodTool = ServerStorage.RodTools[id]
+			rodTool.TextureId = rod.ItemImage
+			rodTool.ToolTip = rod.Name
+			rodTool.RequiresHandle = true
+			rodTool.CanBeDropped = false
+		else
+			-- //TODO - Remove once models are in-game
+			local tempTool = Instance.new("Tool")
+			tempTool.Name = rod.Id
+			tempTool.TextureId = rod.ItemImage
+			tempTool.ToolTip = rod.Name
+			tempTool.RequiresHandle = true
+			tempTool.CanBeDropped = false
+			tempTool.Parent = ServerStorage.RodTools
 
 			local tempPart = Instance.new("Part")
 			tempPart.Name = "Handle"

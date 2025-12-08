@@ -197,6 +197,8 @@ local LOCATION_SPECIES_BY_TIER = {
 	},
 }
 
+table.freeze(LOCATION_SPECIES_BY_TIER)
+
 -- Variant drop chances - elemental variants are rarer, elder only in tier 6
 local VARIANT_DROP_CHANCES = {
 	-- Tiers 1-5: Only normal and elemental
@@ -211,6 +213,8 @@ local VARIANT_DROP_CHANCES = {
 		[FFGEnum.FISH_VARIANT.ELDER] = 0.01, -- 1% chance for elder
 	},
 }
+
+table.freeze(VARIANT_DROP_CHANCES)
 
 -- Quality drops by fishing location tier
 local TIER_QUALITY_DROPS = {
@@ -263,6 +267,8 @@ local TIER_QUALITY_DROPS = {
 		[6] = 0.15,
 	},
 }
+
+table.freeze(TIER_QUALITY_DROPS)
 
 local function chooseQuality(fishingLocTier: number?): number?
 	local tier = math.clamp(fishingLocTier or 1, 1, 6)

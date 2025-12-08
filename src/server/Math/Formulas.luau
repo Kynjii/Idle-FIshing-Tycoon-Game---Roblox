@@ -149,7 +149,7 @@ FORMULAS.TIME_BREAKTHROUGH_LEVELS = {
 }
 
 -- =========================
--- Helper system knobs - IMPROVED
+-- Helper system knobs
 -- =========================
 
 FORMULAS.QUALITY_MULT = {

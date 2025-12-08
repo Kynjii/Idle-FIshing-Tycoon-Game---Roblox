@@ -5,8 +5,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local satchel = require(ReplicatedStorage.Packages.satchel)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
-local FishType = require(ReplicatedStorage.Shared.Types.Classes.FishType)
-local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
 local RodType = require(ReplicatedStorage.Shared.Types.RodType)
 local ShopGUI = require(ReplicatedStorage.Shared.UI.Components.Shop.ShopGUI)
 local ShopItem = require(ReplicatedStorage.Shared.UI.Components.Shop.ShopItem)
@@ -16,7 +14,7 @@ local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
 local main: Instance
-local shopItemsContainer: Instance
+local shopItemsContainer: ScrollingFrame
 local screenGui: ScreenGui
 
 task.spawn(function()
@@ -30,10 +28,10 @@ task.spawn(function()
 	if main then shopItemsContainer = main:FindFirstChild("ItemContainer", true) :: ScrollingFrame end
 end)
 
-function createShopitemComponent(helper: HelperType.HelperData)
+function createShopitemComponent(rod: RodType.FishingRodType)
 	return ShopItem({
-		ItemData = helper,
-		BackgroundColor3 = FFGEnum.QUALITIES[helper.QualityId].Color,
+		ItemData = rod,
+		BackgroundColor3 = FFGEnum.QUALITIES[rod.QualityId].Color,
 		Size = UDim2.fromScale(1, 1),
 		Rounded = FFGEnum.THEME.button.cornerRadius,
 		HoverEffect = true,
@@ -45,16 +43,13 @@ function createShopitemComponent(helper: HelperType.HelperData)
 	})
 end
 
-local shopData: { [string]: any } = {}
-local playersInventory: {
-	Fish: { FishType.FishData },
-	Equipment: { RodType.FishingRodType },
-} = {}
+local shopData: { [number]: RodType.FishingRodType } = {}
 local itemComponents = {}
 
 function handleClosingShopDetailsUI()
-	local character = player.Character.PrimaryPart
-	local originalPosition = character.CFrame.Position
+	local character = player.Character and player.Character.PrimaryPart
+	local originalPosition = character and character.CFrame.Position
+	if not originalPosition then return end
 
 	while true do
 		local distance = player:DistanceFromCharacter(originalPosition)
@@ -70,29 +65,30 @@ end
 
 function updateUI()
 	KinUI.ScrollTo({ instance = shopItemsContainer })
-	for _, component: Instance in pairs(itemComponents) do
-		component:Destroy()
+	for _, component in pairs(itemComponents) do
+		local itemComponent = component :: Instance
+		itemComponent:Destroy()
 	end
 
 	itemComponents = {}
 
 	if shopItemsContainer then
 		local isFirst = true
-		for k, item in pairs(shopData) do
-			if playersInventory[item.Id] then continue end
-
+		for i, rod in ipairs(shopData) do
+			local item = rod.Value
 			local itemComponent = createShopitemComponent(item)
 			itemComponent.LayoutOrder = item.LevelRequirement
-			if isFirst then
+
+			itemComponents[i] = itemComponent
+
+			if i == 1 and isFirst then
 				local btn = itemComponent:FindFirstChildOfClass("ImageButton")
 				if btn then
 					btn.Selected = true
 					Events.FireEvent(Events.RemoteNames.UpdateInfoPanel, player, { Item = item })
 				end
-
 				isFirst = false
 			end
-			itemComponents[item.Id] = itemComponent
 		end
 	end
 end
@@ -105,15 +101,24 @@ function populateDetailsUI()
 	updateUI()
 end
 
+function prepareData(data)
+	local list = {}
+	for key, rod in pairs(data) do
+		table.insert(list, { Key = key, Value = rod })
+	end
+
+	table.sort(list, function(a, b)
+		return a.Value.Id < b.Value.Id
+	end)
+
+	return list
+end
+
 local openUIEvent = Events.GetRemote(Events.RemoteNames.OpenFishingRodShop)
-local getPlayerInventoryEvent = Events.GetRemoteFn(Events.RemoteFunctionNames.GetPlayerInventory)
-if openUIEvent and getPlayerInventoryEvent then
+if openUIEvent then
 	openUIEvent.OnClientEvent:Connect(function(data)
 		if data then
-			shopData = data
-
-			local playerInventory = getPlayerInventoryEvent:InvokeServer()
-			if playerInventory then playersInventory = playerInventory end
+			shopData = prepareData(data)
 
 			populateDetailsUI()
 			satchel:SetBackpackEnabled(false)
@@ -126,8 +131,10 @@ if openUIEvent and getPlayerInventoryEvent then
 end
 
 local updateUIEvent = Events.GetRemote(Events.RemoteNames.UpdateFishingRodShopUI)
-if updateUIEvent then updateUIEvent.OnClientEvent:Connect(function(itemId)
-	if not itemId then return end
-	if shopData[itemId] then shopData[itemId] = nil end
+if updateUIEvent then updateUIEvent.OnClientEvent:Connect(function(newShopData)
+	if not newShopData then return end
+
+	shopData = prepareData(newShopData)
+
 	updateUI()
 end) end

@@ -12,6 +12,7 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local FishData = require(ReplicatedStorage.Shared.Fish.FishData)
+local RodType = require(ReplicatedStorage.Shared.Types.RodType)
 
 local InventoryManager = {}
 InventoryManager.__index = InventoryManager
@@ -50,11 +51,11 @@ function InventoryManager.SetupInventory(self: InventoryManager): { [any]: any }
 	inventory.Parent = self.Player
 
 	for _, item in pairs(self.Inventory.Fish) do
-		self:GrantTool(item)
+		self:GrantTool(item, "Fish")
 	end
 
 	for _, item in pairs(self.Inventory.Equipment) do
-		self:GrantTool(item)
+		self:GrantTool(item, "Equipment")
 	end
 
 	return inventory
@@ -105,8 +106,10 @@ function InventoryManager.AttachEventListeners(self: InventoryManager)
 	if caughtFishEvent then
 		self._cleaner:Add(caughtFishEvent.Event:Connect(function(data: { Player: Player, Fish: Fish.Fish })
 			if self.Player ~= data.Player or self.Owner ~= data.Player.UserId then return end
-			self:GrantTool(data.Fish)
-			self.Inventory.Fish[data.Fish.Id] = data.Fish
+
+			local fishCopy = TableUtil.Copy(data.Fish, true)
+			self:GrantTool(fishCopy, "Fish")
+			self.Inventory.Fish[fishCopy.Id] = fishCopy
 		end))
 	end
 
@@ -150,31 +153,34 @@ function InventoryManager.AttachEventListeners(self: InventoryManager)
 			local sellAmount = item.SellPrice
 			if sellAmount then DataService.Earn(player, "Gold", sellAmount) end
 
-			self:RemoveTool(self.Inventory.Fish[item.Id], itemType)
+			self:RemoveTool(item, itemType)
 		end))
 	end
 
 	local rodPurchasedEvent = Events.GetBindableEvent(Events.BindableNames.PurchasedRod)
 	if rodPurchasedEvent then
-		self._cleaner:Add(rodPurchasedEvent.Event:Connect(function(playerData: { Player: Player, RodId: number })
+		self._cleaner:Add(rodPurchasedEvent.Event:Connect(function(playerData: { Player: Player, Rod: RodType.FishingRodType })
 			local player = playerData.Player
 			if self.Player ~= player or self.Owner ~= player.UserId then return end
 
-			local rodId = playerData.RodId
-			if self.Inventory.Equipment[rodId] then return end
+			local rodKey = playerData.Rod and playerData.Rod.Key
+			if self.Inventory.Equipment[rodKey] then return end
 
 			local associatedRod = TableUtil.Find(FishingRods, function(rod)
-				return rod.Id == rodId
+				return rod.Id == playerData.Rod.Id
 			end)
 
+			local rodCopy = nil
 			if associatedRod then
-				local rodCopy = TableUtil.Copy(associatedRod, true)
-				self.Inventory.Equipment[rodId] = rodCopy
+				rodCopy = TableUtil.Copy(associatedRod, true)
+				self.Inventory.Equipment[rodCopy.Key] = rodCopy
 			else
-				error("No Fishing Rod found with id of:", rodId)
+				error(`No Fishing Rod found with id of: {playerData.Rod.Id}`)
 			end
 
-			self:SaveRod(self.Inventory.Equipment[rodId])
+			self:SaveRod(self.Inventory.Equipment[rodCopy])
+
+			if rodCopy then self:GrantTool(rodCopy, "Equipment") end
 		end))
 	end
 end
@@ -185,9 +191,21 @@ function InventoryManager.SaveRod(self: InventoryManager, rod)
 	DataService.SaveRod(self.Player, rod)
 end
 
-function InventoryManager.GrantTool(self: InventoryManager, item)
-	local toolName = item.SpeciesKey or item.NameKey
-	local toolTemplate = ServerStorage.Tools:FindFirstChild(toolName)
+function InventoryManager.GrantTool(self: InventoryManager, item, type: "Equipment" | "Fish")
+	local toolName = nil
+	if type == "Fish" then
+		toolName = item.SpeciesKey or item.NameKey
+	else
+		toolName = item.Id
+	end
+
+	local toolTemplate = nil
+	if type == "Fish" then
+		toolTemplate = ServerStorage.FishTools:FindFirstChild(toolName)
+	else
+		toolTemplate = ServerStorage.RodTools:FindFirstChild(toolName)
+	end
+
 	if not toolTemplate then return end
 
 	local invTool: Tool = toolTemplate:Clone()
@@ -196,30 +214,32 @@ function InventoryManager.GrantTool(self: InventoryManager, item)
 	local runtimeTool: Tool = invTool:Clone()
 	runtimeTool.Parent = self.Player.Backpack
 
-	invTool.ToolTip = item.Name or item.Species
-	invTool.Name = item.Id
-	runtimeTool.ToolTip = item.Name or item.Species
-	runtimeTool.Name = item.Id
+	if type == "Fish" then
+		invTool.ToolTip = item.Name or item.Species
+		invTool.Name = item.Id
+		runtimeTool.ToolTip = item.Name or item.Species
+		runtimeTool.Name = item.Id
 
-	local image = nil
-	if item.Variant == FFGEnum.FISH_VARIANT.NORMAL then
-		image = FishData.FISH_ASSETS[item.SpeciesKey].Normal[item.QualityId]
-	elseif item.Variant == FFGEnum.FISH_VARIANT.ELEMENTAL then
-		image = FishData.FISH_ASSETS[item.SpeciesKey].Elemental[item.RealmId or item.ElementNum or 1][item.QualityId]
-		local elementName = item.ElementName
-		if elementName then
-			Emitter.AttachElement(invTool.Handle or invTool:FindFirstChild("Handle"), elementName, item.QualityId)
-			Emitter.AttachElement(runtimeTool.Handle or runtimeTool:FindFirstChild("Handle"), elementName, item.QualityId)
+		local image = nil
+		if item.Variant == FFGEnum.FISH_VARIANT.NORMAL then
+			image = FishData.FISH_ASSETS[item.SpeciesKey].Normal[item.QualityId]
+		elseif item.Variant == FFGEnum.FISH_VARIANT.ELEMENTAL then
+			image = FishData.FISH_ASSETS[item.SpeciesKey].Elemental[item.RealmId or item.ElementNum or 1][item.QualityId]
+			local elementName = item.ElementName
+			if elementName then
+				Emitter.AttachElement(invTool.Handle or invTool:FindFirstChild("Handle"), elementName, item.QualityId)
+				Emitter.AttachElement(runtimeTool.Handle or runtimeTool:FindFirstChild("Handle"), elementName, item.QualityId)
+			end
+		elseif item.Variant == FFGEnum.FISH_VARIANT.ELDER then
+			image = FishData.FISH_ASSETS[item.SpeciesKey].Elder[item.QualityId]
+		else
+			image = FishData.FISH_ASSETS[item.SpeciesKey].Basic
 		end
-	elseif item.Variant == FFGEnum.FISH_VARIANT.ELDER then
-		image = FishData.FISH_ASSETS[item.SpeciesKey].Elder[item.QualityId]
-	else
-		image = FishData.FISH_ASSETS[item.SpeciesKey].Basic
-	end
 
-	if image then
-		invTool.TextureId = image
-		runtimeTool.TextureId = image
+		if image then
+			invTool.TextureId = image
+			runtimeTool.TextureId = image
+		end
 	end
 end
 

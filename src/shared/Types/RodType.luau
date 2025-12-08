@@ -1,5 +1,6 @@
 export type FishingRodType = {
 	Entity: string,
+	Key: string,
 	Name: string,
 	Id: number,
 	QualityId: number,

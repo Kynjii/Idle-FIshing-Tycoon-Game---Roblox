@@ -285,6 +285,10 @@ function FishingManager.SetupProximityPrompts(self: FishingManager)
 			self.CurrentFishingLocId = taggedLocationId
 
 			local playerRods = DataService.GetRods(self.Player)
+			local character = player.Character
+			if character then
+				-- //TODO -
+			end
 			local highestRodQualityId = 0
 			if playerRods then
 				for _, rod in pairs(playerRods) do

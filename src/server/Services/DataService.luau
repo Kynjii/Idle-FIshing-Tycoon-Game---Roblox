@@ -578,7 +578,7 @@ function DataService.SaveRod(player: Player, rod): boolean
 	-- Initialize Rod Inventory array if it doesn't exist
 	if not profile.Data.Inventory.Equipment then profile.Data.Inventory.Equipment = {} end
 
-	profile.Data.Inventory.Equipment[rod.Id] = rod
+	profile.Data.Inventory.Equipment[rod.Key] = rod
 
 	return true
 end
