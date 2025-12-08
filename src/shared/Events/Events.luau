@@ -25,7 +25,6 @@ Events.RemoteNames = {
 	UpdateHelperShopUI = "UpdateHelperShopUI",
 	UpdateFishingRodShopUI = "UpdateFishingRodShopUI",
 	PurchaseJobSlot = "PurchaseJobSlot",
-	EntityUpdated = "EntityUpdated",
 	HelperPurchased = "HelperPurchased",
 	UpgradeHelper = "UpgradeHelper",
 	UpdateJobManagementUI = "UpdateJobManagementUI",
@@ -83,7 +82,6 @@ Events.BindableNames = {
 
 	-- Entity Purchase/Upgrade/State
 	PurchaseEntity = "PurchaseEntity",
-	EntityUpdated = "EntityUpdated",
 	UpdateState = "UpdateState",
 
 	-- Jobs

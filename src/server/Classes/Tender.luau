@@ -177,6 +177,8 @@ function Tender.Upgrade(self: Tender)
 	self.UpgradeCost = self:CalculateUpgradeCost()
 	self.CurrentMaxStorage, self.NextLvlMaxStorage = self:CalculateMaxStorage()
 
+	self:UpdateNameplate()
+
 	self:Save()
 end
 

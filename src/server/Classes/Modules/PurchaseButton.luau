@@ -149,8 +149,6 @@ function PB.CreateLogic(class)
 		end
 
 		class:Save()
-
-		Events.FireBindableEvent(Events.BindableNames.EntityUpdated, class:Serialize())
 	end
 
 	class._cleaner:Add(buttonBase.Touched:Connect(function(hit)

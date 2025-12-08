@@ -145,6 +145,8 @@ function Boat.Purchase(self: Boat): ()
 	if self.Tier == 1 then Tutorial.Update(self.Player, self.TeamId) end
 
 	Events.FireBindableEvent(Events.BindableNames.JobUnlocked, self.Tier)
+
+	self:UpdateNameplate()
 end
 
 function Boat.Upgrade(self: Boat): ()
@@ -161,6 +163,8 @@ function Boat.Upgrade(self: Boat): ()
 	self.CurrentFPS, self.NextFPS = self:CalculateFPS()
 	self.UpgradeCost = self:CalculateUpgradeCost()
 	self.CurrentMaxStorage, self.NextLvlMaxStorage = self:CalculateMaxStorage()
+
+	self:UpdateNameplate()
 
 	self:Save()
 end

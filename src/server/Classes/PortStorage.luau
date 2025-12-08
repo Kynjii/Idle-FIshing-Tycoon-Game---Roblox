@@ -155,6 +155,8 @@ function PortStorage.Upgrade(self: PortStorage): ()
 	self.CurrentMaxStorage, self.NextLvlMaxStorage = self:CalculateMaxStorage()
 	self:IsStorageFull()
 
+	self:UpdateNameplate()
+
 	self:Save()
 end
 
