@@ -42,7 +42,19 @@ local STAT_TYPES = {
 }
 
 -- Formats with 0–2 decimals depending on size, strips trailing .0
-function Format.CurrencyNumber(n: number): string
+function Format.CurrencyNumber(n: number, rawNumber: boolean?): string
+	if rawNumber then
+		-- Return raw number without suffix
+		local absn = math.abs(n)
+		if absn >= 100 then
+			return string.format("%.0f", n)
+		elseif absn >= 10 then
+			return (string.format("%.1f", n):gsub("(%..-)0+$", "%1"):gsub("%.$", ""))
+		else
+			return (string.format("%.2f", n):gsub("(%..-)0+$", "%1"):gsub("%.$", ""))
+		end
+	end
+
 	local absn = math.abs(n)
 
 	-- choose suffix if >= 1e3

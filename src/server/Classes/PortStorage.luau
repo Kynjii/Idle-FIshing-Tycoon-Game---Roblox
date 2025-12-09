@@ -14,6 +14,7 @@ local Formulas = require(ServerScriptService.Server.Math.Formulas)
 local EntityNameplate = require(ServerScriptService.Server.Modules.EntityNameplate.EntityNameplate)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local DeepWait = require(ReplicatedStorage.Shared.Utils.DeepWait)
+local Format = require(ReplicatedStorage.Shared.Utils.Format)
 local FadeEffect = require(ServerScriptService.Server.Modules.Tweens.FadeEffect)
 local PopUp = require(ServerScriptService.Server.Modules.Tweens.PopUp)
 local ResizeFromEdge = require(ServerScriptService.Server.Modules.Tweens.ResizeFromEdge)
@@ -314,7 +315,7 @@ function PortStorage.SetupFishRemovalPrompt(self: PortStorage)
 			self:RemoveFish(amount)
 
 			local calculatedAmount = amount * Formulas.FISH_BASEVALUE
-			DataService.Earn(player, FFGEnum.CURRENCY_TYPES.Gold, calculatedAmount, "ManualStorageSell")
+			DataService.Earn(player, FFGEnum.CURRENCY_TYPES.Gold, tonumber(Format.CurrencyNumber(calculatedAmount, true)), "ManualStorageSell")
 
 			-- Save State
 			self:Save()

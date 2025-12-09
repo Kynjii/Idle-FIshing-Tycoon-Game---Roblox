@@ -206,6 +206,11 @@ type earnSource = "ManualStorageSell" | "HelperSell" | "SoldFish"
 type earnSourceInfo = FishType.FishData
 
 function DataService.Earn(player: Player, currencyType: "Gold", amount: number, source: earnSource, sourceInfo: earnSourceInfo)
+	if typeof(amount) ~= "number" then
+		error(`Type of amount is not a number. {type(amount)}`)
+		return
+	end
+
 	local profile = DataService.Profiles[player]
 	if not profile then
 		FFGHelpers.PrintLog("No profile found when attempting to earn: ", currencyType)
@@ -276,7 +281,12 @@ type spendSourceInfo = RodType.FishingRodType | HelperType.HelperData | BoatType
 function DataService.Spend(player: Player, currencyType: "Gold", amount: number, source: spendSource, sourceInfo: spendSourceInfo?)
 	local profile = DataService.Profiles[player]
 	if not profile then return end
-	if typeof(amount) ~= "number" or amount <= 0 then return end
+
+	if typeof(amount) ~= "number" then
+		error(`Type of amount is not a number. {type(amount)}`)
+		return
+	end
+
 	if typeof(currencyType) ~= "string" then return end
 
 	local current = tonumber(profile.Data.Currencies[currencyType]) or 0

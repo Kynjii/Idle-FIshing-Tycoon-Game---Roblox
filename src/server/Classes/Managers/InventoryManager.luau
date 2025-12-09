@@ -13,6 +13,7 @@ local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local FishData = require(ReplicatedStorage.Shared.Fish.FishData)
 local RodType = require(ReplicatedStorage.Shared.Types.RodType)
+local Format = require(ReplicatedStorage.Shared.Utils.Format)
 
 local InventoryManager = {}
 InventoryManager.__index = InventoryManager
@@ -150,7 +151,7 @@ function InventoryManager.AttachEventListeners(self: InventoryManager)
 			end
 
 			local sellAmount = item.SellPrice
-			if sellAmount then DataService.Earn(player, "Gold", sellAmount, "SoldFish", item) end
+			if sellAmount then DataService.Earn(player, "Gold", tonumber(Format.CurrencyNumber(sellAmount, true)), "SoldFish", item) end
 
 			self:RemoveTool(item, itemType)
 		end))

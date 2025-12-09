@@ -14,6 +14,7 @@ local Events = require(ReplicatedStorage.Shared.Events.Events)
 local HelperType = require(ReplicatedStorage.Shared.Types.Classes.HelperType)
 local JobManagerType = require(ReplicatedStorage.Shared.Types.Managers.JobManagerType)
 local ProgressBar = require(ReplicatedStorage.Shared.UI.Components.ProgressBar)
+local Format = require(ReplicatedStorage.Shared.Utils.Format)
 
 local JobManager = {}
 JobManager.__index = JobManager
@@ -215,11 +216,11 @@ function JobManager.BeginAction(self: JobManager, actionType: string, helper: He
 	local progressBarFrame
 	local progressBar
 	if nameplate then
-		progressBarFrame = nameplate:FindFirstChild("ProgressContainer")
+		progressBarFrame = nameplate:WaitForChild("ProgressContainer") or nameplate:WaitForChild("ProgressBarContainer") :: Frame | BillboardGui
 		if progressBarFrame then
 			nameplate.Enabled = true
-			progressBar = progressBarFrame:FindFirstChild("ProgressBar", true)
-			ProgressBar.Show(progressBarFrame)
+			progressBar = progressBarFrame:FindFirstChild("ProgressBar", true) :: ImageLabel
+			progressBarFrame.Visible = true
 		end
 	end
 
@@ -240,7 +241,7 @@ function JobManager.BeginAction(self: JobManager, actionType: string, helper: He
 			end
 
 			if finished then
-				ProgressBar.Hide(progressBarFrame)
+				progressBarFrame.Visible = false
 				ProgressBar.Reset(progressBar)
 				if isGatherAction then
 					local availableStorage = helper.Stats.Storage
@@ -268,12 +269,12 @@ function JobManager.BeginAction(self: JobManager, actionType: string, helper: He
 					end
 					if not currencyAmount then error("No currencyAmount was defined") end
 
-					DataService.Earn(self.Player, FFGEnum.CURRENCY_TYPES.Gold, currencyAmount, "HelperSell")
+					DataService.Earn(self.Player, FFGEnum.CURRENCY_TYPES.Gold, tonumber(Format.CurrencyNumber(currencyAmount, true)), "HelperSell")
 					helper:ClearStorage()
 					self:StartJob(helper, jobId)
 				end
 			else
-				ProgressBar.Hide(progressBarFrame)
+				progressBarFrame.Visible = false
 				print("gathering cancelled")
 			end
 		end)
