@@ -43,9 +43,13 @@ end
 
 function MarketGUI.RenderInfoPanel(innerWindow, item, playerId: number)
 	local existing = MarketGUI.PlayerInfoPanels[playerId]
-	if existing then existing:Destroy() end
+	if existing then
+		existing:Destroy()
+		MarketGUI.PlayerInfoPanels[playerId] = nil
+	end
 
-	MarketGUI.PlayerInfoPanels[playerId] = InfoPanel.Create({ Parent = innerWindow, Infodata = item, isMarket = true })
+	local newInfoPanel = InfoPanel.Create({ Parent = innerWindow, Infodata = item, isMarket = true })
+	MarketGUI.PlayerInfoPanels[playerId] = newInfoPanel
 end
 
 function MarketGUI.CloseShop(mainFrame)

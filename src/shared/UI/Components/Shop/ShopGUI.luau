@@ -10,6 +10,7 @@ local KinUI = require(ReplicatedStorage.Shared.UI.KinUI)
 
 local ShopGUI = {}
 ShopGUI.PlayerInfoPanels = {}
+ShopGUI.RenderInProgress = {}
 
 function ShopGUI.Create(props: { screenGuiName: string?, panelName: string?, panelTabs: boolean? }, playerId: number)
 	local screenGui = MainUIPanel.Create({
@@ -31,6 +32,9 @@ function ShopGUI.Create(props: { screenGuiName: string?, panelName: string?, pan
 	if updateInfoPanelEvent then
 		updateInfoPanelEvent.OnClientEvent:Connect(function(data: { Item: any, isFishDex: boolean? })
 			if data.isFishDex then return end
+			if props.screenGuiName == "FishingRodShop" and data.Item.Entity ~= FFGEnum.CLASS.ENTITY_NAME.FishingRod then return end
+			if props.screenGuiName == "HelperShop" and data.Item.Entity ~= FFGEnum.CLASS.ENTITY_NAME.Helper then return end
+
 			local shopItems = innerWindow:FindFirstChild("ItemContainer"):GetChildren()
 
 			for i, item in ipairs(shopItems) do
@@ -49,10 +53,20 @@ function ShopGUI.Create(props: { screenGuiName: string?, panelName: string?, pan
 end
 
 function ShopGUI.RenderInfoPanel(innerWindow, item, playerId: number)
-	local existing = ShopGUI.PlayerInfoPanels[playerId]
-	if existing then existing:Destroy() end
+	if ShopGUI.RenderInProgress[playerId] then return end
+	ShopGUI.RenderInProgress[playerId] = true
 
-	ShopGUI.PlayerInfoPanels[playerId] = InfoPanel.Create({ Parent = innerWindow, Infodata = item })
+	local existing = ShopGUI.PlayerInfoPanels[playerId]
+	if existing then
+		existing:Destroy()
+		ShopGUI.PlayerInfoPanels[playerId] = nil
+	end
+
+	local newInfoPanel = InfoPanel.Create({ Parent = innerWindow, Infodata = item })
+	ShopGUI.PlayerInfoPanels[playerId] = newInfoPanel
+
+	task.wait(0.1)
+	ShopGUI.RenderInProgress[playerId] = nil
 end
 
 function ShopGUI.CloseShop(mainFrame)

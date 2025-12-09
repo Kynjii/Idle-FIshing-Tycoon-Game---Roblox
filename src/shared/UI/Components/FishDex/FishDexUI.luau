@@ -41,9 +41,13 @@ end
 
 function FishDexUI.RenderInfoPanel(innerWindow, fish, playerId: number)
 	local existing = FishDexUI.PlayerInfoPanels[playerId]
-	if existing then existing:Destroy() end
+	if existing then
+		existing:Destroy()
+		FishDexUI.PlayerInfoPanels[playerId] = nil
+	end
 
-	FishDexUI.PlayerInfoPanels[playerId] = InfoPanel.Create({ Parent = innerWindow, Infodata = fish })
+	local newInfoPanel = InfoPanel.Create({ Parent = innerWindow, Infodata = fish })
+	FishDexUI.PlayerInfoPanels[playerId] = newInfoPanel
 end
 
 function FishDexUI.CloseShop(mainFrame)

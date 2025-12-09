@@ -367,57 +367,45 @@ function HelperCalculator.GenerateBaseStats(jobCategory: string, qualityId: numb
 		end
 	end
 
-	-- Merge FishStorage into Storage for Transporting jobs
-	if jobCategory == "Transporting" then
-		stats.Storage = math.floor((stats.Storage or 0) + (stats.FishStorage or 0) + 0.5)
-		stats.FishStorage = nil
-	end
-
 	return stats, {}
 end
 
 -- Calculate individual stat for specific level (for upgrades)
-function HelperCalculator.CalculateStatForLevel(
-	statName: string, 
-	baseStatValue: number, 
-	jobCategory: string, 
-	level: number, 
-	qualityId: number?
-): number
+function HelperCalculator.CalculateStatForLevel(statName: string, baseStatValue: number, jobCategory: string, level: number, qualityId: number?): number
 	local lvl = clampLevel(level)
 	local stgIndex = getStageForLevel(lvl)
-	
+
 	-- Conservative stage bonus for helpers
 	local helperStageBonus = 1 + (stgIndex - 1) * 0.02
 	local qualityMult = getQualityMult(qualityId)
-	
+
 	-- Get the ORIGINAL base stat value from formulas, not the current stat
 	local baseDefs = Formulas.HELPER_BASE
 	local addDefs = Formulas.HELPER_PER_LEVEL_ADD
 	local typeMap = Formulas.HELPER_STAT_TYPES
-	
+
 	local defaults = (baseDefs and baseDefs.Defaults) or {}
 	local helperBase = (baseDefs and baseDefs.PerJobCategory and baseDefs.PerJobCategory[jobCategory]) or {}
-	
+
 	-- Find the original base value for this stat
 	local originalBaseValue = defaults[statName] or (helperBase and helperBase[statName]) or baseStatValue
-	
+
 	local defaultsAdd = (addDefs and addDefs.Defaults) or {}
 	local helperAdd = (addDefs and addDefs.PerJobCategory and addDefs.PerJobCategory[jobCategory]) or {}
-	
+
 	-- Get per-level growth for this stat
 	local perLevel = defaultsAdd[statName] or (helperAdd and helperAdd[statName]) or 0
 	local statType = typeMap[statName] or "up"
-	
+
 	local leveled
 	if statType == "timeDown" then
 		-- For timeDown stats, subtract per-level improvement (gets faster)
 		leveled = originalBaseValue - perLevel * (lvl - 1)
 	else
-		-- For up/decimal stats, add per-level improvement  
+		-- For up/decimal stats, add per-level improvement
 		leveled = originalBaseValue + perLevel * (lvl - 1)
 	end
-	
+
 	if statType == "up" then
 		local v = leveled * helperStageBonus * qualityMult
 		return math.floor(v + 0.5)
@@ -429,11 +417,11 @@ function HelperCalculator.CalculateStatForLevel(
 		local stageReduction = getStageTimeReductionFraction(stgIndex)
 		local qualityReduction = 1 - (1 / qualityMult)
 		local totalReduction = math.min(0.95, stageReduction + qualityReduction)
-		
+
 		local reduced = leveled * (1 - totalReduction)
 		local minFrac = Formulas.TIME_MIN_FRACTION or 0.02
 		local minTime = math.max(0.5, originalBaseValue * minFrac)
-		
+
 		return math.max(minTime, math.floor(reduced + 0.5))
 	end
 end
@@ -446,7 +434,7 @@ end
 function HelperCalculator.CalculateStats(jobCategory: string, level: number, qualityId: number?): (StatsTable, { string })
 	local lvl = clampLevel(level)
 	local stgIndex = getStageForLevel(lvl)
-	
+
 	-- For helpers, use a much more conservative stage bonus
 	local helperStageBonus = 1 + (stgIndex - 1) * 0.02 -- Only 2% per stage instead of economic rates
 	local qualityMult = getQualityMult(qualityId)
@@ -467,7 +455,7 @@ function HelperCalculator.CalculateStats(jobCategory: string, level: number, qua
 	for key, baseValue in pairs(defaults) do
 		local perLevel = defaultsAdd[key] or 0
 		local statType = typeMap[key] or "up"
-		
+
 		local leveled
 		if statType == "timeDown" then
 			-- For timeDown stats, subtract per-level improvement (gets faster)
@@ -488,11 +476,11 @@ function HelperCalculator.CalculateStats(jobCategory: string, level: number, qua
 			local stageReduction = getStageTimeReductionFraction(stgIndex)
 			local qualityReduction = 1 - (1 / qualityMult)
 			local totalReduction = math.min(0.95, stageReduction + qualityReduction)
-			
+
 			local reduced = leveled * (1 - totalReduction)
 			local minFrac = Formulas.TIME_MIN_FRACTION or 0.02
 			local minTime = math.max(0.5, baseValue * minFrac) -- Use base value for minimum
-			
+
 			stats[key] = math.max(minTime, math.floor(reduced + 0.5))
 		end
 	end
@@ -501,7 +489,7 @@ function HelperCalculator.CalculateStats(jobCategory: string, level: number, qua
 	for key, baseValue in pairs(helperBase) do
 		local perLevel = (helperAdd and helperAdd[key]) or 0
 		local statType = typeMap[key] or "up"
-		
+
 		local leveled
 		if statType == "timeDown" then
 			-- For timeDown stats, subtract per-level improvement (gets faster)
@@ -522,19 +510,13 @@ function HelperCalculator.CalculateStats(jobCategory: string, level: number, qua
 			local stageReduction = getStageTimeReductionFraction(stgIndex)
 			local qualityReduction = 1 - (1 / qualityMult)
 			local totalReduction = math.min(0.95, stageReduction + qualityReduction)
-			
+
 			local reduced = leveled * (1 - totalReduction)
 			local minFrac = Formulas.TIME_MIN_FRACTION or 0.02
 			local minTime = math.max(0.5, baseValue * minFrac) -- Use base value for minimum
-			
+
 			stats[key] = math.max(minTime, math.floor(reduced + 0.5))
 		end
-	end
-
-	-- Merge FishStorage into Storage for Transporting jobs
-	if jobCategory == "Transporting" then
-		stats.Storage = math.floor((stats.Storage or 0) + (stats.FishStorage or 0) + 0.5)
-		stats.FishStorage = nil
 	end
 
 	-- No perks here; second return is the “applied” list for compatibility with old callers.

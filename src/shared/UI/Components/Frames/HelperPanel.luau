@@ -69,9 +69,13 @@ end
 
 function HelperPanel.RenderInfoPanel(innerWindow, helper, playerId)
 	local existing = HelperPanel.PlayerInfoPanels[playerId]
-	if existing then existing:Destroy() end
+	if existing then
+		existing:Destroy()
+		HelperPanel.PlayerInfoPanels[playerId] = nil
+	end
 
-	HelperPanel.PlayerInfoPanels[playerId] = InfoPanel.Create({ Parent = innerWindow, Infodata = helper })
+	local newInfoPanel = InfoPanel.Create({ Parent = innerWindow, Infodata = helper })
+	HelperPanel.PlayerInfoPanels[playerId] = newInfoPanel
 end
 
 return HelperPanel
