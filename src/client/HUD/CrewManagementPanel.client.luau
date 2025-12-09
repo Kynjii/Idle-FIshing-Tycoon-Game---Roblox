@@ -22,7 +22,6 @@ local getJobDataEvent = Events.GetRemoteFn(Events.RemoteFunctionNames.GetJobData
 local getCrewManagementState = Events.GetRemoteFn(Events.RemoteFunctionNames.GetHelperInventory)
 local tabSelectedEvent = Events.GetBindableEvent(Events.BindableNames.TabSelected)
 local updateUIEvent = Events.GetRemote(Events.RemoteNames.UpdateJobManagementUI)
-local helperUpgradedEvent = Events.GetRemote(Events.RemoteNames.HelperUpgraded)
 
 -- State
 local crewState: { [string]: any } = {}
@@ -133,10 +132,5 @@ if tabSelectedEvent and getCrewManagementState then tabSelectedEvent.Event:Conne
 	if not screenGui.Enabled then return end
 	selectedTab = tabName
 
-	updateCrewMngPanelUI()
-end) end
-
-if helperUpgradedEvent then helperUpgradedEvent.OnClientEvent:Connect(function(helperData)
-	if crewState[helperData.Id] then crewState[helperData.Id] = helperData end
 	updateCrewMngPanelUI()
 end) end

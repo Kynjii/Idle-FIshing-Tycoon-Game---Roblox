@@ -137,6 +137,8 @@ function Helper.New(state: HelperType.HelperData, player: Player, teamId: number
 
 	self._cleaner = Trove.new()
 
+	self:AttachEventListeners()
+
 	return self
 end
 -- //!SECTION
@@ -393,7 +395,6 @@ function Helper.AttachEventListeners(self: Helper)
 	local upgradeHelper = Events.GetRemote(Events.RemoteNames.UpgradeHelper)
 	if upgradeHelper then
 		self._cleaner:Add(upgradeHelper.OnServerEvent:Connect(function(player: Player, helperId: string)
-			print(player, helperId, self.Player, self.Id)
 			if self.Player ~= player or self.Owner ~= player.UserId then return end
 			if helperId ~= self.Id then return end
 
@@ -407,19 +408,10 @@ function Helper.AttachEventListeners(self: Helper)
 			local helperUpgradedEvent = Events.GetRemote(Events.RemoteNames.HelperUpgraded)
 			if helperUpgradedEvent then helperUpgradedEvent:FireClient(player, self:Serialize()) end
 
+			local updateInfoPanelEvent = Events.GetRemote(Events.RemoteNames.UpdateInfoPanel)
+			if updateInfoPanelEvent then updateInfoPanelEvent:FireClient(player, { Item = self:Serialize() }) end
+
 			Events.FireBindableEvent(Events.BindableNames.HelperUpgraded, self:Serialize())
-		end))
-	end
-
-	local updateInfoPanel = Events.GetRemote(Events.RemoteNames.UpdateInfoPanel)
-	if updateInfoPanel then
-		self._cleaner:Add(updateInfoPanel.OnServerEvent:Connect(function(player: Player, data: { Item: HelperType.HelperData, isFishDex: boolean? })
-			if self.Player ~= player or self.Owner ~= player.UserId then return end
-			if data.isFishDex then return end
-			if not data.Item or data.Item.Entity ~= FFGEnum.CLASS.ENTITY_NAME.Helper then return end
-			if data.Item.Id ~= self.Id then return end
-
-			Events.FireEvent(Events.RemoteNames.UpdateInfoPanel, player, { Item = self:Serialize() })
 		end))
 	end
 end

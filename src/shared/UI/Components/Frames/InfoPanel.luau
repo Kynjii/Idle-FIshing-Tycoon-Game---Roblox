@@ -20,12 +20,14 @@ local InfoPanel = {}
 local function handleButtonClick(item): ()
 	local isHelper = item.Entity == FFGEnum.CLASS.ENTITY_NAME.Helper
 	if isHelper then
-		if item.isPurchased then
+		local helperData = item :: HelperType.HelperData
+		if helperData.IsPurchased then
 			local upgradeHelper = Events.GetRemote(Events.RemoteNames.UpgradeHelper)
-			if upgradeHelper then upgradeHelper:FireServer(item.Id) end
+
+			if upgradeHelper then upgradeHelper:FireServer(helperData.Id) end
 		else
 			local purchaseEvent = Events.GetRemote(Events.RemoteNames.HelperPurchased)
-			if purchaseEvent then purchaseEvent:FireServer(item.Id) end
+			if purchaseEvent then purchaseEvent:FireServer(helperData.Id) end
 		end
 	else
 		if item.SellPrice then

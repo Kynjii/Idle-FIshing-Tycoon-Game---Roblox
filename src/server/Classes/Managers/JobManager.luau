@@ -52,9 +52,12 @@ function JobManager.CreateHelpers(self: JobManager, helperState)
 end
 
 function JobManager.AssignJobs(self: JobManager): ()
-	for _, helper in pairs(self.Helpers) do
-		if helper.CurrentAssignment > 0 then self:AssignHelper(helper.Id, helper.CurrentAssignment) end
-	end
+	task.spawn(function()
+		for _, helper in pairs(self.Helpers) do
+			task.wait(math.random(0.1, 1))
+			if helper.CurrentAssignment > 0 then self:AssignHelper(helper.Id, helper.CurrentAssignment) end
+		end
+	end)
 end
 
 function JobManager.GetAssignedHelpersForJob(self: JobManager, jobId: number)

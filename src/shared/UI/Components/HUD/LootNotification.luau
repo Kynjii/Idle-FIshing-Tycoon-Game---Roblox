@@ -45,11 +45,11 @@ function LootNotification.Create(props: Props): Frame
 
 	local textLabel = Instance.new("TextLabel")
 	textLabel.Name = "TextLabel"
-	textLabel.AnchorPoint = Vector2.new(0.5, 1)
+	textLabel.AnchorPoint = Vector2.new(0.5, 0.5)
 	textLabel.BackgroundTransparency = 1
 	textLabel.Font = FFGEnum.THEME.bigFont
 	textLabel.Position = UDim2.fromScale(0.5, 0.5)
-	textLabel.Size = UDim2.fromScale(0.8, 0.6)
+	textLabel.Size = UDim2.fromScale(1, 1)
 	textLabel.Text = props.Text or ""
 	textLabel.TextColor3 = Color3.new(1, 1, 1)
 	textLabel.TextScaled = true
