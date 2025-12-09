@@ -50,7 +50,6 @@ local isButtonHeld = false
 local markerConnection = nil
 
 local currentSessionId = nil
-local sessionStartTime = 0
 local totalHits = 0
 local perfectHits = 0
 local goodHits = 0
@@ -68,13 +67,6 @@ local minigameConfig = {
 	HealMultiplier = 1.0, -- Default heal amount multiplier
 }
 
--- Fish escape tracking
-local fishEscapeAttempts = 0
-local maxEscapeAttempts = 3 -- Default, will be set by server
-local minHitsBeforeEscape = 3 -- Default, will be set by server
-local lastEscapeAttemptTime = 0
-local ESCAPE_ATTEMPT_DEBOUNCE = 1 -- 1 second debounce between escape attempts
-
 local hitTimeline = {}
 
 local elapsed = 0
@@ -88,16 +80,23 @@ function startGame(value: boolean)
 	gameStarted = value
 
 	if value then
+		up = true
 		elapsed = 0
 		hitTimeline = {}
 		totalHits = 0
 		perfectHits = 0
 		goodHits = 0
 		okHits = 0
-		fishEscapeAttempts = 0
-		lastEscapeAttemptTime = 0
 		currentFishHP = 0
 		isLosingHP = false
+	else
+		isButtonHeld = false
+		isLosingHP = false
+		if markerConnection then
+			markerConnection:Disconnect()
+			markerConnection = nil
+		end
+		Events.FireEvent(Events.RemoteNames.GameEnded, player, currentTier)
 	end
 
 	resetHitMarker()
@@ -123,14 +122,6 @@ function startGame(value: boolean)
 				up = true
 			end
 		end)
-	else
-		isButtonHeld = false
-		isLosingHP = false -- Stop HP decay when game ends
-		if markerConnection then
-			markerConnection:Disconnect()
-			markerConnection = nil
-		end
-		Events.FireEvent(Events.RemoteNames.GameEnded, player, currentTier)
 	end
 end
 
@@ -249,62 +240,38 @@ end
 function startLosingHP()
 	if isLosingHP then return end
 	isLosingHP = true
-	task.wait(1)
+
 	task.spawn(function()
-		while isLosingHP do
-			-- Use difficulty-based decay rate
+		while isLosingHP and gameStarted do
+			task.wait(1)
+
+			-- visual decay only, server will re-simulate for real
 			local baseDecay = hookedFish.MaxHP / 40
 			local actualDecay = baseDecay * minigameConfig.DecayRate
-			currentFishHP -= actualDecay
 
+			currentFishHP -= actualDecay
+			if currentFishHP < 0 then currentFishHP = 0 end
+
+			-- keep UI in sync
+			ProgressBar.Update(pbFrame, currentFishHP, hookedFish.MaxHP)
+
+			-- visually: fish "gets away" when HP drains
 			if currentFishHP <= 0 then
-				currentFishHP = 0
 				isLosingHP = false
 
-				-- Only allow escape attempts if minimum hits have been reached
-				if totalHits >= minHitsBeforeEscape then
-					-- Add debounce to prevent rapid escape attempts
-					local currentTime = tick()
-					if currentTime - lastEscapeAttemptTime >= ESCAPE_ATTEMPT_DEBOUNCE then
-						lastEscapeAttemptTime = currentTime
-						fishEscapeAttempts += 1
-						print(string.format("Fish escape attempt %d/%d (after %d hits)", fishEscapeAttempts, maxEscapeAttempts, totalHits))
+				local fishingResult = {
+					Success = false, -- client thinks it failed
+					Duration = elapsed,
+					Hits = hitTimeline, -- server uses this
+				}
 
-						-- Check if fish should escape ONLY after incrementing escape attempts
-						if fishEscapeAttempts >= maxEscapeAttempts then
-							print("Fish escaped after", fishEscapeAttempts, "attempts!")
+				local fishingResultEvent = Events.GetRemote(Events.RemoteNames.FishingResult)
+				if fishingResultEvent and currentSessionId then fishingResultEvent:FireServer(currentSessionId, fishingResult) end
 
-							local failSound = workspace.Audio:FindFirstChild("Fail")
-							if failSound then failSound:Play() end
-
-							-- Send fish escaped result to server
-							local fishingResult = {
-								Success = false, -- Fish escaped
-								TotalHits = totalHits,
-								PerfectHits = perfectHits,
-								Duration = elapsed,
-								EscapeReason = "TooManyFailures",
-								EscapeAttempts = fishEscapeAttempts, -- Send actual count,
-							}
-
-							local fishingResultEvent = Events.GetRemote(Events.RemoteNames.FishingResult)
-							if fishingResultEvent and currentSessionId then fishingResultEvent:FireServer(currentSessionId, fishingResult) end
-
-							-- Close game
-							showGame(false)
-							startGame(false)
-							return
-						end
-					end
-				else
-					-- Reset HP to 1 to give player another chance if they haven't hit minimum
-					currentFishHP = 1
-					print(string.format("Fish at 0 HP but only %d/%d hits - giving another chance", totalHits, minHitsBeforeEscape))
-				end
+				showGame(false)
+				startGame(false)
+				break
 			end
-
-			ProgressBar.Update(pbFrame, currentFishHP, hookedFish.MaxHP)
-			task.wait(1)
 		end
 	end)
 end
@@ -312,7 +279,6 @@ end
 local function buttonReleased()
 	isButtonHeld = false
 
-	-- Stop reeling sound when button is released
 	if reelingSound.IsPlaying then reelingSound:Stop() end
 
 	if markerConnection then
@@ -327,16 +293,17 @@ local function buttonReleased()
 	resetHitMarker()
 
 	local area = 0
-
 	if isOverLapping1 then area = 1 end
 	if isOverLapping2 then area = 2 end
 	if isOverLapping3 then area = 3 end
 
+	-- record raw input for server replay
 	table.insert(hitTimeline, {
 		time = elapsed,
 		area = area,
 	})
 
+	-- local stats for display / debugging
 	if area > 0 then
 		totalHits += 1
 		if area == 3 then
@@ -348,27 +315,32 @@ local function buttonReleased()
 		end
 	end
 
+	-- heal / miss logic for visual HP
 	local baseHeal = playerRod.BaseDmg * area
 	local actualHeal = baseHeal * minigameConfig.HealMultiplier
 	animate(area, actualHeal)
-	local currentHp = currentFishHP
 
-	local newHp = currentHp + actualHeal
-	if area == 0 then
-		-- Miss penalty also affected by difficulty
+	local newHp = currentFishHP
+
+	if area > 0 then
+		newHp += actualHeal
+	else
+		-- miss penalty also affected by difficulty
 		local missPenalty = playerRod.BaseDmg * minigameConfig.DecayRate
-		newHp = currentHp - missPenalty
+		newHp -= missPenalty
 	end
+
+	if newHp < 0 then newHp = 0 end
 	currentFishHP = newHp
 
-	if newHp >= hookedFish.MaxHP then
-		currentFishHP = 0
+	-- update UI bar
+	ProgressBar.Update(pbFrame, currentFishHP, hookedFish.MaxHP)
 
-		-- Send fishing result to server for validation
+	-- client-side "I filled the bar!" claim
+	if currentFishHP >= hookedFish.MaxHP then
+		-- send fishing result to server for authoritative validation
 		local fishingResult = {
 			Success = true,
-			TotalHits = totalHits,
-			PerfectHits = perfectHits,
 			Duration = elapsed,
 			Hits = hitTimeline,
 		}
@@ -376,15 +348,14 @@ local function buttonReleased()
 		local fishingResultEvent = Events.GetRemote(Events.RemoteNames.FishingResult)
 		if fishingResultEvent and currentSessionId then fishingResultEvent:FireServer(currentSessionId, fishingResult) end
 
-		-- Close game UI - server will decide if fish was actually caught
 		showGame(false)
 		startGame(false)
-		return -- Exit early to prevent starting HP decay after catching fish
+		return
 	end
+
 	relocateHitContainer()
 
-	ProgressBar.Update(pbFrame, currentFishHP, hookedFish.MaxHP)
-
+	-- start decay loop after first successful hit
 	if area > 0 then startLosingHP() end
 end
 
@@ -436,19 +407,13 @@ if startGameEvent then
 		-- Apply difficulty-based minigame configuration
 		if data.MinigameConfig then
 			minigameConfig = data.MinigameConfig
-			-- Update max escape attempts from server
-			if data.MinigameConfig.EscapeAttempts then maxEscapeAttempts = data.MinigameConfig.EscapeAttempts end
-			-- Update minimum hits before escape attempts from server
-			if data.MinigameConfig.MinHitsBeforeEscape then minHitsBeforeEscape = data.MinigameConfig.MinHitsBeforeEscape end
 			print(
 				string.format(
-					"Minigame difficulty - HitZone: %.2f, Speed: %.2f, Decay: %.2f, Heal: %.2f, Escapes: %d, MinHits: %d",
+					"Minigame difficulty - HitZone: %.2f, Speed: %.2f, Decay: %.2f, Heal: %.2f",
 					minigameConfig.HitZoneSize,
 					minigameConfig.MarkerSpeed,
 					minigameConfig.DecayRate,
-					minigameConfig.HealMultiplier,
-					maxEscapeAttempts,
-					minHitsBeforeEscape
+					minigameConfig.HealMultiplier
 				)
 			)
 		end
