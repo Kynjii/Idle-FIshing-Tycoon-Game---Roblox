@@ -3,6 +3,7 @@ export type FishingRodType = {
 	Key: string,
 	Name: string,
 	Id: number,
+	Color: Color3,
 	QualityId: number,
 	BaseDmg: number,
 	Cost: number,

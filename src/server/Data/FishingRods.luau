@@ -1,11 +1,56 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local ROD_COLOR_RULES = {
+	-- Natural / Beginner rods
+	["Bamboo"] = Color3.fromRGB(148, 120, 83),
+	["Reed"] = Color3.fromRGB(148, 120, 83),
+	["Wood"] = Color3.fromRGB(148, 120, 83),
+	["Guild"] = Color3.fromRGB(148, 120, 83),
+
+	-- Metal rods
+	["Steel"] = Color3.fromRGB(150, 161, 183),
+	["Iron"] = Color3.fromRGB(150, 161, 183),
+	["Hook"] = Color3.fromRGB(150, 161, 183),
+
+	-- Water / Flow / gentle rods
+	["River"] = Color3.fromRGB(69, 112, 171),
+	["Pond"] = Color3.fromRGB(69, 112, 171),
+	["Tide"] = Color3.fromRGB(69, 112, 171),
+	["Current"] = Color3.fromRGB(69, 112, 171),
+	["Whisper"] = Color3.fromRGB(69, 112, 171),
+
+	-- Powerful or crafted rods
+	["Power"] = Color3.fromRGB(132, 80, 162),
+	["Precision"] = Color3.fromRGB(132, 80, 162),
+	["Balance"] = Color3.fromRGB(132, 80, 162),
+	["Master"] = Color3.fromRGB(132, 80, 162),
+
+	-- High-tier magical rods
+	["Storm"] = Color3.fromRGB(226, 178, 78),
+	["Deepsea"] = Color3.fromRGB(226, 178, 78),
+	["Celestial"] = Color3.fromRGB(56, 228, 221),
+	["Angler"] = Color3.fromRGB(56, 228, 221),
+	["Scepter"] = Color3.fromRGB(56, 228, 221),
+}
+
+local function getRodColorFromName(name: string)
+	name = name:lower()
+
+	for keyword, color in pairs(ROD_COLOR_RULES) do
+		if string.find(name, keyword:lower()) then return color end
+	end
+
+	-- fallback
+	return Color3.fromRGB(200, 200, 200)
+end
+
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local FishingRods = {
 	-- QUALITY 1 (Starter/Budget)
 	BambooRod = {
 		Entity = FFGEnum.CLASS.ENTITY_NAME.FishingRod,
 		Name = "Bamboo Rod",
+		Color = getRodColorFromName("Bamboo Rod"),
 		Key = "BambooRod",
 		Id = 1,
 		QualityId = 1,
@@ -25,6 +70,7 @@ local FishingRods = {
 	ApprenticeRod = {
 		Entity = FFGEnum.CLASS.ENTITY_NAME.FishingRod,
 		Name = "Apprentice Rod",
+		Color = getRodColorFromName("Apprentice Rod"),
 		Key = "ApprenticeRod",
 		Id = 10,
 		QualityId = 1,
@@ -44,6 +90,7 @@ local FishingRods = {
 	RiverReedRod = {
 		Entity = FFGEnum.CLASS.ENTITY_NAME.FishingRod,
 		Name = "River Reed Rod",
+		Color = getRodColorFromName("River Reed Rod"),
 		Key = "RiverReedRod",
 		Id = 15,
 		QualityId = 1,
@@ -63,6 +110,7 @@ local FishingRods = {
 	WornGuildRod = {
 		Entity = FFGEnum.CLASS.ENTITY_NAME.FishingRod,
 		Name = "Worn Guild Rod",
+		Color = getRodColorFromName("Worn Guild Rod"),
 		Key = "WornGuildRod",
 		Id = 18,
 		QualityId = 1,
@@ -83,6 +131,7 @@ local FishingRods = {
 	SteelLineRod = {
 		Entity = FFGEnum.CLASS.ENTITY_NAME.FishingRod,
 		Name = "Steel Line Rod",
+		Color = getRodColorFromName("Steel Line Rod"),
 		Key = "SteelLineRod",
 		Id = 19,
 		QualityId = 2,
@@ -102,6 +151,7 @@ local FishingRods = {
 	SteadyFisher = {
 		Entity = FFGEnum.CLASS.ENTITY_NAME.FishingRod,
 		Name = "Steady Fisher",
+		Color = getRodColorFromName("Steady Fisher"),
 		Key = "SteadyFisher",
 		Id = 21,
 		QualityId = 2,
@@ -121,6 +171,7 @@ local FishingRods = {
 	IronHookRod = {
 		Entity = FFGEnum.CLASS.ENTITY_NAME.FishingRod,
 		Name = "Iron Hook Rod",
+		Color = getRodColorFromName("Iron Hook Rod"),
 		Key = "IronHookRod",
 		Id = 25,
 		QualityId = 2,
@@ -140,6 +191,7 @@ local FishingRods = {
 	PondWhisper = {
 		Entity = FFGEnum.CLASS.ENTITY_NAME.FishingRod,
 		Name = "Pond Whisper",
+		Color = getRodColorFromName("Pond Whisper"),
 		Key = "PondWhisper",
 		Id = 30,
 		QualityId = 2,
@@ -160,6 +212,7 @@ local FishingRods = {
 	PowerReeler = {
 		Entity = FFGEnum.CLASS.ENTITY_NAME.FishingRod,
 		Name = "Power Reeler",
+		Color = getRodColorFromName("Power Reeler"),
 		Key = "PowerReeler",
 		Id = 37,
 		QualityId = 3,
@@ -179,6 +232,7 @@ local FishingRods = {
 	PrecisionCaster = {
 		Entity = FFGEnum.CLASS.ENTITY_NAME.FishingRod,
 		Name = "Precision Caster",
+		Color = getRodColorFromName("Precision Caster"),
 		Key = "PrecisionCaster",
 		Id = 39,
 		QualityId = 3,
@@ -198,6 +252,7 @@ local FishingRods = {
 	JourneymansBalance = {
 		Entity = FFGEnum.CLASS.ENTITY_NAME.FishingRod,
 		Name = "Journeyman's Balance",
+		Color = getRodColorFromName("Journeyman's Balance"),
 		Key = "JourneymansBalance",
 		Id = 41,
 		QualityId = 3,
@@ -217,6 +272,7 @@ local FishingRods = {
 	TideBreaker = {
 		Entity = FFGEnum.CLASS.ENTITY_NAME.FishingRod,
 		Name = "Tide Breaker",
+		Color = getRodColorFromName("Tide Breaker"),
 		Key = "TideBreaker",
 		Id = 44,
 		QualityId = 3,
@@ -237,6 +293,7 @@ local FishingRods = {
 	BalancedMaster = {
 		Entity = FFGEnum.CLASS.ENTITY_NAME.FishingRod,
 		Name = "Balanced Master",
+		Color = getRodColorFromName("Balanced Master"),
 		Key = "BalancedMaster",
 		Id = 58,
 		QualityId = 4,
@@ -256,6 +313,7 @@ local FishingRods = {
 	TitansGrip = {
 		Entity = FFGEnum.CLASS.ENTITY_NAME.FishingRod,
 		Name = "Titan's Grip",
+		Color = getRodColorFromName("Titan's Grip"),
 		Key = "TitansGrip",
 		Id = 59,
 		QualityId = 4,
@@ -275,6 +333,7 @@ local FishingRods = {
 	MoonlitThreadRod = {
 		Entity = FFGEnum.CLASS.ENTITY_NAME.FishingRod,
 		Name = "Moonlit Thread Rod",
+		Color = getRodColorFromName("Moonlit Thread Rod"),
 		Key = "MoonlitThreadRod",
 		Id = 63,
 		QualityId = 4,
@@ -294,6 +353,7 @@ local FishingRods = {
 	AnchorheartRod = {
 		Entity = FFGEnum.CLASS.ENTITY_NAME.FishingRod,
 		Name = "Anchorheart Rod",
+		Color = getRodColorFromName("Anchorheart Rod"),
 		Key = "AnchorheartRod",
 		Id = 65,
 		QualityId = 4,
@@ -314,6 +374,7 @@ local FishingRods = {
 	WhisperingCurrent = {
 		Entity = FFGEnum.CLASS.ENTITY_NAME.FishingRod,
 		Name = "Whispering Current",
+		Color = getRodColorFromName("Whispering Current"),
 		Key = "WhisperingCurrent",
 		Id = 66,
 		QualityId = 5,
@@ -333,6 +394,7 @@ local FishingRods = {
 	StormcallerRod = {
 		Entity = FFGEnum.CLASS.ENTITY_NAME.FishingRod,
 		Name = "Stormcaller Rod",
+		Color = getRodColorFromName("Stormcaller Rod"),
 		Key = "StormcallerRod",
 		Id = 68,
 		QualityId = 5,
@@ -352,6 +414,7 @@ local FishingRods = {
 	DeepseaWarden = {
 		Entity = FFGEnum.CLASS.ENTITY_NAME.FishingRod,
 		Name = "Deepsea Warden",
+		Color = getRodColorFromName("Deepsea Warden"),
 		Key = "DeepseaWarden",
 		Id = 70,
 		QualityId = 5,
@@ -372,6 +435,7 @@ local FishingRods = {
 	AnglersPerfection = {
 		Entity = FFGEnum.CLASS.ENTITY_NAME.FishingRod,
 		Name = "Angler's Perfection",
+		Color = getRodColorFromName("Angler's Perfection"),
 		Key = "AnglersPerfection",
 		Id = 71,
 		QualityId = 6,
@@ -391,6 +455,7 @@ local FishingRods = {
 	CelestialTideScepter = {
 		Entity = FFGEnum.CLASS.ENTITY_NAME.FishingRod,
 		Name = "Celestial Tide Scepter",
+		Color = getRodColorFromName("Celestial Tide Scepter"),
 		Key = "CelestialTideScepter",
 		Id = 76,
 		QualityId = 6,
