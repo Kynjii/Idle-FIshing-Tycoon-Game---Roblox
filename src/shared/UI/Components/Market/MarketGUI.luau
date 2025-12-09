@@ -10,8 +10,9 @@ local SingleGridLayout = require(ReplicatedStorage.Shared.UI.Components.GridLayo
 local KinUI = require(ReplicatedStorage.Shared.UI.KinUI)
 
 local MarketGUI = {}
+MarketGUI.PlayerInfoPanels = {}
 
-function MarketGUI.Create()
+function MarketGUI.Create(playerId: number)
 	local screenGui = MainUIPanel.Create({
 		screenGuiName = FFGEnum.SCREENGUI.Market,
 		panelName = "Market",
@@ -32,7 +33,7 @@ function MarketGUI.Create()
 		updateInfoPanelEvent.OnClientEvent:Connect(function(data: { Item: FishType.FishData, isFishDex: boolean? })
 			if data.isFishDex then return end
 
-			MarketGUI.RenderInfoPanel(innerWindow, data.Item)
+			MarketGUI.RenderInfoPanel(innerWindow, data.Item, playerId)
 		end)
 	else
 		warn("[MarketGUI] UpdateInfoPanel RemoteEvent not found!")
@@ -40,11 +41,11 @@ function MarketGUI.Create()
 	return screenGui
 end
 
-function MarketGUI.RenderInfoPanel(innerWindow, item)
-	local existing = innerWindow:FindFirstChild("InfoPanelContainer", true)
+function MarketGUI.RenderInfoPanel(innerWindow, item, playerId: number)
+	local existing = MarketGUI.PlayerInfoPanels[playerId]
 	if existing then existing:Destroy() end
 
-	InfoPanel.Create({ Parent = innerWindow, Infodata = item, isMarket = true })
+	MarketGUI.PlayerInfoPanels[playerId] = InfoPanel.Create({ Parent = innerWindow, Infodata = item, isMarket = true })
 end
 
 function MarketGUI.CloseShop(mainFrame)

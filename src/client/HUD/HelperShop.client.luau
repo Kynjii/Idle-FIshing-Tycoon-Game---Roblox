@@ -18,7 +18,7 @@ local shopItemsContainer: Instance
 local screenGui: ScreenGui
 
 task.spawn(function()
-	screenGui = ShopGUI.Create()
+	screenGui = ShopGUI.Create({}, player.UserId)
 	screenGui.Parent = playerGui
 
 	main = screenGui:FindFirstChild("Main", true) :: Frame

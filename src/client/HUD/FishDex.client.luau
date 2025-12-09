@@ -18,7 +18,7 @@ local fishDexButtonScreenGui = playerGui:WaitForChild("FishDexButton")
 local hudFishDexButton = fishDexButtonScreenGui:FindFirstChild("OpenButton", true) :: ImageButton
 
 task.spawn(function()
-	screenGui = FishDexUI.Create()
+	screenGui = FishDexUI.Create(player.UserId)
 	screenGui.Parent = playerGui
 
 	main = screenGui:FindFirstChild("Main", true) :: Frame

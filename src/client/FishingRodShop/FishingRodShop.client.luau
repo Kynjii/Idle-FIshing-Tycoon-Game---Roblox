@@ -21,7 +21,7 @@ task.spawn(function()
 	screenGui = ShopGUI.Create({
 		screenGuiName = "FishingRodShop",
 		panelName = "Fishing Rod Shop",
-	})
+	}, player.UserId)
 	screenGui.Parent = playerGui
 
 	main = screenGui:FindFirstChild("Main", true) :: Frame

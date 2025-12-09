@@ -36,6 +36,8 @@ function HelperManager.AttachEventListeners(self: HelperManager)
 		end
 		self._cleaner:Add(getHelperInventoryEvent)
 	end
+
+	-- //TODO - Add event for getting infopanel update etc.
 end
 
 -- //SECTION - Cleanup

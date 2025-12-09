@@ -8,6 +8,7 @@ local SingleGridLayout = require(ReplicatedStorage.Shared.UI.Components.GridLayo
 local ShopItem = require(ReplicatedStorage.Shared.UI.Components.Shop.ShopItem)
 
 local HelperPanel = {}
+HelperPanel.PlayerInfoPanels = {}
 
 function HelperPanel.Create(player: Player, crewData, innerWindow: Frame): ScrollingFrame
 	local scrollingFrame = SingleGridLayout.Create({ Name = "ItemContainer", Parent = innerWindow, Size = "TwoThird" })
@@ -31,7 +32,7 @@ function HelperPanel.Create(player: Player, crewData, innerWindow: Frame): Scrol
 		})
 		helperItem.LayoutOrder = index
 
-		if index == 1 then HelperPanel.RenderInfoPanel(innerWindow, helperData) end
+		if index == 1 then HelperPanel.RenderInfoPanel(innerWindow, helperData, player.UserId) end
 	end
 
 	if index == 0 then
@@ -43,7 +44,7 @@ function HelperPanel.Create(player: Player, crewData, innerWindow: Frame): Scrol
 		updateInfoPanelEvent.OnClientEvent:Connect(function(data: { Item: HelperType.HelperInstance, isFishDex: boolean? })
 			if data.isFishDex then return end
 
-			HelperPanel.RenderInfoPanel(innerWindow, data.Item)
+			HelperPanel.RenderInfoPanel(innerWindow, data.Item, player.UserId)
 		end)
 	end
 
@@ -66,11 +67,11 @@ function HelperPanel.AddEmptyState(parent: Instance, text: string, props: { size
 	return emptyState
 end
 
-function HelperPanel.RenderInfoPanel(innerWindow, helper)
-	local existing = innerWindow:FindFirstChild("InfoPanelContainer", true)
+function HelperPanel.RenderInfoPanel(innerWindow, helper, playerId)
+	local existing = HelperPanel.PlayerInfoPanels[playerId]
 	if existing then existing:Destroy() end
 
-	InfoPanel.Create({ Parent = innerWindow, Infodata = helper })
+	HelperPanel.PlayerInfoPanels[playerId] = InfoPanel.Create({ Parent = innerWindow, Infodata = helper })
 end
 
 return HelperPanel

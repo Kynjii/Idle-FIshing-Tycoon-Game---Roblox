@@ -117,7 +117,6 @@ function InventoryManager.AttachEventListeners(self: InventoryManager)
 	if updateInfoPanel then
 		self._cleaner:Add(updateInfoPanel.OnServerEvent:Connect(function(player: Player, data: { Item: Fish.Fish, isFishDex: boolean? })
 			if self.Player ~= player or self.Owner ~= player.UserId then return end
-
 			if data.isFishDex then return end
 
 			local existing = self.Inventory.Fish[data.Item.Id]

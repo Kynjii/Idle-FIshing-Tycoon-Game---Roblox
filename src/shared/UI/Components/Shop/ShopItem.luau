@@ -189,6 +189,7 @@ local function ShopItem(
 	stroke.Transparency = 1
 
 	itemQualityBG.Activated:Connect(function()
+		print("firing update button")
 		Events.FireEvent(Events.RemoteNames.UpdateInfoPanel, Players.LocalPlayer, { Item = typedItem, isFishDex = false })
 	end)
 

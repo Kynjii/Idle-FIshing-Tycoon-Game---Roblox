@@ -1,6 +1,7 @@
 --!strict
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Trove = require(ReplicatedStorage.Packages.Trove)
 local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local FishType = require(ReplicatedStorage.Shared.Types.Classes.FishType)
@@ -129,6 +130,8 @@ function InfoPanel.Create(props: {
 	isMarket: boolean?,
 	Parent: Instance,
 })
+	local trove = Trove.new()
+
 	local data = props.Infodata
 	local isFish = data.Entity == FFGEnum.CLASS.ENTITY_NAME.Fish
 	local isHelper = data.Entity == FFGEnum.CLASS.ENTITY_NAME.Helper
@@ -400,7 +403,7 @@ function InfoPanel.Create(props: {
 
 		local goldChangedEvent = Events.GetRemote(Events.RemoteNames.GoldChanged)
 		if goldChangedEvent then
-			goldChangedEvent.OnClientEvent:Connect(function(newGoldAmount)
+			trove:Add(goldChangedEvent.OnClientEvent:Connect(function(newGoldAmount)
 				if buyButton then
 					if newGoldAmount < cost then
 						Button.Disable(buyButton)
@@ -408,13 +411,13 @@ function InfoPanel.Create(props: {
 						Button.Enable(buyButton)
 					end
 				end
-			end)
+			end))
 		end
 
 		local helperUpgradedEvent = Events.GetRemote(Events.RemoteNames.HelperUpgraded)
 		if helperData.Stats then
 			if helperUpgradedEvent then
-				helperUpgradedEvent.OnClientEvent:Connect(function(data: HelperType.HelperInstance)
+				trove:Add(helperUpgradedEvent.OnClientEvent:Connect(function(data: HelperType.HelperInstance)
 					-- Update Level
 					if levelLabel then levelLabel.Text = helperData.IsPurchased and `Level {helperData.Level}` or "" end
 
@@ -436,7 +439,7 @@ function InfoPanel.Create(props: {
 							btnText.Text = "Max level"
 						end
 					end
-				end)
+				end))
 			end
 		end
 	else
@@ -491,7 +494,7 @@ function InfoPanel.Create(props: {
 
 			local goldChangedEvent = Events.GetRemote(Events.RemoteNames.GoldChanged)
 			if goldChangedEvent then
-				goldChangedEvent.OnClientEvent:Connect(function(newGoldAmount)
+				trove:Add(goldChangedEvent.OnClientEvent:Connect(function(newGoldAmount)
 					if buyButton then
 						if newGoldAmount < cost then
 							Button.Disable(buyButton)
@@ -499,12 +502,21 @@ function InfoPanel.Create(props: {
 							Button.Enable(buyButton)
 						end
 					end
-				end)
+				end))
 			end
 		end
 	end
 
-	return panelContainer
+	trove:Add(panelContainer)
+
+	local self = {}
+	self.Instance = panelContainer
+
+	function self:Destroy()
+		trove:Destroy()
+	end
+
+	return self
 end
 
 return InfoPanel

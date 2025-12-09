@@ -19,7 +19,7 @@ local screenGui: ScreenGui
 local innerWindow: Frame
 
 task.spawn(function()
-	screenGui = MarketGUI.Create()
+	screenGui = MarketGUI.Create(player.UserId)
 	screenGui.Parent = playerGui
 
 	main = screenGui:FindFirstChild("Main", true) :: Frame

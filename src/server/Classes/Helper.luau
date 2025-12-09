@@ -393,6 +393,7 @@ function Helper.AttachEventListeners(self: Helper)
 	local upgradeHelper = Events.GetRemote(Events.RemoteNames.UpgradeHelper)
 	if upgradeHelper then
 		self._cleaner:Add(upgradeHelper.OnServerEvent:Connect(function(player: Player, helperId: string)
+			print(player, helperId, self.Player, self.Id)
 			if self.Player ~= player or self.Owner ~= player.UserId then return end
 			if helperId ~= self.Id then return end
 

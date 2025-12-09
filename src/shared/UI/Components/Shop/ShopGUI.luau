@@ -9,8 +9,9 @@ local SingleGridLayout = require(ReplicatedStorage.Shared.UI.Components.GridLayo
 local KinUI = require(ReplicatedStorage.Shared.UI.KinUI)
 
 local ShopGUI = {}
+ShopGUI.PlayerInfoPanels = {}
 
-function ShopGUI.Create(props: { screenGuiName: string?, panelName: string?, panelTabs: boolean? })
+function ShopGUI.Create(props: { screenGuiName: string?, panelName: string?, panelTabs: boolean? }, playerId: number)
 	local screenGui = MainUIPanel.Create({
 		screenGuiName = props and props.screenGuiName or FFGEnum.SCREENGUI.HelperShop,
 		panelName = props and props.panelName or "Hire Crew Members",
@@ -41,17 +42,17 @@ function ShopGUI.Create(props: { screenGuiName: string?, panelName: string?, pan
 				if tostring(data.Item.Id) == item.Name then stroke.Transparency = 0 end
 			end
 
-			ShopGUI.RenderInfoPanel(innerWindow, data.Item)
+			ShopGUI.RenderInfoPanel(innerWindow, data.Item, playerId)
 		end)
 	end
 	return screenGui
 end
 
-function ShopGUI.RenderInfoPanel(innerWindow, item)
-	local existing = innerWindow:FindFirstChild("InfoPanelContainer", true)
+function ShopGUI.RenderInfoPanel(innerWindow, item, playerId: number)
+	local existing = ShopGUI.PlayerInfoPanels[playerId]
 	if existing then existing:Destroy() end
 
-	InfoPanel.Create({ Parent = innerWindow, Infodata = item })
+	ShopGUI.PlayerInfoPanels[playerId] = InfoPanel.Create({ Parent = innerWindow, Infodata = item })
 end
 
 function ShopGUI.CloseShop(mainFrame)

@@ -9,8 +9,9 @@ local SingleGridLayout = require(ReplicatedStorage.Shared.UI.Components.GridLayo
 local KinUI = require(ReplicatedStorage.Shared.UI.KinUI)
 
 local FishDexUI = {}
+FishDexUI.PlayerInfoPanels = {}
 
-function FishDexUI.Create()
+function FishDexUI.Create(playerId)
 	local screenGui = MainUIPanel.Create({
 		screenGuiName = FFGEnum.SCREENGUI.FishDex,
 		panelName = "Fish Dex",
@@ -31,18 +32,18 @@ function FishDexUI.Create()
 		updateInfoPanelEvent.OnClientEvent:Connect(function(data: { Item: any, isFishDex: boolean? })
 			if not data.isFishDex then return end
 
-			FishDexUI.RenderInfoPanel(innerWindow, data.Item)
+			FishDexUI.RenderInfoPanel(innerWindow, data.Item, playerId)
 		end)
 	end
 
 	return screenGui
 end
 
-function FishDexUI.RenderInfoPanel(innerWindow, fish)
-	local existing = innerWindow:FindFirstChild("InfoPanelContainer", true)
+function FishDexUI.RenderInfoPanel(innerWindow, fish, playerId: number)
+	local existing = FishDexUI.PlayerInfoPanels[playerId]
 	if existing then existing:Destroy() end
 
-	InfoPanel.Create({ Parent = innerWindow, Infodata = fish })
+	FishDexUI.PlayerInfoPanels[playerId] = InfoPanel.Create({ Parent = innerWindow, Infodata = fish })
 end
 
 function FishDexUI.CloseShop(mainFrame)
