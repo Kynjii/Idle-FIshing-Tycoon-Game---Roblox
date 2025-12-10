@@ -13,6 +13,8 @@ local FishingRods = require(ServerScriptService.Server.Data.FishingRods)
 local Tutorial = require(ServerScriptService.Server.Game.Tutorial.Tutorial)
 local Badges = require(ServerScriptService.Server.Modules.Badges.Badges)
 local MusicManager = require(ServerScriptService.Server.Music.MusicManager)
+local PlayerStateService = require(ServerScriptService.Server.PlayerState.PlayerStateService)
+local PlayerStateSyncService = require(ServerScriptService.Server.PlayerState.PlayerStateSyncService)
 local DataService = require(ServerScriptService.Server.Services.DataService)
 
 -- //SECTION - Game Start
@@ -88,6 +90,13 @@ local function updateTools()
 end
 updateTools()
 
+local function initPlayerState(player, profile)
+    local playerAtoms = PlayerStateService:InitPlayer(player, profile)
+    PlayerStateSyncService:ConnectPlayer(player)
+
+    return playerAtoms
+end
+
 local function PlayerAdded(player: Player)
     local profile = PlayerStore:StartSessionAsync("Player_" .. player.UserId, {
         Cancel = function()
@@ -107,6 +116,8 @@ local function PlayerAdded(player: Player)
         if player.Parent == Players then
             DataService.Profiles[player] = profile
             Initialize(player, profile)
+
+            local playerAtoms = initPlayerState(player, profile)
 
             local teamId = TeamManager.AssignTeam(player)
             if not teamId then
