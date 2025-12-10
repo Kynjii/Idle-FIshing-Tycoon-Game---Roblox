@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "@rbxts/charm": "^0.10.0",
-    "@rbxts/charm-sync": "^0.3.0",
-    "@rbxts/react-charm": "^0.3.0"
-  }
-}
