@@ -1,16 +1,17 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local StarterPlayer = game:GetService("StarterPlayer")
 
+local PlayerStateService = require(StarterPlayer.StarterPlayerScripts.Client.PlayerState.PlayerStateService)
 local React = require(ReplicatedStorage.Packages.React)
+local RC = require(ReplicatedStorage.Packages["React-charm"])
 local e = React.createElement
 
-return e("ScreenGui", {
-    Enabled = false,
-    IgnoreGuiInset = true,
-    ResetOnSpawn = false,
-    ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
-    ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
-}, {
-    main = e("Frame", {
+local HUD = {}
+
+function HUD.component()
+    local goldAmount, setGoldAmount = RC.useAtom(PlayerStateService.State.Gold)
+
+    return e("Frame", {
         AnchorPoint = Vector2.new(1, 0),
         BackgroundTransparency = 1,
         Position = UDim2.fromScale(1.005, 0.01),
@@ -83,7 +84,7 @@ return e("ScreenGui", {
                         Position = UDim2.fromScale(0.538998, 0.526316),
                         RichText = true,
                         Size = UDim2.fromScale(0.900306, 1.05263),
-                        Text = "10k",
+                        Text = `{goldAmount}`,
                         TextColor3 = Color3.new(1, 1, 1),
                         TextScaled = true,
                         TextStrokeTransparency = 0,
@@ -121,5 +122,7 @@ return e("ScreenGui", {
                 }),
             }),
         }),
-    }),
-})
+    })
+end
+
+return HUD

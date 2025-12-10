@@ -9,6 +9,7 @@ local syncer = CharmSync.client({
 })
 
 CharmPackets.StateUpdate.listen(function(data)
+    print(`got data: {data}`)
     syncer:sync(data.message)
 end)
 
