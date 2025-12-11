@@ -1,9 +1,15 @@
-_G.__DEV__ = true
+_G.__DEV__ = false
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
+
+local IsStudio = RunService:IsStudio()
+if IsStudio then
+    _G.__DEV__ = true
+end
 
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
