@@ -4,6 +4,7 @@ local Charm = require(ReplicatedStorage.Packages.Charm)
 local React = require(ReplicatedStorage.Packages.React)
 local RC = require(ReplicatedStorage.Packages["React-charm"])
 local PlayerStateService = require(ReplicatedStorage.Shared.Atoms.PlayerStateService)
+local KinProgressBar = require(ReplicatedStorage.Shared.UI.Components.KinProgressBar)
 local e = React.createElement
 
 type FishingLevelState = {
@@ -16,10 +17,10 @@ type FishingLevelState = {
 local FishingSkillBar = {}
 
 function FishingSkillBar.component()
-    local fishingLevelState: FishingLevelState, setFishingLevelState = RC.useAtom(PlayerStateService.State.FishingSkillState)
+    local _fishingLevelState: FishingLevelState, _setFishingLevelState = RC.useAtom(PlayerStateService.State.FishingSkillState)
 
     local progress = Charm.computed(function()
-        local newState = table.clone(fishingLevelState) :: FishingLevelState
+        local newState = table.clone(_fishingLevelState) :: FishingLevelState
         local newXpAmount = newState.FishingXP or 0
         local totalForCurrentLevel = newState.TotalForCurrentLevel or 0
         local totalForNextLevel = newState.TotalForNextLevel or 0
@@ -51,7 +52,7 @@ function FishingSkillBar.component()
             LayoutOrder = 1,
             Position = UDim2.fromScale(0.5, 0.5),
             Size = UDim2.fromScale(0.1, 1),
-            Text = `{fishingLevelState.FishingLevel}`,
+            Text = `{_fishingLevelState.FishingLevel}`,
             TextColor3 = Color3.new(1, 1, 1),
             TextScaled = true,
         }, {
@@ -67,7 +68,7 @@ function FishingSkillBar.component()
             LayoutOrder = 3,
             Position = UDim2.fromScale(0.5, 0.5),
             Size = UDim2.fromScale(0.1, 1),
-            Text = `{fishingLevelState.FishingLevel + 1}`,
+            Text = `{_fishingLevelState.FishingLevel + 1}`,
             TextColor3 = Color3.new(1, 1, 1),
             TextScaled = true,
         }, {
@@ -76,38 +77,7 @@ function FishingSkillBar.component()
             }),
         }),
 
-        progressContainer = e("Frame", {
-            AnchorPoint = Vector2.new(0.5, 0.5),
-            BackgroundTransparency = 1,
-            ClipsDescendants = true,
-            LayoutOrder = 2,
-            Position = UDim2.fromScale(0.5, 0.5),
-            Size = UDim2.fromScale(0.8, 1),
-        }, {
-            progressBG = e("ImageLabel", {
-                AnchorPoint = Vector2.new(0.5, 0.5),
-                BackgroundTransparency = 1,
-                ClipsDescendants = true,
-                Image = "rbxassetid://79661382966531",
-                ImageColor3 = Color3.fromRGB(6, 38, 65),
-                Position = UDim2.fromScale(0.5, 0.5),
-                ScaleType = Enum.ScaleType.Slice,
-                Size = UDim2.fromScale(1, 1),
-                SliceCenter = Rect.new(62, 72, 72, 77),
-            }, {
-                progressBar = e("ImageLabel", {
-                    AnchorPoint = Vector2.new(0, 0.5),
-                    BackgroundTransparency = 1,
-                    Image = "rbxassetid://79661382966531",
-                    ImageColor3 = Color3.fromRGB(62, 255, 62),
-                    Position = UDim2.fromScale(0, 0.5),
-                    ScaleType = Enum.ScaleType.Slice,
-                    Size = UDim2.fromScale(progress(), 1),
-                    SliceCenter = Rect.new(62, 72, 72, 77),
-                    ZIndex = 2,
-                }),
-            }),
-        }),
+        KinProgressBar.component({ state = progress() }),
     })
 end
 
