@@ -15,7 +15,6 @@ type Props = {
 local KinProgressBar = {}
 
 function KinProgressBar.component(props: Props)
-    local progressRef = R.useRef(nil)
     local progressBinding, progressTween = useTween(0, { easing = "linear", duration = 1 })
 
     R.useEffect(function()
@@ -43,7 +42,6 @@ function KinProgressBar.component(props: Props)
             SliceCenter = FFGEnum.UI.ProgressBar.BackgroundWhite.SliceCenter,
         }, {
             progressBar = e("ImageLabel", {
-                key = "Progressbar",
                 AnchorPoint = Vector2.new(0, 0.5),
                 BackgroundTransparency = 1,
                 Image = "rbxassetid://79661382966531",
@@ -55,7 +53,6 @@ function KinProgressBar.component(props: Props)
                 Size = progressBinding:map(function(p)
                     return UDim2.fromScale(p, 1)
                 end),
-                ref = progressRef,
             }),
         }),
     })
