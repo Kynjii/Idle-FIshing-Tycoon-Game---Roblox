@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local React = require(ReplicatedStorage.Packages.React)
 local RC = require(ReplicatedStorage.Packages["React-charm"])
 local PlayerStateService = require(ReplicatedStorage.Shared.Atoms.PlayerStateService)
+local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local KinProgressBar = require(ReplicatedStorage.Shared.UI.Components.KinProgressBar)
 local e = React.createElement
 
@@ -41,11 +42,11 @@ function FishingSkillBar.component()
         }),
 
         currentLevel = e("TextLabel", {
-            AnchorPoint = Vector2.new(0.5, 0.5),
+            AnchorPoint = FFGEnum.THEME.alignment.anchor.center,
             BackgroundTransparency = 1,
-            FontFace = Font.new("rbxasset://fonts/families/Bangers.json"),
+            Font = FFGEnum.THEME.bigFont,
             LayoutOrder = 1,
-            Position = UDim2.fromScale(0.5, 0.5),
+            Position = FFGEnum.THEME.alignment.position.center,
             Size = UDim2.fromScale(0.1, 1),
             Text = `{fishingLevelState.FishingLevel}`,
             TextColor3 = Color3.new(1, 1, 1),
@@ -57,11 +58,11 @@ function FishingSkillBar.component()
         }),
 
         nextLevel = e("TextLabel", {
-            AnchorPoint = Vector2.new(0.5, 0.5),
+            AnchorPoint = FFGEnum.THEME.alignment.anchor.center,
             BackgroundTransparency = 1,
-            FontFace = Font.new("rbxasset://fonts/families/Bangers.json"),
+            Font = FFGEnum.THEME.bigFont,
             LayoutOrder = 3,
-            Position = UDim2.fromScale(0.5, 0.5),
+            Position = FFGEnum.THEME.alignment.position.center,
             Size = UDim2.fromScale(0.1, 1),
             Text = `{fishingLevelState.FishingLevel + 1}`,
             TextColor3 = Color3.new(1, 1, 1),

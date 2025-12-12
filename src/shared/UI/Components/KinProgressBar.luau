@@ -23,7 +23,7 @@ function KinProgressBar.component(props: Props)
     end, { props.state })
 
     return e("Frame", {
-        AnchorPoint = Vector2.new(0.5, 0.5),
+        AnchorPoint = FFGEnum.THEME.alignment.anchor.center,
         BackgroundTransparency = 1,
         ClipsDescendants = true,
         LayoutOrder = 2,
@@ -31,10 +31,10 @@ function KinProgressBar.component(props: Props)
         Size = UDim2.fromScale(0.8, 1),
     }, {
         progressBG = e("ImageLabel", {
-            AnchorPoint = Vector2.new(0.5, 0.5),
+            AnchorPoint = FFGEnum.THEME.alignment.anchor.center,
             BackgroundTransparency = 1,
             ClipsDescendants = true,
-            Image = "rbxassetid://79661382966531",
+            Image = FFGEnum.UI.ProgressBar.BackgroundWhite,
             ImageColor3 = FFGEnum.UI.ProgressBar.BackgroundColor,
             Position = FFGEnum.THEME.alignment.position.center,
             ScaleType = Enum.ScaleType.Slice,
@@ -42,11 +42,11 @@ function KinProgressBar.component(props: Props)
             SliceCenter = FFGEnum.UI.ProgressBar.BackgroundWhite.SliceCenter,
         }, {
             progressBar = e("ImageLabel", {
-                AnchorPoint = Vector2.new(0, 0.5),
+                AnchorPoint = FFGEnum.THEME.alignment.anchor.left,
                 BackgroundTransparency = 1,
-                Image = "rbxassetid://79661382966531",
+                Image = FFGEnum.UI.ProgressBar.BackgroundWhite,
                 ImageColor3 = Color3.fromRGB(62, 255, 62),
-                Position = UDim2.fromScale(0, 0.5),
+                Position = FFGEnum.THEME.alignment.position.left,
                 ScaleType = Enum.ScaleType.Slice,
                 SliceCenter = FFGEnum.UI.ProgressBar.BackgroundWhite.SliceCenter,
                 ZIndex = 2,
