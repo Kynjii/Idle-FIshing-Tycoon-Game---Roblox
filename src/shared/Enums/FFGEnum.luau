@@ -198,6 +198,7 @@ FFGEnum.UI = {
         ThumbsUp = "rbxassetid://117741528720677",
         Close = "rbxassetid://83362863401865",
         Water = "rbxassetid://71379777562758",
+        Sword = "rbxassetid://105204636581390",
     },
     Frames = {
         MainUIPanel = "rbxassetid://95574095879865",

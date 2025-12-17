@@ -82,7 +82,7 @@ function FishingGame.manager()
         Size = UDim2.fromScale(0.31, 0.52),
         Visible = showGameAtom,
     }, {
-        FishingTimingBar.component({
+        fishingTimingBar = FishingTimingBar.component({
             ButtonPressedAtom = FishingGame.Atoms.ButtonPressed,
             HitMarkerPosition = FishingGame.Atoms.HitMarkerPosition,
             Refs = {
@@ -92,7 +92,7 @@ function FishingGame.manager()
                 Area3 = FishingGame.Atoms.HitArea3Ref,
             },
         }),
-        FishingHitNotification.component({ AreaHitAtom = FishingGame.Atoms.AreaHit }),
+        fishingHitNotification = FishingHitNotification.component({ AreaHitAtom = FishingGame.Atoms.AreaHit }),
     })
 end
 

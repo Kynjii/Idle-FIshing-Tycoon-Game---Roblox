@@ -4,6 +4,7 @@ local Charm = require(ReplicatedStorage.Packages.Charm)
 local RCharm = require(ReplicatedStorage.Packages.RCharm)
 local React = require(ReplicatedStorage.Packages.React)
 local ReactRipple = require(ReplicatedStorage.Packages.ReactRipple)
+local FFGEnum = require(ReplicatedStorage.Shared.Enums.FFGEnum)
 local Format = require(ReplicatedStorage.Shared.Utils.Format)
 
 local useTween = ReactRipple.useTween
@@ -25,18 +26,20 @@ function FishingHitNotification.component(props: { AreaHitAtom: Charm.Atom<{ Are
     local color = colorMap[areaHit]
     local formattedText = Format.CurrencyNumber(hitAmount)
 
-    local instanceBinding, instanceTween = useTween(0, { easing = "linear", duration = 0.5 })
+    local instanceBinding, instanceTween = useTween(1, { easing = "linear", duration = 0.5 })
 
     React.useEffect(function()
+        if areaHit == -1 then
+            return
+        end
+
         instanceTween:setGoal(0)
         instanceTween:start()
     end, { props })
 
     return e("Frame", {
         AnchorPoint = Vector2.new(0.5, 0.5),
-        BackgroundTransparency = instanceBinding:map(function(p)
-            return p or 1
-        end),
+        BackgroundTransparency = 1,
         Position = UDim2.fromScale(0.5, 0.385945),
         Size = UDim2.fromScale(0.311134, 0.525346),
     }, {
@@ -44,15 +47,18 @@ function FishingHitNotification.component(props: { AreaHitAtom: Charm.Atom<{ Are
             AnchorPoint = Vector2.new(0.5, 0.5),
             BackgroundTransparency = 1,
             Position = UDim2.fromScale(0.5, 0.3),
-            Size = UDim2.fromScale(0.266308, 0.17401),
+            Size = UDim2.fromScale(0.5, 0.5),
         }, {
             hitIcon = e("ImageLabel", {
                 AnchorPoint = Vector2.new(0, 0.5),
                 BackgroundTransparency = 1,
-                Image = "rbxassetid://105204636581390",
+                ImageTransparency = instanceBinding:map(function(p)
+                    return p
+                end),
+                Image = FFGEnum.UI.Icons.Sword,
                 Position = UDim2.fromScale(0.2, 0.5),
                 ImageColor = color,
-                Size = UDim2.fromScale(0.266367, 0.549909),
+                Size = UDim2.fromScale(0.4, 0.55),
                 ZIndex = 5,
             }, {
                 uIAspectRatioConstraint = e("UIAspectRatioConstraint"),
@@ -61,23 +67,27 @@ function FishingHitNotification.component(props: { AreaHitAtom: Charm.Atom<{ Are
             hitTextLabel = e("TextLabel", {
                 AnchorPoint = Vector2.new(0.5, 0.5),
                 BackgroundTransparency = 1,
-                FontFace = Font.new("rbxasset://fonts/families/Bangers.json"),
+                TextTransparency = instanceBinding:map(function(p)
+                    return p
+                end),
+                Font = FFGEnum.THEME.bigFont,
                 Position = UDim2.fromScale(0.65, 0.5),
-                Size = UDim2.fromScale(0.558766, 0.292045),
+                Size = UDim2.fromScale(0.55, 0.3),
                 TextColor3 = color,
                 TextScaled = true,
                 Text = formattedText,
-            }, {
-                uIStroke = e("UIStroke"),
             }),
 
             hitIconShadow = e("ImageLabel", {
                 AnchorPoint = Vector2.new(0, 0.5),
                 BackgroundTransparency = 1,
-                Image = "rbxassetid://105204636581390",
+                ImageTransparency = instanceBinding:map(function(p)
+                    return p
+                end),
+                Image = FFGEnum.UI.Icons.Sword,
                 ImageColor3 = Color3.new(),
                 Position = UDim2.fromScale(0.21, 0.51),
-                Size = UDim2.fromScale(0.266367, 0.549909),
+                Size = UDim2.fromScale(0.4, 0.55),
             }, {
                 uIAspectRatioConstraint = e("UIAspectRatioConstraint"),
             }),
