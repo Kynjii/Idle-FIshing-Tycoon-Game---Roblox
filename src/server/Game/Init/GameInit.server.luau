@@ -11,7 +11,6 @@ if IsStudio then
     _G.__DEV__ = true
 end
 
-local TableUtil = require(ReplicatedStorage.Packages.TableUtil)
 local Events = require(ReplicatedStorage.Shared.Events.Events)
 local FFGHelpers = require(ServerScriptService.Server.Modules.FFGHelpers)
 local PlayerDataTemplate = require(ServerScriptService.Server.Modules.PlayerDataTemplate)

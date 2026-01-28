@@ -239,7 +239,7 @@ function TeamManager.AssignTeam(player: Player): number?
             player.TeamColor = team.TeamColor
             player.Neutral = false
 
-            player:LoadCharacter()
+            player:LoadCharacterAsync()
 
             return i
         end
